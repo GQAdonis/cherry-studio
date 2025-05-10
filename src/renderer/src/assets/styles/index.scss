@@ -5,19 +5,21 @@
 @use './animation.scss';
 @import '../fonts/icon-fonts/iconfont.css';
 @import '../fonts/ubuntu/ubuntu.css';
+@import '../fonts/roboto/roboto.css';
+@import '../fonts/inter/inter.css';
 
 :root {
   --color-white: #ffffff;
   --color-white-soft: rgba(255, 255, 255, 0.8);
   --color-white-mute: rgba(255, 255, 255, 0.94);
 
-  --color-black: #181818;
-  --color-black-soft: #222222;
-  --color-black-mute: #333333;
+  --color-black: #0A192D; /* Prometheus Navy */
+  --color-black-soft: #0F2440; /* Prometheus Light Navy */
+  --color-black-mute: #333333; /* Prometheus Dark Gray */
 
-  --color-gray-1: #515c67;
-  --color-gray-2: #414853;
-  --color-gray-3: #32363f;
+  --color-gray-1: #CCCCCC; /* Prometheus Medium Gray */
+  --color-gray-2: #F5F5F5; /* Prometheus Light Gray */
+  --color-gray-3: #F8F8F8; /* Prometheus Ultra Light Gray */
 
   --color-text-1: rgba(255, 255, 245, 0.9);
   --color-text-2: rgba(235, 235, 245, 0.6);
@@ -26,12 +28,12 @@
   --color-background: var(--color-black);
   --color-background-soft: var(--color-black-soft);
   --color-background-mute: var(--color-black-mute);
-  --color-background-opacity: rgba(34, 34, 34, 0.7);
+  --color-background-opacity: rgba(10, 25, 45, 0.7);
   --inner-glow-opacity: 0.3; // For the glassmorphism effect in the dropdown menu
 
-  --color-primary: #00b96b;
-  --color-primary-soft: #00b96b99;
-  --color-primary-mute: #00b96b33;
+  --color-primary: #FFDD00; /* Prometheus Yellow */
+  --color-primary-soft: #FFDD0099; /* Prometheus Yellow with opacity */
+  --color-primary-mute: #FFDD0033; /* Prometheus Yellow with more opacity */
 
   --color-text: var(--color-text-1);
   --color-icon: #ffffff99;
@@ -39,22 +41,22 @@
   --color-border: #ffffff19;
   --color-border-soft: #ffffff10;
   --color-border-mute: #ffffff05;
-  --color-error: #f44336;
-  --color-link: #338cff;
-  --color-code-background: #323232;
-  --color-hover: rgba(40, 40, 40, 1);
-  --color-active: rgba(55, 55, 55, 1);
-  --color-frame-border: #333;
+  --color-error: #FF4D4D; /* Prometheus Red */
+  --color-link: #4D9FFF; /* Prometheus Light Blue */
+  --color-code-background: #0F2440; /* Prometheus Light Navy */
+  --color-hover: rgba(15, 36, 64, 1); /* Prometheus Light Navy */
+  --color-active: rgba(10, 25, 45, 1); /* Prometheus Navy */
+  --color-frame-border: #333333; /* Prometheus Dark Gray */
   --color-group-background: var(--color-background-soft);
 
-  --color-reference: #404040;
+  --color-reference: #00A3A3; /* Prometheus Turquoise */
   --color-reference-text: #ffffff;
-  --color-reference-background: #0b0e12;
+  --color-reference-background: #0A192D; /* Prometheus Navy */
 
-  --modal-background: #1f1f1f;
+  --modal-background: #0F2440; /* Prometheus Light Navy */
 
-  --navbar-background-mac: rgba(20, 20, 20, 0.55);
-  --navbar-background: #1f1f1f;
+  --navbar-background-mac: rgba(10, 25, 45, 0.55); /* Prometheus Navy with opacity */
+  --navbar-background: #0F2440; /* Prometheus Light Navy */
 
   --navbar-height: 40px;
   --sidebar-width: 50px;
@@ -65,9 +67,9 @@
   --topic-list-width: 275px;
   --settings-width: 250px;
 
-  --chat-background: #111111;
-  --chat-background-user: #28b561;
-  --chat-background-assistant: #2c2c2c;
+  --chat-background: #0A192D; /* Prometheus Navy */
+  --chat-background-user: #FFDD00; /* Prometheus Yellow */
+  --chat-background-assistant: #0F2440; /* Prometheus Light Navy */
   --chat-text-user: var(--color-black);
 
   --list-item-border-radius: 16px;
@@ -83,55 +85,55 @@ body {
 body[theme-mode='light'] {
   --color-white: #ffffff;
   --color-white-soft: rgba(0, 0, 0, 0.04);
-  --color-white-mute: #eee;
+  --color-white-mute: #F8F8F8; /* Prometheus Ultra Light Gray */
 
-  --color-black: #1b1b1f;
-  --color-black-soft: #262626;
-  --color-black-mute: #363636;
+  --color-black: #0A192D; /* Prometheus Navy */
+  --color-black-soft: #0F2440; /* Prometheus Light Navy */
+  --color-black-mute: #333333; /* Prometheus Dark Gray */
 
-  --color-gray-1: #8e8e93;
-  --color-gray-2: #aeaeb2;
-  --color-gray-3: #c7c7cc;
+  --color-gray-1: #CCCCCC; /* Prometheus Medium Gray */
+  --color-gray-2: #F5F5F5; /* Prometheus Light Gray */
+  --color-gray-3: #F8F8F8; /* Prometheus Ultra Light Gray */
 
-  --color-text-1: rgba(0, 0, 0, 1);
-  --color-text-2: rgba(0, 0, 0, 0.6);
-  --color-text-3: rgba(0, 0, 0, 0.38);
+  --color-text-1: rgba(10, 25, 45, 1); /* Prometheus Navy */
+  --color-text-2: rgba(10, 25, 45, 0.6); /* Prometheus Navy with opacity */
+  --color-text-3: rgba(10, 25, 45, 0.38); /* Prometheus Navy with more opacity */
 
   --color-background: var(--color-white);
   --color-background-soft: var(--color-white-soft);
   --color-background-mute: var(--color-white-mute);
-  --color-background-opacity: rgba(235, 235, 235, 0.7);
+  --color-background-opacity: rgba(248, 248, 248, 0.7); /* Prometheus Ultra Light Gray with opacity */
   --inner-glow-opacity: 0.1;
 
-  --color-primary: #00b96b;
-  --color-primary-soft: #00b96b99;
-  --color-primary-mute: #00b96b33;
+  --color-primary: #FFDD00; /* Prometheus Yellow */
+  --color-primary-soft: #FFDD0099; /* Prometheus Yellow with opacity */
+  --color-primary-mute: #FFDD0033; /* Prometheus Yellow with more opacity */
 
   --color-text: var(--color-text-1);
-  --color-icon: #00000099;
-  --color-icon-white: #000000;
-  --color-border: #00000019;
-  --color-border-soft: #00000010;
-  --color-border-mute: #00000005;
-  --color-error: #f44336;
-  --color-link: #1677ff;
-  --color-code-background: #e3e3e3;
+  --color-icon: #0A192D99; /* Prometheus Navy with opacity */
+  --color-icon-white: #0A192D; /* Prometheus Navy */
+  --color-border: #0A192D19; /* Prometheus Navy with opacity */
+  --color-border-soft: #0A192D10; /* Prometheus Navy with opacity */
+  --color-border-mute: #0A192D05; /* Prometheus Navy with opacity */
+  --color-error: #FF4D4D; /* Prometheus Red */
+  --color-link: #00A3A3; /* Prometheus Turquoise */
+  --color-code-background: #F5F5F5; /* Prometheus Light Gray */
   --color-hover: var(--color-white-mute);
   --color-active: var(--color-white-soft);
-  --color-frame-border: #ddd;
+  --color-frame-border: #CCCCCC; /* Prometheus Medium Gray */
   --color-group-background: var(--color-white);
 
-  --color-reference: #cfe1ff;
-  --color-reference-text: #000000;
-  --color-reference-background: #f1f7ff;
+  --color-reference: #4D9FFF; /* Prometheus Light Blue */
+  --color-reference-text: #0A192D; /* Prometheus Navy */
+  --color-reference-background: #F8F8F8; /* Prometheus Ultra Light Gray */
 
   --modal-background: var(--color-white);
 
-  --navbar-background-mac: rgba(255, 255, 255, 0.55);
-  --navbar-background: rgba(244, 244, 244);
+  --navbar-background-mac: rgba(248, 248, 248, 0.55); /* Prometheus Ultra Light Gray with opacity */
+  --navbar-background: rgba(245, 245, 245); /* Prometheus Light Gray */
 
-  --chat-background: #f3f3f3;
-  --chat-background-user: #95ec69;
+  --chat-background: #F8F8F8; /* Prometheus Ultra Light Gray */
+  --chat-background-user: #FFDD00; /* Prometheus Yellow */
   --chat-background-assistant: #ffffff;
   --chat-text-user: var(--color-text);
 }
@@ -164,12 +166,17 @@ body {
   line-height: 1.6;
   overflow: hidden;
   font-family:
-    -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue',
+    'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue',
     sans-serif;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   transition: background-color 0.3s linear;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Inter', sans-serif;
+  font-weight: 700;
 }
 
 input,
@@ -289,4 +296,35 @@ body,
 
 .lucide {
   color: var(--color-icon);
+}
+
+/* Prometheus Flame Gradient Utilities */
+.text-prometheus-gradient {
+  background: linear-gradient(to bottom, #ffdd00, #ff5500, #ff4d4d, #0a192d);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.bg-prometheus-gradient {
+  background: linear-gradient(to bottom, #ffdd00, #ff5500, #ff4d4d, #0a192d);
+}
+
+.prometheus-flame-icon {
+  width: 40px;
+  height: 60px;
+  position: relative;
+  background: linear-gradient(to bottom, #ffdd00, #ff5500, #ff4d4d, #0a192d);
+  border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+}
+
+.flame-inner {
+  position: absolute;
+  top: 15%;
+  left: 20%;
+  right: 20%;
+  bottom: 10%;
+  background: linear-gradient(to bottom, #ffdd00, #ff5500, #ff4d4d, #0a192d);
+  border-radius: 50% 50% 35% 35% / 50% 50% 50% 50%;
+  opacity: 0.7;
 }

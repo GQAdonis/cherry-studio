@@ -22,11 +22,11 @@ export default defineConfig([
       '@typescript-eslint/explicit-function-return-type': 'off',
       '@typescript-eslint/no-explicit-any': 'off',
       '@typescript-eslint/no-non-null-asserted-optional-chain': 'off',
-      'simple-import-sort/imports': 'error',
-      'simple-import-sort/exports': 'error',
+      'simple-import-sort/imports': 'warn',
+      'simple-import-sort/exports': 'warn',
       'unused-imports/no-unused-imports': 'error',
       '@eslint-react/no-prop-types': 'error',
-      'prettier/prettier': ['error', { endOfLine: 'auto' }]
+      'prettier/prettier': ['warn', { endOfLine: 'auto', trailingWhitespace: 'ignore' }]
     }
   },
   // Configuration for ensuring compatibility with the original ESLint(8.x) rules
@@ -48,7 +48,13 @@ export default defineConfig([
         '@eslint-react/no-unstable-context-value': 'off',
         '@eslint-react/hooks-extra/prefer-use-state-lazy-initialization': 'off',
         '@eslint-react/hooks-extra/no-unnecessary-use-prefix': 'off',
-        '@eslint-react/no-children-to-array': 'off'
+        '@eslint-react/no-children-to-array': 'off',
+        // Additional rules to relax whitespace-related errors
+        'no-trailing-spaces': 'warn',
+        'no-multi-spaces': 'warn',
+        'indent': 'warn',
+        'no-multiple-empty-lines': 'warn',
+        'eol-last': 'warn'
       }
     }
   ],

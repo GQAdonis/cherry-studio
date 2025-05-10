@@ -1,25 +1,24 @@
 <h1 align="center">
-  <a href="https://github.com/CherryHQ/cherry-studio/releases">
-    <img src="https://github.com/CherryHQ/cherry-studio/blob/main/build/icon.png?raw=true" width="150" height="150" alt="banner" /><br>
+  <a href="https://github.com/PrometheusAGS/prometheus-studio/releases">
+    <img src="https://jbcnstuqzsjcsvirfksn.supabase.co/storage/v1/object/public/branding/flame_transparent.png" width="150" height="150" alt="banner" /><br>
   </a>
 </h1>
   <p align="center">English | <a href="./docs/README.zh.md">中文</a> | <a href="./docs/README.ja.md">日本語</a><br></p>
 <div align="center">
- <a href="https://trendshift.io/repositories/11772" target="_blank"><img src="https://trendshift.io/api/badge/repositories/11772" alt="kangfenmao%2Fcherry-studio | Trendshift" style="width: 250px; height: 55px;" width="250" height="55"/></a>
- <a href="https://www.producthunt.com/posts/cherry-studio?embed=true&utm_source=badge-featured&utm_medium=badge&utm_souce=badge-cherry&#0045;studio" target="_blank"><img src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=496640&theme=light" alt="Cherry&#0032;Studio - AI&#0032;Chatbots&#0044;&#0032;AI&#0032;Desktop&#0032;Client | Product Hunt" style="width: 250px; height: 54px;" width="250" height="54" /></a>
+ <a href="https://trendshift.io/repositories/11772" target="_blank"><img src="https://trendshift.io/api/badge/repositories/11772" alt="PrometheusAGS%2Fprometheus-studio | Trendshift" style="width: 250px; height: 55px;" width="250" height="55"/></a>
 </div>
 
-# 🍒 Cherry Studio
+# 🔥 Prometheus Studio
 
-Cherry Studio is a desktop client that supports for multiple LLM providers, available on Windows, Mac and Linux.
+Prometheus Studio is a desktop client that supports multiple LLM providers, available on Windows, Mac and Linux.
 
-👏 Join [Telegram Group](https://t.me/CherryStudioAI)｜[Discord](https://discord.gg/wez8HtpxqQ) | [QQ Group(575014769)](https://qm.qq.com/q/lo0D4qVZKi)
+👏 Join [Discord](https://discord.gg/wez8HtpxqQ)
 
-❤️ Like Cherry Studio? Give it a star 🌟 or [Sponsor](docs/sponsor.md) to support the development!
+❤️ Like Prometheus Studio? Give it a star 🌟 or [Sponsor](docs/sponsor.md) to support the development!
 
 # 📖 Guide
 
-https://docs.cherry-ai.com
+https://docs.prometheusags.ai
 
 # 🌠 Screenshot
 
@@ -82,11 +81,8 @@ https://docs.cherry-ai.com
 
 # 🌈 Theme
 
-- Theme Gallery: https://cherrycss.com
-- Aero Theme: https://github.com/hakadao/CherryStudio-Aero
-- PaperMaterial Theme: https://github.com/rainoffallingstar/CherryStudio-PaperMaterial
-- Claude dynamic-style: https://github.com/bjl101501/CherryStudio-Claudestyle-dynamic
-- Maple Neon Theme: https://github.com/BoningtonChen/CherryStudio_themes
+- Theme Gallery: https://prometheusags.ai/themes
+- Prometheus Navy Theme: Default theme with the Prometheus color palette
 
 Welcome PR for more themes
 
@@ -96,7 +92,7 @@ Refer to the [development documentation](docs/dev.md)
 
 # 🤝 Contributing
 
-We welcome contributions to Cherry Studio! Here are some ways you can contribute:
+We welcome contributions to Prometheus Studio! Here are some ways you can contribute:
 
 1. **Contribute Code**: Develop new features or optimize existing code.
 2. **Fix Bugs**: Submit fixes for any bugs you find.
@@ -104,7 +100,7 @@ We welcome contributions to Cherry Studio! Here are some ways you can contribute
 4. **Product Design**: Participate in design discussions.
 5. **Write Documentation**: Improve user manuals and guides.
 6. **Community Engagement**: Join discussions and help users.
-7. **Promote Usage**: Spread the word about Cherry Studio.
+7. **Promote Usage**: Spread the word about Prometheus Studio.
 
 ## Getting Started
 
@@ -132,7 +128,7 @@ Thank you for your support and contributions!
 
 # 🌐 Community
 
-[Telegram](https://t.me/CherryStudioAI) | [Email](mailto:support@cherry-ai.com) | [Twitter](https://x.com/kangfenmao)
+[Discord](https://discord.gg/wez8HtpxqQ) | [Email](mailto:support@prometheusags.ai) | [Twitter](https://x.com/prometheusags)
 
 # ☕ Sponsor
 
@@ -144,8 +140,8 @@ Thank you for your support and contributions!
 
 # ✉️ Contact
 
-yinsenho@cherry-ai.com
+support@prometheusags.ai
 
 # ⭐️ Star History
 
-[![Star History Chart](https://api.star-history.com/svg?repos=kangfenmao/cherry-studio&type=Timeline)](https://star-history.com/#kangfenmao/cherry-studio&Timeline)
+[![Star History Chart](https://api.star-history.com/svg?repos=PrometheusAGS/prometheus-studio&type=Timeline)](https://star-history.com/#PrometheusAGS/prometheus-studio&Timeline)

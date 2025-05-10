@@ -196,7 +196,18 @@ const ModelList: React.FC<ModelListProps> = ({ providerId, modelStatuses = [], s
   }, [modelGroups])
 
   const onManageModel = useCallback(() => {
-    EditModelsPopup.show({ provider })
+    console.log('ModelList: onManageModel called for provider:', provider.id)
+    try {
+      EditModelsPopup.show({ provider })
+        .then(() => {
+          console.log('ModelList: EditModelsPopup.show promise resolved')
+        })
+        .catch((error) => {
+          console.error('ModelList: EditModelsPopup.show promise rejected:', error)
+        })
+    } catch (error) {
+      console.error('ModelList: Error showing EditModelsPopup:', error)
+    }
   }, [provider])
 
   const onAddModel = useCallback(

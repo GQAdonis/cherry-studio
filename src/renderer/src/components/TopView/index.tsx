@@ -47,13 +47,18 @@ const TopViewContainer: React.FC<Props> = ({ children }) => {
   }
 
   onShow = ({ element, id }: ElementItem) => {
+    console.log(`[TopView] Showing element with id: ${id}`)
     if (!elementsRef.current.find((el) => el.id === id)) {
+      console.log(`[TopView] Adding new element with id: ${id}`)
       elementsRef.current = elementsRef.current.concat([{ element, id }])
       setElements(elementsRef.current)
+    } else {
+      console.log(`[TopView] Element with id: ${id} already exists`)
     }
   }
 
   onHide = (id: string) => {
+    console.log(`[TopView] Hiding element with id: ${id}`)
     elementsRef.current = elementsRef.current.filter((el) => el.id !== id)
     setElements(elementsRef.current)
   }
@@ -64,6 +69,7 @@ const TopViewContainer: React.FC<Props> = ({ children }) => {
   }
 
   const FullScreenContainer: React.FC<PropsWithChildren> = useCallback(({ children }) => {
+    console.log('[TopView] Rendering FullScreenContainer with children:', children)
     return (
       <Box flex={1} position="absolute" w="100%" h="100%">
         <Box position="absolute" w="100%" h="100%" onClick={onPop} />
@@ -78,11 +84,14 @@ const TopViewContainer: React.FC<Props> = ({ children }) => {
       {messageContextHolder}
       {modalContextHolder}
       <TopViewMinappContainer />
-      {elements.map(({ element: Element, id }) => (
-        <FullScreenContainer key={`TOPVIEW_${id}`}>
-          {typeof Element === 'function' ? <Element /> : Element}
-        </FullScreenContainer>
-      ))}
+      {elements.map(({ element: Element, id }) => {
+        console.log(`[TopView] Rendering element with id: ${id}, type: ${typeof Element}`)
+        return (
+          <FullScreenContainer key={`TOPVIEW_${id}`}>
+            {typeof Element === 'function' ? <Element /> : Element}
+          </FullScreenContainer>
+        )
+      })}
     </>
   )
 }

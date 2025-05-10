@@ -1,7 +1,17 @@
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+
 import { LoadingOutlined, MinusOutlined, PlusOutlined } from '@ant-design/icons'
+import { Avatar, Button, Empty, Flex, Modal, Tabs, Tooltip, Typography } from 'antd'
+import Input from 'antd/es/input/Input'
+import { groupBy, isEmpty, uniqBy } from 'lodash'
+import { Search } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
+import styled from 'styled-components'
+
 import CustomCollapse from '@renderer/components/CustomCollapse'
 import CustomTag from '@renderer/components/CustomTag'
 import ModelTagsWithLabel from '@renderer/components/ModelTagsWithLabel'
+import { TopView } from '@renderer/components/TopView'
 import {
   getModelLogo,
   groupQwenModels,
@@ -18,15 +28,6 @@ import FileItem from '@renderer/pages/files/FileItem'
 import { fetchModels } from '@renderer/services/ApiService'
 import { Model, Provider } from '@renderer/types'
 import { getDefaultGroupName, isFreeModel, runAsyncFunction } from '@renderer/utils'
-import { Avatar, Button, Empty, Flex, Modal, Tabs, Tooltip, Typography } from 'antd'
-import Input from 'antd/es/input/Input'
-import { groupBy, isEmpty, uniqBy } from 'lodash'
-import { Search } from 'lucide-react'
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { useTranslation } from 'react-i18next'
-import styled from 'styled-components'
-
-import { TopView } from '../../../components/TopView'
 
 interface ShowParams {
   provider: Provider
@@ -97,11 +98,17 @@ const PopupContainer: React.FC<Props> = ({ provider: _provider, resolve }) => {
     [list, provider.id]
   )
 
-  const onOk = useCallback(() => setOpen(false), [])
-
-  const onCancel = useCallback(() => setOpen(false), [])
-
   const onClose = useCallback(() => resolve({}), [resolve])
+
+  const onOk = useCallback(() => {
+    setOpen(false)
+    onClose()
+  }, [onClose])
+
+  const onCancel = useCallback(() => {
+    setOpen(false)
+    onClose()
+  }, [onClose])
 
   const onAddModel = useCallback(
     (model: Model) => {
@@ -118,23 +125,28 @@ const PopupContainer: React.FC<Props> = ({ provider: _provider, resolve }) => {
     runAsyncFunction(async () => {
       try {
         setLoading(true)
+        console.log('EditModelsPopup: Fetching models for provider:', _provider.id)
         const models = await fetchModels(_provider)
-        setListModels(
-          models
-            .map((model) => ({
-              id: model.id,
-              // @ts-ignore name
-              name: model.name || model.id,
-              provider: _provider.id,
-              group: getDefaultGroupName(model.id, _provider.id),
-              // @ts-ignore name
-              description: model?.description,
-              owned_by: model?.owned_by
-            }))
-            .filter((model) => !isEmpty(model.name))
-        )
+        console.log('EditModelsPopup: Fetched models count:', models.length)
+
+        const processedModels = models
+          .map((model) => ({
+            id: model.id,
+            // @ts-ignore name
+            name: model.name || model.id,
+            provider: _provider.id,
+            group: getDefaultGroupName(model.id, _provider.id),
+            // @ts-ignore name
+            description: model?.description,
+            owned_by: model?.owned_by
+          }))
+          .filter((model) => !isEmpty(model.name))
+
+        console.log('EditModelsPopup: Processed models count:', processedModels.length)
+        setListModels(processedModels)
         setLoading(false)
       } catch (error) {
+        console.error('EditModelsPopup: Error fetching models:', error)
         setLoading(false)
       }
     })
@@ -148,6 +160,18 @@ const PopupContainer: React.FC<Props> = ({ provider: _provider, resolve }) => {
       }, 100)
     }
   }, [open])
+
+  // Log model groups whenever they change
+  useEffect(() => {
+    console.log('EditModelsPopup: Model groups changed:', {
+      groupCount: Object.keys(modelGroups).length,
+      groups: Object.keys(modelGroups),
+      modelCounts: Object.keys(modelGroups).map((group) => ({
+        group,
+        count: modelGroups[group].length
+      }))
+    })
+  }, [modelGroups])
 
   const ModalHeader = () => {
     return (
@@ -219,13 +243,32 @@ const PopupContainer: React.FC<Props> = ({ provider: _provider, resolve }) => {
     [modelGroups, provider, onRemoveModel, onAddModel, t]
   )
 
+  console.log('EditModelsPopup: Rendering with state:', {
+    open,
+    loading,
+    modelCount: list.length,
+    groupCount: Object.keys(modelGroups).length
+  })
+
+  // Log when the component is about to render the modal
+  console.log('EditModelsPopup: About to render Modal with open state:', open)
+
   return (
     <Modal
       title={<ModalHeader />}
       open={open}
-      onOk={onOk}
-      onCancel={onCancel}
-      afterClose={onClose}
+      onOk={() => {
+        console.log('EditModelsPopup: Modal OK button clicked')
+        onOk()
+      }}
+      onCancel={() => {
+        console.log('EditModelsPopup: Modal Cancel button clicked')
+        onCancel()
+      }}
+      afterClose={() => {
+        console.log('EditModelsPopup: Modal afterClose triggered')
+        onClose()
+      }}
       footer={null}
       width="800px"
       styles={{
@@ -402,20 +445,38 @@ const ModelHeaderTitle = styled.div`
 export default class EditModelsPopup {
   static topviewId = 0
   static hide() {
+    console.log('EditModelsPopup: Hiding popup')
     TopView.hide('EditModelsPopup')
   }
   static show(props: ShowParams) {
+    console.log('EditModelsPopup: Showing popup for provider:', props.provider.id)
+    console.log('EditModelsPopup: Provider details:', {
+      id: props.provider.id,
+      type: props.provider.type,
+      apiHost: props.provider.apiHost,
+      modelCount: props.provider.models?.length || 0
+    })
+
     return new Promise<any>((resolve) => {
-      TopView.show(
-        <PopupContainer
-          {...props}
-          resolve={(v) => {
-            resolve(v)
-            this.hide()
-          }}
-        />,
-        'EditModelsPopup'
-      )
+      try {
+        console.log('EditModelsPopup: About to call TopView.show')
+        const popupElement = (
+          <PopupContainer
+            {...props}
+            resolve={(v) => {
+              console.log('EditModelsPopup: Resolving popup')
+              resolve(v)
+              this.hide()
+            }}
+          />
+        )
+        console.log('EditModelsPopup: Created PopupContainer element')
+        TopView.show(popupElement, 'EditModelsPopup')
+        console.log('EditModelsPopup: Called TopView.show')
+      } catch (error) {
+        console.error('EditModelsPopup: Error showing popup:', error)
+        resolve({})
+      }
     })
   }
 }

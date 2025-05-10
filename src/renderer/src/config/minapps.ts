@@ -56,14 +56,14 @@ import OpenAiProviderLogo from '@renderer/assets/images/providers/openai.png?url
 import SiliconFlowProviderLogo from '@renderer/assets/images/providers/silicon.png?url'
 import { MinAppType } from '@renderer/types'
 
-// 加载自定义小应用
+// Load custom mini apps
 const loadCustomMiniApp = async (): Promise<MinAppType[]> => {
   try {
     let content: string
     try {
       content = await window.api.file.read('custom-minapps.json')
     } catch (error) {
-      // 如果文件不存在，创建一个空的 JSON 数组
+      // If the file doesn't exist, create an empty JSON array
       content = '[]'
       await window.api.file.writeWithId('custom-minapps.json', content)
     }
@@ -83,7 +83,7 @@ const loadCustomMiniApp = async (): Promise<MinAppType[]> => {
   }
 }
 
-// 初始化默认小应用
+// Initialize default mini apps
 const ORIGIN_DEFAULT_MIN_APPS: MinAppType[] = [
   {
     id: 'openai',
@@ -112,14 +112,14 @@ const ORIGIN_DEFAULT_MIN_APPS: MinAppType[] = [
   },
   {
     id: 'yi',
-    name: '万知',
+    name: 'Wanzhi',
     url: 'https://www.wanzhi.com/',
     logo: WanZhiAppLogo,
     bodered: true
   },
   {
     id: 'zhipu',
-    name: '智谱清言',
+    name: 'Zhipu Qingyan',
     url: 'https://chatglm.cn/main/alltoolsdetail',
     logo: ZhipuProviderLogo
   },
@@ -131,26 +131,26 @@ const ORIGIN_DEFAULT_MIN_APPS: MinAppType[] = [
   },
   {
     id: 'baichuan',
-    name: '百小应',
+    name: 'Baixiaoying',
     url: 'https://ying.baichuan-ai.com/chat',
     logo: BaicuanAppLogo
   },
   {
     id: 'dashscope',
-    name: '通义千问',
+    name: 'Tongyi Qianwen',
     url: 'https://tongyi.aliyun.com/qianwen/',
     logo: QwenModelLogo
   },
   {
     id: 'stepfun',
-    name: '跃问',
+    name: 'Yuewen',
     url: 'https://yuewen.cn/chats/new',
     logo: YuewenAppLogo,
     bodered: true
   },
   {
     id: 'doubao',
-    name: '豆包',
+    name: 'Doubao',
     url: 'https://www.doubao.com/chat/',
     logo: DoubaoAppLogo
   },
@@ -162,7 +162,7 @@ const ORIGIN_DEFAULT_MIN_APPS: MinAppType[] = [
   },
   {
     id: 'minimax',
-    name: '海螺',
+    name: 'Hailuo',
     url: 'https://hailuoai.com/',
     logo: HailuoModelLogo
   },
@@ -180,13 +180,13 @@ const ORIGIN_DEFAULT_MIN_APPS: MinAppType[] = [
   },
   {
     id: 'baidu-ai-chat',
-    name: '文心一言',
+    name: 'Wenxin Yiyan',
     logo: BaiduAiAppLogo,
     url: 'https://yiyan.baidu.com/'
   },
   {
     id: 'baidu-ai-search',
-    name: '百度AI搜索',
+    name: 'Baidu AI Search',
     logo: BaiduAiSearchLogo,
     url: 'https://chat.baidu.com/',
     bodered: true,
@@ -196,14 +196,14 @@ const ORIGIN_DEFAULT_MIN_APPS: MinAppType[] = [
   },
   {
     id: 'tencent-yuanbao',
-    name: '腾讯元宝',
+    name: 'Tencent Yuanbao',
     logo: TencentYuanbaoAppLogo,
     url: 'https://yuanbao.tencent.com/chat',
     bodered: true
   },
   {
     id: 'sensetime-chat',
-    name: '商量',
+    name: 'Shangliang',
     logo: SensetimeAppLogo,
     url: 'https://chat.sensetime.com/wb/chat',
     bodered: true
@@ -216,7 +216,7 @@ const ORIGIN_DEFAULT_MIN_APPS: MinAppType[] = [
   },
   {
     id: 'metaso',
-    name: '秘塔AI搜索',
+    name: 'Metaso AI Search',
     logo: MetasoAppLogo,
     url: 'https://metaso.cn/'
   },
@@ -240,7 +240,7 @@ const ORIGIN_DEFAULT_MIN_APPS: MinAppType[] = [
   },
   {
     id: 'tiangong-ai',
-    name: '天工AI',
+    name: 'Tiangong AI',
     logo: TiangongAiLogo,
     url: 'https://www.tiangong.cn/',
     bodered: true
@@ -274,14 +274,14 @@ const ORIGIN_DEFAULT_MIN_APPS: MinAppType[] = [
   },
   {
     id: 'nm',
-    name: '纳米AI',
+    name: 'Nami AI',
     logo: NamiAiLogo,
     url: 'https://bot.n.cn/',
     bodered: true
   },
   {
     id: 'nm-search',
-    name: '纳米AI搜索',
+    name: 'Nami AI Search',
     logo: NamiAiSearchLogo,
     url: 'https://www.n.cn/',
     bodered: true
@@ -357,7 +357,7 @@ const ORIGIN_DEFAULT_MIN_APPS: MinAppType[] = [
   },
   {
     id: 'xiaoyi',
-    name: '小艺',
+    name: 'Xiaoyi',
     logo: XiaoYiAppLogo,
     url: 'https://xiaoyi.huawei.com/chat/',
     bodered: true
@@ -379,7 +379,7 @@ const ORIGIN_DEFAULT_MIN_APPS: MinAppType[] = [
     id: 'dify',
     name: 'Dify',
     logo: DifyAppLogo,
-    url: 'https://cloud.dify.ai/apps',
+    url: 'https://dify.skytok.net',
     bodered: true,
     style: {
       padding: 5
@@ -387,7 +387,7 @@ const ORIGIN_DEFAULT_MIN_APPS: MinAppType[] = [
   },
   {
     id: 'wpslingxi',
-    name: 'WPS灵犀',
+    name: 'WPS Lingxi',
     logo: WPSLingXiLogo,
     url: 'https://copilot.wps.cn/',
     bodered: true
@@ -428,14 +428,14 @@ const ORIGIN_DEFAULT_MIN_APPS: MinAppType[] = [
   },
   {
     id: 'zhihu',
-    name: '知乎直答',
+    name: 'Zhihu Zhida',
     logo: ZhihuAppLogo,
     url: 'https://zhida.zhihu.com/',
     bodered: true
   },
   {
     id: 'dangbei',
-    name: '当贝AI',
+    name: 'Dangbei AI',
     logo: DangbeiLogo,
     url: 'https://ai.dangbei.com/',
     bodered: true
@@ -462,7 +462,7 @@ const ORIGIN_DEFAULT_MIN_APPS: MinAppType[] = [
   }
 ]
 
-// 加载自定义小应用并合并到默认应用中
+// Load custom mini apps and merge with default apps
 let DEFAULT_MIN_APPS = [...ORIGIN_DEFAULT_MIN_APPS, ...(await loadCustomMiniApp())]
 
 function updateDefaultMinApps(param) {

@@ -299,9 +299,9 @@ class FileStorage {
   ): Promise<{ fileName: string; filePath: string; content: Buffer } | null> => {
     try {
       const result: OpenDialogReturnValue = await dialog.showOpenDialog({
-        title: '打开文件',
+        title: 'Open File',
         properties: ['openFile'],
-        filters: [{ name: '所有文件', extensions: ['*'] }],
+        filters: [{ name: 'All Files', extensions: ['*'] }],
         ...options
       })
 
@@ -331,7 +331,7 @@ class FileStorage {
   ): Promise<string | null> => {
     try {
       const result: SaveDialogReturnValue = await dialog.showSaveDialog({
-        title: '保存文件',
+        title: 'Save File',
         defaultPath: fileName,
         ...options
       })

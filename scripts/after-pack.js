@@ -9,7 +9,7 @@ exports.default = async function (context) {
   if (platform === 'mac') {
     const node_modules_path = path.join(
       context.appOutDir,
-      'Cherry Studio.app',
+      'Prometheus Studio.app',
       'Contents',
       'Resources',
       'app.asar.unpacked',
@@ -39,7 +39,7 @@ exports.default = async function (context) {
 }
 
 /**
- * 使用指定架构的 node_modules 文件
+ * Use node_modules files for the specified architecture
  * @param {*} nodeModulesPath
  * @param {*} packageName
  * @param {*} arch

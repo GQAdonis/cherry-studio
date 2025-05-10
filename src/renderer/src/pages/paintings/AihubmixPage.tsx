@@ -203,7 +203,7 @@ const AihubmixPage: FC<{ Options: string[] }> = ({ Options }) => {
 
       if (!response.ok) {
         const errorData = await response.json()
-        throw new Error(errorData.error?.message || '生成图像失败')
+        throw new Error(errorData.error?.message || 'Failed to generate image')
       }
 
       const data = await response.json()
@@ -215,7 +215,7 @@ const AihubmixPage: FC<{ Options: string[] }> = ({ Options }) => {
             try {
               return await window.api.file.download(url)
             } catch (error) {
-              console.error('下载图像失败:', error)
+              console.error('Failed to download image:', error)
               return null
             }
           })
@@ -469,7 +469,7 @@ const AihubmixPage: FC<{ Options: string[] }> = ({ Options }) => {
             }}>
             {painting[item.key!] ? (
               <ImagePreview>
-                <img src={'file://' + painting[item.key!]} alt="预览图" />
+                <img src={'file://' + painting[item.key!]} alt="Preview" />
               </ImagePreview>
             ) : (
               <ImageSizeImage src={IcImageUp} theme={theme} />
@@ -736,7 +736,7 @@ const ImageUploadButton = styled(Upload)`
   }
 `
 
-// 修改 ImagePreview 组件，添加悬停效果
+// Modified ImagePreview component, added hover effect
 const ImagePreview = styled.div`
   width: 100%;
   height: 100%;
@@ -751,7 +751,7 @@ const ImagePreview = styled.div`
   }
 
   &:hover::after {
-    content: '点击替换';
+    content: 'Click to Replace';
     position: absolute;
     top: 0;
     left: 0;

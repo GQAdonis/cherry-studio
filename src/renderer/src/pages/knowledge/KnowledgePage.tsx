@@ -129,8 +129,12 @@ const KnowledgePage: FC = () => {
           </ScrollContainer>
         </SideNav>
         {bases.length === 0 ? (
-          <MainContent>
-            <Empty description={t('knowledge.empty')} image={Empty.PRESENTED_IMAGE_SIMPLE} />
+          <MainContent style={{ justifyContent: 'center', alignItems: 'center' }}>
+            <Empty
+              description={t('knowledge.empty')}
+              image={Empty.PRESENTED_IMAGE_SIMPLE}
+              imageStyle={{ opacity: 0.7, filter: 'brightness(1.2)' }}
+            />
           </MainContent>
         ) : selectedBase ? (
           <KnowledgeContent selectedBase={selectedBase} />

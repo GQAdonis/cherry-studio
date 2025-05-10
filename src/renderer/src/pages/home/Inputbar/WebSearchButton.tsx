@@ -74,7 +74,7 @@ const WebSearchButton: FC<Props> = ({ ref, assistant, ToolbarButton }) => {
       action: () => updateSelectedWebSearchBuiltin()
     })
     items.push({
-      label: '前往设置' + '...',
+      label: 'Go to Settings' + '...',
       icon: <Settings />,
       action: () => navigate('/settings/web-search')
     })

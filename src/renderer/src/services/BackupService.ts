@@ -17,7 +17,7 @@ export async function backup() {
 }
 
 export async function restore() {
-  const file = await window.api.file.open({ filters: [{ name: '备份文件', extensions: ['bak', 'zip'] }] })
+  const file = await window.api.file.open({ filters: [{ name: 'Backup Files', extensions: ['bak', 'zip'] }] })
 
   if (file) {
     try {

@@ -1128,11 +1128,15 @@ export default class OpenAICompatibleProvider extends BaseOpenAiProvider {
    */
   public async models(): Promise<OpenAI.Models.Model[]> {
     try {
+      console.log(`[OpenAICompatibleProvider] Fetching models for provider: ${this.provider.id}`)
       await this.checkIsCopilot()
 
+      console.log(`[OpenAICompatibleProvider] Calling SDK models.list for ${this.provider.id}`)
       const response = await this.sdk.models.list()
+      console.log(`[OpenAICompatibleProvider] SDK models.list response received for ${this.provider.id}`)
 
       if (this.provider.id === 'github') {
+        console.log(`[OpenAICompatibleProvider] Processing GitHub models`)
         // @ts-ignore key is not typed
         return response.body
           .map((model) => ({
@@ -1145,6 +1149,7 @@ export default class OpenAICompatibleProvider extends BaseOpenAiProvider {
       }
 
       if (this.provider.id === 'together') {
+        console.log(`[OpenAICompatibleProvider] Processing Together models`)
         // @ts-ignore key is not typed
         return response?.body
           .map((model: any) => ({
@@ -1156,13 +1161,25 @@ export default class OpenAICompatibleProvider extends BaseOpenAiProvider {
           .filter(isSupportedModel)
       }
 
+      if (this.provider.id === 'openrouter') {
+        console.log(`[OpenAICompatibleProvider] Processing OpenRouter models, response:`, response)
+      }
+
       const models = response.data || []
+      console.log(`[OpenAICompatibleProvider] Got ${models.length} models for ${this.provider.id}`)
+      
       models.forEach((model) => {
         model.id = model.id.trim()
       })
 
-      return models.filter(isSupportedModel)
+      const filteredModels = models.filter(isSupportedModel)
+      console.log(
+        `[OpenAICompatibleProvider] Returning ${filteredModels.length} filtered models for ${this.provider.id}`
+      )
+      
+      return filteredModels
     } catch (error) {
+      console.error(`[OpenAICompatibleProvider] Error fetching models for ${this.provider.id}:`, error)
       return []
     }
   }
