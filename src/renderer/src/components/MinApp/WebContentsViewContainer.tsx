@@ -1,6 +1,5 @@
-import { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import './WebContentsViewContainer.css'
-import { getMinAppConfig } from '../../../../../packages/shared/config/miniapps'
 import LoadingIndicator from './LoadingIndicator'
 import { useContentAreaBounds } from '../ContentAreaManager'
 
@@ -11,6 +10,10 @@ import { useContentAreaBounds } from '../ContentAreaManager'
  *
  * This component uses ContentAreaManager to position the WebContentsView correctly within
  * the application's content area, ensuring it doesn't overlap with navigation elements.
+ *
+ * CRITICAL: This component must be used inside a ContentAreaManager to ensure proper positioning.
+ * It will position the WebContentsView exactly at the bounds provided by ContentAreaManager,
+ * which ensures it doesn't overlap with the sidebar (26px from left) or top navigation (41px from top).
  */
 const WebContentsViewContainer: React.FC<{
   appid: string
@@ -21,9 +24,8 @@ const WebContentsViewContainer: React.FC<{
 }> = ({ appid, url, onSetRefCallback, onLoadedCallback, onNavigateCallback }) => {
   // State to track loading status
   const [isLoading, setIsLoading] = useState(true)
-  // Get app configuration for icon and other metadata
-  const appConfig = getMinAppConfig(appid)
-  
+  // We don't need to use appConfig here as we're just passing the appId to the LoadingIndicator
+
   // Get content area bounds from ContentAreaManager
   const contentAreaBounds = useContentAreaBounds()
 
@@ -62,33 +64,35 @@ const WebContentsViewContainer: React.FC<{
       if (!hasCreatedView.current || !contentAreaBounds) return
 
       try {
-        // CRITICAL: Use the content area bounds from ContentAreaManager
-        // This ensures the WebContentsView is positioned exactly at 26px from left and 41px from top
+        // CRITICAL: For mini-apps within a drawer, we need to use exact positioning to ensure
+        // they don't consume the entire screen. The drawer itself is already positioned correctly
+        // relative to the sidebar and navbar, so we position the content at (0,0) within the drawer
         const bounds = {
-          x: contentAreaBounds.x, // CRITICAL: Exactly 26px from left edge
-          y: contentAreaBounds.y, // CRITICAL: Exactly 41px from top edge
-          width: contentAreaBounds.width,
-          height: contentAreaBounds.height
+          x: 0, // Position at the left edge of the drawer
+          y: 0, // Position at the top edge of the drawer
+          width: contentAreaBounds.width, // Use the full width of the drawer
+          height: contentAreaBounds.height // Use the full height of the drawer
         }
 
         // Log detailed positioning information for debugging
         console.log(`WebContentsViewContainer: Updating bounds for ${appid} with precise positioning:`, {
           ...bounds,
-          leftOffset: `${contentAreaBounds.x}px from left edge`,
-          topOffset: `${contentAreaBounds.y}px from top edge`,
+          containerWidth: contentAreaBounds.width,
+          containerHeight: contentAreaBounds.height,
           timestamp: new Date().toISOString()
         })
 
         // Show the WebContentsView with the calculated bounds
-        window.api.webContentsView.show(appid, bounds)
-          .then(result => {
+        window.api.webContentsView
+          .show(appid, bounds)
+          .then((result) => {
             if (result.success) {
               console.log(`WebContentsViewContainer: Successfully updated bounds for ${appid}`)
             } else {
               console.error(`WebContentsViewContainer: Failed to update bounds for ${appid}:`, result.error)
             }
           })
-          .catch(error => {
+          .catch((error) => {
             console.error(`WebContentsViewContainer: Error showing view for appid: ${appid}:`, error)
           })
       } catch (error) {
@@ -103,7 +107,7 @@ const WebContentsViewContainer: React.FC<{
       if (resizeTimeout) {
         clearTimeout(resizeTimeout)
       }
-      
+
       // Set a new timeout to update position after resize completes
       resizeTimeout = setTimeout(() => {
         console.log(`WebContentsViewContainer: Window resize detected for ${appid}, updating position`)
@@ -188,17 +192,27 @@ const WebContentsViewContainer: React.FC<{
           console.error(`WebContentsViewContainer: Error creating view for appid: ${appid}:`, error)
         })
     } else if (contentAreaBounds) {
-      // View already exists, just update its position using content area bounds
+      // CRITICAL: For mini-apps within a drawer, we need to use exact positioning to ensure
+      // they don't consume the entire screen. The drawer itself is already positioned correctly
+      // relative to the sidebar and navbar, so we position the content at (0,0) within the drawer
+      const bounds = {
+        x: 0, // Position at the left edge of the drawer
+        y: 0, // Position at the top edge of the drawer
+        width: contentAreaBounds.width, // Use the full width of the drawer
+        height: contentAreaBounds.height // Use the full height of the drawer
+      }
+
       console.log(`WebContentsViewContainer: Showing existing view for ${appid} with precise positioning:`, {
-        ...contentAreaBounds,
-        leftOffset: `${contentAreaBounds.x}px from left edge`,
-        topOffset: `${contentAreaBounds.y}px from top edge`,
+        ...bounds,
+        containerWidth: contentAreaBounds.width,
+        containerHeight: contentAreaBounds.height,
         timestamp: new Date().toISOString()
       })
-      
+
       // CRITICAL: Ensure precise positioning when showing existing view
-      window.api.webContentsView.show(appid, contentAreaBounds)
-        .then(result => {
+      window.api.webContentsView
+        .show(appid, bounds)
+        .then((result) => {
           if (result.success) {
             console.log(`WebContentsViewContainer: Successfully showed existing view for ${appid}`)
           } else {
@@ -228,20 +242,12 @@ const WebContentsViewContainer: React.FC<{
     }
   }, [appid, url, onLoadedCallback, onNavigateCallback, onSetRefCallback, contentAreaBounds])
 
-  // Create a container div that will determine the position and size of the WebContentsView
+  // Using className instead of inline styles for better performance
+  // The styles are defined in WebContentsViewContainer.css
+
   return (
-    <div
-      ref={containerRef}
-      className="webcontents-view-container"
-      data-appid={appid}
-      // Add data attributes for debugging
-      data-left-offset={contentAreaBounds?.x}
-      data-top-offset={contentAreaBounds?.y}
-      data-width={contentAreaBounds?.width}
-      data-height={contentAreaBounds?.height}
-    >
-      {/* Use the dedicated LoadingIndicator component */}
-      <LoadingIndicator appId={appid} displayName={appid} isLoading={isLoading} />
+    <div ref={containerRef} className="webcontents-view-container" data-appid={appid}>
+      {isLoading && <LoadingIndicator appId={appid} displayName={appid} isLoading={isLoading} />}
     </div>
   )
 }

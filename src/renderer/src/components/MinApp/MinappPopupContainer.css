@@ -1,4 +1,7 @@
 .minapp-drawer {
+  /* Position the drawer correctly */
+  position: fixed !important;
+  
   .ant-drawer-content {
     background-color: var(--color-background);
   }
@@ -7,6 +10,7 @@
     background-color: var(--color-background);
     border-bottom: 1px solid var(--color-border);
     padding: 8px 16px;
+    height: 56px;
   }
 
   .ant-drawer-body {
@@ -17,7 +21,61 @@
     display: flex;
     flex-direction: column;
     align-items: center;
+    /* CRITICAL: Ensure proper positioning for WebContentsView */
+    position: relative;
   }
+  
+  /* Ensure the content area manager is properly positioned */
+  .content-area {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+  }
+}
+
+/* Fix drawer positioning for right placement */
+.ant-drawer-content-wrapper {
+  position: fixed !important;
+  top: var(--navbar-height) !important;
+  left: var(--sidebar-width) !important;
+  width: calc(100vw - var(--sidebar-width)) !important;
+  height: calc(100vh - var(--navbar-height)) !important;
+  bottom: 0 !important;
+  max-height: calc(100vh - var(--navbar-height)) !important;
+}
+
+/* Make sure right drawer has correct height */
+.ant-drawer-right .ant-drawer-content-wrapper {
+  height: calc(100vh - var(--navbar-height)) !important;
+}
+
+/* CRITICAL: Position the drawer mask correctly */
+.minapp-mask {
+  position: fixed !important;
+  top: var(--navbar-height) !important;
+  left: var(--sidebar-width) !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  background-color: rgba(0, 0, 0, 0.45) !important;
+  z-index: 999 !important; /* Just below the drawer but above other content */
+}
+
+/* Add navigation frame overlay */
+.minapp-drawer .ant-drawer-body {
+  position: relative;
+}
+
+/* Create a frame that simulates the navigation elements */
+.minapp-drawer .ant-drawer-body::before,
+.minapp-drawer .ant-drawer-body::after {
+  /* CRITICAL: Removing navigation overlays as they're duplicating the actual navigation elements
+     and causing content to be pushed too far inside */
+  display: none;
 }
 
 /* Special styling for bolt.diy mini app */

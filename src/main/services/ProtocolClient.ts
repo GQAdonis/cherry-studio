@@ -23,9 +23,6 @@ export function registerProtocolClient(app: Electron.App) {
 
 export function handleProtocolUrl(url: string) {
   if (!url) return
-  // Process the URL that was used to open the app
-  // The url will be in the format: prometheusstudio://data?param1=value1&param2=value2
-  console.log('Received URL:', url)
 
   // Parse the URL and extract parameters
   const urlObj = new URL(url)

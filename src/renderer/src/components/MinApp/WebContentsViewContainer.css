@@ -1,3 +1,12 @@
+/* CRITICAL: Ensure WebContentsView is positioned correctly for right drawer */
+.ant-drawer-right .webcontents-view-container {
+  position: fixed !important;
+  left: var(--sidebar-width) !important;
+  top: var(--navbar-height) !important;
+  width: calc(100vw - var(--sidebar-width)) !important;
+  height: calc(100vh - var(--navbar-height) - 56px) !important; /* Subtract navbar and header height */
+}
+
 .webcontents-view-container {
   /* CRITICAL: Base styles for ALL mini apps */
   width: 100% !important;
@@ -15,8 +24,6 @@
   border: none !important;
   outline: none !important;
   /* CRITICAL: Position is controlled by ContentAreaManager */
-  /* These values are relative to the ContentAreaManager div */
-  /* which is already positioned at 26px from left and 41px from top */
   left: 0 !important;
   top: 0 !important;
   right: 0 !important;

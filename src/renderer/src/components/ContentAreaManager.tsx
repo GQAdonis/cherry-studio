@@ -38,15 +38,12 @@ interface ContentAreaManagerProps {
 const ContentAreaManager: React.FC<ContentAreaManagerProps> = ({ children }) => {
   const contentAreaRef = useRef<HTMLDivElement>(null)
   
-  // CRITICAL: Define exact constants for sidebar width and top navigation height
-  // These values MUST be exactly 26px and 41px respectively for precise positioning
-  const SIDEBAR_WIDTH = 26 // Width of the sidebar in pixels - MUST be exactly 26px
-  const TOP_NAV_HEIGHT = 41 // Height of the top navigation in pixels - MUST be exactly 41px
-  
   // Share the content area dimensions with child components
+  // For mini-apps in a drawer, we want to use relative positioning (0,0) within the drawer
+  // rather than absolute positioning from the window edge
   const [contentAreaBounds, setContentAreaBounds] = useState<ContentAreaBounds>({
-    x: SIDEBAR_WIDTH,
-    y: TOP_NAV_HEIGHT,
+    x: 0,
+    y: 0,
     width: 0,
     height: 0
   })
@@ -58,10 +55,10 @@ const ContentAreaManager: React.FC<ContentAreaManagerProps> = ({ children }) => 
       if (contentAreaRef.current) {
         const rect = contentAreaRef.current.getBoundingClientRect()
         
-        // CRITICAL: Ensure precise positioning with exact offsets
+        // For mini-apps in a drawer, we use relative positioning (0,0) within the drawer
         const newBounds = {
-          x: SIDEBAR_WIDTH, // CRITICAL: Exactly 26px from left edge
-          y: TOP_NAV_HEIGHT, // CRITICAL: Exactly 41px from top edge
+          x: 0, // Position relative to the container
+          y: 0, // Position relative to the container
           width: Math.round(rect.width),
           height: Math.round(rect.height)
         }
@@ -71,8 +68,9 @@ const ContentAreaManager: React.FC<ContentAreaManagerProps> = ({ children }) => 
         // Log bounds for debugging
         console.log('ContentAreaManager: Updated content area bounds:', {
           ...newBounds,
-          leftOffset: `${SIDEBAR_WIDTH}px from left edge`,
-          topOffset: `${TOP_NAV_HEIGHT}px from top edge`
+          containerWidth: rect.width,
+          containerHeight: rect.height,
+          timestamp: new Date().toISOString()
         })
       }
     })
@@ -86,10 +84,10 @@ const ContentAreaManager: React.FC<ContentAreaManagerProps> = ({ children }) => 
     if (contentAreaRef.current) {
       const rect = contentAreaRef.current.getBoundingClientRect()
       
-      // CRITICAL: Ensure precise positioning with exact offsets for initial measurement
+      // For mini-apps in a drawer, we use relative positioning (0,0) within the drawer
       const initialBounds = {
-        x: SIDEBAR_WIDTH, // CRITICAL: Exactly 26px from left edge
-        y: TOP_NAV_HEIGHT, // CRITICAL: Exactly 41px from top edge
+        x: 0, // Position relative to the container
+        y: 0, // Position relative to the container
         width: Math.round(rect.width),
         height: Math.round(rect.height)
       }
@@ -99,8 +97,9 @@ const ContentAreaManager: React.FC<ContentAreaManagerProps> = ({ children }) => 
       // Log initial bounds for debugging
       console.log('ContentAreaManager: Initial content area bounds:', {
         ...initialBounds,
-        leftOffset: `${SIDEBAR_WIDTH}px from left edge`,
-        topOffset: `${TOP_NAV_HEIGHT}px from top edge`
+        containerWidth: rect.width,
+        containerHeight: rect.height,
+        timestamp: new Date().toISOString()
       })
     }
     
@@ -109,10 +108,10 @@ const ContentAreaManager: React.FC<ContentAreaManagerProps> = ({ children }) => 
       if (contentAreaRef.current) {
         const rect = contentAreaRef.current.getBoundingClientRect()
         
-        // CRITICAL: Ensure precise positioning with exact offsets during window resize
+        // For mini-apps in a drawer, we use relative positioning (0,0) within the drawer
         const resizeBounds = {
-          x: SIDEBAR_WIDTH, // CRITICAL: Exactly 26px from left edge
-          y: TOP_NAV_HEIGHT, // CRITICAL: Exactly 41px from top edge
+          x: 0, // Position relative to the container
+          y: 0, // Position relative to the container
           width: Math.round(rect.width),
           height: Math.round(rect.height)
         }
@@ -122,8 +121,9 @@ const ContentAreaManager: React.FC<ContentAreaManagerProps> = ({ children }) => 
         // Log resize bounds for debugging
         console.log('ContentAreaManager: Window resize content area bounds:', {
           ...resizeBounds,
-          leftOffset: `${SIDEBAR_WIDTH}px from left edge`,
-          topOffset: `${TOP_NAV_HEIGHT}px from top edge`
+          containerWidth: rect.width,
+          containerHeight: rect.height,
+          timestamp: new Date().toISOString()
         })
       }
     }
@@ -142,18 +142,22 @@ const ContentAreaManager: React.FC<ContentAreaManagerProps> = ({ children }) => 
       ref={contentAreaRef}
       className="content-area"
       style={{
+        // CRITICAL: Set absolute positioning for drawer contents to ensure proper alignment
+        // This ensures proper positioning within the drawer, respecting navbar and sidebar
         position: 'absolute',
-        left: `${SIDEBAR_WIDTH}px`, // CRITICAL: Exactly 26px from left edge
-        top: `${TOP_NAV_HEIGHT}px`, // CRITICAL: Exactly 41px from top edge
+        left: '0',
+        top: '0',
         right: '0',
         bottom: '0',
+        width: '100%',
+        height: '100%',
         overflow: 'hidden',
-        // CRITICAL: Ensure content is scrollable when necessary
+        // Ensure content is scrollable when necessary
         overflowY: 'auto',
-        // CRITICAL: Ensure no margin or padding that might affect positioning
+        // Ensure no margin or padding that might affect positioning
         margin: 0,
         padding: 0,
-        // CRITICAL: Ensure proper box sizing
+        // Ensure proper box sizing
         boxSizing: 'border-box'
       }}
     >

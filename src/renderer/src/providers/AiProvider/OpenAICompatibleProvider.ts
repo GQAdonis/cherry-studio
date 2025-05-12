@@ -25,7 +25,7 @@ import {
   filterEmptyMessages,
   filterUserRoleStartMessages
 } from '@renderer/services/MessagesService'
-import { processReqMessages } from '@renderer/services/ModelMessageService'
+import { processPostsuffixQwen3Model, processReqMessages } from '@renderer/services/ModelMessageService'
 import store from '@renderer/store'
 import {
   Assistant,
@@ -34,6 +34,7 @@ import {
   MCPCallToolResponse,
   MCPTool,
   MCPToolResponse,
+  Metrics,
   Model,
   Provider,
   Suggestion,
@@ -62,6 +63,8 @@ import { buildSystemPrompt } from '@renderer/utils/prompt'
 import { asyncGeneratorToReadableStream, readableStreamAsyncIterable } from '@renderer/utils/stream'
 import { isEmpty, takeRight } from 'lodash'
 import OpenAI, { AzureOpenAI } from 'openai'
+import type { ChatCompletion, ChatCompletionChunk } from 'openai/resources/chat/completions'
+import type { Stream } from 'openai/streaming'
 import {
   ChatCompletionContentPart,
   ChatCompletionCreateParamsNonStreaming,
@@ -248,6 +251,26 @@ export default class OpenAICompatibleProvider extends BaseOpenAiProvider {
    * @param model - The model
    * @returns The reasoning effort
    */
+  /**
+   * Convert our internal ReasoningEffortOptions to OpenAI SDK's ReasoningEffort type
+   * @param effort Our internal reasoning effort option
+   * @returns OpenAI SDK compatible reasoning effort value
+   */
+  private convertToOpenAIReasoningEffort(effort?: string): 'low' | 'medium' | 'high' | null | undefined {
+    // If effort is 'auto' or any other unsupported value, default to 'high'
+    if (effort === 'auto') {
+      return 'high'
+    }
+
+    // Only return the value if it matches one of the allowed values
+    if (effort === 'low' || effort === 'medium' || effort === 'high') {
+      return effort
+    }
+
+    // Otherwise return undefined
+    return undefined
+  }
+
   private getReasoningEffort(assistant: Assistant, model: Model) {
     if (this.provider.id === 'groq') {
       return {}
@@ -300,14 +323,14 @@ export default class OpenAICompatibleProvider extends BaseOpenAiProvider {
     // Grok models
     if (isSupportedReasoningEffortGrokModel(model)) {
       return {
-        reasoning_effort: assistant?.settings?.reasoning_effort
+        reasoning_effort: this.convertToOpenAIReasoningEffort(assistant?.settings?.reasoning_effort)
       }
     }
 
     // OpenAI models
     if (isSupportedReasoningEffortOpenAIModel(model)) {
       return {
-        reasoning_effort: assistant?.settings?.reasoning_effort
+        reasoning_effort: this.convertToOpenAIReasoningEffort(assistant?.settings?.reasoning_effort)
       }
     }
 
@@ -361,7 +384,7 @@ export default class OpenAICompatibleProvider extends BaseOpenAiProvider {
     const model = assistant.model || defaultModel
 
     const { contextCount, maxTokens, streamOutput, enableToolUse } = getAssistantSettings(assistant)
-    const isEnabledWebSearch = assistant.enableWebSearch || !!assistant.webSearchProviderId
+    const isEnabledBultinWebSearch = assistant.enableWebSearch
     messages = addImageFileToContents(messages)
     const enableReasoning =
       ((isSupportedThinkingTokenModel(model) || isSupportedReasoningEffortModel(model)) &&
@@ -395,11 +418,38 @@ export default class OpenAICompatibleProvider extends BaseOpenAiProvider {
       return streamOutput
     }
 
-    const start_time_millsec = new Date().getTime()
     const lastUserMessage = _messages.findLast((m) => m.role === 'user')
     const { abortController, cleanup, signalPromise } = this.createAbortController(lastUserMessage?.id, true)
     const { signal } = abortController
     await this.checkIsCopilot()
+
+    const lastUserMsg = userMessages.findLast((m) => m.role === 'user')
+    if (lastUserMsg && isSupportedThinkingTokenQwenModel(model)) {
+      const postsuffix = '/no_think'
+      // qwenThinkMode === true 表示思考模式啓用，此時不應添加 /no_think，如果存在則移除
+      const qwenThinkModeEnabled = assistant.settings?.qwenThinkMode === true
+      const currentContent = lastUserMsg.content // content 類型：string | ChatCompletionContentPart[] | null | undefined
+
+      // Handle type compatibility and null/undefined cases
+      // First, ensure we have a compatible type for processPostsuffixQwen3Model
+      let compatibleContent: string | ChatCompletionContentPart[] | null = null
+
+      if (currentContent === null || currentContent === undefined) {
+        compatibleContent = null
+      } else if (typeof currentContent === 'string') {
+        compatibleContent = currentContent
+      } else if (Array.isArray(currentContent)) {
+        // Convert array to ensure it's compatible with ChatCompletionContentPart[]
+        compatibleContent = currentContent as ChatCompletionContentPart[]
+      }
+
+      // Now call the function with the compatible content
+      lastUserMsg.content = processPostsuffixQwen3Model(
+        compatibleContent,
+        postsuffix,
+        qwenThinkModeEnabled
+      ) as ChatCompletionContentPart[]
+    }
 
     //当 systemMessage 内容为空时不发送 systemMessage
     let reqMessages: ChatCompletionMessageParam[]
@@ -407,6 +457,18 @@ export default class OpenAICompatibleProvider extends BaseOpenAiProvider {
       reqMessages = [...userMessages]
     } else {
       reqMessages = [systemMessage, ...userMessages].filter(Boolean) as ChatCompletionMessageParam[]
+    }
+
+    let finalUsage: Usage = {
+      completion_tokens: 0,
+      prompt_tokens: 0,
+      total_tokens: 0
+    }
+
+    const finalMetrics: Metrics = {
+      completion_tokens: 0,
+      time_completion_millsec: 0,
+      time_first_token_millsec: 0
     }
 
     const toolResponses: MCPToolResponse[] = []
@@ -422,8 +484,8 @@ export default class OpenAICompatibleProvider extends BaseOpenAiProvider {
 
       onChunk({ type: ChunkType.LLM_RESPONSE_CREATED })
       // Determine if streaming is supported
-      const streamSupported = isSupportStreamOutput();
-      
+      const streamSupported = isSupportStreamOutput()
+
       // Create the base parameters without reasoning_effort
       const baseParams: Record<string, any> = {
         model: model.id,
@@ -435,35 +497,32 @@ export default class OpenAICompatibleProvider extends BaseOpenAiProvider {
         ...getOpenAIWebSearchParams(assistant, model),
         ...this.getProviderSpecificParameters(assistant, model),
         ...this.getCustomParameters(assistant)
-      };
-      
+      }
+
       // Handle reasoning effort separately to avoid type issues
-      const reasoningEffort = this.getReasoningEffort(assistant, model);
+      const reasoningEffort = this.getReasoningEffort(assistant, model)
       if (reasoningEffort && typeof reasoningEffort === 'object') {
         // Only add valid OpenAI API properties
         if ('reasoning' in reasoningEffort) {
-          baseParams.reasoning = reasoningEffort.reasoning;
+          baseParams.reasoning = reasoningEffort.reasoning
         }
         if ('thinking' in reasoningEffort) {
-          baseParams.thinking = reasoningEffort.thinking;
+          baseParams.thinking = reasoningEffort.thinking
         }
         if ('enable_thinking' in reasoningEffort) {
-          baseParams.enable_thinking = reasoningEffort.enable_thinking;
+          baseParams.enable_thinking = reasoningEffort.enable_thinking
         }
       }
-      
+
       // Create the appropriate parameters based on streaming support
       const params = streamSupported
         ? { ...baseParams, stream: true as const }
-        : { ...baseParams, stream: false as const };
-      
+        : { ...baseParams, stream: false as const }
+
       // Make the API call with type assertion to handle the complex parameter structure
-      const newStream = await this.sdk.chat.completions.create(
-        params as any,
-        {
-          signal
-        }
-      )
+      const newStream = await this.sdk.chat.completions.create(params as any, {
+        signal
+      })
       await processStream(newStream, idx + 1)
     }
 
@@ -512,19 +571,22 @@ export default class OpenAICompatibleProvider extends BaseOpenAiProvider {
     }
 
     const processStream = async (stream: any, idx: number) => {
+      // Type guard to check if we have a non-streaming response
+      const isCompletionResponse = (obj: any): obj is ChatCompletion => {
+        return obj && Array.isArray(obj.choices)
+      }
       const toolCalls: ChatCompletionMessageToolCall[] = []
-      // Handle non-streaming case (already returns early, no change needed here)
-      if (!isSupportStreamOutput()) {
-        const time_completion_millsec = new Date().getTime() - start_time_millsec
+      let time_first_token_millsec = 0
+      const start_time_millsec = new Date().getTime()
+
+      // Handle non-streaming case
+      if (!isSupportStreamOutput() || isCompletionResponse(stream)) {
         // Calculate final metrics once
-        const finalMetrics = {
-          completion_tokens: stream.usage?.completion_tokens,
-          time_completion_millsec,
-          time_first_token_millsec: 0 // Non-streaming, first token time is not relevant
-        }
+        finalMetrics.completion_tokens = stream.usage?.completion_tokens
+        finalMetrics.time_completion_millsec = new Date().getTime() - start_time_millsec
 
         // Create a synthetic usage object if stream.usage is undefined
-        const finalUsage = stream.usage
+        finalUsage = { ...stream.usage }
         // Separate onChunk calls for text and usage/metrics
         let content = ''
         stream.choices.forEach((choice) => {
@@ -534,7 +596,7 @@ export default class OpenAICompatibleProvider extends BaseOpenAiProvider {
             onChunk({
               type: ChunkType.THINKING_COMPLETE,
               text: choice.message.reasoning,
-              thinking_millsec: time_completion_millsec
+              thinking_millsec: new Date().getTime() - start_time_millsec
             })
           }
           // text
@@ -584,20 +646,9 @@ export default class OpenAICompatibleProvider extends BaseOpenAiProvider {
         return
       }
 
-      let content = '' // Accumulate content for tool processing if needed
+      let content = ''
       let thinkingContent = ''
-      // 记录最终的完成时间差
-      let final_time_completion_millsec_delta = 0
-      let final_time_thinking_millsec_delta = 0
-      // Variable to store the last received usage object
-      let lastUsage: Usage | undefined = undefined
-      // let isThinkingInContent: ThoughtProcessor | undefined = undefined
-      // const processThinkingChunk = this.handleThinkingTags()
       let isFirstChunk = true
-      let time_first_token_millsec = 0
-      let time_first_token_millsec_delta = 0
-      let time_first_content_millsec = 0
-      let time_thinking_start = 0
 
       // 1. 初始化中间件
       const reasoningTags = [
@@ -648,25 +699,24 @@ export default class OpenAICompatibleProvider extends BaseOpenAiProvider {
 
       // 3. 消费 processedStream，分发 onChunk
       for await (const chunk of readableStreamAsyncIterable(processedStream)) {
-        const currentTime = new Date().getTime()
         const delta = chunk.type === 'finish' ? chunk.delta : chunk
         const rawChunk = chunk.type === 'finish' ? chunk.chunk : chunk
 
         switch (chunk.type) {
           case 'reasoning': {
-            if (time_thinking_start === 0) {
-              time_thinking_start = currentTime
-              time_first_token_millsec = currentTime
-              time_first_token_millsec_delta = currentTime - start_time_millsec
+            if (time_first_token_millsec === 0) {
+              time_first_token_millsec = new Date().getTime()
             }
             thinkingContent += chunk.textDelta
-            const thinking_time = currentTime - time_thinking_start
-            onChunk({ type: ChunkType.THINKING_DELTA, text: chunk.textDelta, thinking_millsec: thinking_time })
+            onChunk({
+              type: ChunkType.THINKING_DELTA,
+              text: chunk.textDelta,
+              thinking_millsec: new Date().getTime() - time_first_token_millsec
+            })
             break
           }
           case 'text-delta': {
             let textDelta = chunk.textDelta
-
             if (assistant.enableWebSearch && delta) {
               const originalDelta = rawChunk?.choices?.[0]?.delta
 
@@ -684,25 +734,32 @@ export default class OpenAICompatibleProvider extends BaseOpenAiProvider {
             if (isFirstChunk) {
               isFirstChunk = false
               if (time_first_token_millsec === 0) {
-                time_first_token_millsec = currentTime
-                time_first_token_millsec_delta = currentTime - start_time_millsec
+                time_first_token_millsec = new Date().getTime()
+              } else {
+                onChunk({
+                  type: ChunkType.THINKING_COMPLETE,
+                  text: thinkingContent,
+                  thinking_millsec: new Date().getTime() - time_first_token_millsec
+                })
               }
             }
             content += textDelta
-            if (time_thinking_start > 0 && time_first_content_millsec === 0) {
-              time_first_content_millsec = currentTime
-              final_time_thinking_millsec_delta = time_first_content_millsec - time_thinking_start
-
-              onChunk({
-                type: ChunkType.THINKING_COMPLETE,
-                text: thinkingContent,
-                thinking_millsec: final_time_thinking_millsec_delta
-              })
-            }
             onChunk({ type: ChunkType.TEXT_DELTA, text: textDelta })
             break
           }
           case 'tool-calls': {
+            if (isFirstChunk) {
+              isFirstChunk = false
+              if (time_first_token_millsec === 0) {
+                time_first_token_millsec = new Date().getTime()
+              } else {
+                onChunk({
+                  type: ChunkType.THINKING_COMPLETE,
+                  text: thinkingContent,
+                  thinking_millsec: new Date().getTime() - time_first_token_millsec
+                })
+              }
+            }
             chunk.delta.tool_calls.forEach((toolCall) => {
               const { id, index, type, function: fun } = toolCall
               if (id && type === 'function' && fun) {
@@ -729,11 +786,17 @@ export default class OpenAICompatibleProvider extends BaseOpenAiProvider {
 
             if (!isEmpty(finishReason)) {
               onChunk({ type: ChunkType.TEXT_COMPLETE, text: content })
-              final_time_completion_millsec_delta = currentTime - start_time_millsec
               if (usage) {
-                lastUsage = usage
+                finalUsage.completion_tokens += usage.completion_tokens || 0
+                finalUsage.prompt_tokens += usage.prompt_tokens || 0
+                finalUsage.total_tokens += usage.total_tokens || 0
+                finalMetrics.completion_tokens += usage.completion_tokens || 0
               }
+              finalMetrics.time_completion_millsec += new Date().getTime() - start_time_millsec
+              finalMetrics.time_first_token_millsec = time_first_token_millsec - start_time_millsec
               if (originalFinishDelta?.annotations) {
+                if (assistant.model?.provider === 'copilot') return
+
                 onChunk({
                   type: ChunkType.LLM_WEB_SEARCH_COMPLETE,
                   llm_web_search: {
@@ -755,7 +818,7 @@ export default class OpenAICompatibleProvider extends BaseOpenAiProvider {
                 }
               }
               if (
-                isEnabledWebSearch &&
+                isEnabledBultinWebSearch &&
                 isZhipuModel(model) &&
                 finishReason === 'stop' &&
                 originalFinishRawChunk?.web_search
@@ -769,7 +832,7 @@ export default class OpenAICompatibleProvider extends BaseOpenAiProvider {
                 } as LLMWebSearchCompleteChunk)
               }
               if (
-                isEnabledWebSearch &&
+                isEnabledBultinWebSearch &&
                 isHunyuanSearchModel(model) &&
                 originalFinishRawChunk?.search_info?.search_results
               ) {
@@ -782,49 +845,46 @@ export default class OpenAICompatibleProvider extends BaseOpenAiProvider {
                 } as LLMWebSearchCompleteChunk)
               }
             }
-            reqMessages.push({
-              role: 'assistant',
-              content: content,
-              tool_calls: toolCalls.length
-                ? toolCalls.map((toolCall) => ({
-                    id: toolCall.id,
-                    function: {
-                      ...toolCall.function,
-                      arguments:
-                        typeof toolCall.function.arguments === 'string'
-                          ? toolCall.function.arguments
-                          : JSON.stringify(toolCall.function.arguments)
-                    },
-                    type: 'function'
-                  }))
-                : undefined
-            })
-            let toolResults: Awaited<ReturnType<typeof parseAndCallTools>> = []
-            if (toolCalls.length) {
-              toolResults = await processToolCalls(mcpTools, toolCalls)
-            }
-            if (content.length) {
-              toolResults = toolResults.concat(await processToolUses(content))
-            }
-            if (toolResults.length) {
-              await processToolResults(toolResults, idx)
-            }
-            onChunk({
-              type: ChunkType.BLOCK_COMPLETE,
-              response: {
-                usage: lastUsage,
-                metrics: {
-                  completion_tokens: lastUsage?.completion_tokens,
-                  time_completion_millsec: final_time_completion_millsec_delta,
-                  time_first_token_millsec: time_first_token_millsec_delta,
-                  time_thinking_millsec: final_time_thinking_millsec_delta
-                }
-              }
-            })
             break
           }
         }
       }
+
+      reqMessages.push({
+        role: 'assistant',
+        content: content,
+        tool_calls: toolCalls.length
+          ? toolCalls.map((toolCall) => ({
+              id: toolCall.id,
+              function: {
+                ...toolCall.function,
+                arguments:
+                  typeof toolCall.function.arguments === 'string'
+                    ? toolCall.function.arguments
+                    : JSON.stringify(toolCall.function.arguments)
+              },
+              type: 'function'
+            }))
+          : undefined
+      })
+      let toolResults: Awaited<ReturnType<typeof parseAndCallTools>> = []
+      if (toolCalls.length) {
+        toolResults = await processToolCalls(mcpTools, toolCalls)
+      }
+      if (content.length) {
+        toolResults = toolResults.concat(await processToolUses(content))
+      }
+      if (toolResults.length) {
+        await processToolResults(toolResults, idx)
+      }
+
+      onChunk({
+        type: ChunkType.BLOCK_COMPLETE,
+        response: {
+          usage: finalUsage,
+          metrics: finalMetrics
+        }
+      })
     }
 
     reqMessages = processReqMessages(model, reqMessages)
@@ -832,44 +892,46 @@ export default class OpenAICompatibleProvider extends BaseOpenAiProvider {
     onChunk({ type: ChunkType.LLM_RESPONSE_CREATED })
     // Determine if we should use streaming
     const useStream = isSupportStreamOutput()
-    
+
     // Create base parameters without stream-specific properties
     const baseParams = {
-          model: model.id,
-          messages: reqMessages,
-          temperature: this.getTemperature(assistant, model),
-          top_p: this.getTopP(assistant, model),
-          max_tokens: maxTokens,
-          tools: !isEmpty(tools) ? tools : undefined,
-          service_tier: this.getServiceTier(model),
-          ...getOpenAIWebSearchParams(assistant, model),
-          ...this.getReasoningEffort(assistant, model),
-          ...this.getProviderSpecificParameters(assistant, model),
-          ...this.getCustomParameters(assistant)
+      model: model.id,
+      messages: reqMessages,
+      temperature: this.getTemperature(assistant, model),
+      top_p: this.getTopP(assistant, model),
+      max_tokens: maxTokens,
+      tools: !isEmpty(tools) ? tools : undefined,
+      service_tier: this.getServiceTier(model) as 'auto' | 'flex' | 'default' | null | undefined,
+      ...getOpenAIWebSearchParams(assistant, model),
+      ...this.getReasoningEffort(assistant, model),
+      ...this.getProviderSpecificParameters(assistant, model),
+      ...this.getCustomParameters(assistant)
     }
-    
+
     // Create request options
     const requestOptions = {
-          signal,
-          timeout: this.getTimeout(model)
+      signal,
+      timeout: this.getTimeout(model)
     }
-    
+
     // Add keep_alive parameter if needed (using type assertion)
     if (this.keepAliveTime !== undefined) {
-      (baseParams as any).keep_alive = this.keepAliveTime
+      ;(baseParams as any).keep_alive = this.keepAliveTime
     }
-    
+
     // Call the appropriate overload based on streaming preference
-    const stream = await (useStream 
-      ? this.sdk.chat.completions.create(
-          { ...baseParams, stream: true as const },
-          requestOptions
-        )
-      : this.sdk.chat.completions.create(
-          { ...baseParams, stream: false as const },
-          requestOptions
-        )
-    )
+    let response
+    if (useStream) {
+      // Create streaming response
+      const streamParams = { ...baseParams, stream: true as const }
+      response = await this.sdk.chat.completions.create(streamParams, requestOptions)
+    } else {
+      // Create non-streaming response
+      const nonStreamParams = { ...baseParams, stream: false as const }
+      response = await this.sdk.chat.completions.create(nonStreamParams, requestOptions)
+    }
+
+    const stream = response
 
     await processStream(stream, 0).finally(cleanup)
 
@@ -917,27 +979,33 @@ export default class OpenAICompatibleProvider extends BaseOpenAiProvider {
       top_p: this.getTopP(assistant, model),
       ...this.getReasoningEffort(assistant, model)
     }
-    
+
     // Add keep_alive parameter if needed (using type assertion)
     if (this.keepAliveTime !== undefined) {
-      (baseParams as any).keep_alive = this.keepAliveTime
+      ;(baseParams as any).keep_alive = this.keepAliveTime
     }
-    
-    // Call the appropriate overload based on streaming preference
-    const response = await (stream 
-      ? this.sdk.chat.completions.create({ ...baseParams, stream: true as const })
-      : this.sdk.chat.completions.create({ ...baseParams, stream: false as const })
-    )
 
-    if (!stream) {
-      return response.choices[0].message?.content || ''
+    // Call the appropriate overload based on streaming preference
+    let response
+    if (stream) {
+      // Create streaming response
+      const streamParams = { ...baseParams, stream: true as const }
+      response = await this.sdk.chat.completions.create(streamParams)
+    } else {
+      // Create non-streaming response
+      const nonStreamParams = { ...baseParams, stream: false as const }
+      response = await this.sdk.chat.completions.create(nonStreamParams)
+
+      // For non-streaming responses, return the content directly
+      return (response as ChatCompletion).choices[0].message?.content || ''
     }
 
     let text = ''
     let isThinking = false
     const isReasoning = isReasoningModel(model)
 
-    for await (const chunk of response) {
+    // For streaming responses, iterate through the chunks
+    for await (const chunk of response as Stream<ChatCompletionChunk>) {
       const deltaContent = chunk.choices[0]?.delta?.content || ''
 
       if (isReasoning) {
@@ -1004,12 +1072,12 @@ export default class OpenAICompatibleProvider extends BaseOpenAiProvider {
       stream: false as const,
       max_tokens: 1000
     }
-    
+
     // Add keep_alive parameter if needed (using type assertion)
     if (this.keepAliveTime !== undefined) {
-      (baseParams as any).keep_alive = this.keepAliveTime
+      ;(baseParams as any).keep_alive = this.keepAliveTime
     }
-    
+
     const response = await this.sdk.chat.completions.create(baseParams)
 
     // 针对思考类模型的返回，总结仅截取</think>之后的内容
@@ -1052,21 +1120,19 @@ export default class OpenAICompatibleProvider extends BaseOpenAiProvider {
       stream: false as const,
       max_tokens: 1000
     }
-    
+
     // Add keep_alive parameter if needed (using type assertion)
     if (this.keepAliveTime !== undefined) {
-      (baseParams as any).keep_alive = this.keepAliveTime
+      ;(baseParams as any).keep_alive = this.keepAliveTime
     }
-    
+
     // Request options
     const requestOptions = {
       timeout: 20 * 1000,
       signal: signal
     }
-    
-    const response = await this.sdk.chat.completions
-      .create(baseParams, requestOptions)
-      .finally(cleanup)
+
+    const response = await this.sdk.chat.completions.create(baseParams, requestOptions).finally(cleanup)
 
     // 针对思考类模型的返回，总结仅截取</think>之后的内容
     let content = response.choices[0].message?.content || ''
@@ -1227,7 +1293,7 @@ export default class OpenAICompatibleProvider extends BaseOpenAiProvider {
 
       const models = response.data || []
       console.log(`[OpenAICompatibleProvider] Got ${models.length} models for ${this.provider.id}`)
-      
+
       models.forEach((model) => {
         if (model.id && typeof model.id === 'string') {
           model.id = model.id.trim()
@@ -1238,7 +1304,7 @@ export default class OpenAICompatibleProvider extends BaseOpenAiProvider {
       console.log(
         `[OpenAICompatibleProvider] Returning ${filteredModels.length} filtered models for ${this.provider.id}`
       )
-      
+
       return filteredModels
     } catch (error) {
       console.error(`[OpenAICompatibleProvider] Error fetching models for ${this.provider.id}:`, error)

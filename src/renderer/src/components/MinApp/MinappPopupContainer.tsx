@@ -24,10 +24,10 @@ import { Avatar, Drawer, Tooltip } from 'antd'
 import { WebviewTag } from 'electron'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import BeatLoader from 'react-spinners/BeatLoader'
 import styled from 'styled-components'
 
 import ContentAreaManager from '../ContentAreaManager'
-import SvgSpinners180Ring from '../Icons/SvgSpinners180Ring'
 import WebContentsViewContainer from './WebContentsViewContainer'
 import './MinappPopupContainer.css'
 
@@ -77,8 +77,10 @@ const MinappPopupContainer: React.FC = () => {
 
   /** set the popup display status */
   useEffect(() => {
-    console.log(`MinappPopupContainer: Effect triggered - minappShow: ${minappShow}, currentMinappId: ${currentMinappId}`)
-    
+    console.log(
+      `MinappPopupContainer: Effect triggered - minappShow: ${minappShow}, currentMinappId: ${currentMinappId}`
+    )
+
     if (minappShow) {
       // init the current url
       if (currentMinappId && currentAppInfo) {
@@ -228,7 +230,7 @@ const MinappPopupContainer: React.FC = () => {
   /** the callback function to set the webviews ref */
   const handleWebviewSetRef = (appid: string, element: WebviewTag | null) => {
     console.log(`MinappPopupContainer: Setting webview ref for ${appid}:`, element ? 'element exists' : 'null')
-    
+
     webviewRefs.current.set(appid, element)
 
     if (!webviewRefs.current.has(appid)) {
@@ -440,7 +442,7 @@ const MinappPopupContainer: React.FC = () => {
   /** group the WebContentsView containers with Memo, one of the key to make them keepalive */
   const WebviewContainerGroup = useMemo(() => {
     console.log(`MinappPopupContainer: Creating WebContentsView containers for ${combinedApps.length} apps`)
-    
+
     return (
       <ContentAreaManager>
         {combinedApps.map((app) => {
@@ -465,39 +467,53 @@ const MinappPopupContainer: React.FC = () => {
 
   return (
     <Drawer
-      title={<Title appInfo={currentAppInfo} url={currentUrl} />}
-      placement="bottom"
-      onClose={handlePopupMinimize}
-      open={isPopupShow}
-      destroyOnClose={false}
-      mask={false}
-      rootClassName="minapp-drawer"
-      maskClassName="minapp-mask"
-      height={'100%'}
-      maskClosable={false}
-      closeIcon={null}
-      data-appid={currentMinappId}
-      style={{
-        marginLeft: 'var(--sidebar-width)',
-        backgroundColor: 'var(--color-background)',
-        // Ensure the drawer content area matches the Claude app layout
-        display: 'flex',
-        flexDirection: 'column'
-      }}
-      styles={{
-        wrapper: {
-          height: '100%',
-          // Set max width to match Claude app
-          maxWidth: '100%', // Allow the container to be full width
-          margin: '0 auto',
-          width: '100%',
-          // Add padding to match Claude app
-          padding: '0',
-          // Ensure content is centered
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center'
-        }
+        title={<Title appInfo={currentAppInfo} url={currentUrl} />}
+        placement="right"
+        onClose={handlePopupMinimize}
+        open={isPopupShow}
+        destroyOnClose={false}
+        mask={true}
+        rootClassName="minapp-drawer"
+        maskClassName="minapp-mask"
+        width="calc(100vw - var(--sidebar-width))"
+        maskClosable={true}
+        closeIcon={null}
+        data-appid={currentMinappId}
+        style={{
+          backgroundColor: 'var(--color-background)'
+        }}
+        styles={{
+          wrapper: {
+            position: 'fixed',
+            top: 'var(--navbar-height)', // Position below the navbar
+            left: 'var(--sidebar-width)', // Position after the sidebar
+            right: 0,
+            bottom: 0,
+            width: 'calc(100vw - var(--sidebar-width))',
+            height: 'calc(100vh - var(--navbar-height))', // Adjust height to account for navbar
+            padding: 0,
+            margin: 0,
+            zIndex: 1000 // Ensure it's above other content
+          },
+          body: {
+            padding: 0,
+            margin: 0,
+            height: 'calc(100% - 56px)', // Subtract header height
+            overflow: 'hidden'
+          },
+          mask: {
+            top: 'var(--navbar-height)',
+            left: 'var(--sidebar-width)',
+            backgroundColor: 'rgba(0, 0, 0, 0.45)'
+          },
+          header: {
+            padding: '8px 16px',
+            height: '56px',
+            borderBottom: '1px solid var(--color-border)'
+          },
+          content: {
+            backgroundColor: 'var(--color-background)'
+          }
       }}>
       {!isReady && (
         <EmptyView>
@@ -506,7 +522,7 @@ const MinappPopupContainer: React.FC = () => {
             size={80}
             style={{ border: '1px solid var(--color-border)', marginTop: -150 }}
           />
-          <SvgSpinners180Ring color="var(--color-text-2)" style={{ marginTop: 15 }} />
+          <BeatLoader color="var(--color-text-2)" size={10} style={{ marginTop: 15 }} />
         </EmptyView>
       )}
       {WebviewContainerGroup}

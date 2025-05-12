@@ -152,18 +152,18 @@ class WebContentsViewService {
       this.applyVisibilityScripts(appId, view, appConfig)
     })
 
-    view.webContents.on('did-fail-load', (event, errorCode, errorDescription) => {
+    view.webContents.on('did-fail-load', (_event, errorCode, errorDescription) => {
       this.loadingStates.set(appId, false)
       Logger.error(`WebContentsViewService: View failed to load for appId: ${appId}, error: ${errorDescription} (${errorCode})`)
     })
 
-    view.webContents.on('did-navigate', (event, url) => {
+    view.webContents.on('did-navigate', (_event, url) => {
       this.currentUrls.set(appId, url)
       Logger.info(`WebContentsViewService: View navigated for appId: ${appId}, url: ${url}`)
     })
 
     // Handle crashes and errors
-    view.webContents.on('render-process-gone', (event, details) => {
+    view.webContents.on('render-process-gone', (_event, details) => {
       Logger.error(`WebContentsViewService: Render process gone for appId: ${appId}, reason: ${details.reason}`)
       this.loadingStates.set(appId, false)
     })
@@ -308,18 +308,14 @@ class WebContentsViewService {
         return { action: 'allow' }
       })
       
-      // CRITICAL: Ensure mini app is flush with sidebar and top navigation without overlap
-      // Define exact sidebar width and top navigation height
-      const SIDEBAR_WIDTH = 26; // Width of the sidebar in pixels - MUST be exactly 26px
-      const TOP_NAV_HEIGHT = 41; // Height of the top navigation in pixels - MUST be exactly 41px
-      
-      // CRITICAL: For ALL mini apps, ensure they are flush with the sidebar and top navigation
-      // Do not use any special case for bolt.diy or other apps
+      // CRITICAL: For drawer-based mini apps, use the bounds provided by the drawer
+      // This ensures the WebContentsView is positioned correctly within the drawer
+      // and doesn't overlap with the sidebar or top navigation
       let adjustedBounds = {
-        x: SIDEBAR_WIDTH, // CRITICAL: Start exactly at the right edge of sidebar (26px)
-        y: TOP_NAV_HEIGHT, // CRITICAL: Start exactly at the bottom edge of top navigation (41px)
-        width: bounds.width, // Use the width provided by the content area
-        height: bounds.height // Use the height provided by the content area
+        x: bounds.x, // Use the x position provided by the drawer
+        y: bounds.y, // Use the y position provided by the drawer
+        width: bounds.width, // Use the width provided by the drawer
+        height: bounds.height // Use the height provided by the drawer
       }
       
       // Log the original bounds for debugging
@@ -332,14 +328,20 @@ class WebContentsViewService {
       // Log the adjusted bounds for debugging with precise positioning information
       Logger.info(`WebContentsViewService: Set bounds for ${appId} with precise positioning:`, {
         ...adjustedBounds,
-        leftOffset: `${SIDEBAR_WIDTH}px from left edge`,
-        topOffset: `${TOP_NAV_HEIGHT}px from top edge`
+        timestamp: new Date().toISOString()
       })
       
-      // CRITICAL: Attach the WebContentsView to the BrowserWindow
-      // This is the key step - WebContentsView must be attached to the window
+      // CRITICAL: Use setContentView for WebContentsView
+      // But we'll ensure it's properly positioned within the drawer
+      // by using the exact bounds provided by the drawer
       this.mainWindow.setContentView(view)
-      Logger.info(`WebContentsViewService: Attached WebContentsView to window for appId: ${appId}`)
+      Logger.info(`WebContentsViewService: Set WebContentsView for window for appId: ${appId}`)
+      
+      // Set properties to ensure proper rendering
+      view.webContents.setZoomFactor(1.0) // Reset zoom to ensure proper rendering
+      
+      // Store the active view ID for proper management
+      this.activeViewId = appId
       
       // Mark this view as visible
       this.isVisible.set(appId, true)
@@ -383,9 +385,13 @@ class WebContentsViewService {
       if (this.activeViewId === appId) {
         this.activeViewId = null
         
-        // Create an empty WebContentsView to replace the current one
-        // This effectively hides the current view without destroying it
+        // Create an empty WebContentsView to replace the current one if needed
         if (this.emptyView) {
+          // Set bounds to zero to ensure it doesn't interfere with UI
+          const zeroBounds = { x: 0, y: 0, width: 0, height: 0 }
+          view.setBounds(zeroBounds)
+          
+          // Replace with empty view
           this.mainWindow.setContentView(this.emptyView)
           Logger.info(`WebContentsViewService: Replaced active view with empty view for appId: ${appId}`)
         }
