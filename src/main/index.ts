@@ -6,8 +6,8 @@ import installExtension, { REACT_DEVELOPER_TOOLS, REDUX_DEVTOOLS } from 'electro
 import Logger from 'electron-log'
 
 // Import debug helpers
-import { setupDebugOverrides, getDebugConfig, setDebugConfigOption, createComponentLogger } from './debug-helpers'
-import { debugLog, markPerformance, measurePerformance } from './utils/debugUtils'
+import { setupDebugOverrides, getDebugConfig, createComponentLogger } from './debug-helpers'
+import { markPerformance, measurePerformance } from './utils/debugUtils'
 
 import { registerIpc } from './ipc'
 import { configManager } from './services/ConfigManager'
@@ -29,17 +29,19 @@ import { setUserDataDir } from './utils/file'
 Logger.initialize()
 
 // Setup debug overrides if running in debug mode
-if (process.env.DISABLE_LAUNCH_TO_TRAY === 'true' || 
-    process.env.FORCE_SHOW_WINDOW === 'true' || 
-    process.env.OPEN_DEVTOOLS === 'true' ||
-    process.env.SUPPRESS_SOURCEMAP_ERRORS === 'true' ||
-    process.env.SUPPRESS_SECURITY_WARNINGS === 'true' ||
-    process.env.SUPPRESS_ROUTER_WARNINGS === 'true' ||
-    process.env.VERBOSE_LOGGING === 'true' ||
-    process.env.LOG_WEBCONTENTSVIEW_EVENTS === 'true' ||
-    process.env.LOG_IPC_EVENTS === 'true' ||
-    process.env.LOG_PERFORMANCE === 'true' ||
-    process.env.LOG_MEMORY_USAGE === 'true') {
+if (
+  process.env.DISABLE_LAUNCH_TO_TRAY === 'true' ||
+  process.env.FORCE_SHOW_WINDOW === 'true' ||
+  process.env.OPEN_DEVTOOLS === 'true' ||
+  process.env.SUPPRESS_SOURCEMAP_ERRORS === 'true' ||
+  process.env.SUPPRESS_SECURITY_WARNINGS === 'true' ||
+  process.env.SUPPRESS_ROUTER_WARNINGS === 'true' ||
+  process.env.VERBOSE_LOGGING === 'true' ||
+  process.env.LOG_WEBCONTENTSVIEW_EVENTS === 'true' ||
+  process.env.LOG_IPC_EVENTS === 'true' ||
+  process.env.LOG_PERFORMANCE === 'true' ||
+  process.env.LOG_MEMORY_USAGE === 'true'
+) {
   setupDebugOverrides()
   logger.info('Debug mode enabled with enhanced debugging capabilities')
 }
