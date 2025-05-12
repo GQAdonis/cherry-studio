@@ -1,6 +1,9 @@
+/* EMERGENCY FIX: Ensure the drawer doesn't block dev tools */
 .minapp-drawer {
   /* Position the drawer correctly */
   position: fixed !important;
+  /* CRITICAL: Lower z-index to allow dev tools to appear on top */
+  z-index: 800 !important;
   
   .ant-drawer-content {
     background-color: var(--color-background);
@@ -40,13 +43,19 @@
 
 /* Fix drawer positioning for right placement */
 .ant-drawer-content-wrapper {
-  position: fixed !important;
-  top: var(--navbar-height) !important;
-  left: var(--sidebar-width) !important;
-  width: calc(100vw - var(--sidebar-width)) !important;
-  height: calc(100vh - var(--navbar-height)) !important;
+  position: absolute !important; /* Use absolute instead of fixed */
+  top: var(--navbar-height) !important; /* Position exactly below the navbar */
+  left: var(--sidebar-width) !important; /* Position exactly at the right edge of the sidebar */
+  width: calc(100vw - var(--sidebar-width)) !important; /* Ensure width excludes sidebar */
+  height: calc(100vh - var(--navbar-height)) !important; /* Ensure height excludes navbar */
   bottom: 0 !important;
-  max-height: calc(100vh - var(--navbar-height)) !important;
+  max-height: calc(100vh - var(--navbar-height)) !important; /* Don't exceed available height */
+  /* CRITICAL: Ensure content is properly contained */
+  overflow: visible !important;
+  /* CRITICAL: Ensure correct positioning */
+  margin: 0 !important;
+  padding: 0 !important;
+  z-index: 800 !important;
 }
 
 /* Make sure right drawer has correct height */

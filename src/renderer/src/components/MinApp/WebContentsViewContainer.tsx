@@ -64,14 +64,17 @@ const WebContentsViewContainer: React.FC<{
       if (!hasCreatedView.current || !contentAreaBounds) return
 
       try {
-        // CRITICAL: For mini-apps within a drawer, we need to use exact positioning to ensure
-        // they don't consume the entire screen. The drawer itself is already positioned correctly
-        // relative to the sidebar and navbar, so we position the content at (0,0) within the drawer
+        // CRITICAL: Ensure positioning ONLY takes up the content area to the right of left sidebar and below top nav
+        // Get the actual sidebar width and navbar height from CSS variables
+        const sidebarWidth = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--sidebar-width') || '26', 10);
+        const navbarHeight = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--navbar-height') || '41', 10);
+        
+        // Calculate the bounds precisely to ensure content only appears in the correct area
         const bounds = {
-          x: contentAreaBounds.x, // Position at the left edge of the content area (after sidebar)
-          y: contentAreaBounds.y, // Position at the top edge of the content area (below navbar)
-          width: contentAreaBounds.width, // Use the full width of the content area
-          height: contentAreaBounds.height // Use the full height of the content area
+          x: sidebarWidth, // Position exactly at the right edge of the sidebar
+          y: navbarHeight, // Position exactly below the navbar
+          width: window.innerWidth - sidebarWidth, // Use width excluding sidebar
+          height: window.innerHeight - navbarHeight // Use height excluding navbar
         }
 
         // Log detailed positioning information for debugging
@@ -192,14 +195,17 @@ const WebContentsViewContainer: React.FC<{
           console.error(`WebContentsViewContainer: Error creating view for appid: ${appid}:`, error)
         })
     } else if (contentAreaBounds) {
-      // CRITICAL: For mini-apps within a drawer, we need to use exact positioning to ensure
-      // they don't consume the entire screen. The drawer itself is already positioned correctly
-      // relative to the sidebar and navbar, so we position the content at (0,0) within the drawer
+      // CRITICAL: Ensure positioning ONLY takes up the content area to the right of left sidebar and below top nav
+      // Get the actual sidebar width and navbar height from CSS variables
+      const sidebarWidth = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--sidebar-width') || '26', 10);
+      const navbarHeight = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--navbar-height') || '41', 10);
+      
+      // Calculate the bounds precisely to ensure content only appears in the correct area
       const bounds = {
-        x: contentAreaBounds.x, // Position at the left edge of the content area (after sidebar)
-        y: contentAreaBounds.y, // Position at the top edge of the content area (below navbar)
-        width: contentAreaBounds.width, // Use the full width of the content area
-        height: contentAreaBounds.height // Use the full height of the content area
+        x: sidebarWidth, // Position exactly at the right edge of the sidebar
+        y: navbarHeight, // Position exactly below the navbar
+        width: window.innerWidth - sidebarWidth, // Use width excluding sidebar
+        height: window.innerHeight - navbarHeight // Use height excluding navbar
       }
 
       console.log(`WebContentsViewContainer: Showing existing view for ${appid} with precise positioning:`, {

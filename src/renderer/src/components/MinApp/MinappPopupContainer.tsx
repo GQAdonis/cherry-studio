@@ -75,6 +75,25 @@ const MinappPopupContainer: React.FC = () => {
 
   useBridge()
 
+  /** Add escape key handler for emergency closing */
+  useEffect(() => {
+    const handleEscapeKey = (event: KeyboardEvent) => {
+      if (event.key === 'Escape' && minappShow) {
+        console.log('EMERGENCY: Escape key pressed, closing min-app');
+        handlePopupMinimize();
+        if (currentMinappId) {
+          setTimeout(() => closeMinapp(currentMinappId), 300);
+        }
+      }
+    };
+    
+    window.addEventListener('keydown', handleEscapeKey);
+    
+    return () => {
+      window.removeEventListener('keydown', handleEscapeKey);
+    };
+  }, [minappShow, currentMinappId]);
+
   /** set the popup display status */
   useEffect(() => {
     console.log(
@@ -484,16 +503,16 @@ const MinappPopupContainer: React.FC = () => {
         }}
         styles={{
           wrapper: {
-            position: 'fixed',
-            top: 'var(--navbar-height)', // Position below the navbar
-            left: 'var(--sidebar-width)', // Position after the sidebar
-            right: 0,
-            bottom: 0,
-            width: 'calc(100vw - var(--sidebar-width))',
-            height: 'calc(100vh - var(--navbar-height))', // Adjust height to account for navbar
+            position: 'absolute', // Use absolute instead of fixed
+            top: 'var(--navbar-height)', // Position exactly below the navbar
+            left: 'var(--sidebar-width)', // Position exactly at the right edge of the sidebar
+            right: '0',
+            bottom: '0',
+            width: 'calc(100vw - var(--sidebar-width))', // Ensure width excludes sidebar
+            height: 'calc(100vh - var(--navbar-height))', // Ensure height excludes navbar
             padding: 0,
             margin: 0,
-            zIndex: 1000 // Ensure it's above other content
+            zIndex: 800 // Lower z-index to allow dev tools to appear on top
           },
           body: {
             padding: 0,
@@ -526,6 +545,37 @@ const MinappPopupContainer: React.FC = () => {
         </EmptyView>
       )}
       {WebviewContainerGroup}
+      {/* EMERGENCY ESCAPE BUTTON - for debugging when min-apps block dev tools */}
+      <div 
+        style={{
+          position: 'absolute',
+          top: '8px',
+          right: '8px',
+          zIndex: 9999,
+          backgroundColor: 'red',
+          color: 'white',
+          padding: '8px 16px',
+          borderRadius: '4px',
+          cursor: 'pointer',
+          fontWeight: 'bold',
+          boxShadow: '0 2px 8px rgba(0,0,0,0.3)',
+          border: '2px solid white'
+        }}
+        onClick={() => {
+          // Force close all min-apps
+          console.log('EMERGENCY: Forcing close of all min-apps');
+          setIsPopupShow(false);
+          hideMinappPopup();
+          // Close specific minapp if it exists
+          if (currentMinappId) {
+            closeMinapp(currentMinappId);
+          }
+          // Display alert to confirm
+          alert('Emergency min-app close triggered. The min-app should now be closed.');
+        }}
+      >
+        EMERGENCY CLOSE
+      </div>
     </Drawer>
   )
 }

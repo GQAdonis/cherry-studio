@@ -1,4 +1,4 @@
-import { WebContentsView, BrowserWindow, Rectangle, WebPreferences, app, shell } from 'electron'
+import { WebContentsView, BrowserWindow, Rectangle, WebPreferences, app, shell, session } from 'electron'
 import Logger from 'electron-log'
 import path from 'path'
 import fs from 'fs'
@@ -33,6 +33,10 @@ class WebContentsViewService {
 
   constructor() {
     logger.info('Initialized')
+    
+    // Increase default max listeners to avoid warnings
+    // This is needed because we attach multiple listeners to WebContents
+    require('events').EventEmitter.defaultMaxListeners = 20
   }
 
   /**
@@ -73,6 +77,15 @@ class WebContentsViewService {
       // Get app config for this mini app
       const appConfig = getMinAppConfig(appId)
       
+      // Create a custom session for this WebContentsView to avoid sandbox issues
+      const customSession = session.fromPartition(`persist:miniapp-${appId}`, { cache: true })
+      
+      // Configure session permissions
+      customSession.setPermissionRequestHandler((_webContents, _permission, callback) => {
+        // Allow all permissions for mini apps
+        callback(true)
+      })
+      
       // CRITICAL: Set up WebPreferences to ensure full browser capabilities
       // All mini apps MUST have access to localStorage, IndexedDB, and all browser APIs
       const webPreferences: WebPreferences = {
@@ -81,6 +94,8 @@ class WebContentsViewService {
         contextIsolation: true,
         // CRITICAL: Ensure sandbox is disabled to allow full browser capabilities
         sandbox: false,
+        // Use the custom session
+        session: customSession,
         // CRITICAL: Allow web security to be configured per app
         webSecurity: appConfig?.metadata?.webPreferences?.webSecurity ?? true,
         // CRITICAL: Allow running insecure content if needed
@@ -91,6 +106,12 @@ class WebContentsViewService {
         experimentalFeatures: true,
         // CRITICAL: Disable background throttling for better performance
         backgroundThrottling: false,
+        // Ensure JavaScript is enabled
+        javascript: true,
+        // Ensure webgl is enabled
+        webgl: true,
+        // Disable the sandbox renderer bundle that's causing issues
+        additionalArguments: ['--disable-sandboxed-renderer'],
         // Apply any additional app-specific web preferences
         ...appConfig?.metadata?.webPreferences
       }
@@ -103,10 +124,33 @@ class WebContentsViewService {
         Logger.info(`WebContentsViewService: Using preload script at ${preloadScriptPath}`)
       } else {
         Logger.warn(`WebContentsViewService: Default preload script not found at ${preloadScriptPath}`)
+        // Try to find the preload script in the resources directory as a fallback
+        const resourcePreloadPath = path.join(app.getAppPath(), 'resources/js/miniapp-preload.js')
+        if (fs.existsSync(resourcePreloadPath)) {
+          webPreferences.preload = resourcePreloadPath
+          Logger.info(`WebContentsViewService: Using fallback preload script at ${resourcePreloadPath}`)
+        }
       }
 
       // Create the WebContentsView with enhanced web preferences
-      const view = new WebContentsView({ webPreferences })
+      // Ensure we're creating a valid WebContentsView instance
+      try {
+        // Disable the sandbox renderer bundle that's causing issues
+        app.commandLine.appendSwitch('disable-sandboxed-renderer')
+        
+        const view = new WebContentsView({ webPreferences })
+        
+        // Verify the WebContentsView was created successfully
+        if (!view || !view.webContents) {
+          throw new Error('WebContentsView or webContents is null')
+        }
+        
+        // Disable the sandbox for this specific webContents
+        view.webContents.setBackgroundThrottling(false)
+        
+        // Set user agent to ensure full compatibility
+        const userAgent = view.webContents.getUserAgent()
+        view.webContents.setUserAgent(userAgent.replace('Electron', 'Chrome'))
       
       // Store the view and its initial state
       this.views.set(appId, view)
@@ -114,6 +158,9 @@ class WebContentsViewService {
       this.webContentsIds.set(appId, view.webContents.id)
       this.currentUrls.set(appId, url)
       this.isVisible.set(appId, false)
+      
+      // Log successful creation
+      logger.info(`Successfully created WebContentsView for appId: ${appId} with webContentsId: ${view.webContents.id}`)
       
       // Set up event handlers
       this.setupEventHandlers(appId, view, appConfig)
@@ -135,6 +182,10 @@ class WebContentsViewService {
         })
 
       return view
+      } catch (error) {
+        logger.error(`Failed to create WebContentsView for appId: ${appId}:`, error)
+        return null
+      }
     } catch (error) {
       Logger.error(`WebContentsViewService: Error creating view for appId: ${appId}:`, error)
       return null
@@ -145,6 +196,34 @@ class WebContentsViewService {
    * Set up event handlers for a WebContentsView
    */
   private setupEventHandlers(appId: string, view: WebContentsView, appConfig: any): void {
+    // Set up permission handling for the view
+    view.webContents.session.setPermissionRequestHandler((_webContents, _permission, callback) => {
+      // Allow all permissions for mini apps
+      callback(true)
+    })
+    
+    // Handle console messages for debugging
+    view.webContents.on('console-message', (_event, level, message, line, sourceId) => {
+      const levels = ['debug', 'info', 'warn', 'error']
+      const logLevel = levels[level] || 'info'
+      
+      // Use the correct logger method based on level
+      switch(logLevel) {
+        case 'debug':
+          logger.debug(`Console [${appId}]: ${message} (${sourceId}:${line})`)
+          break
+        case 'warn':
+          logger.warn(`Console [${appId}]: ${message} (${sourceId}:${line})`)
+          break
+        case 'error':
+          logger.error(`Console [${appId}]: ${message} (${sourceId}:${line})`)
+          break
+        case 'info':
+        default:
+          logger.info(`Console [${appId}]: ${message} (${sourceId}:${line})`)
+          break
+      }
+    })
     // Handle navigation events
     view.webContents.on('did-start-loading', () => {
       this.loadingStates.set(appId, true)

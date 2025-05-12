@@ -142,10 +142,9 @@ const ThinkingBlock: React.FC<Props> = ({ block }) => {
             </MessageTitleLabel>
           ),
           children: (
-            //  FIXME: 临时兼容
-            <div style={{ fontFamily, fontSize }}>
+            <MarkdownContainer fontFamily={fontFamily} fontSize={fontSize}>
               <Markdown block={block} />
-            </div>
+            </MarkdownContainer>
           )
         }
       ]}
@@ -168,6 +167,11 @@ const MessageTitleLabel = styled.div`
 
 const ThinkingText = styled.span`
   color: var(--color-text-2);
+`
+
+const MarkdownContainer = styled.div<{ fontFamily: string; fontSize: number }>`
+  font-family: ${props => props.fontFamily};
+  font-size: ${props => props.fontSize}px;
 `
 
 const ActionButton = styled.button`

@@ -145,12 +145,12 @@ const ContentAreaManager: React.FC<ContentAreaManagerProps> = ({ children }) => 
         // CRITICAL: Set absolute positioning for drawer contents to ensure proper alignment
         // This ensures proper positioning within the drawer, respecting navbar and sidebar
         position: 'absolute',
-        left: '0',
-        top: '0',
+        left: 'var(--sidebar-width)',
+        top: 'var(--navbar-height)',
         right: '0',
         bottom: '0',
-        width: '100%',
-        height: '100%',
+        width: 'calc(100vw - var(--sidebar-width))',
+        height: 'calc(100vh - var(--navbar-height))',
         overflow: 'hidden',
         // Ensure content is scrollable when necessary
         overflowY: 'auto',
