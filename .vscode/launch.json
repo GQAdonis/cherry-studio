@@ -21,7 +21,15 @@
       "env": {
         "FORCE_SHOW_WINDOW": "true",
         "DISABLE_LAUNCH_TO_TRAY": "true",
-        "OPEN_DEVTOOLS": "true"
+        "OPEN_DEVTOOLS": "true",
+        "SUPPRESS_SOURCEMAP_ERRORS": "true",
+        "SUPPRESS_SECURITY_WARNINGS": "true",
+        "SUPPRESS_ROUTER_WARNINGS": "true",
+        "VERBOSE_LOGGING": "false",
+        "LOG_WEBCONTENTSVIEW_EVENTS": "false",
+        "LOG_IPC_EVENTS": "false",
+        "LOG_PERFORMANCE": "false",
+        "LOG_MEMORY_USAGE": "false"
       },
       "console": "integratedTerminal",
       "protocol": "inspector",
@@ -66,7 +74,15 @@
         "FORCE_SHOW_WINDOW": "true",
         "DISABLE_LAUNCH_TO_TRAY": "true",
         "OPEN_DEVTOOLS": "true",
-        "DEBUG_FORCE_WINDOW_VISIBLE": "true"
+        "DEBUG_FORCE_WINDOW_VISIBLE": "true",
+        "SUPPRESS_SOURCEMAP_ERRORS": "true",
+        "SUPPRESS_SECURITY_WARNINGS": "true",
+        "SUPPRESS_ROUTER_WARNINGS": "true",
+        "VERBOSE_LOGGING": "false",
+        "LOG_WEBCONTENTSVIEW_EVENTS": "false",
+        "LOG_IPC_EVENTS": "false",
+        "LOG_PERFORMANCE": "false",
+        "LOG_MEMORY_USAGE": "false"
       },
       "outputCapture": "std",
       "console": "integratedTerminal",

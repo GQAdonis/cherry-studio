@@ -1,4 +1,4 @@
-import { CheckOutlined } from '@ant-design/icons'
+ import { CheckOutlined } from '@ant-design/icons'
 import { useSettings } from '@renderer/hooks/useSettings'
 import { MessageBlockStatus, type ThinkingMessageBlock } from '@renderer/types/newMessage'
 import { Collapse, message as antdMessage, Tooltip } from 'antd'

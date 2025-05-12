@@ -3,6 +3,10 @@ import Logger from 'electron-log'
 import path from 'path'
 import fs from 'fs'
 import { getMinAppConfig } from '../../../packages/shared/config/miniapps'
+import { createComponentLogger, attachDebugListeners, getDebugConfig } from '../debug-helpers'
+
+// Create a component-specific logger
+const logger = createComponentLogger('WebContentsViewService')
 
 /**
  * Service for managing WebContentsView instances in the main process.
@@ -28,7 +32,7 @@ class WebContentsViewService {
   private emptyView: WebContentsView | null = null
 
   constructor() {
-    Logger.info('WebContentsViewService: Initialized')
+    logger.info('Initialized')
   }
 
   /**
@@ -38,7 +42,7 @@ class WebContentsViewService {
     this.mainWindow = window
     // Create an empty view to use when hiding content
     this.emptyView = new WebContentsView({})
-    Logger.info('WebContentsViewService: Main window set')
+    logger.info('Main window set')
   }
 
   /**
@@ -52,16 +56,16 @@ class WebContentsViewService {
    * Create a new WebContentsView for a mini app using metadata configuration
    */
   createView(appId: string, url: string): WebContentsView | null {
-    Logger.info(`WebContentsViewService: Creating view for appId: ${appId}, url: ${url}`)
+    logger.info(`Creating view for appId: ${appId}, url: ${url}`)
 
     if (!this.mainWindow) {
-      Logger.error('WebContentsViewService: Cannot create view, main window not set')
+      logger.error('Cannot create view, main window not set')
       return null
     }
 
     // Check if a view already exists for this appId
     if (this.views.has(appId)) {
-      Logger.info(`WebContentsViewService: View already exists for appId: ${appId}, reusing existing view`)
+      logger.info(`View already exists for appId: ${appId}, reusing existing view`)
       return this.views.get(appId) || null
     }
 
@@ -114,6 +118,11 @@ class WebContentsViewService {
       // Set up event handlers
       this.setupEventHandlers(appId, view, appConfig)
       
+      // Attach debug listeners if enabled
+      if (getDebugConfig().logWebContentsViewEvents) {
+        attachDebugListeners(view.webContents, `WebContentsView-${appId}`)
+      }
+      
       // Load the URL
       this.loadUrlWithFallbacks(appId, url)
         .then(success => {
@@ -139,14 +148,14 @@ class WebContentsViewService {
     // Handle navigation events
     view.webContents.on('did-start-loading', () => {
       this.loadingStates.set(appId, true)
-      Logger.info(`WebContentsViewService: View started loading for appId: ${appId}`)
+      logger.info(`View started loading for appId: ${appId}`)
     })
 
     view.webContents.on('did-finish-load', () => {
       this.loadingStates.set(appId, false)
       const url = view.webContents.getURL()
       this.currentUrls.set(appId, url)
-      Logger.info(`WebContentsViewService: View finished loading for appId: ${appId}, url: ${url}`)
+      logger.info(`View finished loading for appId: ${appId}, url: ${url}`)
       
       // Apply visibility scripts after loading
       this.applyVisibilityScripts(appId, view, appConfig)
@@ -154,23 +163,23 @@ class WebContentsViewService {
 
     view.webContents.on('did-fail-load', (_event, errorCode, errorDescription) => {
       this.loadingStates.set(appId, false)
-      Logger.error(`WebContentsViewService: View failed to load for appId: ${appId}, error: ${errorDescription} (${errorCode})`)
+      logger.error(`View failed to load for appId: ${appId}, error: ${errorDescription} (${errorCode})`)
     })
 
     view.webContents.on('did-navigate', (_event, url) => {
       this.currentUrls.set(appId, url)
-      Logger.info(`WebContentsViewService: View navigated for appId: ${appId}, url: ${url}`)
+      logger.info(`View navigated for appId: ${appId}, url: ${url}`)
     })
 
     // Handle crashes and errors
     view.webContents.on('render-process-gone', (_event, details) => {
-      Logger.error(`WebContentsViewService: Render process gone for appId: ${appId}, reason: ${details.reason}`)
+      logger.error(`Render process gone for appId: ${appId}, reason: ${details.reason}`)
       this.loadingStates.set(appId, false)
     })
 
     // Use a different approach for crash detection
     view.webContents.on('unresponsive', () => {
-      Logger.error(`WebContentsViewService: View became unresponsive for appId: ${appId}`)
+      logger.error(`View became unresponsive for appId: ${appId}`)
       this.loadingStates.set(appId, false)
     })
   }
@@ -183,18 +192,18 @@ class WebContentsViewService {
       // Apply CSS if specified in the config
       if (appConfig?.metadata?.loadingBehavior?.injectCSS) {
         view.webContents.insertCSS(appConfig.metadata.loadingBehavior.injectCSS).catch(error => {
-          Logger.error(`WebContentsViewService: Error inserting CSS for appId: ${appId}:`, error)
+          logger.error(`Error inserting CSS for appId: ${appId}:`, error)
         })
       }
       
       // Apply visibility script if specified in the config
       if (appConfig?.metadata?.loadingBehavior?.visibilityScript) {
         view.webContents.executeJavaScript(appConfig.metadata.loadingBehavior.visibilityScript).catch(error => {
-          Logger.error(`WebContentsViewService: Error executing visibility script for appId: ${appId}:`, error)
+          logger.error(`Error executing visibility script for appId: ${appId}:`, error)
         })
       }
     } catch (error) {
-      Logger.error(`WebContentsViewService: Error applying visibility scripts for appId: ${appId}:`, error)
+      logger.error(`Error applying visibility scripts for appId: ${appId}:`, error)
     }
   }
 
@@ -234,7 +243,7 @@ class WebContentsViewService {
       this.currentUrls.set(appId, primaryUrl)
       return true
     } catch (error) {
-      Logger.error(`WebContentsViewService: Error loading primary URL for appId: ${appId}:`, error)
+      logger.error(`Error loading primary URL for appId: ${appId}:`, error)
       
       // Get app config for fallback URLs
       const appConfig = getMinAppConfig(appId)
@@ -245,10 +254,10 @@ class WebContentsViewService {
         try {
           await view.webContents.loadURL(fallbackUrl)
           this.currentUrls.set(appId, fallbackUrl)
-          Logger.info(`WebContentsViewService: Loaded fallback URL for appId: ${appId}, url: ${fallbackUrl}`)
+          logger.info(`Loaded fallback URL for appId: ${appId}, url: ${fallbackUrl}`)
           return true
         } catch (fallbackError) {
-          Logger.error(`WebContentsViewService: Error loading fallback URL for appId: ${appId}:`, fallbackError)
+          logger.error(`Error loading fallback URL for appId: ${appId}:`, fallbackError)
         }
       }
       
@@ -260,16 +269,16 @@ class WebContentsViewService {
    * Show a WebContentsView
    */
   showView(appId: string, bounds: Rectangle): boolean {
-    Logger.info(`WebContentsViewService: Showing view for appId: ${appId}`)
+    logger.info(`Showing view for appId: ${appId}`)
     
     const view = this.views.get(appId)
     if (!view) {
-      Logger.error(`WebContentsViewService: Cannot show view for appId: ${appId}, view not found`)
+      logger.error(`Cannot show view for appId: ${appId}, view not found`)
       return false
     }
     
     if (!this.mainWindow) {
-      Logger.error('WebContentsViewService: Cannot show view, main window not set')
+      logger.error('Cannot show view, main window not set')
       return false
     }
     
@@ -319,14 +328,14 @@ class WebContentsViewService {
       }
       
       // Log the original bounds for debugging
-      Logger.info(`WebContentsViewService: Original bounds for ${appId}:`, bounds);
+      logger.info(`Original bounds for ${appId}:`, bounds);
       
       // CRITICAL: Set the bounds for the view to make it visible
       // This ensures the WebContentsView is positioned exactly at 26px from left and 41px from top
       view.setBounds(adjustedBounds)
       
       // Log the adjusted bounds for debugging with precise positioning information
-      Logger.info(`WebContentsViewService: Set bounds for ${appId} with precise positioning:`, {
+      logger.info(`Set bounds for ${appId} with precise positioning:`, {
         ...adjustedBounds,
         timestamp: new Date().toISOString()
       })
@@ -335,7 +344,7 @@ class WebContentsViewService {
       // But we'll ensure it's properly positioned within the drawer
       // by using the exact bounds provided by the drawer
       this.mainWindow.setContentView(view)
-      Logger.info(`WebContentsViewService: Set WebContentsView for window for appId: ${appId}`)
+      logger.info(`Set WebContentsView for window for appId: ${appId}`)
       
       // Set properties to ensure proper rendering
       view.webContents.setZoomFactor(1.0) // Reset zoom to ensure proper rendering
@@ -367,16 +376,16 @@ class WebContentsViewService {
    * Hide a specific WebContentsView
    */
   hideView(appId: string): boolean {
-    Logger.info(`WebContentsViewService: Hiding view for appId: ${appId}`)
+    logger.info(`Hiding view for appId: ${appId}`)
     
     const view = this.views.get(appId)
     if (!view) {
-      Logger.error(`WebContentsViewService: Cannot hide view for appId: ${appId}, view not found`)
+      logger.error(`Cannot hide view for appId: ${appId}, view not found`)
       return false
     }
     
     if (!this.mainWindow) {
-      Logger.error('WebContentsViewService: Cannot hide view, main window not set')
+      logger.error('Cannot hide view, main window not set')
       return false
     }
     
@@ -393,7 +402,7 @@ class WebContentsViewService {
           
           // Replace with empty view
           this.mainWindow.setContentView(this.emptyView)
-          Logger.info(`WebContentsViewService: Replaced active view with empty view for appId: ${appId}`)
+          logger.info(`Replaced active view with empty view for appId: ${appId}`)
         }
       }
       
@@ -411,10 +420,10 @@ class WebContentsViewService {
    * Hide all WebContentsViews
    */
   hideAllViews(): boolean {
-    Logger.info('WebContentsViewService: Hiding all views')
+    logger.info('Hiding all views')
     
     if (!this.mainWindow) {
-      Logger.error('WebContentsViewService: Cannot hide all views, main window not set')
+      logger.error('Cannot hide all views, main window not set')
       return false
     }
     
@@ -440,11 +449,11 @@ class WebContentsViewService {
    * Destroy a WebContentsView
    */
   destroyView(appId: string): boolean {
-    Logger.info(`WebContentsViewService: Destroying view for appId: ${appId}`)
+    logger.info(`Destroying view for appId: ${appId}`)
     
     const view = this.views.get(appId)
     if (!view) {
-      Logger.error(`WebContentsViewService: Cannot destroy view for appId: ${appId}, view not found`)
+      logger.error(`Cannot destroy view for appId: ${appId}, view not found`)
       return false
     }
     
@@ -474,7 +483,7 @@ class WebContentsViewService {
    * Destroy all WebContentsViews
    */
   destroyAllViews(): boolean {
-    Logger.info('WebContentsViewService: Destroying all views')
+    logger.info('Destroying all views')
     
     try {
       // Destroy each view
@@ -495,7 +504,7 @@ class WebContentsViewService {
   setOpenLinksExternally(appId: string, openExternal: boolean): boolean {
     const view = this.views.get(appId)
     if (!view) {
-      Logger.error(`WebContentsViewService: Cannot set open links externally for appId: ${appId}, view not found`)
+      logger.error(`Cannot set open links externally for appId: ${appId}, view not found`)
       return false
     }
 
@@ -505,7 +514,7 @@ class WebContentsViewService {
         if (openExternal) {
           // Open links externally
           shell.openExternal(url).catch(error => {
-            Logger.error(`WebContentsViewService: Error opening external URL: ${url}`, error)
+            logger.error(`Error opening external URL: ${url}`, error)
           })
           return { action: 'deny' }
         }
@@ -513,7 +522,7 @@ class WebContentsViewService {
       })
       return true
     } catch (error) {
-      Logger.error(`WebContentsViewService: Error setting open links externally for ${appId}:`, error)
+      logger.error(`Error setting open links externally for ${appId}:`, error)
       return false
     }
   }
@@ -524,16 +533,16 @@ class WebContentsViewService {
   openDevTools(appId: string): boolean {
     const view = this.views.get(appId)
     if (!view) {
-      Logger.error(`WebContentsViewService: Cannot open DevTools for appId: ${appId}, view not found`)
+      logger.error(`Cannot open DevTools for appId: ${appId}, view not found`)
       return false
     }
 
     try {
       view.webContents.openDevTools()
-      Logger.info(`WebContentsViewService: Opened DevTools for appId: ${appId}`)
+      logger.info(`Opened DevTools for appId: ${appId}`)
       return true
     } catch (error) {
-      Logger.error(`WebContentsViewService: Error opening DevTools for ${appId}:`, error)
+      logger.error(`Error opening DevTools for ${appId}:`, error)
       return false
     }
   }
@@ -544,7 +553,7 @@ class WebContentsViewService {
   async reloadView(appId: string, url?: string): Promise<boolean> {
     const view = this.views.get(appId)
     if (!view) {
-      Logger.error(`WebContentsViewService: Cannot reload view for appId: ${appId}, view not found`)
+      logger.error(`Cannot reload view for appId: ${appId}, view not found`)
       return false
     }
 
@@ -555,11 +564,11 @@ class WebContentsViewService {
       } else {
         // Reload the current URL
         view.webContents.reload()
-        Logger.info(`WebContentsViewService: Reloaded view for appId: ${appId}`)
+        logger.info(`Reloaded view for appId: ${appId}`)
         return true
       }
     } catch (error) {
-      Logger.error(`WebContentsViewService: Error reloading view for appId: ${appId}:`, error)
+      logger.error(`Error reloading view for appId: ${appId}:`, error)
       return false
     }
   }
@@ -570,7 +579,7 @@ class WebContentsViewService {
   getCurrentUrl(appId: string): string | null {
     const view = this.views.get(appId)
     if (!view) {
-      Logger.error(`WebContentsViewService: Cannot get URL for appId: ${appId}, view not found`)
+      logger.error(`Cannot get URL for appId: ${appId}, view not found`)
       return null
     }
 
@@ -578,7 +587,7 @@ class WebContentsViewService {
       const url = view.webContents.getURL()
       return url
     } catch (error) {
-      Logger.error(`WebContentsViewService: Error getting URL for appId: ${appId}:`, error)
+      logger.error(`Error getting URL for appId: ${appId}:`, error)
       return null
     }
   }

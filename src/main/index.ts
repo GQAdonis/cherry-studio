@@ -6,12 +6,15 @@ import installExtension, { REACT_DEVELOPER_TOOLS, REDUX_DEVTOOLS } from 'electro
 import Logger from 'electron-log'
 
 // Import debug helpers
-import { setupDebugOverrides } from './debug-helpers'
+import { setupDebugOverrides, getDebugConfig, setDebugConfigOption, createComponentLogger } from './debug-helpers'
 import { debugLog, markPerformance, measurePerformance } from './utils/debugUtils'
 
 import { registerIpc } from './ipc'
 import { configManager } from './services/ConfigManager'
 import mcpService from './services/MCPService'
+
+// Create a component-specific logger for the main process
+const logger = createComponentLogger('MainProcess')
 import {
   CHERRY_STUDIO_PROTOCOL,
   handleProtocolUrl,
@@ -26,9 +29,19 @@ import { setUserDataDir } from './utils/file'
 Logger.initialize()
 
 // Setup debug overrides if running in debug mode
-if (process.env.DISABLE_LAUNCH_TO_TRAY === 'true' || process.env.FORCE_SHOW_WINDOW === 'true' || process.env.OPEN_DEVTOOLS === 'true') {
+if (process.env.DISABLE_LAUNCH_TO_TRAY === 'true' || 
+    process.env.FORCE_SHOW_WINDOW === 'true' || 
+    process.env.OPEN_DEVTOOLS === 'true' ||
+    process.env.SUPPRESS_SOURCEMAP_ERRORS === 'true' ||
+    process.env.SUPPRESS_SECURITY_WARNINGS === 'true' ||
+    process.env.SUPPRESS_ROUTER_WARNINGS === 'true' ||
+    process.env.VERBOSE_LOGGING === 'true' ||
+    process.env.LOG_WEBCONTENTSVIEW_EVENTS === 'true' ||
+    process.env.LOG_IPC_EVENTS === 'true' ||
+    process.env.LOG_PERFORMANCE === 'true' ||
+    process.env.LOG_MEMORY_USAGE === 'true') {
   setupDebugOverrides()
-  Logger.info('Debug mode enabled: overriding window visibility settings')
+  logger.info('Debug mode enabled with enhanced debugging capabilities')
 }
 
 // Check for single instance lock
@@ -39,23 +52,25 @@ if (!app.requestSingleInstanceLock()) {
   // Set the application name to "Prometheus Studio" instead of "prometheus-studio"
   app.name = 'Prometheus Studio'
 
-  // Example of using debug utilities
-  debugLog('Application startup', {
+  // Log application startup information
+  logger.info('Application startup', {
     name: app.name,
     version: app.getVersion(),
     platform: process.platform,
     arch: process.arch,
     nodeVersion: process.versions.node,
-    electronVersion: process.versions.electron
-  }, true)
+    electronVersion: process.versions.electron,
+    debugConfig: getDebugConfig()
+  })
 
   // This method will be called when Electron has finished
   // initialization and is ready to create browser windows.
   // Some APIs can only be used after this event occurs.
 
   app.whenReady().then(async () => {
-    // Example of using performance markers
+    // Mark performance for app-ready event
     markPerformance('app-ready')
+    logger.info('App ready event triggered')
 
     // Set app user model id for windows
     electronApp.setAppUserModelId(import.meta.env.VITE_MAIN_BUNDLE_ID || 'ai.prometheusags.PrometheusStudio')
@@ -69,9 +84,10 @@ if (!app.requestSingleInstanceLock()) {
     const mainWindow = windowService.createMainWindow()
     new TrayService()
 
-    // Example of measuring performance between two points
+    // Measure performance for main window creation
     markPerformance('main-window-created')
     measurePerformance('app-ready', 'main-window-created', 'Main window creation time')
+    logger.info('Main window created')
 
     app.on('activate', function () {
       const mainWindow = windowService.getMainWindow()
