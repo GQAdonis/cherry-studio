@@ -191,6 +191,8 @@ export const META_CONFIG: Record<string, MinAppConfig> = {
     id: 'dify',
     metadata: {
       fallbackUrls: [
+        'https://dify.prometheusags.ai/apps',
+        'https://dify.prometheusags.ai',
         'http://localhost:5001',
         'https://cloud.dify.ai/',
         'https://dify.ai/'
@@ -252,16 +254,25 @@ export const META_CONFIG: Record<string, MinAppConfig> = {
       linkHandling: {
         handleNavigation: true,
         externalUrlPatterns: [],
-        internalUrlPatterns: ['dify.ai']
+        internalUrlPatterns: ['dify.prometheusags.ai', 'dify.ai']
       },
       ui: {
         centerContent: false,
         backgroundColor: '#ffffff',
         contentPadding: {
-          top: 0,
+          top: 41,  // Ensure flush positioning with top navigation
           right: 0,
           bottom: 0,
-          left: 0
+          left: 26  // Ensure flush positioning with left sidebar
+        }
+      },
+      // Add ContentAreaManager configuration for proper positioning
+      settings: {
+        useContentAreaManager: true,
+        webContentsViewContainer: {
+          positionFlush: true,
+          sidebarWidth: 26,
+          topNavHeight: 41
         }
       },
       browserCapabilities: {

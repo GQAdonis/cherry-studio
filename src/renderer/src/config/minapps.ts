@@ -398,10 +398,24 @@ const ORIGIN_DEFAULT_MIN_APPS: MinAppType[] = [
     id: 'dify',
     name: 'Dify',
     logo: DifyAppLogo,
-    url: 'https://dify.prometheusagi.ai',
+    url: 'https://dify.prometheusags.ai/apps',
     bodered: true,
     style: {
       padding: 5
+    },
+    // Add metadata for WebContentsView configuration
+    metadata: {
+      // Prioritize the correct URL and add fallbacks
+      fallbackUrls: [
+        'https://dify.prometheusags.ai/apps',
+        'https://dify.prometheusags.ai'
+      ],
+      // Disable sandbox for better compatibility
+      webPreferences: {
+        sandbox: false,
+        contextIsolation: true,
+        webSecurity: true
+      }
     }
   },
   {
