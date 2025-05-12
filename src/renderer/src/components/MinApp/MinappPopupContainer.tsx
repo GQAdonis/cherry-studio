@@ -135,7 +135,7 @@ const MinappPopupContainer: React.FC = () => {
 
     //delete the extra webviewLoadedRefs
     console.log(`MinappPopupContainer: Checking webviewLoadedRefs, total: ${webviewLoadedRefs.current.size}`)
-    webviewLoadedRefs.current.forEach((loaded, appid) => {
+    webviewLoadedRefs.current.forEach((_, appid) => {
       if (!webviewRefs.current.has(appid)) {
         console.log(`MinappPopupContainer: Removing loaded ref for ${appid} as it no longer exists`)
         webviewLoadedRefs.current.delete(appid)

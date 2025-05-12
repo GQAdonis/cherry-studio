@@ -160,12 +160,34 @@ export class WindowService {
     mainWindow.once('ready-to-show', () => {
       mainWindow.webContents.setZoomFactor(configManager.getZoomFactor())
 
-      // show window only when laucn to tray not set
+      // show window only when launch to tray not set or debug force window visible is set
       const isLaunchToTray = configManager.getLaunchToTray()
-      if (!isLaunchToTray) {
-        //[mac]hacky-fix: miniWindow set visibleOnFullScreen:true will cause dock icon disappeared
-        app.dock?.show()
-        mainWindow.show()
+      const forceShowWindow = process.env.FORCE_SHOW_WINDOW === 'true' || process.env.DEBUG_FORCE_WINDOW_VISIBLE === 'true'
+      const disableLaunchToTray = process.env.DISABLE_LAUNCH_TO_TRAY === 'true'
+
+      // In debug mode, always show the window regardless of launch to tray setting
+      if (!isLaunchToTray || forceShowWindow || disableLaunchToTray) {
+        // Ensure dock icon is visible on macOS
+        if (process.platform === 'darwin') {
+          app.dock?.show()
+        }
+
+        // Ensure window is visible and focused
+        if (!mainWindow.isVisible()) {
+          mainWindow.show()
+        }
+
+        // Bring window to front and focus it
+        mainWindow.focus()
+
+        // Log window visibility for debugging
+        Logger.info('Window shown during startup with settings:', {
+          isLaunchToTray,
+          forceShowWindow,
+          disableLaunchToTray,
+          isVisible: mainWindow.isVisible(),
+          isFocused: mainWindow.isFocused()
+        })
       }
     })
 
@@ -211,7 +233,15 @@ export class WindowService {
 
   private setupWebContentsHandlers(mainWindow: BrowserWindow) {
     mainWindow.webContents.on('will-navigate', (event, url) => {
+      // Allow navigation to localhost:5173 (development server)
       if (url.includes('localhost:5173')) {
+        return
+      }
+      // Also allow navigation to localhost:3000 and redirect to localhost:5173
+      if (url.includes('localhost:3000')) {
+        event.preventDefault()
+        const redirectUrl = url.replace('localhost:3000', 'localhost:5173')
+        mainWindow.loadURL(redirectUrl)
         return
       }
 
@@ -277,8 +307,13 @@ export class WindowService {
 
   private loadMainWindowContent(mainWindow: BrowserWindow) {
     if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
-      mainWindow.loadURL(process.env['ELECTRON_RENDERER_URL'])
-      // mainWindow.webContents.openDevTools()
+      // Ensure we're using the correct URL (http://localhost:5173)
+      const rendererUrl = process.env['ELECTRON_RENDERER_URL'].replace('http://localhost:3000', 'http://localhost:5173');
+      mainWindow.loadURL(rendererUrl)
+      // Open DevTools automatically in development mode or when debugging is enabled
+      if (process.env.OPEN_DEVTOOLS === 'true') {
+        mainWindow.webContents.openDevTools()
+      }
     } else {
       mainWindow.loadFile(join(__dirname, '../renderer/index.html'))
     }
@@ -472,7 +507,13 @@ export class WindowService {
     })
 
     if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
-      this.miniWindow.loadURL(process.env['ELECTRON_RENDERER_URL'] + '/miniWindow.html')
+      // Ensure we're using the correct URL (http://localhost:5173)
+      const rendererUrl = process.env['ELECTRON_RENDERER_URL'].replace('http://localhost:3000', 'http://localhost:5173');
+      this.miniWindow.loadURL(rendererUrl + '/miniWindow.html')
+      // Open DevTools for mini window when debugging is enabled
+      if (process.env.OPEN_DEVTOOLS === 'true' && !isPreload) {
+        this.miniWindow.webContents.openDevTools({ mode: 'detach' })
+      }
     } else {
       this.miniWindow.loadFile(join(__dirname, '../renderer/miniWindow.html'))
     }

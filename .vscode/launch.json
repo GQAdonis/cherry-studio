@@ -1,40 +1,79 @@
 {
   "version": "0.2.0",
+  "compounds": [
+    {
+      "name": "Debug All",
+      "configurations": ["Debug Main Process", "Debug Renderer Process"],
+      "stopAll": true,
+      "preLaunchTask": "Start Electron with Debug Port"
+    }
+  ],
   "configurations": [
     {
       "name": "Debug Main Process",
       "type": "node",
       "request": "launch",
-      "cwd": "${workspaceRoot}",
       "runtimeExecutable": "${workspaceRoot}/node_modules/.bin/electron-vite",
-      "runtimeVersion": "20",
       "windows": {
         "runtimeExecutable": "${workspaceRoot}/node_modules/.bin/electron-vite.cmd"
       },
-      "runtimeArgs": ["--sourcemap"],
+      "runtimeArgs": ["dev", "--inspect=9229", "--remote-debugging-port=9222"],
       "env": {
-        "REMOTE_DEBUGGING_PORT": "9222"
-      }
+        "FORCE_SHOW_WINDOW": "true",
+        "DISABLE_LAUNCH_TO_TRAY": "true",
+        "OPEN_DEVTOOLS": "true"
+      },
+      "console": "integratedTerminal",
+      "protocol": "inspector",
+      "sourceMaps": true,
+      "outFiles": ["${workspaceFolder}/out/**/*.js"],
+      "timeout": 60000,
+      "autoAttachChildProcesses": true,
+      "resolveSourceMapLocations": [
+        "${workspaceFolder}/**",
+        "!**/node_modules/**"
+      ]
     },
     {
       "name": "Debug Renderer Process",
-      "port": 9222,
-      "request": "attach",
       "type": "chrome",
+      "request": "attach",
+      "port": 9222,
       "webRoot": "${workspaceFolder}/src/renderer",
       "timeout": 60000,
+      "sourceMaps": true,
+      "sourceMapPathOverrides": {
+        "webpack:///./src/*": "${webRoot}/*",
+        "webpack:///src/*": "${webRoot}/*"
+      },
+      "urlFilter": "http://localhost:5173*",
       "presentation": {
-        "hidden": true
+        "hidden": false
       }
-    }
-  ],
-  "compounds": [
+    },
     {
-      "name": "Debug All",
-      "configurations": ["Debug Main Process", "Debug Renderer Process"],
-      "presentation": {
-        "order": 1
-      }
+      "name": "Debug Main Process (Direct)",
+      "type": "node",
+      "request": "launch",
+      "cwd": "${workspaceRoot}",
+      "runtimeExecutable": "${workspaceRoot}/node_modules/.bin/electron",
+      "windows": {
+        "runtimeExecutable": "${workspaceRoot}/node_modules/.bin/electron.cmd"
+      },
+      "args": [".", "--inspect=9229", "--remote-debugging-port=9222"],
+      "env": {
+        "NODE_ENV": "development",
+        "FORCE_SHOW_WINDOW": "true",
+        "DISABLE_LAUNCH_TO_TRAY": "true",
+        "OPEN_DEVTOOLS": "true",
+        "DEBUG_FORCE_WINDOW_VISIBLE": "true"
+      },
+      "outputCapture": "std",
+      "console": "integratedTerminal",
+      "protocol": "inspector",
+      "sourceMaps": true,
+      "outFiles": ["${workspaceFolder}/out/**/*.js"],
+      "preLaunchTask": "electron-vite-dev-build"
     }
   ]
 }

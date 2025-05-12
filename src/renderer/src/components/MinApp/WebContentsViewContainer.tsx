@@ -43,7 +43,7 @@ const WebContentsViewContainer: React.FC<{
     currentUrlRef.current = url
 
     // Initialize
-    const isMounted = true
+    // const isMounted = true  // Removed unused variable
 
     // Create a ResizeObserver to update the WebContentsView position when the container size changes
     const resizeObserver = new ResizeObserver(() => {
@@ -68,10 +68,10 @@ const WebContentsViewContainer: React.FC<{
         // they don't consume the entire screen. The drawer itself is already positioned correctly
         // relative to the sidebar and navbar, so we position the content at (0,0) within the drawer
         const bounds = {
-          x: 0, // Position at the left edge of the drawer
-          y: 0, // Position at the top edge of the drawer
-          width: contentAreaBounds.width, // Use the full width of the drawer
-          height: contentAreaBounds.height // Use the full height of the drawer
+          x: contentAreaBounds.x, // Position at the left edge of the content area (after sidebar)
+          y: contentAreaBounds.y, // Position at the top edge of the content area (below navbar)
+          width: contentAreaBounds.width, // Use the full width of the content area
+          height: contentAreaBounds.height // Use the full height of the content area
         }
 
         // Log detailed positioning information for debugging
@@ -196,10 +196,10 @@ const WebContentsViewContainer: React.FC<{
       // they don't consume the entire screen. The drawer itself is already positioned correctly
       // relative to the sidebar and navbar, so we position the content at (0,0) within the drawer
       const bounds = {
-        x: 0, // Position at the left edge of the drawer
-        y: 0, // Position at the top edge of the drawer
-        width: contentAreaBounds.width, // Use the full width of the drawer
-        height: contentAreaBounds.height // Use the full height of the drawer
+        x: contentAreaBounds.x, // Position at the left edge of the content area (after sidebar)
+        y: contentAreaBounds.y, // Position at the top edge of the content area (below navbar)
+        width: contentAreaBounds.width, // Use the full width of the content area
+        height: contentAreaBounds.height // Use the full height of the content area
       }
 
       console.log(`WebContentsViewContainer: Showing existing view for ${appid} with precise positioning:`, {

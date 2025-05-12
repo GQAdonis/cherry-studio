@@ -5,6 +5,10 @@ import { app, ipcMain } from 'electron'
 import installExtension, { REACT_DEVELOPER_TOOLS, REDUX_DEVTOOLS } from 'electron-devtools-installer'
 import Logger from 'electron-log'
 
+// Import debug helpers
+import { setupDebugOverrides } from './debug-helpers'
+import { debugLog, markPerformance, measurePerformance } from './utils/debugUtils'
+
 import { registerIpc } from './ipc'
 import { configManager } from './services/ConfigManager'
 import mcpService from './services/MCPService'
@@ -21,6 +25,12 @@ import { setUserDataDir } from './utils/file'
 
 Logger.initialize()
 
+// Setup debug overrides if running in debug mode
+if (process.env.DISABLE_LAUNCH_TO_TRAY === 'true' || process.env.FORCE_SHOW_WINDOW === 'true' || process.env.OPEN_DEVTOOLS === 'true') {
+  setupDebugOverrides()
+  Logger.info('Debug mode enabled: overriding window visibility settings')
+}
+
 // Check for single instance lock
 if (!app.requestSingleInstanceLock()) {
   app.quit()
@@ -29,11 +39,24 @@ if (!app.requestSingleInstanceLock()) {
   // Set the application name to "Prometheus Studio" instead of "prometheus-studio"
   app.name = 'Prometheus Studio'
 
+  // Example of using debug utilities
+  debugLog('Application startup', {
+    name: app.name,
+    version: app.getVersion(),
+    platform: process.platform,
+    arch: process.arch,
+    nodeVersion: process.versions.node,
+    electronVersion: process.versions.electron
+  }, true)
+
   // This method will be called when Electron has finished
   // initialization and is ready to create browser windows.
   // Some APIs can only be used after this event occurs.
 
   app.whenReady().then(async () => {
+    // Example of using performance markers
+    markPerformance('app-ready')
+
     // Set app user model id for windows
     electronApp.setAppUserModelId(import.meta.env.VITE_MAIN_BUNDLE_ID || 'ai.prometheusags.PrometheusStudio')
 
@@ -45,6 +68,10 @@ if (!app.requestSingleInstanceLock()) {
 
     const mainWindow = windowService.createMainWindow()
     new TrayService()
+
+    // Example of measuring performance between two points
+    markPerformance('main-window-created')
+    measurePerformance('app-ready', 'main-window-created', 'Main window creation time')
 
     app.on('activate', function () {
       const mainWindow = windowService.getMainWindow()
