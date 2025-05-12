@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Test Mini App</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+      background-color: #f0f0f0;
+      color: #333;
+    }
+    .container {
+      border: 2px solid #333;
+      padding: 20px;
+      background-color: white;
+      border-radius: 5px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+    .position-info {
+      margin-bottom: 20px;
+      font-weight: bold;
+      padding: 10px;
+      background-color: #e9f7fe;
+      border-radius: 4px;
+    }
+    .api-test {
+      margin-top: 20px;
+    }
+    .test-section {
+      margin-bottom: 20px;
+      padding: 15px;
+      background-color: #f9f9f9;
+      border-radius: 4px;
+      border-left: 4px solid #ddd;
+    }
+    .test-section h2 {
+      margin-top: 0;
+      font-size: 18px;
+    }
+    .success {
+      color: green;
+      font-weight: bold;
+    }
+    .error {
+      color: red;
+      font-weight: bold;
+    }
+    .warning {
+      color: orange;
+      font-weight: bold;
+    }
+    .test-item {
+      margin-bottom: 8px;
+      padding: 8px;
+      background-color: #fff;
+      border-radius: 3px;
+      border: 1px solid #eee;
+    }
+    .test-controls {
+      margin-top: 20px;
+      padding: 15px;
+      background-color: #f5f5f5;
+      border-radius: 4px;
+    }
+    button {
+      padding: 8px 12px;
+      margin-right: 8px;
+      margin-bottom: 8px;
+      background-color: #4a90e2;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #357ab8;
+    }
+    .boundary-indicator {
+      position: fixed;
+      background-color: rgba(255, 0, 0, 0.2);
+      z-index: 1000;
+      pointer-events: none;
+    }
+    #top-boundary {
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+    }
+    #left-boundary {
+      top: 0;
+      left: 0;
+      bottom: 0;
+      width: 2px;
+    }
+    #log-container {
+      margin-top: 20px;
+      max-height: 200px;
+      overflow-y: auto;
+      padding: 10px;
+      background-color: #f5f5f5;
+      border-radius: 4px;
+      border: 1px solid #ddd;
+      font-family: monospace;
+      font-size: 12px;
+    }
+    .log-entry {
+      margin-bottom: 4px;
+      padding: 4px;
+      border-bottom: 1px solid #eee;
+    }
+    .log-info {
+      color: #4a90e2;
+    }
+    .log-error {
+      color: #e24a4a;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Test Mini App</h1>
+    
+    <div class="position-info" id="position-info">
+      Position: Calculating...
+    </div>
+    
+    <div class="test-section">
+      <h2>Browser API Tests</h2>
+      <div id="localStorage-test" class="test-item">localStorage: Testing...</div>
+      <div id="indexedDB-test" class="test-item">IndexedDB: Testing...</div>
+      <div id="cookies-test" class="test-item">Cookies: Testing...</div>
+      <div id="other-apis-test" class="test-item">Other APIs: Testing...</div>
+    </div>
+
+    <div class="test-section">
+      <h2>Positioning Tests</h2>
+      <div id="positioning-test" class="test-item">Positioning: Testing...</div>
+      <div id="scrolling-test" class="test-item">Scrolling: Testing...</div>
+      <div id="resize-test" class="test-item">Resize Handling: Testing...</div>
+    </div>
+
+    <div class="test-controls">
+      <h2>Test Controls</h2>
+      <button id="refresh-tests">Refresh Tests</button>
+      <button id="clear-storage">Clear Storage</button>
+      <button id="add-content">Add Content</button>
+      <button id="toggle-boundaries">Show Boundaries</button>
+    </div>
+
+    <div id="log-container">
+      <div class="log-entry log-info">Test mini-app initialized</div>
+    </div>
+  </div>
+
+  <script>
+    // Logging function
+    function log(message, type = 'info') {
+      const logContainer = document.getElementById('log-container');
+      const logEntry = document.createElement('div');
+      logEntry.className = `log-entry log-${type}`;
+      logEntry.textContent = message;
+      logContainer.appendChild(logEntry);
+      logContainer.scrollTop = logContainer.scrollHeight;
+    }
+
+    // Test position and dimensions
+    function updatePositionInfo() {
+      const info = document.getElementById('position-info');
+      info.textContent = `Position: ${window.screenX}x${window.screenY}, Size: ${window.innerWidth}x${window.innerHeight}`;
+      
+      // Update positioning test
+      const positioningTest = document.getElementById('positioning-test');
+      positioningTest.textContent = `Positioning: Window at ${window.screenX}x${window.screenY}, Size: ${window.innerWidth}x${window.innerHeight}`;
+      positioningTest.className = 'test-item success';
+    }
+    
+    // Test localStorage
+    function testLocalStorage() {
+      const result = document.getElementById('localStorage-test');
+      try {
+        localStorage.setItem('test', 'success');
+        const value = localStorage.getItem('test');
+        if (value === 'success') {
+          result.textContent = 'localStorage: ✅ Working';
+          result.className = 'test-item success';
+          log('localStorage test passed');
+        } else {
+          result.textContent = 'localStorage: ❌ Not working correctly';
+          result.className = 'test-item error';
+          log('localStorage test failed - unexpected value', 'error');
+        }
+      } catch (e) {
+        result.textContent = `localStorage: ❌ Error: ${e.message}`;
+        result.className = 'test-item error';
+        log(`localStorage test error: ${e.message}`, 'error');
+      }
+    }
+    
+    // Test IndexedDB
+    function testIndexedDB() {
+      const result = document.getElementById('indexedDB-test');
+      try {
+        const request = indexedDB.open('TestDB', 1);
+        request.onerror = function(event) {
+          result.textContent = `IndexedDB: ❌ Error: ${event.target.error}`;
+          result.className = 'test-item error';
+          log(`IndexedDB test error: ${event.target.error}`, 'error');
+        };
+        request.onsuccess = function(event) {
+          result.textContent = 'IndexedDB: ✅ Working';
+          result.className = 'test-item success';
+          log('IndexedDB test passed');
+          event.target.result.close();
+        };
+      } catch (e) {
+        result.textContent = `IndexedDB: ❌ Error: ${e.message}`;
+        result.className = 'test-item error';
+        log(`IndexedDB test error: ${e.message}`, 'error');
+      }
+    }
+
+    // Test cookies
+    function testCookies() {
+      const result = document.getElementById('cookies-test');
+      try {
+        document.cookie = "testCookie=success; expires=Fri, 31 Dec 9999 23:59:59 GMT";
+        if (document.cookie.indexOf('testCookie=success') !== -1) {
+          result.textContent = 'Cookies: ✅ Working';
+          result.className = 'test-item success';
+          log('Cookies test passed');
+        } else {
+          result.textContent = 'Cookies: ❌ Not working correctly';
+          result.className = 'test-item error';
+          log('Cookies test failed', 'error');
+        }
+      } catch (e) {
+        result.textContent = `Cookies: ❌ Error: ${e.message}`;
+        result.className = 'test-item error';
+        log(`Cookies test error: ${e.message}`, 'error');
+      }
+    }
+    
+    // Test other APIs
+    function testOtherAPIs() {
+      const result = document.getElementById('other-apis-test');
+      const apis = [
+        { name: 'fetch', available: 'fetch' in window },
+        { name: 'WebSocket', available: 'WebSocket' in window },
+        { name: 'Notification', available: 'Notification' in window },
+        { name: 'geolocation', available: 'geolocation' in navigator },
+        { name: 'serviceWorker', available: 'serviceWorker' in navigator },
+        { name: 'WebRTC', available: 'RTCPeerConnection' in window },
+        { name: 'WebGL', available: !!document.createElement('canvas').getContext('webgl') }
+      ];
+      
+      const working = apis.filter(api => api.available).length;
+      const apiList = apis.map(api => `${api.name}: ${api.available ? '✅' : '❌'}`).join(', ');
+      
+      if (working === apis.length) {
+        result.textContent = `Other APIs: ✅ All tested APIs available (${working}/${apis.length})`;
+        result.className = 'test-item success';
+        log(`All APIs available: ${apiList}`);
+      } else {
+        result.textContent = `Other APIs: ⚠️ Some APIs unavailable (${working}/${apis.length})`;
+        result.className = 'test-item warning';
+        log(`Some APIs unavailable: ${apiList}`, 'error');
+      }
+    }
+
+    // Test scrolling
+    function testScrolling() {
+      const result = document.getElementById('scrolling-test');
+      try {
+        // Check if scrolling works
+        window.scrollTo(0, 10);
+        setTimeout(() => {
+          if (window.scrollY === 10) {
+            result.textContent = 'Scrolling: ✅ Working';
+            result.className = 'test-item success';
+            log('Scrolling test passed');
+            // Reset scroll position
+            window.scrollTo(0, 0);
+          } else {
+            result.textContent = 'Scrolling: ⚠️ Not working as expected';
+            result.className = 'test-item warning';
+            log('Scrolling test warning - unexpected scroll position', 'error');
+          }
+        }, 100);
+      } catch (e) {
+        result.textContent = `Scrolling: ❌ Error: ${e.message}`;
+        result.className = 'test-item error';
+        log(`Scrolling test error: ${e.message}`, 'error');
+      }
+    }
+
+    // Test resize handling
+    function testResizeHandling() {
+      const result = document.getElementById('resize-test');
+      try {
+        result.textContent = 'Resize Handling: ✅ Working (resize window to test)';
+        result.className = 'test-item success';
+        log('Resize handler registered');
+      } catch (e) {
+        result.textContent = `Resize Handling: ❌ Error: ${e.message}`;
+        result.className = 'test-item error';
+        log(`Resize test error: ${e.message}`, 'error');
+      }
+    }
+
+    // Add content to test scrolling
+    function addContent() {
+      const container = document.querySelector('.container');
+      const contentDiv = document.createElement('div');
+      contentDiv.className = 'test-section';
+      contentDiv.innerHTML = `
+        <h2>Additional Content (${new Date().toLocaleTimeString()})</h2>
+        <p>This content was added dynamically to test scrolling behavior.</p>
+        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam auctor, nisl eget ultricies tincidunt, nisl nisl aliquam nisl, eget ultricies nisl nisl eget nisl. Nullam auctor, nisl eget ultricies tincidunt, nisl nisl aliquam nisl, eget ultricies nisl nisl eget nisl.</p>
+      `;
+      container.appendChild(contentDiv);
+      log('Added content to test scrolling');
+    }
+
+    // Toggle boundary indicators
+    function toggleBoundaries() {
+      let topBoundary = document.getElementById('top-boundary');
+      let leftBoundary = document.getElementById('left-boundary');
+      
+      if (topBoundary) {
+        document.body.removeChild(topBoundary);
+        document.body.removeChild(leftBoundary);
+        log('Hiding boundary indicators');
+      } else {
+        topBoundary = document.createElement('div');
+        topBoundary.id = 'top-boundary';
+        topBoundary.className = 'boundary-indicator';
+        
+        leftBoundary = document.createElement('div');
+        leftBoundary.id = 'left-boundary';
+        leftBoundary.className = 'boundary-indicator';
+        
+        document.body.appendChild(topBoundary);
+        document.body.appendChild(leftBoundary);
+        log('Showing boundary indicators');
+      }
+    }
+
+    // Clear storage
+    function clearStorage() {
+      try {
+        localStorage.clear();
+        
+        // Clear IndexedDB
+        indexedDB.deleteDatabase('TestDB');
+        
+        // Clear cookies
+        document.cookie.split(";").forEach(function(c) {
+          document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/");
+        });
+        
+        log('All storage cleared');
+        
+        // Re-run tests
+        runAllTests();
+      } catch (e) {
+        log(`Error clearing storage: ${e.message}`, 'error');
+      }
+    }
+
+    // Run all tests
+    function runAllTests() {
+      updatePositionInfo();
+      testLocalStorage();
+      testIndexedDB();
+      testCookies();
+      testOtherAPIs();
+      testScrolling();
+      testResizeHandling();
+      log('All tests refreshed');
+    }
+    
+    // Set up event listeners
+    window.addEventListener('load', function() {
+      log('Window loaded');
+      runAllTests();
+      
+      // Set up button event listeners
+      document.getElementById('refresh-tests').addEventListener('click', runAllTests);
+      document.getElementById('clear-storage').addEventListener('click', clearStorage);
+      document.getElementById('add-content').addEventListener('click', addContent);
+      document.getElementById('toggle-boundaries').addEventListener('click', toggleBoundaries);
+      
+      // Update position on resize
+      window.addEventListener('resize', function() {
+        updatePositionInfo();
+        log(`Window resized: ${window.innerWidth}x${window.innerHeight}`);
+      });
+    });
+  </script>
+</body>
+</html>

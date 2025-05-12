@@ -421,27 +421,49 @@ export default class OpenAICompatibleProvider extends BaseOpenAiProvider {
       console.debug('[tool] reqMessages', model.id, reqMessages)
 
       onChunk({ type: ChunkType.LLM_RESPONSE_CREATED })
-      const newStream = await this.sdk.chat.completions
-        // @ts-ignore key is not typed
-        .create(
-          {
-            model: model.id,
-            messages: reqMessages,
-            temperature: this.getTemperature(assistant, model),
-            top_p: this.getTopP(assistant, model),
-            max_tokens: maxTokens,
-            keep_alive: this.keepAliveTime,
-            stream: isSupportStreamOutput(),
-            tools: !isEmpty(tools) ? tools : undefined,
-            ...getOpenAIWebSearchParams(assistant, model),
-            ...this.getReasoningEffort(assistant, model),
-            ...this.getProviderSpecificParameters(assistant, model),
-            ...this.getCustomParameters(assistant)
-          },
-          {
-            signal
-          }
-        )
+      // Determine if streaming is supported
+      const streamSupported = isSupportStreamOutput();
+      
+      // Create the base parameters without reasoning_effort
+      const baseParams: Record<string, any> = {
+        model: model.id,
+        messages: reqMessages,
+        temperature: this.getTemperature(assistant, model),
+        top_p: this.getTopP(assistant, model),
+        max_tokens: maxTokens,
+        tools: !isEmpty(tools) ? tools : undefined,
+        ...getOpenAIWebSearchParams(assistant, model),
+        ...this.getProviderSpecificParameters(assistant, model),
+        ...this.getCustomParameters(assistant)
+      };
+      
+      // Handle reasoning effort separately to avoid type issues
+      const reasoningEffort = this.getReasoningEffort(assistant, model);
+      if (reasoningEffort && typeof reasoningEffort === 'object') {
+        // Only add valid OpenAI API properties
+        if ('reasoning' in reasoningEffort) {
+          baseParams.reasoning = reasoningEffort.reasoning;
+        }
+        if ('thinking' in reasoningEffort) {
+          baseParams.thinking = reasoningEffort.thinking;
+        }
+        if ('enable_thinking' in reasoningEffort) {
+          baseParams.enable_thinking = reasoningEffort.enable_thinking;
+        }
+      }
+      
+      // Create the appropriate parameters based on streaming support
+      const params = streamSupported
+        ? { ...baseParams, stream: true as const }
+        : { ...baseParams, stream: false as const };
+      
+      // Make the API call with type assertion to handle the complex parameter structure
+      const newStream = await this.sdk.chat.completions.create(
+        params as any,
+        {
+          signal
+        }
+      )
       await processStream(newStream, idx + 1)
     }
 
@@ -808,29 +830,46 @@ export default class OpenAICompatibleProvider extends BaseOpenAiProvider {
     reqMessages = processReqMessages(model, reqMessages)
     // 等待接口返回流
     onChunk({ type: ChunkType.LLM_RESPONSE_CREATED })
-    const stream = await this.sdk.chat.completions
-      // @ts-ignore key is not typed
-      .create(
-        {
+    // Determine if we should use streaming
+    const useStream = isSupportStreamOutput()
+    
+    // Create base parameters without stream-specific properties
+    const baseParams = {
           model: model.id,
           messages: reqMessages,
           temperature: this.getTemperature(assistant, model),
           top_p: this.getTopP(assistant, model),
           max_tokens: maxTokens,
-          keep_alive: this.keepAliveTime,
-          stream: isSupportStreamOutput(),
           tools: !isEmpty(tools) ? tools : undefined,
           service_tier: this.getServiceTier(model),
           ...getOpenAIWebSearchParams(assistant, model),
           ...this.getReasoningEffort(assistant, model),
           ...this.getProviderSpecificParameters(assistant, model),
           ...this.getCustomParameters(assistant)
-        },
-        {
+    }
+    
+    // Create request options
+    const requestOptions = {
           signal,
           timeout: this.getTimeout(model)
-        }
-      )
+    }
+    
+    // Add keep_alive parameter if needed (using type assertion)
+    if (this.keepAliveTime !== undefined) {
+      (baseParams as any).keep_alive = this.keepAliveTime
+    }
+    
+    // Call the appropriate overload based on streaming preference
+    const stream = await (useStream 
+      ? this.sdk.chat.completions.create(
+          { ...baseParams, stream: true as const },
+          requestOptions
+        )
+      : this.sdk.chat.completions.create(
+          { ...baseParams, stream: false as const },
+          requestOptions
+        )
+    )
 
     await processStream(stream, 0).finally(cleanup)
 
@@ -870,16 +909,25 @@ export default class OpenAICompatibleProvider extends BaseOpenAiProvider {
     await this.checkIsCopilot()
 
     // console.debug('[translate] reqMessages', model.id, message)
-    // @ts-ignore key is not typed
-    const response = await this.sdk.chat.completions.create({
+    // Create base parameters without stream-specific properties
+    const baseParams = {
       model: model.id,
       messages: messagesForApi as ChatCompletionMessageParam[],
-      stream,
-      keep_alive: this.keepAliveTime,
       temperature: this.getTemperature(assistant, model),
       top_p: this.getTopP(assistant, model),
       ...this.getReasoningEffort(assistant, model)
-    })
+    }
+    
+    // Add keep_alive parameter if needed (using type assertion)
+    if (this.keepAliveTime !== undefined) {
+      (baseParams as any).keep_alive = this.keepAliveTime
+    }
+    
+    // Call the appropriate overload based on streaming preference
+    const response = await (stream 
+      ? this.sdk.chat.completions.create({ ...baseParams, stream: true as const })
+      : this.sdk.chat.completions.create({ ...baseParams, stream: false as const })
+    )
 
     if (!stream) {
       return response.choices[0].message?.content || ''
@@ -949,14 +997,20 @@ export default class OpenAICompatibleProvider extends BaseOpenAiProvider {
 
     await this.checkIsCopilot()
 
-    // @ts-ignore key is not typed
-    const response = await this.sdk.chat.completions.create({
+    // Create base parameters
+    const baseParams = {
       model: model.id,
       messages: [systemMessage, userMessage] as ChatCompletionMessageParam[],
-      stream: false,
-      keep_alive: this.keepAliveTime,
+      stream: false as const,
       max_tokens: 1000
-    })
+    }
+    
+    // Add keep_alive parameter if needed (using type assertion)
+    if (this.keepAliveTime !== undefined) {
+      (baseParams as any).keep_alive = this.keepAliveTime
+    }
+    
+    const response = await this.sdk.chat.completions.create(baseParams)
 
     // 针对思考类模型的返回，总结仅截取</think>之后的内容
     let content = response.choices[0].message?.content || ''
@@ -991,21 +1045,27 @@ export default class OpenAICompatibleProvider extends BaseOpenAiProvider {
     const { abortController, cleanup } = this.createAbortController(lastUserMessage?.id)
     const { signal } = abortController
 
+    // Create base parameters
+    const baseParams = {
+      model: model.id,
+      messages: [systemMessage, userMessage] as ChatCompletionMessageParam[],
+      stream: false as const,
+      max_tokens: 1000
+    }
+    
+    // Add keep_alive parameter if needed (using type assertion)
+    if (this.keepAliveTime !== undefined) {
+      (baseParams as any).keep_alive = this.keepAliveTime
+    }
+    
+    // Request options
+    const requestOptions = {
+      timeout: 20 * 1000,
+      signal: signal
+    }
+    
     const response = await this.sdk.chat.completions
-      // @ts-ignore key is not typed
-      .create(
-        {
-          model: model.id,
-          messages: [systemMessage, userMessage] as ChatCompletionMessageParam[],
-          stream: false,
-          keep_alive: this.keepAliveTime,
-          max_tokens: 1000
-        },
-        {
-          timeout: 20 * 1000,
-          signal: signal
-        }
-      )
+      .create(baseParams, requestOptions)
       .finally(cleanup)
 
     // 针对思考类模型的返回，总结仅截取</think>之后的内容
@@ -1169,7 +1229,9 @@ export default class OpenAICompatibleProvider extends BaseOpenAiProvider {
       console.log(`[OpenAICompatibleProvider] Got ${models.length} models for ${this.provider.id}`)
       
       models.forEach((model) => {
-        model.id = model.id.trim()
+        if (model.id && typeof model.id === 'string') {
+          model.id = model.id.trim()
+        }
       })
 
       const filteredModels = models.filter(isSupportedModel)

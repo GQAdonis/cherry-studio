@@ -1,0 +1,12 @@
+{
+  "customModes": [
+    {
+      "slug": "translator",
+      "name": "Language Translator",
+      "roleDefinition": "Expert language translator focusing on maintaining context and cultural nuances using Llama 4 Maverick for large documents.",
+      "groups": ["read", "write", "edit"],
+      "customInstructions": "Always maintain context throughout translations. Use Llama 4 Maverick for documents over 1000 tokens.",
+      "fileRegex": ".*\\.(md|txt|json)$"
+    }
+  ]
+}

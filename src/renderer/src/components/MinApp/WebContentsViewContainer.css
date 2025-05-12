@@ -1,0 +1,134 @@
+.webcontents-view-container {
+  /* CRITICAL: Base styles for ALL mini apps */
+  width: 100% !important;
+  height: 100% !important;
+  background-color: var(--color-background);
+  display: flex !important;
+  /* CRITICAL: Ensure proper positioning for ALL mini apps */
+  position: absolute !important;
+  /* CRITICAL: Ensure flush with edges for ALL mini apps */
+  margin: 0 !important;
+  padding: 0 !important;
+  /* CRITICAL: Allow content to scroll when necessary */
+  overflow: auto !important;
+  box-sizing: border-box !important;
+  border: none !important;
+  outline: none !important;
+  /* CRITICAL: Position is controlled by ContentAreaManager */
+  /* These values are relative to the ContentAreaManager div */
+  /* which is already positioned at 26px from left and 41px from top */
+  left: 0 !important;
+  top: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  /* CRITICAL: Remove any inset that might cause overlap */
+  inset: 0 !important;
+  /* Ensure content is properly contained */
+  max-width: 100% !important;
+  max-height: 100% !important;
+  /* Remove border radius for full-screen appearance */
+  border-radius: 0 !important;
+  /* CRITICAL: Align content to the edges */
+  justify-content: flex-start !important;
+  align-items: flex-start !important;
+  /* CRITICAL: Ensure no transform that might affect positioning */
+  transform: none !important;
+  /* CRITICAL: Ensure no z-index issues */
+  z-index: 1 !important;
+}
+
+/* Style for bolt.diy app - additional customizations */
+.webcontents-view-container[data-appid='bolt.diy'] {
+  /* CRITICAL: Ensure background is transparent */
+  background-color: transparent !important;
+  /* CRITICAL: Center content within the container */
+  justify-content: center !important;
+  align-items: center !important;
+  /* CRITICAL: Ensure no positioning overrides */
+  left: 0 !important;
+  top: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  /* CRITICAL: Ensure no margin overrides */
+  margin: 0 !important;
+  /* CRITICAL: Ensure no padding overrides */
+  padding: 0 !important;
+  /* CRITICAL: Allow content to scroll when necessary */
+  overflow: auto !important;
+}
+
+/* Style for other apps - additional customizations */
+.webcontents-view-container[data-appid='dify'],
+.webcontents-view-container[data-appid='openai'],
+.webcontents-view-container[data-appid='groq'],
+.webcontents-view-container[data-appid='anthropic'] {
+  /* CRITICAL: Center content within the container */
+  justify-content: center !important;
+  align-items: center !important;
+  /* CRITICAL: Ensure no positioning overrides */
+  left: 0 !important;
+  top: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  /* CRITICAL: Ensure no margin overrides */
+  margin: 0 !important;
+  /* CRITICAL: Ensure no padding overrides */
+  padding: 0 !important;
+  /* CRITICAL: Allow content to scroll when necessary */
+  overflow: auto !important;
+}
+
+/* Loading indicator styles */
+.loading-indicator {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background-color: var(--color-background, #f5f5f5);
+  z-index: 10;
+  transition: opacity 0.3s ease-in-out;
+  /* CRITICAL: Ensure loading indicator doesn't affect positioning */
+  margin: 0 !important;
+  padding: 0 !important;
+  box-sizing: border-box !important;
+}
+
+.loading-indicator.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.app-icon {
+  width: 64px;
+  height: 64px;
+  margin-bottom: 16px;
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.loading-spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid rgba(0, 0, 0, 0.1);
+  border-radius: 50%;
+  border-top-color: var(--color-primary, #007aff);
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.loading-text {
+  margin-top: 16px;
+  font-size: 14px;
+  color: var(--color-text, #333);
+}

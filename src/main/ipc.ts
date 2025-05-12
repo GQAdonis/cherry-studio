@@ -29,6 +29,7 @@ import { TrayService } from './services/TrayService'
 import { setOpenLinkExternal } from './services/WebviewService'
 import { windowService } from './services/WindowService'
 import { getResourcePath } from './utils'
+import { registerWebContentsViewIpc } from './ipc/webContentsViewIpc'
 import { decrypt, encrypt } from './utils/aes'
 import { getConfigDir, getFilesDir } from './utils/file'
 import { compress, decompress } from './utils/zip'
@@ -39,6 +40,9 @@ const obsidianVaultService = new ObsidianVaultService()
 
 export function registerIpc(mainWindow: BrowserWindow, app: Electron.App) {
   const appUpdater = new AppUpdater(mainWindow)
+  
+  // Register WebContentsView IPC handlers
+  registerWebContentsViewIpc()
 
   ipcMain.handle(IpcChannel.App_Info, () => ({
     version: app.getVersion(),

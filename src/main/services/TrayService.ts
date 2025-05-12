@@ -70,7 +70,7 @@ export class TrayService {
       this.tray.setContextMenu(contextMenu)
     }
 
-    this.tray.setToolTip('Cherry Studio')
+    this.tray.setToolTip('Prometheus Studio')
 
     this.tray.on('right-click', () => {
       this.tray?.popUpContextMenu(contextMenu)

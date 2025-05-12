@@ -1,0 +1,52 @@
+.minapp-drawer {
+  .ant-drawer-content {
+    background-color: var(--color-background);
+  }
+
+  .ant-drawer-header {
+    background-color: var(--color-background);
+    border-bottom: 1px solid var(--color-border);
+    padding: 8px 16px;
+  }
+
+  .ant-drawer-body {
+    padding: 0;
+    height: calc(100% - 56px);
+    overflow: hidden;
+    /* Center content for all mini apps */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+}
+
+/* Special styling for bolt.diy mini app */
+.minapp-drawer[data-appid="bolt.diy"] {
+  .ant-drawer-body {
+    /* Ensure content is centered */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    /* Add background color to match Claude app */
+    background-color: #f5f5f5;
+  }
+  
+  .ant-drawer-content-wrapper {
+    /* Ensure the drawer takes full width */
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+}
+
+/* Special styling for other mini apps that need similar treatment */
+.minapp-drawer[data-appid="dify"],
+.minapp-drawer[data-appid="openai"],
+.minapp-drawer[data-appid="groq"],
+.minapp-drawer[data-appid="anthropic"] {
+  .ant-drawer-body {
+    /* Ensure content is centered */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+}

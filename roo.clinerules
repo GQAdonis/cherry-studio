@@ -1,0 +1,65 @@
+# roo.clinerules for Electron + TypeScript + Yarn
+
+[package_manager]
+yarn
+
+[project_type]
+electron-typescript
+
+[dependency_management]
+- Use yarn for all dependency operations (add, remove, upgrade).
+- The lock file (yarn.lock) must be committed and up to date.
+- Use devDependencies for build/test tools (e.g., Electron, TypeScript, Vite, Electron Forge, concurrently, cross-env).
+- Use exact versions for Electron and TypeScript dependencies.
+
+[build]
+- Use Electron Forge for packaging and distribution.
+- Use separate tsconfig.json files for Electron and frontend code.
+- Scripts should include: dev, preview, build (see package.json best practices).
+- Use Vite for frontend build, tsc for Electron code.
+
+[security]
+- Always code sign the distributable before release.
+- Use contextBridge and preload scripts for secure IPC.
+- Never expose Node.js APIs directly to the renderer process.
+- Always use the pure WebContentsView implementation and NEVER use BrowserView in ANY form.
+
+[code_style]
+- Use TypeScript strict mode.
+- Use Prettier and ESLint for code formatting and linting.
+- Follow Electron and TypeScript community best practices for file structure.
+- Implement all web content rendering using WebContentsView exclusively, never BrowserView.
+
+[testing]
+- Add tests for both main and renderer processes.
+- Use Jest or similar for unit tests.
+
+[documentation]
+- Document all custom scripts and build steps in README.md.
+- Document IPC channels and preload API surface.
+
+[continuous_integration]
+- Add CI workflow to check build, lint, and test on push/PR.
+
+[ai_generation]
+- Always check the memory MCP server before generating code to avoid duplicating mistakes.
+- After successfully fixing a bug (no compile or lint errors), automatically generate a memory in MCP memory describing how the bug was fixed.
+- Before finalizing code generation, check with the Tavily search and extract MCP servers, as well as the Context7 MCP server, to ensure correct API versions are used for this project.
+- If no relevant information is found, check the node_modules code directories and package.json files to ensure the actual code for installed components matches the generated code.
+- Always check the docs/* subdirectories for markdown files that specify architectural choices, other rules, or design instructions generated from other tools, and ensure adherence to those standards.
+
+[web_content_implementation]
+- Always use WebContentsView for all web content rendering.
+- NEVER use BrowserView in any form or implementation.
+- All mini apps must be implemented using WebContentsView exclusively.
+- Any code that uses BrowserView must be refactored to use WebContentsView instead.
+- WebContentsView provides better web compatibility, proper Z-order management, and improved resource management.
+
+[mini_app_requirements]
+- Mini apps MUST be able to use localStorage, IndexedDB, and have NO browser restrictions on ANY APIs they may want to use.
+- All mini apps should use the SAME code and ONLY differ in their metadata configuration in 'packages/shared/config/miniapps.ts'.
+- Mini apps MUST NEVER overlap with the side navigation or top navigation.
+- Mini apps MUST be positioned flush against the left sidebar and top navigation without ANY overlap.
+- Mini apps MUST only consume the content area of the application.
+- Mini app content MUST be scrollable if necessary, rather than overflowing.
+- Mini apps MUST respond correctly to window resize events, maintaining their flush positioning.

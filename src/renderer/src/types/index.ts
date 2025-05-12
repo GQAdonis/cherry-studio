@@ -260,7 +260,23 @@ export type MinAppType = {
   background?: string
   style?: React.CSSProperties
   addTime?: string
-  type?: 'Custom' | 'Default' // Added the 'type' property
+  type?: 'Custom' | 'Default'
+  // Add metadata for WebContentsView configuration
+  metadata?: {
+    fallbackUrls?: string[]
+    webPreferences?: {
+      sandbox?: boolean
+      contextIsolation?: boolean
+      webSecurity?: boolean
+      allowRunningInsecureContent?: boolean
+      nodeIntegration?: boolean
+      [key: string]: any
+    }
+    // Additional app-specific settings
+    settings?: {
+      [key: string]: any
+    }
+  }
 }
 
 export interface FileType {

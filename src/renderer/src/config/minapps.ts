@@ -5,7 +5,7 @@ import ApplicationLogo from '@renderer/assets/images/apps/application.png?url'
 import BaiduAiAppLogo from '@renderer/assets/images/apps/baidu-ai.png?url'
 import BaiduAiSearchLogo from '@renderer/assets/images/apps/baidu-ai-search.webp?url'
 import BaicuanAppLogo from '@renderer/assets/images/apps/baixiaoying.webp?url'
-import BoltAppLogo from '@renderer/assets/images/apps/bolt.svg?url'
+import BoltAppLogo from '@renderer/assets/images/apps/bolt.png?url'
 import CiciAppLogo from '@renderer/assets/images/apps/cici.webp?url'
 import CozeAppLogo from '@renderer/assets/images/apps/coze.webp?url'
 import DangbeiLogo from '@renderer/assets/images/apps/dangbei.jpg?url'
@@ -266,11 +266,30 @@ const ORIGIN_DEFAULT_MIN_APPS: MinAppType[] = [
     url: 'https://duck.ai'
   },
   {
-    id: 'bolt',
-    name: 'bolt',
+    id: 'bolt.diy',
+    name: 'Bolt.diy',
     logo: BoltAppLogo,
-    url: 'https://bolt.new/',
-    bodered: true
+    url: 'https://bolt.prometheusags.ai',
+    bodered: true,
+    // Add style properties to ensure proper rendering
+    style: {
+      padding: 5,
+      backgroundColor: '#ffffff'
+    },
+    // Add metadata for WebContentsView configuration
+    metadata: {
+      // Prioritize local file for better reliability
+      fallbackUrls: [
+        'file://${path.join(__dirname, "resources", "miniapps", "bolt.diy.html")}',
+        'http://localhost:3000/bolt.diy'
+      ],
+      // Disable sandbox for better compatibility
+      webPreferences: {
+        sandbox: false,
+        contextIsolation: true,
+        webSecurity: true
+      }
+    }
   },
   {
     id: 'nm',
@@ -379,7 +398,7 @@ const ORIGIN_DEFAULT_MIN_APPS: MinAppType[] = [
     id: 'dify',
     name: 'Dify',
     logo: DifyAppLogo,
-    url: 'https://dify.skytok.net',
+    url: 'https://dify.prometheusagi.ai',
     bodered: true,
     style: {
       padding: 5

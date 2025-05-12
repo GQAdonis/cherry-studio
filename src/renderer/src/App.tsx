@@ -19,6 +19,8 @@ import HomePage from './pages/home/HomePage'
 import KnowledgePage from './pages/knowledge/KnowledgePage'
 import PaintingsRoutePage from './pages/paintings/PaintingsRoutePage'
 import SettingsPage from './pages/settings/SettingsPage'
+import MiniAppPositioningTest from './pages/test/MiniAppPositioningTest'
+import TestMiniAppPage from './pages/test/TestMiniAppPage'
 import TranslatePage from './pages/translate/TranslatePage'
 
 function App(): React.ReactElement {
@@ -42,6 +44,8 @@ function App(): React.ReactElement {
                       <Route path="/knowledge" element={<KnowledgePage />} />
                       <Route path="/apps" element={<AppsPage />} />
                       <Route path="/settings/*" element={<SettingsPage />} />
+                      <Route path="/test" element={<TestMiniAppPage />} />
+                      <Route path="/test/positioning" element={<MiniAppPositioningTest />} />
                     </Routes>
                   </HashRouter>
                 </TopViewContainer>

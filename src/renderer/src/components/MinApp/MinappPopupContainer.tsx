@@ -26,8 +26,10 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import styled from 'styled-components'
 
+import ContentAreaManager from '../ContentAreaManager'
 import SvgSpinners180Ring from '../Icons/SvgSpinners180Ring'
-import WebviewContainer from './WebviewContainer'
+import WebContentsViewContainer from './WebContentsViewContainer'
+import './MinappPopupContainer.css'
 
 interface AppExtraInfo {
   canPinned: boolean
@@ -45,6 +47,10 @@ const MinappPopupContainer: React.FC = () => {
   const { t } = useTranslation()
   const backgroundColor = useNavBackgroundColor()
   const dispatch = useAppDispatch()
+
+  console.log(`MinappPopupContainer: Initializing with currentMinappId: ${currentMinappId}`)
+  console.log(`MinappPopupContainer: openedKeepAliveMinapps:`, openedKeepAliveMinapps)
+  console.log(`MinappPopupContainer: openedOneOffMinapp:`, openedOneOffMinapp)
 
   /** control the drawer open or close */
   const [isPopupShow, setIsPopupShow] = useState(true)
@@ -71,27 +77,34 @@ const MinappPopupContainer: React.FC = () => {
 
   /** set the popup display status */
   useEffect(() => {
+    console.log(`MinappPopupContainer: Effect triggered - minappShow: ${minappShow}, currentMinappId: ${currentMinappId}`)
+    
     if (minappShow) {
       // init the current url
       if (currentMinappId && currentAppInfo) {
+        console.log(`MinappPopupContainer: Setting current URL to ${currentAppInfo.url} for ${currentMinappId}`)
         setCurrentUrl(currentAppInfo.url)
       }
 
       setIsPopupShow(true)
 
       if (webviewLoadedRefs.current.get(currentMinappId)) {
+        console.log(`MinappPopupContainer: Webview already loaded for ${currentMinappId}, setting ready state`)
         setIsReady(true)
         /** the case that open the minapp from sidebar */
       } else if (lastMinappId.current !== currentMinappId && lastMinappShow.current === minappShow) {
+        console.log(`MinappPopupContainer: New minapp ${currentMinappId} not loaded yet, setting not ready`)
         setIsReady(false)
       }
     } else {
+      console.log(`MinappPopupContainer: Hiding popup`)
       setIsPopupShow(false)
       setIsReady(false)
     }
 
     return () => {
       /** renew the last minapp id and show status */
+      console.log(`MinappPopupContainer: Cleanup - setting lastMinappId to ${currentMinappId}`)
       lastMinappId.current = currentMinappId
       lastMinappShow.current = minappShow
     }
@@ -99,7 +112,13 @@ const MinappPopupContainer: React.FC = () => {
   }, [minappShow, currentMinappId])
 
   useEffect(() => {
-    if (!webviewRefs.current) return
+    if (!webviewRefs.current) {
+      console.log(`MinappPopupContainer: webviewRefs is null, skipping effect`)
+      return
+    }
+
+    console.log(`MinappPopupContainer: Setting display for webviews, current ID: ${currentMinappId}`)
+    console.log(`MinappPopupContainer: Total webview refs: ${webviewRefs.current.size}`)
 
     /** set the webview display status
      * DO NOT use the state to set the display status,
@@ -107,17 +126,55 @@ const MinappPopupContainer: React.FC = () => {
      */
     webviewRefs.current.forEach((webviewRef, appid) => {
       if (!webviewRef) return
-      webviewRef.style.display = appid === currentMinappId ? 'inline-flex' : 'none'
+      const display = appid === currentMinappId ? 'inline-flex' : 'none'
+      console.log(`MinappPopupContainer: Setting display for ${appid} to ${display}`)
+      webviewRef.style.display = display
     })
 
     //delete the extra webviewLoadedRefs
-    webviewLoadedRefs.current.forEach((_, appid) => {
+    console.log(`MinappPopupContainer: Checking webviewLoadedRefs, total: ${webviewLoadedRefs.current.size}`)
+    webviewLoadedRefs.current.forEach((loaded, appid) => {
       if (!webviewRefs.current.has(appid)) {
+        console.log(`MinappPopupContainer: Removing loaded ref for ${appid} as it no longer exists`)
         webviewLoadedRefs.current.delete(appid)
       } else if (appid === currentMinappId) {
-        const webviewId = webviewRefs.current.get(appid)?.getWebContentsId()
-        if (webviewId) {
-          window.api.webview.setOpenLinkExternal(webviewId, minappsOpenLinkExternal)
+        console.log(`MinappPopupContainer: Setting up external link handling for current app ${appid}`)
+        const webviewRef = webviewRefs.current.get(appid)
+        if (webviewRef) {
+          // Check if this is a WebContentsView or a regular webview
+          if (typeof webviewRef.getWebContentsId === 'function') {
+            console.log(`MinappPopupContainer: ${appid} has getWebContentsId function, checking type`)
+            const webviewIdResult: unknown = webviewRef.getWebContentsId()
+
+            // Check if getWebContentsId returns a Promise (WebContentsView) or a number (WebviewTag)
+            if (webviewIdResult instanceof Promise) {
+              console.log(`MinappPopupContainer: ${appid} is using WebContentsView (async)`)
+              // For WebContentsView (async)
+              webviewIdResult
+                .then((webviewId: number | null) => {
+                  console.log(`MinappPopupContainer: Got WebContentsId for ${appid}: ${webviewId}`)
+                  if (webviewId !== null) {
+                    window.api.webview.setOpenLinkExternal(webviewId, minappsOpenLinkExternal)
+                  }
+                })
+                .catch((error) => {
+                  console.error(`MinappPopupContainer: Error getting WebContents ID for ${appid}:`, error)
+                  // Fallback to using the WebContentsView API
+                  console.log(`MinappPopupContainer: Falling back to WebContentsView API for ${appid}`)
+                  window.api.webContentsView.setOpenLinksExternally(appid, minappsOpenLinkExternal)
+                })
+            } else {
+              console.log(`MinappPopupContainer: ${appid} is using regular WebviewTag (sync): ${webviewIdResult}`)
+              // For regular WebviewTag (sync)
+              if (webviewIdResult !== null && typeof webviewIdResult === 'number') {
+                window.api.webview.setOpenLinkExternal(webviewIdResult, minappsOpenLinkExternal)
+              }
+            }
+          } else {
+            console.log(`MinappPopupContainer: ${appid} doesn't have getWebContentsId, using WebContentsView API`)
+            // For WebContentsView, use the dedicated API
+            window.api.webContentsView.setOpenLinksExternally(appid, minappsOpenLinkExternal)
+          }
         }
       }
     })
@@ -170,28 +227,71 @@ const MinappPopupContainer: React.FC = () => {
 
   /** the callback function to set the webviews ref */
   const handleWebviewSetRef = (appid: string, element: WebviewTag | null) => {
+    console.log(`MinappPopupContainer: Setting webview ref for ${appid}:`, element ? 'element exists' : 'null')
+    
     webviewRefs.current.set(appid, element)
 
     if (!webviewRefs.current.has(appid)) {
+      console.log(`MinappPopupContainer: Webview ref for ${appid} not found, setting to null`)
       webviewRefs.current.set(appid, null)
       return
     }
 
     if (element) {
+      console.log(`MinappPopupContainer: Stored webview ref for ${appid}`)
       webviewRefs.current.set(appid, element)
     } else {
+      console.log(`MinappPopupContainer: Removing webview ref for ${appid}`)
       webviewRefs.current.delete(appid)
     }
   }
 
   /** the callback function to set the webviews loaded indicator */
   const handleWebviewLoaded = (appid: string) => {
+    console.log(`MinappPopupContainer: Webview loaded for ${appid}`)
     webviewLoadedRefs.current.set(appid, true)
-    const webviewId = webviewRefs.current.get(appid)?.getWebContentsId()
-    if (webviewId) {
-      window.api.webview.setOpenLinkExternal(webviewId, minappsOpenLinkExternal)
+
+    const webviewRef = webviewRefs.current.get(appid)
+    if (webviewRef) {
+      console.log(`MinappPopupContainer: Setting up external link handling for loaded app ${appid}`)
+      // Check if this is a WebContentsView or a regular webview
+      if (typeof webviewRef.getWebContentsId === 'function') {
+        console.log(`MinappPopupContainer: ${appid} has getWebContentsId function, checking type`)
+        const webviewIdResult: unknown = webviewRef.getWebContentsId()
+
+        // Check if getWebContentsId returns a Promise (WebContentsView) or a number (WebviewTag)
+        if (webviewIdResult instanceof Promise) {
+          console.log(`MinappPopupContainer: ${appid} is using WebContentsView (async)`)
+          // For WebContentsView (async)
+          webviewIdResult
+            .then((webviewId: number | null) => {
+              console.log(`MinappPopupContainer: Got WebContentsId for ${appid}: ${webviewId}`)
+              if (webviewId !== null) {
+                window.api.webview.setOpenLinkExternal(webviewId, minappsOpenLinkExternal)
+              }
+            })
+            .catch((error) => {
+              console.error(`MinappPopupContainer: Error getting WebContents ID for ${appid}:`, error)
+              // Fallback to using the WebContentsView API
+              console.log(`MinappPopupContainer: Falling back to WebContentsView API for ${appid}`)
+              window.api.webContentsView.setOpenLinksExternally(appid, minappsOpenLinkExternal)
+            })
+        } else {
+          console.log(`MinappPopupContainer: ${appid} is using regular WebviewTag (sync): ${webviewIdResult}`)
+          // For regular WebviewTag (sync)
+          if (webviewIdResult !== null && typeof webviewIdResult === 'number') {
+            window.api.webview.setOpenLinkExternal(webviewIdResult, minappsOpenLinkExternal)
+          }
+        }
+      } else {
+        console.log(`MinappPopupContainer: ${appid} doesn't have getWebContentsId, using WebContentsView API`)
+        // For WebContentsView, use the dedicated API
+        window.api.webContentsView.setOpenLinksExternally(appid, minappsOpenLinkExternal)
+      }
     }
+
     if (appid == currentMinappId) {
+      console.log(`MinappPopupContainer: Current app ${appid} is loaded, setting ready state`)
       setTimeout(() => setIsReady(true), 200)
     }
   }
@@ -337,18 +437,27 @@ const MinappPopupContainer: React.FC = () => {
     )
   }
 
-  /** group the webview containers with Memo, one of the key to make them keepalive */
+  /** group the WebContentsView containers with Memo, one of the key to make them keepalive */
   const WebviewContainerGroup = useMemo(() => {
-    return combinedApps.map((app) => (
-      <WebviewContainer
-        key={app.id}
-        appid={app.id}
-        url={app.url}
-        onSetRefCallback={handleWebviewSetRef}
-        onLoadedCallback={handleWebviewLoaded}
-        onNavigateCallback={handleWebviewNavigate}
-      />
-    ))
+    console.log(`MinappPopupContainer: Creating WebContentsView containers for ${combinedApps.length} apps`)
+    
+    return (
+      <ContentAreaManager>
+        {combinedApps.map((app) => {
+          console.log(`MinappPopupContainer: Creating WebContentsView for ${app.id} with URL ${app.url}`)
+          return (
+            <WebContentsViewContainer
+              key={app.id}
+              appid={app.id}
+              url={app.url}
+              onSetRefCallback={handleWebviewSetRef}
+              onLoadedCallback={handleWebviewLoaded}
+              onNavigateCallback={handleWebviewNavigate}
+            />
+          )
+        })}
+      </ContentAreaManager>
+    )
 
     // because the combinedApps is enough
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -367,7 +476,29 @@ const MinappPopupContainer: React.FC = () => {
       height={'100%'}
       maskClosable={false}
       closeIcon={null}
-      style={{ marginLeft: 'var(--sidebar-width)', backgroundColor: 'var(--color-background)' }}>
+      data-appid={currentMinappId}
+      style={{
+        marginLeft: 'var(--sidebar-width)',
+        backgroundColor: 'var(--color-background)',
+        // Ensure the drawer content area matches the Claude app layout
+        display: 'flex',
+        flexDirection: 'column'
+      }}
+      styles={{
+        wrapper: {
+          height: '100%',
+          // Set max width to match Claude app
+          maxWidth: '100%', // Allow the container to be full width
+          margin: '0 auto',
+          width: '100%',
+          // Add padding to match Claude app
+          padding: '0',
+          // Ensure content is centered
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center'
+        }
+      }}>
       {!isReady && (
         <EmptyView>
           <Avatar
@@ -465,6 +596,11 @@ const EmptyView = styled.div`
   width: 100%;
   height: 100%;
   background-color: var(--color-background);
+  /* Match Claude app styling */
+  max-width: var(--content-max-width);
+  margin: 0 auto;
+  padding: 40px;
+  box-sizing: border-box;
 `
 
 const Spacer = styled.div`

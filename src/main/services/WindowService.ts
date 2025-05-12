@@ -12,6 +12,7 @@ import icon from '../../../build/icon.png?asset'
 import { titleBarOverlayDark, titleBarOverlayLight } from '../config'
 import { configManager } from './ConfigManager'
 import { contextMenu } from './ContextMenu'
+import webContentsViewService from './WebContentsViewService'
 import { initSessionUserAgent } from './WebviewService'
 
 export class WindowService {
@@ -98,6 +99,9 @@ export class WindowService {
 
     this.setupMaximize(mainWindow, mainWindowState.isMaximized)
     this.setupContextMenu(mainWindow)
+    // Initialize the WebContentsViewService with the main window
+    webContentsViewService.setMainWindow(mainWindow)
+
     this.setupWindowEvents(mainWindow)
     this.setupWebContentsHandlers(mainWindow)
     this.setupWindowLifecycleEvents(mainWindow)

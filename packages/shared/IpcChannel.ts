@@ -23,6 +23,18 @@ export enum IpcChannel {
 
   Webview_SetOpenLinkExternal = 'webview:set-open-link-external',
 
+  // WebContentsView channels for enhanced web app compatibility
+  WebContentsView_Create = 'webcontentsview:create',
+  WebContentsView_Show = 'webcontentsview:show',
+  WebContentsView_Hide = 'webcontentsview:hide',
+  WebContentsView_HideAll = 'webcontentsview:hide-all',
+  WebContentsView_Destroy = 'webcontentsview:destroy',
+  WebContentsView_OpenDevTools = 'webcontentsview:open-devtools',
+  WebContentsView_SetOpenLinksExternally = 'webcontentsview:set-open-links-externally',
+  WebContentsView_Reload = 'webcontentsview:reload',
+  WebContentsView_GetURL = 'webcontentsview:get-url',
+  WebContentsView_GetWebContentsId = 'webcontentsview:get-webcontents-id',
+
   // Open
   Open_Path = 'open:path',
   Open_Website = 'open:website',

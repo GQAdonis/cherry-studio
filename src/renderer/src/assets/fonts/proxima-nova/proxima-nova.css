@@ -1,0 +1,11 @@
+/*
+ * NOTE: You need to export Proxima Nova Bold from your Adobe font library
+ * and place the font file in this directory as ProximaNova-Bold.ttf
+ */
+@font-face {
+  font-family: 'Proxima Nova';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('./ProximaNova-Bold.ttf') format('truetype');
+}

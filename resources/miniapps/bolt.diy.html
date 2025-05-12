@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bolt DIY</title>
+  <style>
+    html, body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #121212;
+      color: #e0e0e0;
+      line-height: 1.6;
+      visibility: visible !important;
+      display: block !important;
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+    }
+    
+    .container {
+      width: 100%;
+      max-width: 800px;
+      margin: 0 auto;
+      background-color: #121212;
+      padding: 20px;
+      box-sizing: border-box;
+    }
+    
+    h1 {
+      color: #007aff;
+      margin-top: 0;
+    }
+    
+    h2 {
+      color: #007aff;
+      margin-top: 0;
+    }
+    
+    .card {
+      background-color: #1e1e1e;
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+      border: 1px solid #333;
+    }
+    
+    button {
+      background-color: #007aff;
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: background-color 0.2s;
+    }
+    
+    button:hover {
+      background-color: #0062cc;
+    }
+    
+    input, textarea {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #444;
+      border-radius: 4px;
+      margin-bottom: 15px;
+      font-size: 14px;
+      background-color: #2a2a2a;
+      color: #e0e0e0;
+    }
+    
+    .bolt-logo {
+      width: 40px;
+      height: 40px;
+      margin-right: 10px;
+      vertical-align: middle;
+    }
+    
+    .header {
+      display: flex;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    ul {
+      color: #e0e0e0;
+    }
+
+    p {
+      color: #e0e0e0;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <svg class="bolt-logo" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect width="64" height="64" rx="12" fill="#1e1e1e"/>
+        <path d="M32 12L14 36H30L28 52L46 28H30L32 12Z" fill="#007AFF" stroke="#007AFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <h1>Bolt DIY</h1>
+    </div>
+    
+    <div class="card">
+      <h2>Welcome to Bolt DIY</h2>
+      <p>This is a sample mini app that demonstrates the WebContentsView implementation in Cherry Studio.</p>
+      <p>The app is loaded using a metadata-driven approach that ensures consistent behavior across all mini apps.</p>
+    </div>
+    
+    <div class="card">
+      <h2>Create a New Project</h2>
+      <input type="text" placeholder="Project Name">
+      <textarea placeholder="Project Description" rows="3"></textarea>
+      <button id="createButton">Create Project</button>
+    </div>
+    
+    <div class="card">
+      <h2>Recent Projects</h2>
+      <ul id="projectsList">
+        <li>Sample Project 1</li>
+        <li>Sample Project 2</li>
+        <li>Sample Project 3</li>
+      </ul>
+    </div>
+  </div>
+
+  <script>
+    // Notify the main app that the mini app is ready
+    if (window.miniAppBridge) {
+      window.miniAppBridge.notifyReady();
+    }
+    
+    // Add event listener to the create button
+    document.getElementById('createButton').addEventListener('click', function() {
+      alert('Project created successfully!');
+    });
+    
+    // Log that the app has loaded
+    console.log('Bolt DIY app loaded successfully');
+    
+    // Ensure the content is visible
+    document.body.style.visibility = 'visible';
+    document.body.style.display = 'block';
+  </script>
+</body>
+</html>
