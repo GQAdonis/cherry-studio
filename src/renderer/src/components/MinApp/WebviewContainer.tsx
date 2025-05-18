@@ -39,22 +39,49 @@ const WebviewContainer = memo(
       if (!webviewRef.current) return
 
       const handleLoaded = () => {
+        console.log(`WebviewContainer: Mini-app ${appid} loaded successfully`)
         onLoadedCallback(appid)
       }
 
       const handleNavigate = (event: any) => {
+        console.log(`WebviewContainer: Mini-app ${appid} navigated to ${event.url}`)
         onNavigateCallback(appid, event.url)
       }
 
+      const handleFailLoad = (event: any) => {
+        console.error(`WebviewContainer: Mini-app ${appid} failed to load: ${event.errorCode} - ${event.errorDescription}`)
+        // If the page fails to load, we might want to try reloading or showing an error message
+        if (event.errorCode === -6) { // ERR_FILE_NOT_FOUND
+          console.log(`WebviewContainer: Attempting to reload mini-app ${appid}`)
+          setTimeout(() => {
+            if (webviewRef.current) {
+              webviewRef.current.src = url
+            }
+          }, 1000)
+        }
+      }
+
+      const handleConsoleMessage = (event: any) => {
+        console.log(`WebviewContainer: Mini-app ${appid} console message: ${event.message}`)
+      }
+
+      // Add event listeners
       webviewRef.current.addEventListener('did-finish-load', handleLoaded)
       webviewRef.current.addEventListener('did-navigate-in-page', handleNavigate)
+      webviewRef.current.addEventListener('did-fail-load', handleFailLoad)
+      webviewRef.current.addEventListener('console-message', handleConsoleMessage)
 
       // we set the url when the webview is ready
+      console.log(`WebviewContainer: Setting URL for mini-app ${appid}: ${url}`)
       webviewRef.current.src = url
 
       return () => {
-        webviewRef.current?.removeEventListener('did-finish-load', handleLoaded)
-        webviewRef.current?.removeEventListener('did-navigate-in-page', handleNavigate)
+        if (webviewRef.current) {
+          webviewRef.current.removeEventListener('did-finish-load', handleLoaded)
+          webviewRef.current.removeEventListener('did-navigate-in-page', handleNavigate)
+          webviewRef.current.removeEventListener('did-fail-load', handleFailLoad)
+          webviewRef.current.removeEventListener('console-message', handleConsoleMessage)
+        }
       }
       // because the appid and url are enough, no need to add onLoadedCallback
       // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -67,6 +94,14 @@ const WebviewContainer = memo(
         style={WebviewStyle}
         allowpopups={'true' as any}
         partition="persist:webview"
+        webpreferences="allowRunningInsecureContent=yes, javascript=yes, plugins=yes, webSql=yes, experimentalFeatures=yes"
+        disablewebsecurity={'true' as any}
+        nodeintegration={'true' as any}
+        // TypeScript doesn't recognize this attribute, but it's valid for webview
+        // @ts-ignore
+        allowtransparency={'true' as any}
+        useragent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.7049.96 Safari/537.36"
+        httpreferrer="https://cherry-studio.app"
       />
     )
   }

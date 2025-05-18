@@ -28,7 +28,7 @@ import BeatLoader from 'react-spinners/BeatLoader'
 import styled from 'styled-components'
 
 import ContentAreaManager from '../ContentAreaManager'
-import WebContentsViewContainer from './WebContentsViewContainer'
+import WebviewContainer from './WebviewContainer'
 import './MinappPopupContainer.css'
 
 interface AppExtraInfo {
@@ -162,39 +162,13 @@ const MinappPopupContainer: React.FC = () => {
         console.log(`MinappPopupContainer: Setting up external link handling for current app ${appid}`)
         const webviewRef = webviewRefs.current.get(appid)
         if (webviewRef) {
-          // Check if this is a WebContentsView or a regular webview
+          // Set webview to open links externally based on settings
           if (typeof webviewRef.getWebContentsId === 'function') {
-            console.log(`MinappPopupContainer: ${appid} has getWebContentsId function, checking type`)
-            const webviewIdResult: unknown = webviewRef.getWebContentsId()
-
-            // Check if getWebContentsId returns a Promise (WebContentsView) or a number (WebviewTag)
-            if (webviewIdResult instanceof Promise) {
-              console.log(`MinappPopupContainer: ${appid} is using WebContentsView (async)`)
-              // For WebContentsView (async)
-              webviewIdResult
-                .then((webviewId: number | null) => {
-                  console.log(`MinappPopupContainer: Got WebContentsId for ${appid}: ${webviewId}`)
-                  if (webviewId !== null) {
-                    window.api.webview.setOpenLinkExternal(webviewId, minappsOpenLinkExternal)
-                  }
-                })
-                .catch((error) => {
-                  console.error(`MinappPopupContainer: Error getting WebContents ID for ${appid}:`, error)
-                  // Fallback to using the WebContentsView API
-                  console.log(`MinappPopupContainer: Falling back to WebContentsView API for ${appid}`)
-                  window.api.webContentsView.setOpenLinksExternally(appid, minappsOpenLinkExternal)
-                })
-            } else {
-              console.log(`MinappPopupContainer: ${appid} is using regular WebviewTag (sync): ${webviewIdResult}`)
-              // For regular WebviewTag (sync)
-              if (webviewIdResult !== null && typeof webviewIdResult === 'number') {
-                window.api.webview.setOpenLinkExternal(webviewIdResult, minappsOpenLinkExternal)
-              }
+            const webviewId = webviewRef.getWebContentsId()
+            if (webviewId !== null && typeof webviewId === 'number') {
+              console.log(`MinappPopupContainer: Setting external link handling for ${appid} with ID ${webviewId}`)
+              window.api.webview.setOpenLinkExternal(webviewId, minappsOpenLinkExternal)
             }
-          } else {
-            console.log(`MinappPopupContainer: ${appid} doesn't have getWebContentsId, using WebContentsView API`)
-            // For WebContentsView, use the dedicated API
-            window.api.webContentsView.setOpenLinksExternally(appid, minappsOpenLinkExternal)
           }
         }
       }
@@ -275,39 +249,13 @@ const MinappPopupContainer: React.FC = () => {
     const webviewRef = webviewRefs.current.get(appid)
     if (webviewRef) {
       console.log(`MinappPopupContainer: Setting up external link handling for loaded app ${appid}`)
-      // Check if this is a WebContentsView or a regular webview
+      // Set webview to open links externally based on settings
       if (typeof webviewRef.getWebContentsId === 'function') {
-        console.log(`MinappPopupContainer: ${appid} has getWebContentsId function, checking type`)
-        const webviewIdResult: unknown = webviewRef.getWebContentsId()
-
-        // Check if getWebContentsId returns a Promise (WebContentsView) or a number (WebviewTag)
-        if (webviewIdResult instanceof Promise) {
-          console.log(`MinappPopupContainer: ${appid} is using WebContentsView (async)`)
-          // For WebContentsView (async)
-          webviewIdResult
-            .then((webviewId: number | null) => {
-              console.log(`MinappPopupContainer: Got WebContentsId for ${appid}: ${webviewId}`)
-              if (webviewId !== null) {
-                window.api.webview.setOpenLinkExternal(webviewId, minappsOpenLinkExternal)
-              }
-            })
-            .catch((error) => {
-              console.error(`MinappPopupContainer: Error getting WebContents ID for ${appid}:`, error)
-              // Fallback to using the WebContentsView API
-              console.log(`MinappPopupContainer: Falling back to WebContentsView API for ${appid}`)
-              window.api.webContentsView.setOpenLinksExternally(appid, minappsOpenLinkExternal)
-            })
-        } else {
-          console.log(`MinappPopupContainer: ${appid} is using regular WebviewTag (sync): ${webviewIdResult}`)
-          // For regular WebviewTag (sync)
-          if (webviewIdResult !== null && typeof webviewIdResult === 'number') {
-            window.api.webview.setOpenLinkExternal(webviewIdResult, minappsOpenLinkExternal)
-          }
+        const webviewId = webviewRef.getWebContentsId()
+        if (webviewId !== null && typeof webviewId === 'number') {
+          console.log(`MinappPopupContainer: Setting external link handling for ${appid} with ID ${webviewId}`)
+          window.api.webview.setOpenLinkExternal(webviewId, minappsOpenLinkExternal)
         }
-      } else {
-        console.log(`MinappPopupContainer: ${appid} doesn't have getWebContentsId, using WebContentsView API`)
-        // For WebContentsView, use the dedicated API
-        window.api.webContentsView.setOpenLinksExternally(appid, minappsOpenLinkExternal)
       }
     }
 
@@ -458,16 +406,16 @@ const MinappPopupContainer: React.FC = () => {
     )
   }
 
-  /** group the WebContentsView containers with Memo, one of the key to make them keepalive */
+  /** group the webview containers with Memo, one of the key to make them keepalive */
   const WebviewContainerGroup = useMemo(() => {
-    console.log(`MinappPopupContainer: Creating WebContentsView containers for ${combinedApps.length} apps`)
+    console.log(`MinappPopupContainer: Creating webview containers for ${combinedApps.length} apps`)
 
     return (
-      <ContentAreaManager>
+      <>
         {combinedApps.map((app) => {
-          console.log(`MinappPopupContainer: Creating WebContentsView for ${app.id} with URL ${app.url}`)
+          console.log(`MinappPopupContainer: Creating webview for ${app.id} with URL ${app.url}`)
           return (
-            <WebContentsViewContainer
+            <WebviewContainer
               key={app.id}
               appid={app.id}
               url={app.url}
@@ -477,7 +425,7 @@ const MinappPopupContainer: React.FC = () => {
             />
           )
         })}
-      </ContentAreaManager>
+      </>
     )
 
     // because the combinedApps is enough
@@ -545,37 +493,7 @@ const MinappPopupContainer: React.FC = () => {
         </EmptyView>
       )}
       {WebviewContainerGroup}
-      {/* EMERGENCY ESCAPE BUTTON - for debugging when min-apps block dev tools */}
-      <div 
-        style={{
-          position: 'absolute',
-          top: '8px',
-          right: '8px',
-          zIndex: 9999,
-          backgroundColor: 'red',
-          color: 'white',
-          padding: '8px 16px',
-          borderRadius: '4px',
-          cursor: 'pointer',
-          fontWeight: 'bold',
-          boxShadow: '0 2px 8px rgba(0,0,0,0.3)',
-          border: '2px solid white'
-        }}
-        onClick={() => {
-          // Force close all min-apps
-          console.log('EMERGENCY: Forcing close of all min-apps');
-          setIsPopupShow(false);
-          hideMinappPopup();
-          // Close specific minapp if it exists
-          if (currentMinappId) {
-            closeMinapp(currentMinappId);
-          }
-          // Display alert to confirm
-          alert('Emergency min-app close triggered. The min-app should now be closed.');
-        }}
-      >
-        EMERGENCY CLOSE
-      </div>
+      {/* Emergency close button removed - using standard close mechanism */}
     </Drawer>
   )
 }

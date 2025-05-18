@@ -189,28 +189,7 @@ const api = {
     setOpenLinkExternal: (webviewId: number, isExternal: boolean) =>
       ipcRenderer.invoke(IpcChannel.Webview_SetOpenLinkExternal, webviewId, isExternal)
   },
-  webContentsView: {
-    create: (appId: string, url: string) =>
-      ipcRenderer.invoke(IpcChannel.WebContentsView_Create, appId, url),
-    show: (appId: string, bounds: { x: number; y: number; width: number; height: number }) =>
-      ipcRenderer.invoke(IpcChannel.WebContentsView_Show, appId, bounds),
-    hide: (appId: string) =>
-      ipcRenderer.invoke(IpcChannel.WebContentsView_Hide, appId),
-    hideAll: () =>
-      ipcRenderer.invoke(IpcChannel.WebContentsView_HideAll),
-    destroy: (appId: string) =>
-      ipcRenderer.invoke(IpcChannel.WebContentsView_Destroy, appId),
-    openDevTools: (appId: string) =>
-      ipcRenderer.invoke(IpcChannel.WebContentsView_OpenDevTools, appId),
-    setOpenLinksExternally: (appId: string, openExternal: boolean) =>
-      ipcRenderer.invoke(IpcChannel.WebContentsView_SetOpenLinksExternally, appId, openExternal),
-    reload: (appId: string, url?: string) =>
-      ipcRenderer.invoke(IpcChannel.WebContentsView_Reload, appId, url),
-    getURL: (appId: string) =>
-      ipcRenderer.invoke(IpcChannel.WebContentsView_GetURL, appId),
-    getWebContentsId: (appId: string) =>
-      ipcRenderer.invoke(IpcChannel.WebContentsView_GetWebContentsId, appId)
-  },
+  // WebContentsView API removed - reverting to webview implementation
   storeSync: {
     subscribe: () => ipcRenderer.invoke(IpcChannel.StoreSync_Subscribe),
     unsubscribe: () => ipcRenderer.invoke(IpcChannel.StoreSync_Unsubscribe),

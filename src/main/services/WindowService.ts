@@ -12,7 +12,7 @@ import icon from '../../../build/icon.png?asset'
 import { titleBarOverlayDark, titleBarOverlayLight } from '../config'
 import { configManager } from './ConfigManager'
 import { contextMenu } from './ContextMenu'
-import webContentsViewService from './WebContentsViewService'
+// WebContentsViewService import removed
 import { initSessionUserAgent } from './WebviewService'
 
 export class WindowService {
@@ -100,7 +100,7 @@ export class WindowService {
     this.setupMaximize(mainWindow, mainWindowState.isMaximized)
     this.setupContextMenu(mainWindow)
     // Initialize the WebContentsViewService with the main window
-    webContentsViewService.setMainWindow(mainWindow)
+    // WebContentsViewService initialization removed - using webview implementation
 
     this.setupWindowEvents(mainWindow)
     this.setupWebContentsHandlers(mainWindow)
@@ -148,12 +148,25 @@ export class WindowService {
       contextMenu.contextMenu(win)
     })
 
-    // Dangerous API
-    if (isDev) {
-      mainWindow.webContents.on('will-attach-webview', (_, webPreferences) => {
-        webPreferences.preload = join(__dirname, '../preload/index.js')
-      })
-    }
+    // Configure webview to ensure mini-apps have full access to browser APIs
+    // This is required for mini-apps to use localStorage, IndexedDB, and other browser features
+    mainWindow.webContents.on('will-attach-webview', (event, webPreferences) => {
+      // Set security preferences to allow mini-apps to function properly
+      webPreferences.nodeIntegration = false
+      webPreferences.contextIsolation = true
+      webPreferences.webSecurity = false // Required for cross-origin requests
+      webPreferences.allowRunningInsecureContent = true // Required for mixed content
+      
+      // Enable browser features needed by mini-apps
+      webPreferences.enableWebSQL = true
+      webPreferences.plugins = true
+      
+      // Set partition to ensure persistent storage
+      webPreferences.partition = 'persist:webview'
+      
+      // Log webview configuration for debugging
+      console.log(`Configuring webview with enhanced settings for mini-apps`)
+    })
   }
 
   private setupWindowEvents(mainWindow: BrowserWindow) {

@@ -130,43 +130,6 @@ const ORIGIN_DEFAULT_MIN_APPS: MinAppType[] = [
     logo: KimiAppLogo
   },
   {
-    id: 'baichuan',
-    name: 'Baixiaoying',
-    url: 'https://ying.baichuan-ai.com/chat',
-    logo: BaicuanAppLogo
-  },
-  {
-    id: 'dashscope',
-    name: 'Tongyi Qianwen',
-    url: 'https://tongyi.aliyun.com/qianwen/',
-    logo: QwenModelLogo
-  },
-  {
-    id: 'stepfun',
-    name: 'Yuewen',
-    url: 'https://yuewen.cn/chats/new',
-    logo: YuewenAppLogo,
-    bodered: true
-  },
-  {
-    id: 'doubao',
-    name: 'Doubao',
-    url: 'https://www.doubao.com/chat/',
-    logo: DoubaoAppLogo
-  },
-  {
-    id: 'cici',
-    name: 'Cici',
-    url: 'https://www.cici.com/chat/',
-    logo: CiciAppLogo
-  },
-  {
-    id: 'minimax',
-    name: 'Hailuo',
-    url: 'https://hailuoai.com/',
-    logo: HailuoModelLogo
-  },
-  {
     id: 'groq',
     name: 'Groq',
     url: 'https://chat.groq.com/',
@@ -195,32 +158,6 @@ const ORIGIN_DEFAULT_MIN_APPS: MinAppType[] = [
     }
   },
   {
-    id: 'tencent-yuanbao',
-    name: 'Tencent Yuanbao',
-    logo: TencentYuanbaoAppLogo,
-    url: 'https://yuanbao.tencent.com/chat',
-    bodered: true
-  },
-  {
-    id: 'sensetime-chat',
-    name: 'Shangliang',
-    logo: SensetimeAppLogo,
-    url: 'https://chat.sensetime.com/wb/chat',
-    bodered: true
-  },
-  {
-    id: 'spark-desk',
-    name: 'SparkDesk',
-    logo: SparkDeskAppLogo,
-    url: 'https://xinghuo.xfyun.cn/desk'
-  },
-  {
-    id: 'metaso',
-    name: 'Metaso AI Search',
-    logo: MetasoAppLogo,
-    url: 'https://metaso.cn/'
-  },
-  {
     id: 'poe',
     name: 'Poe',
     logo: PoeAppLogo,
@@ -239,24 +176,10 @@ const ORIGIN_DEFAULT_MIN_APPS: MinAppType[] = [
     url: 'https://devv.ai/'
   },
   {
-    id: 'tiangong-ai',
-    name: 'Tiangong AI',
-    logo: TiangongAiLogo,
-    url: 'https://www.tiangong.cn/',
-    bodered: true
-  },
-  {
     id: 'hugging-chat',
     name: 'HuggingChat',
     logo: HuggingChatLogo,
     url: 'https://huggingface.co/chat/',
-    bodered: true
-  },
-  {
-    id: 'Felo',
-    name: 'Felo',
-    logo: FeloAppLogo,
-    url: 'https://felo.ai/',
     bodered: true
   },
   {
@@ -292,20 +215,6 @@ const ORIGIN_DEFAULT_MIN_APPS: MinAppType[] = [
     }
   },
   {
-    id: 'nm',
-    name: 'Nami AI',
-    logo: NamiAiLogo,
-    url: 'https://bot.n.cn/',
-    bodered: true
-  },
-  {
-    id: 'nm-search',
-    name: 'Nami AI Search',
-    logo: NamiAiSearchLogo,
-    url: 'https://www.n.cn/',
-    bodered: true
-  },
-  {
     id: 'thinkany',
     name: 'ThinkAny',
     logo: ThinkAnyLogo,
@@ -316,37 +225,10 @@ const ORIGIN_DEFAULT_MIN_APPS: MinAppType[] = [
     }
   },
   {
-    id: 'hika',
-    name: 'Hika',
-    logo: HikaLogo,
-    url: 'https://hika.fyi/',
-    bodered: true
-  },
-  {
     id: 'github-copilot',
     name: 'GitHub Copilot',
     logo: GithubCopilotLogo,
     url: 'https://github.com/copilot'
-  },
-  {
-    id: 'genspark',
-    name: 'Genspark',
-    logo: GensparkLogo,
-    url: 'https://www.genspark.ai/'
-  },
-  {
-    id: 'grok',
-    name: 'Grok',
-    logo: GrokAppLogo,
-    url: 'https://grok.com',
-    bodered: true
-  },
-  {
-    id: 'grok-x',
-    name: 'Grok / X',
-    logo: GrokXAppLogo,
-    url: 'https://x.com/i/grok',
-    bodered: true
   },
   {
     id: 'qwenlm',
@@ -355,31 +237,10 @@ const ORIGIN_DEFAULT_MIN_APPS: MinAppType[] = [
     url: 'https://qwenlm.ai/'
   },
   {
-    id: 'flowith',
-    name: 'Flowith',
-    logo: FlowithAppLogo,
-    url: 'https://www.flowith.io/',
-    bodered: true
-  },
-  {
-    id: '3mintop',
-    name: '3MinTop',
-    logo: ThreeMinTopAppLogo,
-    url: 'https://3min.top',
-    bodered: false
-  },
-  {
     id: 'aistudio',
     name: 'AI Studio',
     logo: AIStudioLogo,
     url: 'https://aistudio.google.com/'
-  },
-  {
-    id: 'xiaoyi',
-    name: 'Xiaoyi',
-    logo: XiaoYiAppLogo,
-    url: 'https://xiaoyi.huawei.com/chat/',
-    bodered: true
   },
   {
     id: 'notebooklm',
@@ -388,17 +249,10 @@ const ORIGIN_DEFAULT_MIN_APPS: MinAppType[] = [
     url: 'https://notebooklm.google.com/'
   },
   {
-    id: 'coze',
-    name: 'Coze',
-    logo: CozeAppLogo,
-    url: 'https://www.coze.com/space',
-    bodered: true
-  },
-  {
     id: 'dify',
     name: 'Dify',
     logo: DifyAppLogo,
-    url: 'https://dify.prometheusags.ai/apps',
+    url: 'https://dify.skytok.net',
     bodered: true,
     style: {
       padding: 5
@@ -406,10 +260,7 @@ const ORIGIN_DEFAULT_MIN_APPS: MinAppType[] = [
     // Add metadata for WebContentsView configuration
     metadata: {
       // Prioritize the correct URL and add fallbacks
-      fallbackUrls: [
-        'https://dify.prometheusags.ai/apps',
-        'https://dify.prometheusags.ai'
-      ],
+      fallbackUrls: ['https://dify.skytok.net', 'https://dify.skytok.net/apps'],
       // Disable sandbox for better compatibility
       webPreferences: {
         sandbox: false,
@@ -419,75 +270,16 @@ const ORIGIN_DEFAULT_MIN_APPS: MinAppType[] = [
     }
   },
   {
-    id: 'wpslingxi',
-    name: 'WPS Lingxi',
-    logo: WPSLingXiLogo,
-    url: 'https://copilot.wps.cn/',
-    bodered: true
-  },
-  {
-    id: 'lechat',
-    name: 'LeChat',
-    logo: LeChatLogo,
-    url: 'https://chat.mistral.ai/chat',
-    bodered: true
-  },
-  {
-    id: 'abacus',
-    name: 'Abacus',
-    logo: AbacusLogo,
-    url: 'https://apps.abacus.ai/chatllm',
-    bodered: true
-  },
-  {
-    id: 'lambdachat',
-    name: 'Lambda Chat',
-    logo: LambdaChatLogo,
-    url: 'https://lambda.chat/',
-    bodered: true
-  },
-  {
-    id: 'monica',
-    name: 'Monica',
-    logo: MonicaLogo,
-    url: 'https://monica.im/home/',
-    bodered: true
-  },
-  {
     id: 'you',
     name: 'You',
     logo: YouLogo,
     url: 'https://you.com/'
   },
   {
-    id: 'zhihu',
-    name: 'Zhihu Zhida',
-    logo: ZhihuAppLogo,
-    url: 'https://zhida.zhihu.com/',
-    bodered: true
-  },
-  {
-    id: 'dangbei',
-    name: 'Dangbei AI',
-    logo: DangbeiLogo,
-    url: 'https://ai.dangbei.com/',
-    bodered: true
-  },
-  {
-    id: `zai`,
-    name: `Z.ai`,
-    logo: ZaiAppLogo,
-    url: `https://chat.z.ai/`,
-    bodered: true,
-    style: {
-      padding: 10
-    }
-  },
-  {
     id: 'n8n',
     name: 'n8n',
     logo: n8nLogo,
-    url: 'https://app.n8n.cloud/',
+    url: 'https://n8n.skytok.net/',
     bodered: true,
     style: {
       padding: 5
