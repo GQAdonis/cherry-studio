@@ -64,24 +64,32 @@ const WebContentsViewContainer: React.FC<{
       if (!hasCreatedView.current || !contentAreaBounds) return
 
       try {
-        // CRITICAL: Ensure positioning ONLY takes up the content area to the right of left sidebar and below top nav
+        // CRITICAL: Ensure positioning ONLY takes up the content area flush with the left sidebar and below top nav
         // Get the actual sidebar width and navbar height from CSS variables
         const sidebarWidth = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--sidebar-width') || '26', 10);
         const navbarHeight = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--navbar-height') || '41', 10);
         
         // Calculate the bounds precisely to ensure content only appears in the correct area
+        // CRITICAL: Position flush against the left edge without any gap
         const bounds = {
-          x: sidebarWidth, // Position exactly at the right edge of the sidebar
+          x: 0, // CRITICAL: Force position to absolute left edge of the window
           y: navbarHeight, // Position exactly below the navbar
           width: window.innerWidth - sidebarWidth, // Use width excluding sidebar
           height: window.innerHeight - navbarHeight // Use height excluding navbar
         }
+        
+        // Log the calculated sidebar width and navbar height for debugging
+        console.log(`WebContentsViewContainer: Using sidebar width: ${sidebarWidth}px and navbar height: ${navbarHeight}px`)
 
         // Log detailed positioning information for debugging
         console.log(`WebContentsViewContainer: Updating bounds for ${appid} with precise positioning:`, {
           ...bounds,
           containerWidth: contentAreaBounds.width,
           containerHeight: contentAreaBounds.height,
+          windowWidth: window.innerWidth,
+          windowHeight: window.innerHeight,
+          sidebarWidth,
+          navbarHeight,
           timestamp: new Date().toISOString()
         })
 

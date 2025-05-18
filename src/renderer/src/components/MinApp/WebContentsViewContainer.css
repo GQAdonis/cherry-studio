@@ -1,10 +1,13 @@
 /* CRITICAL: Ensure WebContentsView is positioned correctly for right drawer */
 .ant-drawer-right .webcontents-view-container {
   position: fixed !important;
-  left: var(--sidebar-width) !important;
+  left: 0 !important; /* Force position to absolute left edge */
   top: var(--navbar-height) !important;
   width: calc(100vw - var(--sidebar-width)) !important;
   height: calc(100vh - var(--navbar-height) - 56px) !important; /* Subtract navbar and header height */
+  margin-left: 0 !important; /* Ensure no left margin */
+  padding-left: 0 !important; /* Ensure no left padding */
+  border-left: 0 !important; /* Ensure no left border */
 }
 
 .webcontents-view-container {
@@ -23,13 +26,13 @@
   box-sizing: border-box !important;
   border: none !important;
   outline: none !important;
-  /* CRITICAL: Position exactly at sidebar edge and below navbar */
-  left: var(--sidebar-width) !important;
+  /* CRITICAL: Position flush with left edge and below navbar */
+  left: 0 !important;
   top: var(--navbar-height) !important;
   right: 0 !important;
   bottom: 0 !important;
   /* CRITICAL: Remove any inset that might cause overlap */
-  inset: var(--navbar-height) 0 0 var(--sidebar-width) !important;
+  inset: var(--navbar-height) 0 0 0 !important;
   /* Ensure content is properly contained */
   max-width: calc(100vw - var(--sidebar-width)) !important;
   max-height: calc(100vh - var(--navbar-height)) !important;
@@ -42,6 +45,11 @@
   transform: none !important;
   /* CRITICAL: Ensure no z-index issues */
   z-index: 1 !important;
+  /* CRITICAL: Additional properties to ensure flush positioning */
+  margin-left: 0 !important;
+  padding-left: 0 !important;
+  border-left: 0 !important;
+  text-indent: 0 !important;
 }
 
 /* Style for bolt.diy app - additional customizations */
@@ -53,36 +61,49 @@
   align-items: center !important;
   /* CRITICAL: Ensure no positioning overrides */
   left: 0 !important;
-  top: 0 !important;
+  top: var(--navbar-height) !important;
   right: 0 !important;
   bottom: 0 !important;
   /* CRITICAL: Ensure no margin overrides */
   margin: 0 !important;
+  margin-left: 0 !important;
   /* CRITICAL: Ensure no padding overrides */
   padding: 0 !important;
+  padding-left: 0 !important;
   /* CRITICAL: Allow content to scroll when necessary */
   overflow: auto !important;
+  /* CRITICAL: Ensure no border or transform that might affect positioning */
+  border-left: 0 !important;
+  transform: none !important;
+  text-indent: 0 !important;
 }
 
 /* Style for other apps - additional customizations */
 .webcontents-view-container[data-appid='dify'],
 .webcontents-view-container[data-appid='openai'],
 .webcontents-view-container[data-appid='groq'],
-.webcontents-view-container[data-appid='anthropic'] {
+.webcontents-view-container[data-appid='anthropic'],
+.webcontents-view-container[data-appid] { /* Apply to ALL mini apps regardless of ID */
   /* CRITICAL: Center content within the container */
   justify-content: center !important;
   align-items: center !important;
   /* CRITICAL: Ensure no positioning overrides */
   left: 0 !important;
-  top: 0 !important;
+  top: var(--navbar-height) !important;
   right: 0 !important;
   bottom: 0 !important;
   /* CRITICAL: Ensure no margin overrides */
   margin: 0 !important;
+  margin-left: 0 !important;
   /* CRITICAL: Ensure no padding overrides */
   padding: 0 !important;
+  padding-left: 0 !important;
   /* CRITICAL: Allow content to scroll when necessary */
   overflow: auto !important;
+  /* CRITICAL: Ensure no border or transform that might affect positioning */
+  border-left: 0 !important;
+  transform: none !important;
+  text-indent: 0 !important;
 }
 
 /* Loading indicator styles */

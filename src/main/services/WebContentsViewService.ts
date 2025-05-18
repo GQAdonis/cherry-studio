@@ -396,14 +396,15 @@ class WebContentsViewService {
         return { action: 'allow' }
       })
       
-      // CRITICAL: For drawer-based mini apps, use the bounds provided by the drawer
-      // This ensures the WebContentsView is positioned correctly within the drawer
+      // CRITICAL: For ALL mini apps, ensure they are positioned flush against the left edge
+      // This ensures the WebContentsView is positioned correctly within the content area
       // and doesn't overlap with the sidebar or top navigation
+      // CRITICAL: Force x to 0 to ensure content is flush against the left edge
       let adjustedBounds = {
-        x: bounds.x, // Use the x position provided by the drawer
-        y: bounds.y, // Use the y position provided by the drawer
-        width: bounds.width, // Use the width provided by the drawer
-        height: bounds.height // Use the height provided by the drawer
+        x: 0, // CRITICAL: Force position to absolute left edge regardless of what was provided
+        y: bounds.y, // Use the y position provided by the content area
+        width: bounds.width, // Use the width provided by the content area
+        height: bounds.height // Use the height provided by the content area
       }
       
       // Log the original bounds for debugging
