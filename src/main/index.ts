@@ -1,17 +1,18 @@
+import '@main/config'
+
 import { electronApp, optimizer } from '@electron-toolkit/utils'
 import { replaceDevtoolsFont } from '@main/utils/windowUtil'
 import { IpcChannel } from '@shared/IpcChannel'
-import { app, ipcMain } from 'electron'
+import { app, BrowserWindow, ipcMain } from 'electron'
 import installExtension, { REACT_DEVELOPER_TOOLS, REDUX_DEVTOOLS } from 'electron-devtools-installer'
 import Logger from 'electron-log'
 
-// Import debug helpers
-import { setupDebugOverrides, getDebugConfig, createComponentLogger } from './debug-helpers'
-import { markPerformance, measurePerformance } from './utils/debugUtils'
-
+import { isDev, isMac, isWin } from './constant'
+import { createComponentLogger } from './debug-helpers'
 import { registerIpc } from './ipc'
 import { configManager } from './services/ConfigManager'
 import mcpService from './services/MCPService'
+import { markPerformance, measurePerformance } from './utils/debugUtils'
 
 // Create a component-specific logger for the main process
 const logger = createComponentLogger('MainProcess')
@@ -28,22 +29,17 @@ import { setUserDataDir } from './utils/file'
 
 Logger.initialize()
 
-// Setup debug overrides if running in debug mode
-if (
-  process.env.DISABLE_LAUNCH_TO_TRAY === 'true' ||
-  process.env.FORCE_SHOW_WINDOW === 'true' ||
-  process.env.OPEN_DEVTOOLS === 'true' ||
-  process.env.SUPPRESS_SOURCEMAP_ERRORS === 'true' ||
-  process.env.SUPPRESS_SECURITY_WARNINGS === 'true' ||
-  process.env.SUPPRESS_ROUTER_WARNINGS === 'true' ||
-  process.env.VERBOSE_LOGGING === 'true' ||
-  process.env.LOG_WEBCONTENTSVIEW_EVENTS === 'true' ||
-  process.env.LOG_IPC_EVENTS === 'true' ||
-  process.env.LOG_PERFORMANCE === 'true' ||
-  process.env.LOG_MEMORY_USAGE === 'true'
-) {
-  setupDebugOverrides()
-  logger.info('Debug mode enabled with enhanced debugging capabilities')
+// in production mode, handle uncaught exception and unhandled rejection globally
+if (!isDev) {
+  // handle uncaught exception
+  process.on('uncaughtException', (error) => {
+    Logger.error('Uncaught Exception:', error)
+  })
+
+  // handle unhandled rejection
+  process.on('unhandledRejection', (reason, promise) => {
+    Logger.error('Unhandled Rejection at:', promise, 'reason:', reason)
+  })
 }
 
 // Check for single instance lock
@@ -51,19 +47,8 @@ if (!app.requestSingleInstanceLock()) {
   app.quit()
   process.exit(0)
 } else {
-  // Set the application name to "Prometheus Studio" instead of "prometheus-studio"
-  app.name = 'Prometheus Studio'
-
-  // Log application startup information
-  logger.info('Application startup', {
-    name: app.name,
-    version: app.getVersion(),
-    platform: process.platform,
-    arch: process.arch,
-    nodeVersion: process.versions.node,
-    electronVersion: process.versions.electron,
-    debugConfig: getDebugConfig()
-  })
+  // Portable dir must be setup before app ready
+  setUserDataDir()
 
   // This method will be called when Electron has finished
   // initialization and is ready to create browser windows.
@@ -106,22 +91,25 @@ if (!app.requestSingleInstanceLock()) {
 
     replaceDevtoolsFont(mainWindow)
 
-    setUserDataDir()
-
     // Setup deep link for AppImage on Linux
     await setupAppImageDeepLink()
 
-    if (process.env.NODE_ENV === 'development') {
+    if (isDev) {
       installExtension([REDUX_DEVTOOLS, REACT_DEVELOPER_TOOLS])
         .then((name) => console.log(`Added Extension:  ${name}`))
         .catch((err) => console.log('An error occurred: ', err))
     }
     ipcMain.handle(IpcChannel.System_GetDeviceType, () => {
-      return process.platform === 'darwin' ? 'mac' : process.platform === 'win32' ? 'windows' : 'linux'
+      return isMac ? 'mac' : isWin ? 'windows' : 'linux'
     })
 
     ipcMain.handle(IpcChannel.System_GetHostname, () => {
       return require('os').hostname()
+    })
+
+    ipcMain.handle(IpcChannel.System_ToggleDevTools, (e) => {
+      const win = BrowserWindow.fromWebContents(e.sender)
+      win && win.webContents.toggleDevTools()
     })
   })
 

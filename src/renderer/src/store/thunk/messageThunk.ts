@@ -348,6 +348,7 @@ const fetchAndProcessAssistantResponseImpl = async (
         }
       },
       onTextComplete: async (finalText) => {
+        cancelThrottledBlockUpdate()
         if (lastBlockType === MessageBlockType.MAIN_TEXT && lastBlockId) {
           const changes = {
             content: finalText,
@@ -405,6 +406,8 @@ const fetchAndProcessAssistantResponseImpl = async (
         }
       },
       onThinkingComplete: (finalText, final_thinking_millsec) => {
+        cancelThrottledBlockUpdate()
+
         if (lastBlockType === MessageBlockType.THINKING && lastBlockId) {
           const changes = {
             type: MessageBlockType.THINKING,
@@ -446,6 +449,7 @@ const fetchAndProcessAssistantResponseImpl = async (
         }
       },
       onToolCallComplete: (toolResponse: MCPToolResponse) => {
+        cancelThrottledBlockUpdate()
         const existingBlockId = toolCallIdToBlockIdMap.get(toolResponse.id)
         if (toolResponse.status === 'done' || toolResponse.status === 'error') {
           if (!existingBlockId) {
@@ -532,10 +536,22 @@ const fetchAndProcessAssistantResponseImpl = async (
         }
       },
       onImageCreated: () => {
-        const imageBlock = createImageBlock(assistantMsgId, {
-          status: MessageBlockStatus.PROCESSING
-        })
-        handleBlockTransition(imageBlock, MessageBlockType.IMAGE)
+        if (lastBlockId) {
+          if (lastBlockType === MessageBlockType.UNKNOWN) {
+            const initialChanges: Partial<MessageBlock> = {
+              type: MessageBlockType.IMAGE,
+              status: MessageBlockStatus.STREAMING
+            }
+            lastBlockType = MessageBlockType.IMAGE
+            dispatch(updateOneBlock({ id: lastBlockId, changes: initialChanges }))
+            saveUpdatedBlockToDB(lastBlockId, assistantMsgId, topicId, getState)
+          } else {
+            const imageBlock = createImageBlock(assistantMsgId, {
+              status: MessageBlockStatus.PROCESSING
+            })
+            handleBlockTransition(imageBlock, MessageBlockType.IMAGE)
+          }
+        }
       },
       onImageGenerated: (imageData) => {
         const imageUrl = imageData.images?.[0] || 'placeholder_image_url'
@@ -605,6 +621,14 @@ const fetchAndProcessAssistantResponseImpl = async (
           const userMsgIndex = orderedMsgs.findIndex((m) => m.id === userMsgId)
           const contextForUsage = userMsgIndex !== -1 ? orderedMsgs.slice(0, userMsgIndex + 1) : []
           const finalContextWithAssistant = [...contextForUsage, finalAssistantMsg]
+
+          if (lastBlockId) {
+            const changes: Partial<MessageBlock> = {
+              status: MessageBlockStatus.SUCCESS
+            }
+            dispatch(updateOneBlock({ id: lastBlockId, changes }))
+            saveUpdatedBlockToDB(lastBlockId, assistantMsgId, topicId, getState)
+          }
 
           // 更新topic的name
           autoRenameTopic(assistant, topicId)
@@ -710,6 +734,7 @@ export const loadTopicMessagesThunk =
   async (dispatch: AppDispatch, getState: () => RootState) => {
     const state = getState()
     const topicMessagesExist = !!state.messages.messageIdsByTopic[topicId]
+    dispatch(newMessagesActions.setCurrentTopicId(topicId))
 
     if (topicMessagesExist && !forceReload) {
       return
@@ -717,6 +742,10 @@ export const loadTopicMessagesThunk =
 
     try {
       const topic = await db.topics.get(topicId)
+      if (!topic) {
+        await db.topics.add({ id: topicId, messages: [] })
+      }
+
       const messagesFromDB = topic?.messages || []
 
       if (messagesFromDB.length > 0) {
@@ -776,21 +805,19 @@ export const deleteMessageGroupThunk =
     const currentState = getState()
     const topicMessageIds = currentState.messages.messageIdsByTopic[topicId] || []
     const messagesToDelete: Message[] = []
-    const idsToDelete: string[] = []
 
     topicMessageIds.forEach((id) => {
       const msg = currentState.messages.entities[id]
       if (msg && msg.askId === askId) {
         messagesToDelete.push(msg)
-        idsToDelete.push(id)
       }
     })
 
-    const userQuery = currentState.messages.entities[askId]
-    if (userQuery && userQuery.topicId === topicId && !idsToDelete.includes(askId)) {
-      messagesToDelete.push(userQuery)
-      idsToDelete.push(askId)
-    }
+    // const userQuery = currentState.messages.entities[askId]
+    // if (userQuery && userQuery.topicId === topicId && !idsToDelete.includes(askId)) {
+    //   messagesToDelete.push(userQuery)
+    //   idsToDelete.push(askId)
+    // }
 
     if (messagesToDelete.length === 0) {
       console.warn(`[deleteMessageGroup] No messages found with askId ${askId} in topic ${topicId}.`)
@@ -865,13 +892,29 @@ export const resendMessageThunk =
       const resetDataList: Message[] = []
 
       if (assistantMessagesToReset.length === 0) {
-        // 没有用户消息,就创建一个
-        const assistantMessage = createAssistantMessage(assistant.id, topicId, {
-          askId: userMessageToResend.id,
-          model: assistant.model
+        // 没有用户消息,就创建一个或多个
+
+        if (userMessageToResend?.mentions?.length) {
+          console.log('userMessageToResend.mentions', userMessageToResend.mentions)
+          for (const mention of userMessageToResend.mentions) {
+            const assistantMessage = createAssistantMessage(assistant.id, topicId, {
+              askId: userMessageToResend.id,
+              model: mention,
+              modelId: mention.id
+            })
+            resetDataList.push(assistantMessage)
+          }
+        } else {
+          const assistantMessage = createAssistantMessage(assistant.id, topicId, {
+            askId: userMessageToResend.id,
+            model: assistant.model
+          })
+          resetDataList.push(assistantMessage)
+        }
+
+        resetDataList.forEach((message) => {
+          dispatch(newMessagesActions.addMessage({ topicId, message }))
         })
-        resetDataList.push(assistantMessage)
-        dispatch(newMessagesActions.addMessage({ topicId, message: assistantMessage }))
       }
 
       const allBlockIdsToDelete: string[] = []
@@ -983,10 +1026,21 @@ export const regenerateAssistantResponseThunk =
       const blockIdsToDelete = [...(messageToResetEntity.blocks || [])]
 
       // 5. Reset the message entity in Redux
-      const resetAssistantMsg = resetAssistantMessage(messageToResetEntity, {
-        status: AssistantMessageStatus.PENDING,
-        updatedAt: new Date().toISOString()
-      })
+      const resetAssistantMsg = resetAssistantMessage(
+        messageToResetEntity,
+        // Grouped message (mentioned model message) should not reset model and modelId, always use the original model
+        assistantMessageToRegenerate.modelId
+          ? {
+              status: AssistantMessageStatus.PENDING,
+              updatedAt: new Date().toISOString()
+            }
+          : {
+              status: AssistantMessageStatus.PENDING,
+              updatedAt: new Date().toISOString(),
+              model: assistant.model
+            }
+      )
+
       dispatch(
         newMessagesActions.updateMessage({
           topicId,

@@ -1,3 +1,5 @@
+import './MinappPopupContainer.css'
+
 import {
   CloseOutlined,
   CodeOutlined,
@@ -22,14 +24,12 @@ import { MinAppType } from '@renderer/types'
 import { delay } from '@renderer/utils'
 import { Avatar, Drawer, Tooltip } from 'antd'
 import { WebviewTag } from 'electron'
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import BeatLoader from 'react-spinners/BeatLoader'
 import styled from 'styled-components'
 
-import ContentAreaManager from '../ContentAreaManager'
 import WebviewContainer from './WebviewContainer'
-import './MinappPopupContainer.css'
 
 interface AppExtraInfo {
   canPinned: boolean
@@ -75,24 +75,31 @@ const MinappPopupContainer: React.FC = () => {
 
   useBridge()
 
+  /** will hide the popup and remain the webviews */
+  const handlePopupMinimize = useCallback(async () => {
+    setIsPopupShow(false)
+    await delay(0.3)
+    hideMinappPopup()
+  }, [hideMinappPopup])
+
   /** Add escape key handler for emergency closing */
   useEffect(() => {
     const handleEscapeKey = (event: KeyboardEvent) => {
       if (event.key === 'Escape' && minappShow) {
-        console.log('EMERGENCY: Escape key pressed, closing min-app');
-        handlePopupMinimize();
+        console.log('EMERGENCY: Escape key pressed, closing min-app')
+        handlePopupMinimize()
         if (currentMinappId) {
-          setTimeout(() => closeMinapp(currentMinappId), 300);
+          setTimeout(() => closeMinapp(currentMinappId), 300)
         }
       }
-    };
-    
-    window.addEventListener('keydown', handleEscapeKey);
-    
+    }
+
+    window.addEventListener('keydown', handleEscapeKey)
+
     return () => {
-      window.removeEventListener('keydown', handleEscapeKey);
-    };
-  }, [minappShow, currentMinappId]);
+      window.removeEventListener('keydown', handleEscapeKey)
+    }
+  }, [minappShow, currentMinappId, closeMinapp, handlePopupMinimize])
 
   /** set the popup display status */
   useEffect(() => {
@@ -213,12 +220,7 @@ const MinappPopupContainer: React.FC = () => {
     closeMinapp(appid)
   }
 
-  /** will hide the popup and remain the webviews */
-  const handlePopupMinimize = async () => {
-    setIsPopupShow(false)
-    await delay(0.3)
-    hideMinappPopup()
-  }
+  /** Function moved to before the useEffect that references it */
 
   /** the callback function to set the webviews ref */
   const handleWebviewSetRef = (appid: string, element: WebviewTag | null) => {
@@ -434,53 +436,20 @@ const MinappPopupContainer: React.FC = () => {
 
   return (
     <Drawer
-        title={<Title appInfo={currentAppInfo} url={currentUrl} />}
-        placement="right"
-        onClose={handlePopupMinimize}
-        open={isPopupShow}
-        destroyOnClose={false}
-        mask={true}
-        rootClassName="minapp-drawer"
-        maskClassName="minapp-mask"
-        width="calc(100vw - var(--sidebar-width))"
-        maskClosable={true}
-        closeIcon={null}
-        data-appid={currentMinappId}
-        style={{
-          backgroundColor: 'var(--color-background)'
-        }}
-        styles={{
-          wrapper: {
-            position: 'absolute', // Use absolute instead of fixed
-            top: 'var(--navbar-height)', // Position exactly below the navbar
-            left: 'var(--sidebar-width)', // Position exactly at the right edge of the sidebar
-            right: '0',
-            bottom: '0',
-            width: 'calc(100vw - var(--sidebar-width))', // Ensure width excludes sidebar
-            height: 'calc(100vh - var(--navbar-height))', // Ensure height excludes navbar
-            padding: 0,
-            margin: 0,
-            zIndex: 800 // Lower z-index to allow dev tools to appear on top
-          },
-          body: {
-            padding: 0,
-            margin: 0,
-            height: 'calc(100% - 56px)', // Subtract header height
-            overflow: 'hidden'
-          },
-          mask: {
-            top: 'var(--navbar-height)',
-            left: 'var(--sidebar-width)',
-            backgroundColor: 'rgba(0, 0, 0, 0.45)'
-          },
-          header: {
-            padding: '8px 16px',
-            height: '56px',
-            borderBottom: '1px solid var(--color-border)'
-          },
-          content: {
-            backgroundColor: 'var(--color-background)'
-          }
+      title={<Title appInfo={currentAppInfo} url={currentUrl} />}
+      placement="bottom"
+      onClose={handlePopupMinimize}
+      open={isPopupShow}
+      destroyOnClose={false}
+      mask={false}
+      rootClassName="minapp-drawer"
+      maskClassName="minapp-mask"
+      height={'100%'}
+      maskClosable={false}
+      closeIcon={null}
+      style={{
+        marginLeft: 'var(--sidebar-width)',
+        backgroundColor: window.root.style.background
       }}>
       {!isReady && (
         <EmptyView>

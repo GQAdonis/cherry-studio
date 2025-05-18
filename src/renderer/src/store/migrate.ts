@@ -1257,6 +1257,7 @@ const migrateConfig = {
     try {
       state.llm.providers.forEach((provider) => {
         if (provider.type === 'openai' && provider.id !== 'openai') {
+          // @ts-ignore eslint-disable-next-line
           provider.type = 'openai-compatible'
         }
       })
@@ -1290,6 +1291,52 @@ const migrateConfig = {
             return rest
           }
           return provider
+        })
+      }
+      return state
+    } catch (error) {
+      return state
+    }
+  },
+  '100': (state: RootState) => {
+    try {
+      state.llm.providers.forEach((provider) => {
+        // @ts-ignore eslint-disable-next-line
+        if (['openai-compatible', 'openai'].includes(provider.type)) {
+          provider.type = 'openai'
+        }
+        if (provider.id === 'openai') {
+          provider.type = 'openai-response'
+        }
+      })
+      state.assistants.assistants.forEach((assistant) => {
+        assistant.knowledgeRecognition = 'off'
+      })
+      return state
+    } catch (error) {
+      return state
+    }
+  },
+  '101': (state: RootState) => {
+    try {
+      state.assistants.assistants.forEach((assistant) => {
+        if (assistant.settings) {
+          // @ts-ignore eslint-disable-next-line
+          if (assistant.settings.enableToolUse) {
+            // @ts-ignore eslint-disable-next-line
+            assistant.settings.toolUseMode = assistant.settings.enableToolUse ? 'function' : 'prompt'
+            // @ts-ignore eslint-disable-next-line
+            delete assistant.settings.enableToolUse
+          }
+        }
+      })
+      if (state.shortcuts) {
+        state.shortcuts.shortcuts.push({
+          key: 'exit_fullscreen',
+          shortcut: ['Escape'],
+          editable: false,
+          enabled: true,
+          system: true
         })
       }
       return state
