@@ -500,17 +500,20 @@ export default class OpenAICompatibleProvider extends BaseOpenAiProvider {
       }
 
       // Handle reasoning effort separately to avoid type issues
-      const reasoningEffort = this.getReasoningEffort(assistant, model)
-      if (reasoningEffort && typeof reasoningEffort === 'object') {
-        // Only add valid OpenAI API properties
-        if ('reasoning' in reasoningEffort) {
-          baseParams.reasoning = reasoningEffort.reasoning
-        }
-        if ('thinking' in reasoningEffort) {
-          baseParams.thinking = reasoningEffort.thinking
-        }
-        if ('enable_thinking' in reasoningEffort) {
-          baseParams.enable_thinking = reasoningEffort.enable_thinking
+      // Skip reasoning effort parameters for Groq provider
+      if (this.provider.id !== 'groq') {
+        const reasoningEffort = this.getReasoningEffort(assistant, model)
+        if (reasoningEffort && typeof reasoningEffort === 'object') {
+          // Only add valid OpenAI API properties
+          if ('reasoning' in reasoningEffort) {
+            baseParams.reasoning = reasoningEffort.reasoning
+          }
+          if ('thinking' in reasoningEffort) {
+            baseParams.thinking = reasoningEffort.thinking
+          }
+          if ('enable_thinking' in reasoningEffort) {
+            baseParams.enable_thinking = reasoningEffort.enable_thinking
+          }
         }
       }
 

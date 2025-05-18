@@ -95,13 +95,34 @@ export function isEmoji(str: string): boolean {
 }
 
 /**
- * 从话题名称中移除特殊字符：
- * - 替换换行符为空格。
- * @param str 输入字符串
- * @returns string 处理后的字符串
+ * Process topic names to ensure English is the primary language:
+ * - Replace newlines with spaces
+ * - Remove Chinese and other non-Latin characters
+ * - Ensure English is used as the primary language
+ * @param str Input string
+ * @returns string Processed string with only English/Latin characters
  */
 export function removeSpecialCharactersForTopicName(str: string) {
-  return str.replace(/[\r\n]+/g, ' ').trim()
+    // First replace newlines with spaces
+    let result = str.replace(/[\r\n]+/g, ' ').trim()
+    
+    // Check if the string contains Chinese or other non-Latin characters
+    const hasNonLatinChars = /[^\p{Script=Latin}\p{P}\p{Z}\p{N}\p{S}]/u.test(result)
+    
+    if (hasNonLatinChars) {
+        // Remove all non-Latin characters (keeping punctuation, spaces, numbers, and symbols)
+        result = result.replace(/[^\p{Script=Latin}\p{P}\p{Z}\p{N}\p{S}]/gu, '')
+        
+        // Clean up any double spaces that might have been created
+        result = result.replace(/\s+/g, ' ').trim()
+        
+        // If the result is empty or too short after filtering, use a default English title
+        if (result.length < 3) {
+            result = 'New Topic'
+        }
+    }
+    
+    return result
 }
 
 /**
