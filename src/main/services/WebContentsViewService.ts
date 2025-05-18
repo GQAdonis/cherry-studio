@@ -399,9 +399,10 @@ class WebContentsViewService {
       // CRITICAL: For ALL mini apps, ensure they are positioned flush against the left edge
       // This ensures the WebContentsView is positioned correctly within the content area
       // and doesn't overlap with the sidebar or top navigation
-      // CRITICAL: Force x to 0 to ensure content is flush against the left edge
-      let adjustedBounds = {
-        x: 0, // CRITICAL: Force position to absolute left edge regardless of what was provided
+      // CRITICAL: Force x to match the sidebar width to ensure content is flush against the sidebar
+      const sidebarWidth = 26; // Sidebar width in pixels
+      const adjustedBounds = {
+        x: sidebarWidth, // CRITICAL: Position exactly at the right edge of the sidebar
         y: bounds.y, // Use the y position provided by the content area
         width: bounds.width, // Use the width provided by the content area
         height: bounds.height // Use the height provided by the content area

@@ -111,7 +111,20 @@ const WebviewStyle: React.CSSProperties = {
   width: '100%',
   height: 'calc(100vh - var(--navbar-height))',
   backgroundColor: 'var(--color-background)',
-  display: 'inline-flex'
+  display: 'inline-flex',
+  // CRITICAL: Ensure the webview is positioned flush against the left sidebar
+  position: 'absolute',
+  left: 0,
+  top: 0,
+  right: 0,
+  bottom: 0,
+  // CRITICAL: Remove any margin or padding that might cause gaps
+  margin: 0,
+  padding: 0,
+  // CRITICAL: Ensure content is properly contained
+  boxSizing: 'border-box',
+  // CRITICAL: Allow content to scroll when necessary
+  overflow: 'auto'
 }
 
 export default WebviewContainer

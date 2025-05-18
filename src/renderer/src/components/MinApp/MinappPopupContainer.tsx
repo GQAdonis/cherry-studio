@@ -448,7 +448,8 @@ const MinappPopupContainer: React.FC = () => {
       maskClosable={false}
       closeIcon={null}
       style={{
-        marginLeft: 'var(--sidebar-width)',
+        // CRITICAL: Remove marginLeft to prevent gap between sidebar and content
+        // The positioning is already handled by the ant-drawer-content-wrapper CSS class
         backgroundColor: window.root.style.background
       }}>
       {!isReady && (

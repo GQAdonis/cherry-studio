@@ -20,12 +20,14 @@
     padding: 0;
     height: calc(100% - 56px);
     overflow: hidden;
-    /* Center content for all mini apps */
+    /* CRITICAL: Use flex layout but align content to the left edge */
     display: flex;
     flex-direction: column;
-    align-items: center;
-    /* CRITICAL: Ensure proper positioning for WebContentsView */
+    align-items: flex-start; /* Align to the left instead of center */
+    /* CRITICAL: Ensure proper positioning for content */
     position: relative;
+    /* CRITICAL: Ensure the drawer body takes up the full width */
+    width: 100%;
   }
   
   /* Ensure the content area manager is properly positioned */
@@ -90,12 +92,14 @@
 /* Special styling for bolt.diy mini app */
 .minapp-drawer[data-appid="bolt.diy"] {
   .ant-drawer-body {
-    /* Ensure content is centered */
+    /* CRITICAL: Use flex layout but align content to the left edge */
     display: flex;
     flex-direction: column;
-    align-items: center;
+    align-items: flex-start; /* Align to the left instead of center */
     /* Add background color to match Claude app */
     background-color: #f5f5f5;
+    /* CRITICAL: Ensure the drawer body takes up the full width */
+    width: 100%;
   }
   
   .ant-drawer-content-wrapper {
@@ -111,9 +115,11 @@
 .minapp-drawer[data-appid="groq"],
 .minapp-drawer[data-appid="anthropic"] {
   .ant-drawer-body {
-    /* Ensure content is centered */
+    /* CRITICAL: Use flex layout but align content to the left edge */
     display: flex;
     flex-direction: column;
-    align-items: center;
+    align-items: flex-start; /* Align to the left instead of center */
+    /* CRITICAL: Ensure the drawer body takes up the full width */
+    width: 100%;
   }
 }

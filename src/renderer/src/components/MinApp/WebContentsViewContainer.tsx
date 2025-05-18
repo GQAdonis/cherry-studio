@@ -70,9 +70,9 @@ const WebContentsViewContainer: React.FC<{
         const navbarHeight = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--navbar-height') || '41', 10);
         
         // Calculate the bounds precisely to ensure content only appears in the correct area
-        // CRITICAL: Position flush against the left edge without any gap
+        // CRITICAL: Position flush against the right edge of the sidebar without any gap
         const bounds = {
-          x: 0, // CRITICAL: Force position to absolute left edge of the window
+          x: sidebarWidth, // CRITICAL: Position exactly at the right edge of the sidebar
           y: navbarHeight, // Position exactly below the navbar
           width: window.innerWidth - sidebarWidth, // Use width excluding sidebar
           height: window.innerHeight - navbarHeight // Use height excluding navbar
