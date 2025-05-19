@@ -32,7 +32,7 @@ https://docs.prometheusags.ai
 1. **Diverse LLM Provider Support**:
 
 - ☁️ Major LLM Cloud Services: OpenAI, Gemini, Anthropic, and more
-- 🔗 AI Web Service Integration: Claude, Peplexity, Poe, and others
+- 🔗 AI Web Service Integration: Claude, Perplexity, Poe, and others
 - 💻 Local Model Support with Ollama, LM Studio
 
 2. **AI Assistants & Conversations**:

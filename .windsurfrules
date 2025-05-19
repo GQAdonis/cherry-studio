@@ -22,13 +22,13 @@ electron-typescript
 - Always code sign the distributable before release.
 - Use contextBridge and preload scripts for secure IPC.
 - Never expose Node.js APIs directly to the renderer process.
-- Always use the pure WebContentsView implementation and NEVER use BrowserView in ANY form.
+- Use either WebContentsView or Webview implementations for web content rendering, but NEVER use BrowserView in ANY form.
 
 [code_style]
 - Use TypeScript strict mode.
 - Use Prettier and ESLint for code formatting and linting.
 - Follow Electron and TypeScript community best practices for file structure.
-- Implement all web content rendering using WebContentsView exclusively, never BrowserView.
+- Implement all web content rendering using either WebContentsView or Webview, never BrowserView.
 
 [testing]
 - Add tests for both main and renderer processes.
@@ -49,11 +49,11 @@ electron-typescript
 - Always check the docs/* subdirectories for markdown files that specify architectural choices, other rules, or design instructions generated from other tools, and ensure adherence to those standards.
 
 [web_content_implementation]
-- Always use WebContentsView for all web content rendering.
+- Use either WebContentsView or Webview for web content rendering.
 - NEVER use BrowserView in any form or implementation.
-- All mini apps must be implemented using WebContentsView exclusively.
-- Any code that uses BrowserView must be refactored to use WebContentsView instead.
-- WebContentsView provides better web compatibility, proper Z-order management, and improved resource management.
+- All mini apps must be implemented using either WebContentsView or Webview.
+- Any code that uses BrowserView must be refactored to use WebContentsView or Webview instead.
+- Both WebContentsView and Webview provide better web compatibility, proper Z-order management, and improved resource management compared to BrowserView.
 
 [mini_app_requirements]
 - Mini apps MUST be able to use localStorage, IndexedDB, and have NO browser restrictions on ANY APIs they may want to use.

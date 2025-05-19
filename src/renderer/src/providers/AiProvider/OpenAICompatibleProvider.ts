@@ -53,6 +53,7 @@ import {
   convertLinksToZhipu
 } from '@renderer/utils/linkConverter'
 import {
+  isEnabledToolUse,
   mcpToolCallResponseToOpenAICompatibleMessage,
   mcpToolsToOpenAIChatTools,
   openAIToolsToMcpTool,
@@ -75,7 +76,7 @@ import {
 } from 'openai/resources'
 
 import { CompletionsParams } from '.'
-import { BaseOpenAiProvider } from './OpenAIProvider'
+import { BaseOpenAIProvider } from './OpenAIResponseProvider'
 
 // 1. 定义联合类型
 export type OpenAIStreamChunk =
@@ -83,7 +84,7 @@ export type OpenAIStreamChunk =
   | { type: 'tool-calls'; delta: any }
   | { type: 'finish'; finishReason: any; usage: any; delta: any; chunk: any }
 
-export default class OpenAICompatibleProvider extends BaseOpenAiProvider {
+export default class OpenAICompatibleProvider extends BaseOpenAIProvider {
   constructor(provider: Provider) {
     super(provider)
 
@@ -132,7 +133,7 @@ export default class OpenAICompatibleProvider extends BaseOpenAiProvider {
   override async getMessageParam(
     message: Message,
     model: Model
-  ): Promise<OpenAI.Chat.Completions.ChatCompletionMessageParam> {
+  ): Promise<ChatCompletionMessageParam> {
     const isVision = isVisionModel(model)
     const content = await this.getMessageContent(message)
     const fileBlocks = findFileBlocks(message)
@@ -256,7 +257,7 @@ export default class OpenAICompatibleProvider extends BaseOpenAiProvider {
    * @param effort Our internal reasoning effort option
    * @returns OpenAI SDK compatible reasoning effort value
    */
-  private convertToOpenAIReasoningEffort(effort?: string): 'low' | 'medium' | 'high' | null | undefined {
+  private convertToOpenAIReasoningEffort(effort?: string): 'low' | 'medium' | 'high' | undefined {
     // If effort is 'auto' or any other unsupported value, default to 'high'
     if (effort === 'auto') {
       return 'high'
@@ -383,7 +384,7 @@ export default class OpenAICompatibleProvider extends BaseOpenAiProvider {
     const defaultModel = getDefaultModel()
     const model = assistant.model || defaultModel
 
-    const { contextCount, maxTokens, streamOutput, enableToolUse } = getAssistantSettings(assistant)
+    const { contextCount, maxTokens, streamOutput } = getAssistantSettings(assistant)
     const isEnabledBultinWebSearch = assistant.enableWebSearch
     messages = addImageFileToContents(messages)
     const enableReasoning =
@@ -397,7 +398,13 @@ export default class OpenAICompatibleProvider extends BaseOpenAiProvider {
         content: `Formatting re-enabled${systemMessage ? '\n' + systemMessage.content : ''}`
       }
     }
-    const { tools } = this.setupToolsConfig<ChatCompletionTool>({ mcpTools, model, enableToolUse })
+    
+    // Use isEnabledToolUse from mcp-tools
+    const { tools } = this.setupToolsConfig<ChatCompletionTool>({ 
+      mcpTools, 
+      model, 
+      enableToolUse: isEnabledToolUse(assistant)
+    })
 
     if (this.useSystemPromptForTools) {
       systemMessage.content = buildSystemPrompt(systemMessage.content || '', mcpTools)
@@ -431,24 +438,24 @@ export default class OpenAICompatibleProvider extends BaseOpenAiProvider {
       const currentContent = lastUserMsg.content // content 類型：string | ChatCompletionContentPart[] | null | undefined
 
       // Handle type compatibility and null/undefined cases
-      // First, ensure we have a compatible type for processPostsuffixQwen3Model
-      let compatibleContent: string | ChatCompletionContentPart[] | null = null
-
       if (currentContent === null || currentContent === undefined) {
-        compatibleContent = null
+        // If content is null or undefined, set it to empty string to avoid issues
+        lastUserMsg.content = ''
       } else if (typeof currentContent === 'string') {
-        compatibleContent = currentContent
+        // Process string content
+        lastUserMsg.content = processPostsuffixQwen3Model(
+          currentContent,
+          postsuffix,
+          qwenThinkModeEnabled
+        ) as string
       } else if (Array.isArray(currentContent)) {
-        // Convert array to ensure it's compatible with ChatCompletionContentPart[]
-        compatibleContent = currentContent as ChatCompletionContentPart[]
+        // Process array content
+        lastUserMsg.content = processPostsuffixQwen3Model(
+          currentContent as ChatCompletionContentPart[],
+          postsuffix,
+          qwenThinkModeEnabled
+        ) as ChatCompletionContentPart[]
       }
-
-      // Now call the function with the compatible content
-      lastUserMsg.content = processPostsuffixQwen3Model(
-        compatibleContent,
-        postsuffix,
-        qwenThinkModeEnabled
-      ) as ChatCompletionContentPart[]
     }
 
     //当 systemMessage 内容为空时不发送 systemMessage
@@ -486,8 +493,8 @@ export default class OpenAICompatibleProvider extends BaseOpenAiProvider {
       // Determine if streaming is supported
       const streamSupported = isSupportStreamOutput()
 
-      // Create the base parameters without reasoning_effort
-      const baseParams: Record<string, any> = {
+      // Create the base parameters
+      const baseParams: ChatCompletionCreateParamsNonStreaming = {
         model: model.id,
         messages: reqMessages,
         temperature: this.getTemperature(assistant, model),
@@ -497,33 +504,36 @@ export default class OpenAICompatibleProvider extends BaseOpenAiProvider {
         ...getOpenAIWebSearchParams(assistant, model),
         ...this.getProviderSpecificParameters(assistant, model),
         ...this.getCustomParameters(assistant)
-      }
+      } as ChatCompletionCreateParamsNonStreaming
 
       // Handle reasoning effort separately to avoid type issues
       // Skip reasoning effort parameters for Groq provider
       if (this.provider.id !== 'groq') {
         const reasoningEffort = this.getReasoningEffort(assistant, model)
         if (reasoningEffort && typeof reasoningEffort === 'object') {
+          // Create a properly typed parameter object
+          const typedParams = baseParams as unknown as Record<string, any>
+          
           // Only add valid OpenAI API properties
           if ('reasoning' in reasoningEffort) {
-            baseParams.reasoning = reasoningEffort.reasoning
+            typedParams.reasoning = reasoningEffort.reasoning
           }
           if ('thinking' in reasoningEffort) {
-            baseParams.thinking = reasoningEffort.thinking
+            typedParams.thinking = reasoningEffort.thinking
           }
           if ('enable_thinking' in reasoningEffort) {
-            baseParams.enable_thinking = reasoningEffort.enable_thinking
+            typedParams.enable_thinking = reasoningEffort.enable_thinking
           }
         }
       }
 
       // Create the appropriate parameters based on streaming support
       const params = streamSupported
-        ? { ...baseParams, stream: true as const }
-        : { ...baseParams, stream: false as const }
+        ? { ...baseParams, stream: true }
+        : { ...baseParams, stream: false }
 
-      // Make the API call with type assertion to handle the complex parameter structure
-      const newStream = await this.sdk.chat.completions.create(params as any, {
+      // Make the API call with proper typing
+      const newStream = await this.sdk.chat.completions.create(params, {
         signal
       })
       await processStream(newStream, idx + 1)
@@ -896,19 +906,29 @@ export default class OpenAICompatibleProvider extends BaseOpenAiProvider {
     // Determine if we should use streaming
     const useStream = isSupportStreamOutput()
 
-    // Create base parameters without stream-specific properties
-    const baseParams = {
+    // Create base parameters with proper typing
+    const baseParams: Partial<ChatCompletionCreateParamsNonStreaming> = {
       model: model.id,
       messages: reqMessages,
       temperature: this.getTemperature(assistant, model),
       top_p: this.getTopP(assistant, model),
       max_tokens: maxTokens,
       tools: !isEmpty(tools) ? tools : undefined,
-      service_tier: this.getServiceTier(model) as 'auto' | 'flex' | 'default' | null | undefined,
       ...getOpenAIWebSearchParams(assistant, model),
-      ...this.getReasoningEffort(assistant, model),
       ...this.getProviderSpecificParameters(assistant, model),
       ...this.getCustomParameters(assistant)
+    }
+
+    // Handle service_tier separately to avoid type issues
+    const serviceTier = this.getServiceTier(model)
+    if (serviceTier) {
+      (baseParams as any).service_tier = serviceTier
+    }
+
+    // Add reasoning effort parameters
+    const reasoningEffort = this.getReasoningEffort(assistant, model)
+    if (reasoningEffort && typeof reasoningEffort === 'object') {
+      Object.assign(baseParams, reasoningEffort)
     }
 
     // Create request options
@@ -917,21 +937,21 @@ export default class OpenAICompatibleProvider extends BaseOpenAiProvider {
       timeout: this.getTimeout(model)
     }
 
-    // Add keep_alive parameter if needed (using type assertion)
+    // Add keep_alive parameter if needed
     if (this.keepAliveTime !== undefined) {
-      ;(baseParams as any).keep_alive = this.keepAliveTime
+      (baseParams as any).keep_alive = this.keepAliveTime
     }
 
     // Call the appropriate overload based on streaming preference
     let response
     if (useStream) {
       // Create streaming response
-      const streamParams = { ...baseParams, stream: true as const }
-      response = await this.sdk.chat.completions.create(streamParams, requestOptions)
+      const streamParams = { ...baseParams, stream: true }
+      response = await this.sdk.chat.completions.create(streamParams as any, requestOptions)
     } else {
       // Create non-streaming response
-      const nonStreamParams = { ...baseParams, stream: false as const }
-      response = await this.sdk.chat.completions.create(nonStreamParams, requestOptions)
+      const nonStreamParams = { ...baseParams, stream: false }
+      response = await this.sdk.chat.completions.create(nonStreamParams as ChatCompletionCreateParamsNonStreaming, requestOptions)
     }
 
     const stream = response
@@ -974,30 +994,35 @@ export default class OpenAICompatibleProvider extends BaseOpenAiProvider {
     await this.checkIsCopilot()
 
     // console.debug('[translate] reqMessages', model.id, message)
-    // Create base parameters without stream-specific properties
-    const baseParams = {
+    // Create base parameters with proper typing
+    const baseParams: Partial<ChatCompletionCreateParamsNonStreaming> = {
       model: model.id,
       messages: messagesForApi as ChatCompletionMessageParam[],
       temperature: this.getTemperature(assistant, model),
-      top_p: this.getTopP(assistant, model),
-      ...this.getReasoningEffort(assistant, model)
+      top_p: this.getTopP(assistant, model)
     }
 
-    // Add keep_alive parameter if needed (using type assertion)
+    // Add reasoning effort parameters
+    const reasoningEffort = this.getReasoningEffort(assistant, model)
+    if (reasoningEffort && typeof reasoningEffort === 'object') {
+      Object.assign(baseParams, reasoningEffort)
+    }
+
+    // Add keep_alive parameter if needed
     if (this.keepAliveTime !== undefined) {
-      ;(baseParams as any).keep_alive = this.keepAliveTime
+      (baseParams as any).keep_alive = this.keepAliveTime
     }
 
     // Call the appropriate overload based on streaming preference
     let response
     if (stream) {
       // Create streaming response
-      const streamParams = { ...baseParams, stream: true as const }
-      response = await this.sdk.chat.completions.create(streamParams)
+      const streamParams = { ...baseParams, stream: true }
+      response = await this.sdk.chat.completions.create(streamParams as any)
     } else {
       // Create non-streaming response
-      const nonStreamParams = { ...baseParams, stream: false as const }
-      response = await this.sdk.chat.completions.create(nonStreamParams)
+      const nonStreamParams = { ...baseParams, stream: false }
+      response = await this.sdk.chat.completions.create(nonStreamParams as ChatCompletionCreateParamsNonStreaming)
 
       // For non-streaming responses, return the content directly
       return (response as ChatCompletion).choices[0].message?.content || ''
@@ -1008,30 +1033,36 @@ export default class OpenAICompatibleProvider extends BaseOpenAiProvider {
     const isReasoning = isReasoningModel(model)
 
     // For streaming responses, iterate through the chunks
-    for await (const chunk of response as Stream<ChatCompletionChunk>) {
-      const deltaContent = chunk.choices[0]?.delta?.content || ''
-
-      if (isReasoning) {
-        if (deltaContent.includes('<think>')) {
-          isThinking = true
-        }
-
-        if (!isThinking) {
+    try {
+      for await (const chunk of response as unknown as Stream<ChatCompletionChunk>) {
+        const deltaContent = chunk.choices[0]?.delta?.content || ''
+        
+        if (isReasoning) {
+          if (deltaContent.includes('<think>')) {
+            isThinking = true
+          }
+          
+          if (!isThinking) {
+            text += deltaContent
+            onResponse?.(text, false)
+          }
+          
+          if (deltaContent.includes('</think>')) {
+            isThinking = false
+          }
+        } else {
           text += deltaContent
           onResponse?.(text, false)
         }
-
-        if (deltaContent.includes('</think>')) {
-          isThinking = false
-        }
-      } else {
-        text += deltaContent
-        onResponse?.(text, false)
       }
+      
+      onResponse?.(text, true)
+    } catch (error) {
+      console.error('Error in streaming response:', error)
+      // If streaming fails, still return the text we've collected so far
+      onResponse?.(text, true)
     }
-
-    onResponse?.(text, true)
-
+    
     return text
   }
 
@@ -1068,17 +1099,17 @@ export default class OpenAICompatibleProvider extends BaseOpenAiProvider {
 
     await this.checkIsCopilot()
 
-    // Create base parameters
-    const baseParams = {
+    // Create base parameters with proper typing
+    const baseParams: ChatCompletionCreateParamsNonStreaming = {
       model: model.id,
       messages: [systemMessage, userMessage] as ChatCompletionMessageParam[],
-      stream: false as const,
+      stream: false,
       max_tokens: 1000
     }
 
-    // Add keep_alive parameter if needed (using type assertion)
+    // Add keep_alive parameter if needed
     if (this.keepAliveTime !== undefined) {
-      ;(baseParams as any).keep_alive = this.keepAliveTime
+      (baseParams as any).keep_alive = this.keepAliveTime
     }
 
     const response = await this.sdk.chat.completions.create(baseParams)
@@ -1116,17 +1147,17 @@ export default class OpenAICompatibleProvider extends BaseOpenAiProvider {
     const { abortController, cleanup } = this.createAbortController(lastUserMessage?.id)
     const { signal } = abortController
 
-    // Create base parameters
-    const baseParams = {
+    // Create base parameters with proper typing
+    const baseParams: ChatCompletionCreateParamsNonStreaming = {
       model: model.id,
       messages: [systemMessage, userMessage] as ChatCompletionMessageParam[],
-      stream: false as const,
+      stream: false,
       max_tokens: 1000
     }
 
-    // Add keep_alive parameter if needed (using type assertion)
+    // Add keep_alive parameter if needed
     if (this.keepAliveTime !== undefined) {
-      ;(baseParams as any).keep_alive = this.keepAliveTime
+      (baseParams as any).keep_alive = this.keepAliveTime
     }
 
     // Request options
@@ -1161,7 +1192,7 @@ export default class OpenAICompatibleProvider extends BaseOpenAiProvider {
       messages: [
         { role: 'system', content: prompt },
         { role: 'user', content }
-      ]
+      ] as ChatCompletionMessageParam[]
     })
 
     return response.choices[0].message?.content || ''
@@ -1215,33 +1246,48 @@ export default class OpenAICompatibleProvider extends BaseOpenAiProvider {
       return { valid: false, error: new Error('No model found') }
     }
 
-    const body = {
-      model: model.id,
-      messages: [{ role: 'user', content: 'hi' }],
-      stream
-    }
-
+    const messages: ChatCompletionMessageParam[] = [{ role: 'user', content: 'hi' }]
+    
     try {
       await this.checkIsCopilot()
       if (!stream) {
-        const response = await this.sdk.chat.completions.create(body as ChatCompletionCreateParamsNonStreaming)
+        // Non-streaming request
+        const params: ChatCompletionCreateParamsNonStreaming = {
+          model: model.id,
+          messages,
+          stream: false
+        }
+        
+        const response = await this.sdk.chat.completions.create(params)
         if (!response?.choices[0].message) {
           throw new Error('Empty response')
         }
         return { valid: true, error: null }
       } else {
-        const response: any = await this.sdk.chat.completions.create(body as any)
-        // 等待整个流式响应结束
+        // Streaming request
+        const params = {
+          model: model.id,
+          messages,
+          stream: true
+        }
+        
+        const response = await this.sdk.chat.completions.create(params as any)
+        // Wait for the entire streaming response to finish
         let hasContent = false
-        for await (const chunk of response) {
-          if (chunk.choices?.[0]?.delta?.content) {
-            hasContent = true
+        try {
+          for await (const chunk of response as unknown as Stream<ChatCompletionChunk>) {
+            if (chunk.choices?.[0]?.delta?.content) {
+              hasContent = true
+            }
           }
+          if (hasContent) {
+            return { valid: true, error: null }
+          }
+          throw new Error('Empty streaming response')
+        } catch (streamError) {
+          console.error('Error in streaming check:', streamError);
+          return { valid: false, error: streamError instanceof Error ? streamError : new Error(String(streamError)) };
         }
-        if (hasContent) {
-          return { valid: true, error: null }
-        }
-        throw new Error('Empty streaming response')
       }
     } catch (error: any) {
       return {

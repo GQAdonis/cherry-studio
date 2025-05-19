@@ -18,19 +18,19 @@
         "runtimeExecutable": "${workspaceRoot}/node_modules/.bin/electron-vite.cmd"
       },
       "runtimeArgs": ["dev", "--inspect=9229", "--remote-debugging-port=9222"],
-      "env": {
-        "FORCE_SHOW_WINDOW": "true",
-        "DISABLE_LAUNCH_TO_TRAY": "true",
-        "OPEN_DEVTOOLS": "true",
-        "SUPPRESS_SOURCEMAP_ERRORS": "true",
-        "SUPPRESS_SECURITY_WARNINGS": "true",
-        "SUPPRESS_ROUTER_WARNINGS": "true",
-        "VERBOSE_LOGGING": "false",
-        "LOG_WEBCONTENTSVIEW_EVENTS": "false",
-        "LOG_IPC_EVENTS": "false",
-        "LOG_PERFORMANCE": "false",
-        "LOG_MEMORY_USAGE": "false"
-      },
+"env": {
+  "FORCE_SHOW_WINDOW": "true",
+  "DISABLE_LAUNCH_TO_TRAY": "true",
+  "OPEN_DEVTOOLS": "true",
+  "SUPPRESS_SOURCEMAP_ERRORS": "true",
+  "SUPPRESS_SECURITY_WARNINGS": "true",
+  "SUPPRESS_ROUTER_WARNINGS": "true",
+  "VERBOSE_LOGGING": "true",
+  "LOG_WEBCONTENTSVIEW_EVENTS": "true",
+  "LOG_IPC_EVENTS": "true",
+  "LOG_PERFORMANCE": "true",
+  "LOG_MEMORY_USAGE": "true"
+},
       "console": "integratedTerminal",
       "protocol": "inspector",
       "sourceMaps": true,

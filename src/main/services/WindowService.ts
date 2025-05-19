@@ -331,17 +331,49 @@ export class WindowService {
   }
 
   private loadMainWindowContent(mainWindow: BrowserWindow) {
+    // Log window visibility state before loading content
+    Logger.info('Window state before loading content:', {
+      isVisible: mainWindow.isVisible(),
+      isMinimized: mainWindow.isMinimized(),
+      isMaximized: mainWindow.isMaximized(),
+      isFullScreen: mainWindow.isFullScreen(),
+      isFocused: mainWindow.isFocused(),
+      environmentVariables: {
+        FORCE_SHOW_WINDOW: process.env.FORCE_SHOW_WINDOW,
+        DISABLE_LAUNCH_TO_TRAY: process.env.DISABLE_LAUNCH_TO_TRAY,
+        DEBUG_FORCE_WINDOW_VISIBLE: process.env.DEBUG_FORCE_WINDOW_VISIBLE,
+        OPEN_DEVTOOLS: process.env.OPEN_DEVTOOLS
+      }
+    })
+
     if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
       // Ensure we're using the correct URL (http://localhost:5173)
       const rendererUrl = process.env['ELECTRON_RENDERER_URL'].replace('http://localhost:3000', 'http://localhost:5173');
+      Logger.info(`Loading renderer URL: ${rendererUrl}`)
+      
       mainWindow.loadURL(rendererUrl)
+      
       // Open DevTools automatically in development mode or when debugging is enabled
       if (process.env.OPEN_DEVTOOLS === 'true') {
+        Logger.info('Opening DevTools')
         mainWindow.webContents.openDevTools()
       }
     } else {
-      mainWindow.loadFile(join(__dirname, '../renderer/index.html'))
+      const htmlPath = join(__dirname, '../renderer/index.html')
+      Logger.info(`Loading file: ${htmlPath}`)
+      mainWindow.loadFile(htmlPath)
     }
+    
+    // Add listener for did-finish-load to check window state after loading
+    mainWindow.webContents.on('did-finish-load', () => {
+      Logger.info('Window state after content loaded:', {
+        isVisible: mainWindow.isVisible(),
+        isMinimized: mainWindow.isMinimized(),
+        isMaximized: mainWindow.isMaximized(),
+        isFullScreen: mainWindow.isFullScreen(),
+        isFocused: mainWindow.isFocused()
+      })
+    })
   }
 
   public getMainWindow(): BrowserWindow | null {

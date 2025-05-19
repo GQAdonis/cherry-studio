@@ -1,4 +1,4 @@
-import { WebviewTag } from 'electron'
+import { WebviewTag } from '@renderer/types/electron-renderer'
 import { memo, useEffect, useRef } from 'react'
 
 /**
@@ -36,7 +36,12 @@ const WebviewContainer = memo(
     }
 
     useEffect(() => {
-      if (!webviewRef.current) return
+      if (!webviewRef.current) {
+        console.log(`WebviewContainer: webviewRef is null for ${appid}, skipping effect`)
+        return
+      }
+
+      console.log(`WebviewContainer: Setting up webview for ${appid}`)
 
       const handleLoaded = () => {
         console.log(`WebviewContainer: Mini-app ${appid} loaded successfully`)
@@ -55,7 +60,11 @@ const WebviewContainer = memo(
           console.log(`WebviewContainer: Attempting to reload mini-app ${appid}`)
           setTimeout(() => {
             if (webviewRef.current) {
-              webviewRef.current.src = url
+              try {
+                webviewRef.current.src = url
+              } catch (error) {
+                console.error(`WebviewContainer: Error setting src for ${appid}:`, error)
+              }
             }
           }, 1000)
         }
@@ -65,22 +74,32 @@ const WebviewContainer = memo(
         console.log(`WebviewContainer: Mini-app ${appid} console message: ${event.message}`)
       }
 
-      // Add event listeners
-      webviewRef.current.addEventListener('did-finish-load', handleLoaded)
-      webviewRef.current.addEventListener('did-navigate-in-page', handleNavigate)
-      webviewRef.current.addEventListener('did-fail-load', handleFailLoad)
-      webviewRef.current.addEventListener('console-message', handleConsoleMessage)
+      try {
+        // Add event listeners
+        console.log(`WebviewContainer: Adding event listeners for ${appid}`)
+        webviewRef.current.addEventListener('did-finish-load', handleLoaded)
+        webviewRef.current.addEventListener('did-navigate-in-page', handleNavigate)
+        webviewRef.current.addEventListener('did-fail-load', handleFailLoad)
+        webviewRef.current.addEventListener('console-message', handleConsoleMessage)
 
-      // we set the url when the webview is ready
-      console.log(`WebviewContainer: Setting URL for mini-app ${appid}: ${url}`)
-      webviewRef.current.src = url
+        // we set the url when the webview is ready
+        console.log(`WebviewContainer: Setting URL for mini-app ${appid}: ${url}`)
+        webviewRef.current.src = url
+      } catch (error) {
+        console.error(`WebviewContainer: Error setting up webview for ${appid}:`, error)
+      }
 
       return () => {
         if (webviewRef.current) {
-          webviewRef.current.removeEventListener('did-finish-load', handleLoaded)
-          webviewRef.current.removeEventListener('did-navigate-in-page', handleNavigate)
-          webviewRef.current.removeEventListener('did-fail-load', handleFailLoad)
-          webviewRef.current.removeEventListener('console-message', handleConsoleMessage)
+          try {
+            console.log(`WebviewContainer: Removing event listeners for ${appid}`)
+            webviewRef.current.removeEventListener('did-finish-load', handleLoaded)
+            webviewRef.current.removeEventListener('did-navigate-in-page', handleNavigate)
+            webviewRef.current.removeEventListener('did-fail-load', handleFailLoad)
+            webviewRef.current.removeEventListener('console-message', handleConsoleMessage)
+          } catch (error) {
+            console.error(`WebviewContainer: Error removing event listeners for ${appid}:`, error)
+          }
         }
       }
       // because the appid and url are enough, no need to add onLoadedCallback

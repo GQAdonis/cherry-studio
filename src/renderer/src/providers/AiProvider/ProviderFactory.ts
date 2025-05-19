@@ -4,6 +4,7 @@ import AihubmixProvider from './AihubmixProvider'
 import AnthropicProvider from './AnthropicProvider'
 import BaseProvider from './BaseProvider'
 import GeminiProvider from './GeminiProvider'
+import HuggingfaceProvider from './HuggingfaceProvider'
 import OpenAIProvider from './OpenAIProvider'
 import OpenAIResponseProvider from './OpenAIResponseProvider'
 
@@ -22,6 +23,8 @@ export default class ProviderFactory {
         return new AnthropicProvider(provider)
       case 'gemini':
         return new GeminiProvider(provider)
+      case 'huggingface':
+        return new HuggingfaceProvider(provider)
       default:
         return new OpenAIProvider(provider)
     }
@@ -29,5 +32,9 @@ export default class ProviderFactory {
 }
 
 export function isOpenAIProvider(provider: Provider) {
-  return !['anthropic', 'gemini'].includes(provider.type)
+  return !['anthropic', 'gemini', 'huggingface'].includes(provider.type)
+}
+
+export function isHuggingfaceProvider(provider: Provider) {
+  return provider.type === 'huggingface'
 }

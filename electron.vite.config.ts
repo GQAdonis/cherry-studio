@@ -3,6 +3,9 @@ import { defineConfig, externalizeDepsPlugin } from 'electron-vite'
 import { resolve } from 'path'
 import { visualizer } from 'rollup-plugin-visualizer'
 
+// Import our custom electron import fix plugin
+const electronImportFixPlugin = require('./electron-import-fix')
+
 const visualizerPlugin = (type: 'renderer' | 'main') => {
   return process.env[`VISUALIZER_${type.toUpperCase()}`] ? [visualizer({ open: true })] : []
 }
@@ -64,6 +67,8 @@ export default defineConfig({
           ]
         ]
       }),
+      // Add our electron import fix plugin to intercept electron imports
+      electronImportFixPlugin(),
       ...visualizerPlugin('renderer')
     ],
     resolve: {

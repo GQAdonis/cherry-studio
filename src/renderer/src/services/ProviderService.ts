@@ -16,11 +16,11 @@ export function getProviderName(id: string) {
 }
 
 export function isProviderSupportAuth(provider: Provider) {
-  const supportProviders = ['silicon', 'aihubmix']
+  const supportProviders = ['huggingface', 'aihubmix']
   return supportProviders.includes(provider.id)
 }
 
 export function isProviderSupportCharge(provider: Provider) {
-  const supportProviders = ['silicon', 'aihubmix']
+  const supportProviders = ['huggingface', 'aihubmix']
   return supportProviders.includes(provider.id)
 }

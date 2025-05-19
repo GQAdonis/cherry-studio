@@ -1,5 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { isLocalAi } from '@renderer/config/env'
+import { HUGGINGFACE_MODELS } from '@renderer/config/huggingface-models'
 import { SYSTEM_MODELS } from '@renderer/config/models'
 import { Model, Provider } from '@renderer/types'
 import { uniqBy } from 'lodash'
@@ -25,16 +26,6 @@ export interface LlmState {
 }
 
 export const INITIAL_PROVIDERS: Provider[] = [
-  {
-    id: 'silicon',
-    name: 'Silicon',
-    type: 'openai',
-    apiKey: '',
-    apiHost: 'https://api.siliconflow.cn',
-    models: SYSTEM_MODELS.silicon,
-    isSystem: true,
-    enabled: true
-  },
   {
     id: 'aihubmix',
     name: 'AiHubMix',
@@ -476,13 +467,39 @@ export const INITIAL_PROVIDERS: Provider[] = [
     models: SYSTEM_MODELS.voyageai,
     isSystem: true,
     enabled: false
+  },
+  {
+    id: 'huggingface',
+    name: 'Huggingface',
+    type: 'huggingface',
+    apiKey: '',
+    apiHost: '',
+    models: HUGGINGFACE_MODELS,
+    isSystem: true,
+    enabled: true
   }
 ]
 
 const initialState: LlmState = {
-  defaultModel: SYSTEM_MODELS.silicon[1],
-  topicNamingModel: SYSTEM_MODELS.silicon[2],
-  translateModel: SYSTEM_MODELS.silicon[3],
+    // Using SmolLM2 models as default
+    defaultModel: {
+        id: 'HuggingFaceTB/SmolLM2-360M-Instruct',
+        provider: 'huggingface',
+        name: 'SmolLM2-360M-Instruct',
+        group: 'SmolLM2'
+    },
+    topicNamingModel: {
+        id: 'HuggingFaceTB/SmolLM2-360M-Instruct',
+        provider: 'huggingface',
+        name: 'SmolLM2-360M-Instruct',
+        group: 'SmolLM2'
+    },
+    translateModel: {
+        id: 'HuggingFaceTB/SmolLM2-360M-Instruct',
+        provider: 'huggingface',
+        name: 'SmolLM2-360M-Instruct',
+        group: 'SmolLM2'
+    },
   providers: INITIAL_PROVIDERS,
   settings: {
     ollama: {
@@ -498,35 +515,47 @@ const initialState: LlmState = {
 }
 
 const getIntegratedInitialState = () => {
-  const model = JSON.parse(import.meta.env.VITE_RENDERER_INTEGRATED_MODEL)
-
-  return {
-    defaultModel: model,
-    topicNamingModel: model,
-    translateModel: model,
-    providers: [
-      {
-        id: 'ollama',
-        name: 'Ollama',
-        apiKey: 'ollama',
-        apiHost: 'http://localhost:15537/v1/',
-        models: [model],
-        isSystem: true,
-        enabled: true
-      }
-    ],
-    settings: {
-      ollama: {
-        keepAliveTime: 3600
-      },
-      lmstudio: {
-        keepAliveTime: 3600
-      },
-      gpustack: {
-        keepAliveTime: 3600
-      }
+    // Safely parse the model with fallback
+    let model;
+    try {
+        model = JSON.parse(import.meta.env.VITE_RENDERER_INTEGRATED_MODEL)
+    } catch (error) {
+        console.error('Failed to parse integrated model:', error)
+        // Fallback to DeepSeek V3 model if parsing fails
+        model = {
+            id: 'deepseek-ai/DeepSeek-V3',
+            provider: 'o3',
+            name: 'DeepSeek V3',
+            group: 'DeepSeek'
+        }
     }
-  } as LlmState
+
+    return {
+        defaultModel: model,
+        topicNamingModel: model,
+        translateModel: model,
+        providers: [
+            {
+                id: 'ollama',
+                name: 'Ollama',
+                apiKey: 'ollama',
+                apiHost: 'http://localhost:15537/v1/',
+                models: [model],
+                enabled: true
+            }
+        ],
+        settings: {
+            ollama: {
+                keepAliveTime: 3600
+            },
+            lmstudio: {
+                keepAliveTime: 3600
+            },
+            gpustack: {
+                keepAliveTime: 3600
+            }
+        }
+    } as LlmState
 }
 
 export const moveProvider = (providers: Provider[], id: string, position: number) => {

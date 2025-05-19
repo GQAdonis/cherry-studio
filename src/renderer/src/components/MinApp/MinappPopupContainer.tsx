@@ -23,7 +23,7 @@ import { setMinappsOpenLinkExternal } from '@renderer/store/settings'
 import { MinAppType } from '@renderer/types'
 import { delay } from '@renderer/utils'
 import { Avatar, Drawer, Tooltip } from 'antd'
-import { WebviewTag } from 'electron'
+import { WebviewTag } from '@renderer/types/electron-renderer'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import BeatLoader from 'react-spinners/BeatLoader'
@@ -153,10 +153,18 @@ const MinappPopupContainer: React.FC = () => {
      * to AVOID the re-render of the webview container
      */
     webviewRefs.current.forEach((webviewRef, appid) => {
-      if (!webviewRef) return
-      const display = appid === currentMinappId ? 'inline-flex' : 'none'
-      console.log(`MinappPopupContainer: Setting display for ${appid} to ${display}`)
-      webviewRef.style.display = display
+      if (!webviewRef) {
+        console.log(`MinappPopupContainer: No webview ref for ${appid}, skipping display update`)
+        return
+      }
+      
+      try {
+        const display = appid === currentMinappId ? 'inline-flex' : 'none'
+        console.log(`MinappPopupContainer: Setting display for ${appid} to ${display}`)
+        webviewRef.style.display = display
+      } catch (error) {
+        console.error(`MinappPopupContainer: Error setting display for ${appid}:`, error)
+      }
     })
 
     //delete the extra webviewLoadedRefs
@@ -170,12 +178,20 @@ const MinappPopupContainer: React.FC = () => {
         const webviewRef = webviewRefs.current.get(appid)
         if (webviewRef) {
           // Set webview to open links externally based on settings
-          if (typeof webviewRef.getWebContentsId === 'function') {
-            const webviewId = webviewRef.getWebContentsId()
-            if (webviewId !== null && typeof webviewId === 'number') {
-              console.log(`MinappPopupContainer: Setting external link handling for ${appid} with ID ${webviewId}`)
-              window.api.webview.setOpenLinkExternal(webviewId, minappsOpenLinkExternal)
+          try {
+            if (typeof webviewRef.getWebContentsId === 'function') {
+              const webviewId = webviewRef.getWebContentsId()
+              if (webviewId !== null && typeof webviewId === 'number') {
+                console.log(`MinappPopupContainer: Setting external link handling for ${appid} with ID ${webviewId}`)
+                window.api.webview.setOpenLinkExternal(webviewId, minappsOpenLinkExternal)
+              } else {
+                console.warn(`MinappPopupContainer: Invalid webContentsId for ${appid}: ${webviewId}`)
+              }
+            } else {
+              console.warn(`MinappPopupContainer: getWebContentsId is not a function for ${appid}`)
             }
+          } catch (error) {
+            console.error(`MinappPopupContainer: Error setting external link handling for ${appid}:`, error)
           }
         }
       }
@@ -252,12 +268,20 @@ const MinappPopupContainer: React.FC = () => {
     if (webviewRef) {
       console.log(`MinappPopupContainer: Setting up external link handling for loaded app ${appid}`)
       // Set webview to open links externally based on settings
-      if (typeof webviewRef.getWebContentsId === 'function') {
-        const webviewId = webviewRef.getWebContentsId()
-        if (webviewId !== null && typeof webviewId === 'number') {
-          console.log(`MinappPopupContainer: Setting external link handling for ${appid} with ID ${webviewId}`)
-          window.api.webview.setOpenLinkExternal(webviewId, minappsOpenLinkExternal)
+      try {
+        if (typeof webviewRef.getWebContentsId === 'function') {
+          const webviewId = webviewRef.getWebContentsId()
+          if (webviewId !== null && typeof webviewId === 'number') {
+            console.log(`MinappPopupContainer: Setting external link handling for ${appid} with ID ${webviewId}`)
+            window.api.webview.setOpenLinkExternal(webviewId, minappsOpenLinkExternal)
+          } else {
+            console.warn(`MinappPopupContainer: Invalid webContentsId for ${appid}: ${webviewId}`)
+          }
+        } else {
+          console.warn(`MinappPopupContainer: getWebContentsId is not a function for ${appid}`)
         }
+      } catch (error) {
+        console.error(`MinappPopupContainer: Error setting external link handling for ${appid}:`, error)
       }
     }
 

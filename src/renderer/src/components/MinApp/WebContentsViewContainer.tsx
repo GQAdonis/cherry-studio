@@ -152,7 +152,8 @@ const WebContentsViewContainer: React.FC<{
             console.log(`WebContentsViewContainer: Successfully created view for appid: ${appid}`)
             hasCreatedView.current = true
 
-            // Create a simulated WebviewTag interface for compatibility
+            // Create a simulated interface for compatibility with WebviewContainer
+            // This avoids direct dependency on the WebviewTag type from electron
             const simulatedRef = {
               getWebContentsId: async () => {
                 const result = await window.api.webContentsView.getWebContentsId(appid)

@@ -25,6 +25,7 @@ const api = {
   openWebsite: (url: string) => ipcRenderer.invoke(IpcChannel.Open_Website, url),
   getCacheSize: () => ipcRenderer.invoke(IpcChannel.App_GetCacheSize),
   clearCache: () => ipcRenderer.invoke(IpcChannel.App_ClearCache),
+  getPath: (name: string) => ipcRenderer.invoke(IpcChannel.App_GetPath, name),
   system: {
     getDeviceType: () => ipcRenderer.invoke(IpcChannel.System_GetDeviceType),
     getHostname: () => ipcRenderer.invoke(IpcChannel.System_GetHostname)
@@ -193,7 +194,21 @@ const api = {
     setOpenLinkExternal: (webviewId: number, isExternal: boolean) =>
       ipcRenderer.invoke(IpcChannel.Webview_SetOpenLinkExternal, webviewId, isExternal)
   },
-  // WebContentsView API removed - reverting to webview implementation
+  // WebContentsView API for web content rendering
+  webContentsView: {
+    create: (appid: string, url: string) =>
+      ipcRenderer.invoke('webcontentsview:create', appid, url),
+    show: (appid: string, bounds: { x: number, y: number, width: number, height: number }) =>
+      ipcRenderer.invoke('webcontentsview:show', appid, bounds),
+    hide: (appid: string) =>
+      ipcRenderer.invoke('webcontentsview:hide', appid),
+    getWebContentsId: (appid: string) =>
+      ipcRenderer.invoke('webcontentsview:get-webcontents-id', appid),
+    openDevTools: (appid: string) =>
+      ipcRenderer.invoke('webcontentsview:open-devtools', appid),
+    getURL: (appid: string) =>
+      ipcRenderer.invoke('webcontentsview:get-url', appid)
+  },
   storeSync: {
     subscribe: () => ipcRenderer.invoke(IpcChannel.StoreSync_Subscribe),
     unsubscribe: () => ipcRenderer.invoke(IpcChannel.StoreSync_Unsubscribe),

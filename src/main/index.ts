@@ -68,6 +68,27 @@ if (!app.requestSingleInstanceLock()) {
       app.dock?.hide()
     }
 
+    // Add debugging for renderer process
+    app.on('web-contents-created', (event, webContents) => {
+      webContents.on('did-start-loading', () => {
+        logger.info('WebContents started loading:', webContents.getURL())
+      })
+      
+      webContents.on('did-fail-load', (event, errorCode, errorDescription) => {
+        logger.error('WebContents failed to load:', errorCode, errorDescription)
+      })
+      
+      // Use any for the event type to avoid TypeScript errors
+      webContents.on('crashed' as any, (event: any, killed: boolean) => {
+        logger.error('WebContents crashed, killed:', killed)
+      })
+      
+      webContents.on('console-message', (event, level, message, line, sourceId) => {
+        const levels = ['debug', 'info', 'warning', 'error']
+        logger.info(`Console ${levels[level] || 'message'} from ${sourceId}:${line}: ${message}`)
+      })
+    })
+
     const mainWindow = windowService.createMainWindow()
     new TrayService()
 
