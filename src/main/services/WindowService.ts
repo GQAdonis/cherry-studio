@@ -1,4 +1,3 @@
-import { is } from '@electron-toolkit/utils'
 import { isLinux, isMac, isWin } from '@main/constant'
 import { getFilesDir } from '@main/utils/file'
 import { IpcChannel } from '@shared/IpcChannel'
@@ -152,20 +151,20 @@ export class WindowService {
 
     // Configure webview to ensure mini-apps have full access to browser APIs
     // This is required for mini-apps to use localStorage, IndexedDB, and other browser features
-    mainWindow.webContents.on('will-attach-webview', (_event, webPreferences) => {
+    mainWindow.webContents.on('will-attach-webview', (_, webPreferences) => {
       // Set security preferences to allow mini-apps to function properly
       webPreferences.nodeIntegration = false
       webPreferences.contextIsolation = true
       webPreferences.webSecurity = false // Required for cross-origin requests
       webPreferences.allowRunningInsecureContent = true // Required for mixed content
-      
+
       // Enable browser features needed by mini-apps
       webPreferences.enableWebSQL = true
       webPreferences.plugins = true
-      
+
       // Set partition to ensure persistent storage
       webPreferences.partition = 'persist:webview'
-      
+
       // Log webview configuration for debugging
       console.log(`Configuring webview with enhanced settings for mini-apps`)
     })
@@ -241,7 +240,7 @@ export class WindowService {
     }
 
     // 添加Escape键退出全屏的支持
-    mainWindow.webContents.on('before-input-event', (event, input) => {
+    mainWindow.webContents.on('before-input-event', (_, input) => {
       // 当按下Escape键且窗口处于全屏状态时退出全屏
       if (input.key === 'Escape' && !input.alt && !input.control && !input.meta && !input.shift) {
         if (mainWindow.isFullScreen()) {
@@ -253,7 +252,7 @@ export class WindowService {
             return
           }
           if (exitFullscreenShortcut?.enabled) {
-            event.preventDefault()
+            _.preventDefault()
             mainWindow.setFullScreen(false)
             return
           }
@@ -264,20 +263,20 @@ export class WindowService {
   }
 
   private setupWebContentsHandlers(mainWindow: BrowserWindow) {
-    mainWindow.webContents.on('will-navigate', (event, url) => {
+    mainWindow.webContents.on('will-navigate', (_, url) => {
       // Allow navigation to localhost:5173 (development server)
       if (url.includes('localhost:5173')) {
         return
       }
       // Also allow navigation to localhost:3000 and redirect to localhost:5173
       if (url.includes('localhost:3000')) {
-        event.preventDefault()
+        _.preventDefault()
         const redirectUrl = url.replace('localhost:3000', 'localhost:5173')
         mainWindow.loadURL(redirectUrl)
         return
       }
 
-      event.preventDefault()
+      _.preventDefault()
       shell.openExternal(url)
     })
 
@@ -338,7 +337,7 @@ export class WindowService {
   }
 
   private loadMainWindowContent(mainWindow: BrowserWindow) {
-    if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
+    if (process.env['ELECTRON_RENDERER_URL']) {
       // Ensure we're using the correct URL (http://localhost:5173)
       const rendererUrl = process.env['ELECTRON_RENDERER_URL'].replace('http://localhost:3000', 'http://localhost:5173');
       mainWindow.loadURL(rendererUrl)
@@ -539,7 +538,7 @@ export class WindowService {
       this.miniWindow?.webContents.send(IpcChannel.ShowMiniWindow)
     })
 
-    if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
+    if (process.env['ELECTRON_RENDERER_URL']) {
       // Ensure we're using the correct URL (http://localhost:5173)
       const rendererUrl = process.env['ELECTRON_RENDERER_URL'].replace('http://localhost:3000', 'http://localhost:5173');
       this.miniWindow.loadURL(rendererUrl + '/miniWindow.html')

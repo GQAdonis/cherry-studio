@@ -1,15 +1,29 @@
 import { IpcChannel } from '@shared/IpcChannel'
-import { Rectangle, ipcMain } from 'electron'
+import { ipcMain,Rectangle } from 'electron'
 import Logger from 'electron-log'
 
 import webContentsViewService from '../services/WebContentsViewService'
+
+// Define the WebContentsView IPC channels explicitly to avoid TypeScript errors
+const {
+  WebContentsView_Create,
+  WebContentsView_Show,
+  WebContentsView_Hide,
+  WebContentsView_HideAll,
+  WebContentsView_Destroy,
+  WebContentsView_OpenDevTools,
+  WebContentsView_SetOpenLinksExternally,
+  WebContentsView_Reload,
+  WebContentsView_GetURL,
+  WebContentsView_GetWebContentsId
+} = IpcChannel
 
 /**
  * Register IPC handlers for WebContentsView operations
  */
 export function registerWebContentsViewIpc() {
   // Create a new WebContentsView
-  ipcMain.handle(IpcChannel.WebContentsView_Create, async (_event, appId: string, url: string) => {
+  ipcMain.handle(WebContentsView_Create, async (_event, appId: string, url: string) => {
     try {
       const view = webContentsViewService.createView(appId, url)
       return { success: !!view }
@@ -20,7 +34,7 @@ export function registerWebContentsViewIpc() {
   })
 
   // Show a WebContentsView
-  ipcMain.handle(IpcChannel.WebContentsView_Show, (_event, appId: string, bounds: Rectangle) => {
+  ipcMain.handle(WebContentsView_Show, (_event, appId: string, bounds: Rectangle) => {
     try {
       webContentsViewService.showView(appId, bounds)
       return { success: true }
@@ -31,7 +45,7 @@ export function registerWebContentsViewIpc() {
   })
 
   // Hide a WebContentsView
-  ipcMain.handle(IpcChannel.WebContentsView_Hide, (_event, appId: string) => {
+  ipcMain.handle(WebContentsView_Hide, (_event, appId: string) => {
     try {
       webContentsViewService.hideView(appId)
       return { success: true }
@@ -42,7 +56,7 @@ export function registerWebContentsViewIpc() {
   })
 
   // Hide all WebContentsViews
-  ipcMain.handle(IpcChannel.WebContentsView_HideAll, () => {
+  ipcMain.handle(WebContentsView_HideAll, () => {
     try {
       webContentsViewService.hideAllViews()
       return { success: true }
@@ -53,7 +67,7 @@ export function registerWebContentsViewIpc() {
   })
 
   // Destroy a WebContentsView
-  ipcMain.handle(IpcChannel.WebContentsView_Destroy, (_event, appId: string) => {
+  ipcMain.handle(WebContentsView_Destroy, (_event, appId: string) => {
     try {
       webContentsViewService.destroyView(appId)
       return { success: true }
@@ -64,7 +78,7 @@ export function registerWebContentsViewIpc() {
   })
 
   // Open DevTools for a WebContentsView
-  ipcMain.handle(IpcChannel.WebContentsView_OpenDevTools, (_event, appId: string) => {
+  ipcMain.handle(WebContentsView_OpenDevTools, (_event, appId: string) => {
     try {
       webContentsViewService.openDevTools(appId)
       return { success: true }
@@ -76,7 +90,7 @@ export function registerWebContentsViewIpc() {
 
   // Set whether links should open externally
   ipcMain.handle(
-    IpcChannel.WebContentsView_SetOpenLinksExternally,
+    WebContentsView_SetOpenLinksExternally,
     (_event, appId: string, openExternal: boolean) => {
       try {
         webContentsViewService.setOpenLinksExternally(appId, openExternal)
@@ -89,7 +103,7 @@ export function registerWebContentsViewIpc() {
   )
 
   // Reload a WebContentsView
-  ipcMain.handle(IpcChannel.WebContentsView_Reload, async (_event, appId: string, url?: string) => {
+  ipcMain.handle(WebContentsView_Reload, async (_event, appId: string, url?: string) => {
     try {
       const success = await webContentsViewService.reloadView(appId, url)
       return { success }
@@ -100,7 +114,7 @@ export function registerWebContentsViewIpc() {
   })
 
   // Get the current URL of a WebContentsView
-  ipcMain.handle(IpcChannel.WebContentsView_GetURL, (_event, appId: string) => {
+  ipcMain.handle(WebContentsView_GetURL, (_event, appId: string) => {
     try {
       const url = webContentsViewService.getCurrentUrl(appId)
       if (!url) {
@@ -114,7 +128,7 @@ export function registerWebContentsViewIpc() {
   })
 
   // Get the WebContents ID for a WebContentsView
-  ipcMain.handle(IpcChannel.WebContentsView_GetWebContentsId, (_event, appId: string) => {
+  ipcMain.handle(WebContentsView_GetWebContentsId, (_event, appId: string) => {
     try {
       const id = webContentsViewService.getWebContentsId(appId)
       if (id === null) {
