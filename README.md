@@ -99,7 +99,7 @@ Refer to the [debugging guide](docs/DEBUGGING.md) for troubleshooting and debugg
 
 Refer to the [Architecture overview documentation](https://deepwiki.com/CherryHQ/cherry-studio)
 
-Refer to the [Branching Strategy](docs/branching-strategy.md) for contribution guidelines
+Refer to the [Branching Strategy](docs/branching-strategy-en.md) for contribution guidelines
 
 # 🤝 Contributing
 

@@ -1,7 +1,7 @@
 import Scrollbar from '@renderer/components/Scrollbar'
+import { MessageEditingProvider } from '@renderer/context/MessageEditingContext'
 import { useMessageOperations } from '@renderer/hooks/useMessageOperations'
 import { useSettings } from '@renderer/hooks/useSettings'
-import { EVENT_NAMES, EventEmitter } from '@renderer/services/EventService'
 import { MultiModelMessageStyle } from '@renderer/store/settings'
 import type { Topic } from '@renderer/types'
 import type { Message } from '@renderer/types/newMessage'
@@ -12,14 +12,16 @@ import styled, { css } from 'styled-components'
 
 import MessageItem from './Message'
 import MessageGroupMenuBar from './MessageGroupMenuBar'
+import SelectableMessage from './MessageSelect'
 
 interface Props {
   messages: (Message & { index: number })[]
   topic: Topic
   hidePresetMessages?: boolean
+  registerMessageElement?: (id: string, element: HTMLElement | null) => void
 }
 
-const MessageGroup = ({ messages, topic, hidePresetMessages }: Props) => {
+const MessageGroup = ({ messages, topic, hidePresetMessages, registerMessageElement }: Props) => {
   const { editMessage } = useMessageOperations(topic)
   const { multiModelMessageStyle: multiModelMessageStyleSetting, gridColumns, gridPopoverTrigger } = useSettings()
 
@@ -111,41 +113,20 @@ const MessageGroup = ({ messages, topic, hidePresetMessages }: Props) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [messages, selectedIndex, isGrouped, messageLength])
 
-  // 添加对LOCATE_MESSAGE事件的监听
   useEffect(() => {
-    // 为每个消息注册一个定位事件监听器
-    const eventHandlers: { [key: string]: () => void } = {}
-
     messages.forEach((message) => {
-      const eventName = EVENT_NAMES.LOCATE_MESSAGE + ':' + message.id
-      const handler = () => {
-        // 检查消息是否处于可见状态
-        const element = document.getElementById(`message-${message.id}`)
-        if (element) {
-          const display = window.getComputedStyle(element).display
-
-          if (display === 'none') {
-            // 如果消息隐藏，先切换标签
-            setSelectedMessage(message)
-          } else {
-            // 直接滚动
-            element.scrollIntoView({ behavior: 'smooth', block: 'start' })
-          }
-        }
+      const element = document.getElementById(`message-${message.id}`)
+      if (element) {
+        registerMessageElement?.(message.id, element)
       }
-
-      eventHandlers[eventName] = handler
-      EventEmitter.on(eventName, handler)
     })
 
-    // 清理函数
     return () => {
-      // 移除所有事件监听器
-      Object.entries(eventHandlers).forEach(([eventName, handler]) => {
-        EventEmitter.off(eventName, handler)
+      messages.forEach((message) => {
+        registerMessageElement?.(message.id, null)
       })
     }
-  }, [messages, setSelectedMessage])
+  }, [messages, registerMessageElement])
 
   const renderMessage = useCallback(
     (message: Message & { index: number }) => {
@@ -161,7 +142,7 @@ const MessageGroup = ({ messages, topic, hidePresetMessages }: Props) => {
         }
       }
 
-      const messageWrapper = (
+      const messageContent = (
         <MessageWrapper
           id={`message-${message.id}`}
           $layout={multiModelMessageStyle}
@@ -173,8 +154,18 @@ const MessageGroup = ({ messages, topic, hidePresetMessages }: Props) => {
             [multiModelMessageStyle]: isGrouped,
             selected: message.id === selectedMessageId
           })}>
-          {message.id === selectedMessageId && <MessageItem {...messageProps} />}
+          <MessageItem {...messageProps} />
         </MessageWrapper>
+      )
+
+      const wrappedMessage = (
+        <SelectableMessage
+          key={`selectable-${message.id}`}
+          messageId={message.id}
+          topic={topic}
+          isClearMessage={message.type === 'clear'}>
+          {messageContent}
+        </SelectableMessage>
       )
 
       if (isGridGroupMessage) {
@@ -193,54 +184,56 @@ const MessageGroup = ({ messages, topic, hidePresetMessages }: Props) => {
             trigger={gridPopoverTrigger}
             styles={{ root: { maxWidth: '60vw', minWidth: '550px', overflowY: 'auto', zIndex: 1000 } }}
             getPopupContainer={(triggerNode) => triggerNode.parentNode as HTMLElement}>
-            {messageWrapper}
+            {wrappedMessage}
           </Popover>
         )
       }
 
-      return messageWrapper
+      return wrappedMessage
     },
     [
       isGrid,
       isGrouped,
-      isHorizontal,
-      multiModelMessageStyle,
       topic,
       hidePresetMessages,
-      gridPopoverTrigger,
-      selectedMessageId
+      multiModelMessageStyle,
+      isHorizontal,
+      selectedMessageId,
+      gridPopoverTrigger
     ]
   )
 
   return (
-    <GroupContainer
-      id={`message-group-${messages[0].askId}`}
-      $isGrouped={isGrouped}
-      $layout={multiModelMessageStyle}
-      className={classNames([isGrouped && 'group-container', isHorizontal && 'horizontal', isGrid && 'grid'])}>
-      <GridContainer
-        $count={messageLength}
+    <MessageEditingProvider>
+      <GroupContainer
+        id={`message-group-${messages[0].askId}`}
+        $isGrouped={isGrouped}
         $layout={multiModelMessageStyle}
-        $gridColumns={gridColumns}
-        className={classNames([isGrouped && 'group-grid-container', isHorizontal && 'horizontal', isGrid && 'grid'])}>
-        {messages.map(renderMessage)}
-      </GridContainer>
-      {isGrouped && (
-        <MessageGroupMenuBar
-          multiModelMessageStyle={multiModelMessageStyle}
-          setMultiModelMessageStyle={(style) => {
-            setMultiModelMessageStyle(style)
-            messages.forEach((message) => {
-              editMessage(message.id, { multiModelMessageStyle: style })
-            })
-          }}
-          messages={messages}
-          selectMessageId={selectedMessageId}
-          setSelectedMessage={setSelectedMessage}
-          topic={topic}
-        />
-      )}
-    </GroupContainer>
+        className={classNames([isGrouped && 'group-container', isHorizontal && 'horizontal', isGrid && 'grid'])}>
+        <GridContainer
+          $count={messageLength}
+          $layout={multiModelMessageStyle}
+          $gridColumns={gridColumns}
+          className={classNames([isGrouped && 'group-grid-container', isHorizontal && 'horizontal', isGrid && 'grid'])}>
+          {messages.map(renderMessage)}
+        </GridContainer>
+        {isGrouped && (
+          <MessageGroupMenuBar
+            multiModelMessageStyle={multiModelMessageStyle}
+            setMultiModelMessageStyle={(style) => {
+              setMultiModelMessageStyle(style)
+              messages.forEach((message) => {
+                editMessage(message.id, { multiModelMessageStyle: style })
+              })
+            }}
+            messages={messages}
+            selectMessageId={selectedMessageId}
+            setSelectedMessage={setSelectedMessage}
+            topic={topic}
+          />
+        )}
+      </GroupContainer>
+    </MessageEditingProvider>
   )
 }
 
@@ -304,18 +297,6 @@ interface MessageWrapperProps {
 
 const MessageWrapper = styled(Scrollbar)<MessageWrapperProps>`
   width: 100%;
-  &.horizontal {
-    display: inline-block;
-  }
-  &.grid {
-    display: inline-block;
-  }
-  &.fold {
-    display: none;
-    &.selected {
-      display: inline-block;
-    }
-  }
 
   ${({ $layout, $isGrouped }) => {
     if ($layout === 'horizontal' && $isGrouped) {

@@ -100,8 +100,12 @@ const WebviewContainer = memo(
         // TypeScript doesn't recognize this attribute, but it's valid for webview
         // @ts-ignore - allowtransparency is a valid webview attribute in Electron but not recognized by TypeScript
         allowtransparency={'true' as any}
-        useragent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.7049.96 Safari/537.36"
         httpreferrer="https://cherry-studio.app"
+        useragent={
+          appid === 'google'
+            ? 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko)  Safari/537.36'
+            : undefined
+        }
       />
     )
   }
