@@ -9,7 +9,8 @@
   "workspaces": {
     "packages": [
       "local",
-      "packages/*"
+      "packages/*",
+      "apps/tauri/metheus-app"
     ],
     "installConfig": {
       "hoistingLimits": [

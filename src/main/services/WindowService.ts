@@ -1,5 +1,5 @@
 import { is } from '@electron-toolkit/utils'
-import { isDev, isLinux, isMac, isWin } from '@main/constant'
+import { isLinux, isMac, isWin } from '@main/constant'
 import { getFilesDir } from '@main/utils/file'
 import { IpcChannel } from '@shared/IpcChannel'
 import { ThemeMode } from '@types'
@@ -151,7 +151,7 @@ export class WindowService {
 
     // Configure webview to ensure mini-apps have full access to browser APIs
     // This is required for mini-apps to use localStorage, IndexedDB, and other browser features
-    mainWindow.webContents.on('will-attach-webview', (event, webPreferences) => {
+    mainWindow.webContents.on('will-attach-webview', (_event, webPreferences) => {
       // Set security preferences to allow mini-apps to function properly
       webPreferences.nodeIntegration = false
       webPreferences.contextIsolation = true

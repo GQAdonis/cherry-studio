@@ -53,6 +53,7 @@ import {
   convertLinksToZhipu
 } from '@renderer/utils/linkConverter'
 import {
+  isEnabledToolUse,
   mcpToolCallResponseToOpenAICompatibleMessage,
   mcpToolsToOpenAIChatTools,
   openAIToolsToMcpTool,
@@ -75,7 +76,7 @@ import {
 } from 'openai/resources'
 
 import { CompletionsParams } from '.'
-import { BaseOpenAiProvider } from './OpenAIProvider'
+import { BaseOpenAIProvider } from './OpenAIResponseProvider'
 
 // 1. 定义联合类型
 export type OpenAIStreamChunk =
@@ -83,7 +84,7 @@ export type OpenAIStreamChunk =
   | { type: 'tool-calls'; delta: any }
   | { type: 'finish'; finishReason: any; usage: any; delta: any; chunk: any }
 
-export default class OpenAICompatibleProvider extends BaseOpenAiProvider {
+export default class OpenAICompatibleProvider extends BaseOpenAIProvider {
   constructor(provider: Provider) {
     super(provider)
 
@@ -246,12 +247,6 @@ export default class OpenAICompatibleProvider extends BaseOpenAiProvider {
   }
 
   /**
-   * Get the reasoning effort for the assistant
-   * @param assistant - The assistant
-   * @param model - The model
-   * @returns The reasoning effort
-   */
-  /**
    * Convert our internal ReasoningEffortOptions to OpenAI SDK's ReasoningEffort type
    * @param effort Our internal reasoning effort option
    * @returns OpenAI SDK compatible reasoning effort value
@@ -383,7 +378,8 @@ export default class OpenAICompatibleProvider extends BaseOpenAiProvider {
     const defaultModel = getDefaultModel()
     const model = assistant.model || defaultModel
 
-    const { contextCount, maxTokens, streamOutput, enableToolUse } = getAssistantSettings(assistant)
+    const { contextCount, maxTokens, streamOutput } = getAssistantSettings(assistant)
+    const enableToolUse = isEnabledToolUse(assistant)
     const isEnabledBultinWebSearch = assistant.enableWebSearch
     messages = addImageFileToContents(messages)
     const enableReasoning =
