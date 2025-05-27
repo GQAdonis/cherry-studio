@@ -937,7 +937,9 @@
       "zhinao": "360 智腦",
       "zhipu": "智譜 AI",
       "voyageai": "Voyage AI",
-      "qiniu": "七牛雲"
+      "qiniu": "七牛雲",
+      "fal": "FAL.ai",
+      "replicate": "Replicate"
     },
     "restore": {
       "confirm": "確定要復原資料嗎？",

@@ -14,6 +14,19 @@ import esES from './translate/es-es.json'
 import frFR from './translate/fr-fr.json'
 import ptPT from './translate/pt-pt.json'
 
+// Define supported languages
+export const supportedLanguages = [
+  'el-GR',
+  'en-US',
+  'es-ES',
+  'fr-FR',
+  'ja-JP',
+  'pt-PT',
+  'ru-RU',
+  'zh-CN',
+  'zh-TW'
+]
+
 const resources = {
   'el-GR': elGR,
   'en-US': enUS,
@@ -26,8 +39,39 @@ const resources = {
   'zh-TW': zhTW
 }
 
+/**
+ * Determines the best language to use based on user preferences and system settings
+ * Prioritizes:
+ * 1. User's explicitly saved language preference
+ * 2. System language if supported
+ * 3. Default language (en-US)
+ *
+ * @returns The language code to use
+ */
 export const getLanguage = () => {
-  return localStorage.getItem('language') || navigator.language || defaultLanguage
+  // First check if user has explicitly set a language preference
+  const savedLanguage = localStorage.getItem('language')
+  if (savedLanguage && supportedLanguages.includes(savedLanguage)) {
+    return savedLanguage
+  }
+  
+  // Then check browser/system language
+  const browserLanguage = navigator.language
+  
+  // Check if the exact browser language is supported
+  if (supportedLanguages.includes(browserLanguage)) {
+    return browserLanguage
+  }
+  
+  // Check if we support the language code without region (e.g., 'en' from 'en-GB')
+  const languageCode = browserLanguage.split('-')[0]
+  const matchingLanguage = supportedLanguages.find(lang => lang.startsWith(languageCode + '-'))
+  if (matchingLanguage) {
+    return matchingLanguage
+  }
+  
+  // Default to English if no matches
+  return defaultLanguage
 }
 
 export const getLanguageCode = () => {
@@ -37,9 +81,33 @@ export const getLanguageCode = () => {
 i18n.use(initReactI18next).init({
   resources,
   lng: getLanguage(),
-  fallbackLng: defaultLanguage,
+  fallbackLng: {
+    // Define fallback chain - first try language without region code
+    // then fall back to English
+    default: [defaultLanguage],
+    // For specific languages, define custom fallback chains
+    'zh-TW': ['zh-CN', defaultLanguage],
+    'zh-HK': ['zh-TW', 'zh-CN', defaultLanguage],
+    'pt-BR': ['pt-PT', defaultLanguage],
+    'es-419': ['es-ES', defaultLanguage]
+  },
   interpolation: {
     escapeValue: false
+  },
+  // Don't show missing key warnings in console
+  nsSeparator: false,
+  keySeparator: false,
+  // Return key if missing translation
+  returnNull: false,
+  returnEmptyString: false,
+  returnObjects: false,
+  saveMissing: false,
+  missingKeyHandler: (lng, ns, key) => {
+    // In development, log missing keys
+    if (process.env.NODE_ENV === 'development') {
+      console.warn(`Missing translation key: ${key} for language: ${lng}`)
+    }
+    return key
   }
 })
 

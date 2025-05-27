@@ -98,9 +98,9 @@ const GeneralSettings: FC = () => {
   }
 
   const languagesOptions: { value: LanguageVarious; label: string; flag: string }[] = [
+    { value: 'en-US', label: 'English', flag: '🇺🇸' },
     { value: 'zh-CN', label: '中文', flag: '🇨🇳' },
     { value: 'zh-TW', label: '中文（繁体）', flag: '🇭🇰' },
-    { value: 'en-US', label: 'English', flag: '🇺🇸' },
     { value: 'ja-JP', label: '日本語', flag: '🇯🇵' },
     { value: 'ru-RU', label: 'Русский', flag: '🇷🇺' },
     { value: 'el-GR', label: 'Ελληνικά', flag: '🇬🇷' },

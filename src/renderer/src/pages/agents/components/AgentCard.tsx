@@ -143,9 +143,9 @@ const AgentCard: FC<Props> = ({ agent, onClick, activegroup, getLocalizedGroupNa
             <AgentCardHeaderInfo>
               <AgentCardHeaderInfoTitle>{agent.name}</AgentCardHeaderInfoTitle>
               <AgentCardHeaderInfoTags>
-                {activegroup === '我的' && (
+                {activegroup === 'My Agents' && (
                   <CustomTag color="#A0A0A0" size={11}>
-                    {getLocalizedGroupName('我的')}
+                    {getLocalizedGroupName('My Agents')}
                   </CustomTag>
                 )}
                 {!!agent.group?.length &&
@@ -156,7 +156,7 @@ const AgentCard: FC<Props> = ({ agent, onClick, activegroup, getLocalizedGroupNa
                   ))}
               </AgentCardHeaderInfoTags>
             </AgentCardHeaderInfo>
-            {activegroup === '我的' ? (
+            {activegroup === 'My Agents' ? (
               <AgentCardHeaderInfoAction>
                 {emoji && <HeaderInfoEmoji>{emoji}</HeaderInfoEmoji>}
                 <Dropdown
@@ -189,7 +189,7 @@ const AgentCard: FC<Props> = ({ agent, onClick, activegroup, getLocalizedGroupNa
     </AgentCardContainer>
   )
 
-  if (activegroup === '我的') {
+  if (activegroup === 'My Agents') {
     return (
       <Dropdown
         menu={{

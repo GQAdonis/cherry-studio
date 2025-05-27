@@ -13,6 +13,41 @@ export type GroupTranslations = {
 }
 
 export const groupTranslations: GroupTranslations = {
+  // Add English keys that map to the same translations
+  'My Agents': {
+    'el-GR': 'Τα δικά μου',
+    'en-US': 'My Agents',
+    'es-ES': 'Mis agentes',
+    'fr-FR': 'Mes agents',
+    'zh-CN': '我的',
+    'zh-TW': '我的',
+    'ru-RU': 'Мои агенты',
+    'ja-JP': '私のエージェント',
+    'pt-PT': 'Meus Agentes'
+  },
+  'Featured': {
+    'el-GR': 'Επιλεγμένο',
+    'en-US': 'Featured',
+    'es-ES': 'Destacado',
+    'fr-FR': 'Sélection',
+    'zh-CN': '精选',
+    'zh-TW': '精選',
+    'ru-RU': 'Избранное',
+    'ja-JP': '特集',
+    'pt-PT': 'Destaque'
+  },
+  'Search': {
+    'el-GR': 'Αναζήτηση',
+    'en-US': 'Search',
+    'es-ES': 'Búsqueda',
+    'fr-FR': 'Recherche',
+    'zh-CN': '搜索',
+    'zh-TW': '搜索',
+    'ru-RU': 'Поиск',
+    'ja-JP': '検索',
+    'pt-PT': 'Pesquisa'
+  },
+  // Keep the original Chinese keys for backward compatibility
   我的: {
     'el-GR': 'Τα δικά μου',
     'en-US': 'My Agents',

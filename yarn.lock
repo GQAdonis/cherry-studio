@@ -798,7 +798,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@codemirror/lang-json@npm:^6.0.0":
+"@codemirror/lang-json@npm:^6.0.0, @codemirror/lang-json@npm:^6.0.1":
   version: 6.0.1
   resolution: "@codemirror/lang-json@npm:6.0.1"
   dependencies:
@@ -1035,7 +1035,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@codemirror/lint@npm:^6.0.0":
+"@codemirror/lint@npm:^6.0.0, @codemirror/lint@npm:^6.8.5":
   version: 6.8.5
   resolution: "@codemirror/lint@npm:6.8.5"
   dependencies:
@@ -5806,6 +5806,8 @@ __metadata:
     "@cherrystudio/embedjs-loader-web": "npm:^0.1.31"
     "@cherrystudio/embedjs-loader-xml": "npm:^0.1.31"
     "@cherrystudio/embedjs-openai": "npm:^0.1.31"
+    "@codemirror/lang-json": "npm:^6.0.1"
+    "@codemirror/lint": "npm:^6.8.5"
     "@electron-toolkit/eslint-config-prettier": "npm:^3.0.0"
     "@electron-toolkit/eslint-config-ts": "npm:^3.0.0"
     "@electron-toolkit/preload": "npm:^3.0.0"

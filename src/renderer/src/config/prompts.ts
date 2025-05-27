@@ -440,12 +440,12 @@ export const FOOTNOTE_PROMPT = `Please answer the question based on the referenc
 `
 
 export const WEB_SEARCH_PROMPT_FOR_ZHIPU = `
-# 以下是来自互联网的信息：
+# The following information is from the internet:
 {search_result}
 
-# 当前日期: ${dayjs().format('YYYY-MM-DD')}
-# 要求：
-根据最新发布的信息回答用户问题，当回答引用了参考信息时，必须在句末使用对应的[ref_序号](url)的markdown链接形式来标明参考信息来源。
+# Current date: ${dayjs().format('YYYY-MM-DD')}
+# Requirements:
+Answer the user's question based on the latest published information. When your answer references information from the search results, you must cite the source using markdown link format [ref_number](url) at the end of the sentence.
 `
 export const WEB_SEARCH_PROMPT_FOR_OPENROUTER = `
 A web search was conducted on \`${dayjs().format('YYYY-MM-DD')}\`. Incorporate the following web search results into your response.

@@ -174,7 +174,7 @@ export const initialState: SettingsState = {
   showAssistants: true,
   showTopics: true,
   sendMessageShortcut: 'Enter',
-  language: navigator.language as LanguageVarious,
+  language: 'en-US' as LanguageVarious,
   targetLanguage: 'english' as TranslateLanguageVarious,
   proxyMode: 'system',
   proxyUrl: undefined,

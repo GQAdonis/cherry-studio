@@ -936,7 +936,9 @@
       "zhinao": "360AI",
       "zhipu": "ZHIPU AI",
       "voyageai": "Voyage AI",
-      "qiniu": "Qiniu"
+      "qiniu": "Qiniu",
+      "fal": "FAL.ai",
+      "replicate": "Replicate"
     },
     "restore": {
       "confirm": "Are you sure you want to restore data?",

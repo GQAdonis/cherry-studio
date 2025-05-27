@@ -25,7 +25,7 @@ import ImportAgentPopup from './components/ImportAgentPopup'
 const AgentsPage: FC = () => {
   const [search, setSearch] = useState('')
   const [searchInput, setSearchInput] = useState('')
-  const [activeGroup, setActiveGroup] = useState('我的')
+  const [activeGroup, setActiveGroup] = useState('My Agents')
   const [agentGroups, setAgentGroups] = useState<Record<string, Agent[]>>({})
   const systemAgents = useSystemAgents()
   const { agents: userAgents } = useAgents()
@@ -33,8 +33,8 @@ const AgentsPage: FC = () => {
   useEffect(() => {
     const systemAgentsGroupList = groupByCategories(systemAgents)
     const agentsGroupList = {
-      我的: userAgents,
-      精选: [],
+      'My Agents': userAgents,
+      'Featured': [],
       ...systemAgentsGroupList
     } as Record<string, Agent[]>
     setAgentGroups(agentsGroupList)
@@ -115,7 +115,7 @@ const AgentsPage: FC = () => {
   const handleSearch = () => {
     if (searchInput.trim() === '') {
       setSearch('')
-      setActiveGroup('我的')
+      setActiveGroup('My Agents')
     } else {
       setActiveGroup('')
       setSearch(searchInput)
@@ -124,7 +124,7 @@ const AgentsPage: FC = () => {
 
   const handleSearchClear = () => {
     setSearch('')
-    setActiveGroup('我的')
+    setActiveGroup('My Agents')
   }
 
   const handleGroupClick = (group: string) => () => {
@@ -204,7 +204,7 @@ const AgentsPage: FC = () => {
             <AgentsListTitle>
               {search.trim() ? (
                 <>
-                  <AgentGroupIcon groupName="搜索" size={24} />
+                  <AgentGroupIcon groupName="Search" size={24} />
                   {search.trim()}{' '}
                 </>
               ) : (

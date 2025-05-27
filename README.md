@@ -91,6 +91,56 @@ https://docs.prometheusags.ai
 
 Welcome PR for more themes
 
+# 🌐 Localization
+
+Prometheus Studio supports multiple languages with English (en-US) as the default language. The application uses i18next for internationalization and follows these best practices:
+
+## Language Detection
+
+The application determines which language to use in the following order:
+1. User's explicitly saved language preference (stored in localStorage)
+2. Browser/system language if it's supported by the application
+3. Default to English (en-US) if no matches are found
+
+## Supported Languages
+
+Currently supported languages:
+- English (en-US) - Default
+- Chinese Simplified (zh-CN)
+- Chinese Traditional (zh-TW)
+- Japanese (ja-JP)
+- Russian (ru-RU)
+- Greek (el-GR)
+- Spanish (es-ES)
+- French (fr-FR)
+- Portuguese (pt-PT)
+
+## Fallback Mechanism
+
+If a translation key is missing in a non-English language, the application will:
+1. Try the language without the region code (e.g., 'en' for 'en-US')
+2. Fall back to English (en-US) if still not found
+3. Display the key itself as a last resort
+
+## Adding New Translations
+
+To add a new language:
+
+1. Create a new JSON file in `src/renderer/src/i18n/locales/` named with the language code (e.g., `de-DE.json`)
+2. Copy the structure from `en-us.json` and translate all values
+3. Add the language to the `supportedLanguages` array in `src/renderer/src/i18n/index.ts`
+4. Import and add the new language to the `resources` object in the same file
+
+## Date, Time, and Number Formatting
+
+The application uses the Intl API for locale-aware formatting of:
+- Dates and times
+- Numbers and currencies
+- Relative times
+- File sizes
+
+These utilities can be found in `src/renderer/src/utils/intl.ts` and automatically respect the user's selected language.
+
 # 🖥️ Develop
 
 Refer to the [development documentation](docs/dev.md)

@@ -74,6 +74,8 @@
     "@cherrystudio/embedjs-loader-web": "^0.1.31",
     "@cherrystudio/embedjs-loader-xml": "^0.1.31",
     "@cherrystudio/embedjs-openai": "^0.1.31",
+    "@codemirror/lang-json": "^6.0.1",
+    "@codemirror/lint": "^6.8.5",
     "@electron-toolkit/utils": "^3.0.0",
     "@electron/notarize": "^2.5.0",
     "@langchain/community": "^0.3.36",

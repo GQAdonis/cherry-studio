@@ -5,6 +5,9 @@ import AiHubMixProviderLogo from '@renderer/assets/images/providers/aihubmix.web
 import BurnCloudProviderLogo from '@renderer/assets/images/providers/burncloud.png'
 import AlayaNewProviderLogo from '@renderer/assets/images/providers/alayanew.webp'
 import AnthropicProviderLogo from '@renderer/assets/images/providers/anthropic.png'
+// Using existing logos as placeholders for FAL.ai and Replicate until actual logos are created
+import FALProviderLogo from '@renderer/assets/images/providers/jina.png'
+import ReplicateProviderLogo from '@renderer/assets/images/providers/together.png'
 import BaichuanProviderLogo from '@renderer/assets/images/providers/baichuan.png'
 import BaiduCloudProviderLogo from '@renderer/assets/images/providers/baidu-cloud.svg'
 import BailianProviderLogo from '@renderer/assets/images/providers/bailian.png'
@@ -51,6 +54,8 @@ const PROVIDER_LOGO_MAP = {
   'gitee-ai': GiteeAIProviderLogo,
   yi: ZeroOneProviderLogo,
   groq: GroqProviderLogo,
+  fal: FALProviderLogo,
+  replicate: ReplicateProviderLogo,
   zhipu: ZhipuProviderLogo,
   ollama: OllamaProviderLogo,
   lmstudio: LMStudioProviderLogo,
@@ -596,6 +601,28 @@ export const PROVIDER_CONFIG = {
       apiKey: 'https://portal.qiniu.com/ai-inference/api-key?cps_key=1h4vzfbkxobiq',
       docs: 'https://developer.qiniu.com/aitokenapi',
       models: 'https://developer.qiniu.com/aitokenapi/12883/model-list'
+    }
+  },
+  fal: {
+    api: {
+      url: 'https://api.fal.ai'
+    },
+    websites: {
+      official: 'https://fal.ai/',
+      apiKey: 'https://console.fal.ai/settings/api-keys',
+      docs: 'https://fal.ai/docs',
+      models: 'https://fal.ai/models'
+    }
+  },
+  replicate: {
+    api: {
+      url: 'https://api.replicate.com'
+    },
+    websites: {
+      official: 'https://replicate.com/',
+      apiKey: 'https://replicate.com/account/api-tokens',
+      docs: 'https://replicate.com/docs',
+      models: 'https://replicate.com/explore'
     }
   }
 }
