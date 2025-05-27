@@ -1,6 +1,7 @@
 import '@renderer/databases'
 
 import store, { persistor } from '@renderer/store'
+import { I18nextProvider } from 'react-i18next'
 import { Provider } from 'react-redux'
 import { HashRouter, Route, Routes } from 'react-router-dom'
 import { PersistGate } from 'redux-persist/integration/react'
@@ -13,6 +14,7 @@ import { NotificationProvider } from './context/NotificationProvider'
 import StyleSheetManager from './context/StyleSheetManager'
 import { ThemeProvider } from './context/ThemeProvider'
 import NavigationHandler from './handler/NavigationHandler'
+import i18n from './i18n'
 import AgentsPage from './pages/agents/AgentsPage'
 import AppsPage from './pages/apps/AppsPage'
 import FilesPage from './pages/files/FilesPage'
@@ -29,28 +31,30 @@ function App(): React.ReactElement {
       <StyleSheetManager>
         <ThemeProvider>
           <AntdProvider>
-            <NotificationProvider>
-              <CodeStyleProvider>
-                <PersistGate loading={null} persistor={persistor}>
-                  <TopViewContainer>
-                    <HashRouter>
-                      <NavigationHandler />
-                      <Sidebar />
-                      <Routes>
-                        <Route path="/" element={<HomePage />} />
-                        <Route path="/agents" element={<AgentsPage />} />
-                        <Route path="/paintings/*" element={<PaintingsRoutePage />} />
-                        <Route path="/translate" element={<TranslatePage />} />
-                        <Route path="/files" element={<FilesPage />} />
-                        <Route path="/knowledge" element={<KnowledgePage />} />
-                        <Route path="/apps" element={<AppsPage />} />
-                        <Route path="/settings/*" element={<SettingsPage />} />
-                      </Routes>
-                    </HashRouter>
-                  </TopViewContainer>
-                </PersistGate>
-              </CodeStyleProvider>
-            </NotificationProvider>
+            <I18nextProvider i18n={i18n}>
+              <NotificationProvider>
+                <CodeStyleProvider>
+                  <PersistGate loading={null} persistor={persistor}>
+                    <TopViewContainer>
+                      <HashRouter>
+                        <NavigationHandler />
+                        <Sidebar />
+                        <Routes>
+                          <Route path="/" element={<HomePage />} />
+                          <Route path="/agents" element={<AgentsPage />} />
+                          <Route path="/paintings/*" element={<PaintingsRoutePage />} />
+                          <Route path="/translate" element={<TranslatePage />} />
+                          <Route path="/files" element={<FilesPage />} />
+                          <Route path="/knowledge" element={<KnowledgePage />} />
+                          <Route path="/apps" element={<AppsPage />} />
+                          <Route path="/settings/*" element={<SettingsPage />} />
+                        </Routes>
+                      </HashRouter>
+                    </TopViewContainer>
+                  </PersistGate>
+                </CodeStyleProvider>
+              </NotificationProvider>
+            </I18nextProvider>
           </AntdProvider>
         </ThemeProvider>
       </StyleSheetManager>

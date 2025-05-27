@@ -5,6 +5,8 @@
     "src/renderer/src/types/vite-env.d.ts",
     "src/renderer/src/types/json-imports.d.ts",
     "src/renderer/src/types/jest.d.ts",
+    "src/renderer/src/i18n/locales/*.json",
+    "src/renderer/src/i18n/translate/*.json",
     "src/preload/*.d.ts",
     "local/src/renderer/**/*",
     "packages/shared/**/*"

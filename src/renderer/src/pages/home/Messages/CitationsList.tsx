@@ -69,11 +69,11 @@ const CitationsList: React.FC<CitationsListProps> = ({ citations }) => {
               </PreviewIcon>
             ))}
           </PreviewIcons>
-          {t('message.citation', { count })}
+          {t('citation', { count })}
         </OpenButton>
 
         <Drawer
-          title={t('message.citations')}
+          title={t('citations')}
           placement="right"
           onClose={() => setOpen(false)}
           open={open}

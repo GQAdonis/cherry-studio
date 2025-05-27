@@ -2,18 +2,6 @@ import { defaultLanguage } from '@shared/config/constant'
 import i18n from 'i18next'
 import { initReactI18next } from 'react-i18next'
 
-// Original translation
-import enUS from './locales/en-us.json'
-import jaJP from './locales/ja-jp.json'
-import ruRU from './locales/ru-ru.json'
-import zhCN from './locales/zh-cn.json'
-import zhTW from './locales/zh-tw.json'
-// Machine translation
-import elGR from './translate/el-gr.json'
-import esES from './translate/es-es.json'
-import frFR from './translate/fr-fr.json'
-import ptPT from './translate/pt-pt.json'
-
 // Define supported languages
 export const supportedLanguages = [
   'el-GR',
@@ -27,50 +15,26 @@ export const supportedLanguages = [
   'zh-TW'
 ]
 
-const resources = {
-  'el-GR': elGR,
-  'en-US': enUS,
-  'es-ES': esES,
-  'fr-FR': frFR,
-  'ja-JP': jaJP,
-  'pt-PT': ptPT,
-  'ru-RU': ruRU,
-  'zh-CN': zhCN,
-  'zh-TW': zhTW
-}
-
 /**
  * Determines the best language to use based on user preferences and system settings
- * Prioritizes:
- * 1. User's explicitly saved language preference
- * 2. System language if supported
- * 3. Default language (en-US)
- *
- * @returns The language code to use
  */
 export const getLanguage = () => {
-  // First check if user has explicitly set a language preference
   const savedLanguage = localStorage.getItem('language')
   if (savedLanguage && supportedLanguages.includes(savedLanguage)) {
     return savedLanguage
   }
   
-  // Then check browser/system language
   const browserLanguage = navigator.language
-  
-  // Check if the exact browser language is supported
   if (supportedLanguages.includes(browserLanguage)) {
     return browserLanguage
   }
   
-  // Check if we support the language code without region (e.g., 'en' from 'en-GB')
   const languageCode = browserLanguage.split('-')[0]
   const matchingLanguage = supportedLanguages.find(lang => lang.startsWith(languageCode + '-'))
   if (matchingLanguage) {
     return matchingLanguage
   }
   
-  // Default to English if no matches
   return defaultLanguage
 }
 
@@ -78,37 +42,116 @@ export const getLanguageCode = () => {
   return getLanguage().split('-')[0]
 }
 
-i18n.use(initReactI18next).init({
-  resources,
-  lng: getLanguage(),
-  fallbackLng: {
-    // Define fallback chain - first try language without region code
-    // then fall back to English
-    default: [defaultLanguage],
-    // For specific languages, define custom fallback chains
-    'zh-TW': ['zh-CN', defaultLanguage],
-    'zh-HK': ['zh-TW', 'zh-CN', defaultLanguage],
-    'pt-BR': ['pt-PT', defaultLanguage],
-    'es-419': ['es-ES', defaultLanguage]
-  },
-  interpolation: {
-    escapeValue: false
-  },
-  // Don't show missing key warnings in console
-  nsSeparator: false,
-  keySeparator: false,
-  // Return key if missing translation
-  returnNull: false,
-  returnEmptyString: false,
-  returnObjects: false,
-  saveMissing: false,
-  missingKeyHandler: (lng, ns, key) => {
-    // In development, log missing keys
-    if (process.env.NODE_ENV === 'development') {
-      console.warn(`Missing translation key: ${key} for language: ${lng}`)
+// Load translations dynamically and initialize i18n
+const loadTranslations = async () => {
+  try {
+    // Load all translation files dynamically
+    const [enUS, jaJP, ruRU, zhCN, zhTW, elGR, esES, frFR, ptPT] = await Promise.all([
+      import('./locales/en-us.json'),
+      import('./locales/ja-jp.json'),
+      import('./locales/ru-ru.json'),
+      import('./locales/zh-cn.json'),
+      import('./locales/zh-tw.json'),
+      import('./translate/el-gr.json'),
+      import('./translate/es-es.json'),
+      import('./translate/fr-fr.json'),
+      import('./translate/pt-pt.json')
+    ])
+
+    // Extract translation data - the JSON structure is { "translation": { ... } }
+    const extractTranslation = (module: any, langCode: string) => {
+      try {
+        // Try different possible structures
+        let translation = null
+        
+        if (module.default && module.default.translation) {
+          translation = module.default.translation
+        } else if (module.default) {
+          translation = module.default
+        } else if (module.translation) {
+          translation = module.translation
+        } else {
+          translation = module
+        }
+
+        if (process.env.NODE_ENV === 'development') {
+          console.log(`${langCode} extraction:`, {
+            hasTranslation: !!translation,
+            hasChat: !!(translation as any)?.chat,
+            chatInputPlaceholder: (translation as any)?.chat?.input?.placeholder,
+            chatDefaultDescription: (translation as any)?.chat?.default?.description,
+            sampleKeys: translation ? Object.keys(translation).slice(0, 3) : []
+          })
+        }
+
+        return translation || {}
+      } catch (error) {
+        console.error(`Error extracting translation for ${langCode}:`, error)
+        return {}
+      }
     }
-    return key
+
+    // Build resources object
+    const resources = {
+      'el-GR': { translation: extractTranslation(elGR, 'el-GR') },
+      'en-US': { translation: extractTranslation(enUS, 'en-US') },
+      'es-ES': { translation: extractTranslation(esES, 'es-ES') },
+      'fr-FR': { translation: extractTranslation(frFR, 'fr-FR') },
+      'ja-JP': { translation: extractTranslation(jaJP, 'ja-JP') },
+      'pt-PT': { translation: extractTranslation(ptPT, 'pt-PT') },
+      'ru-RU': { translation: extractTranslation(ruRU, 'ru-RU') },
+      'zh-CN': { translation: extractTranslation(zhCN, 'zh-CN') },
+      'zh-TW': { translation: extractTranslation(zhTW, 'zh-TW') }
+    }
+
+    // Initialize i18n
+    await i18n.use(initReactI18next).init({
+      resources,
+      lng: getLanguage(),
+      fallbackLng: defaultLanguage,
+      interpolation: {
+        escapeValue: false
+      },
+      // Disable key separator to handle nested keys properly
+      keySeparator: '.',
+      nsSeparator: false,
+      returnNull: false,
+      returnEmptyString: false,
+      returnObjects: false,
+      debug: process.env.NODE_ENV === 'development'
+    })
+
+    if (process.env.NODE_ENV === 'development') {
+      console.log('i18n initialized successfully')
+      console.log('Current language:', i18n.language)
+      console.log('Available languages:', Object.keys(resources))
+      
+      // Test the specific keys that were failing
+      const testKeys = [
+        'chat.input.placeholder',
+        'chat.default.description',
+        'chat.add.assistant.title'
+      ]
+      testKeys.forEach(key => {
+        const translation = i18n.t(key)
+        console.log(`Test - ${key}: "${translation}" (${translation === key ? 'MISSING' : 'FOUND'})`)
+      })
+    }
+
+  } catch (error) {
+    console.error('Failed to load translations:', error)
+    
+    // Fallback initialization with empty resources
+    await i18n.use(initReactI18next).init({
+      resources: {},
+      lng: getLanguage(),
+      fallbackLng: defaultLanguage,
+      interpolation: { escapeValue: false }
+    })
   }
-})
+}
+
+// Initialize translations immediately
+loadTranslations()
 
 export default i18n

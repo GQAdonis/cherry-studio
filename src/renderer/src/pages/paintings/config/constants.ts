@@ -141,3 +141,16 @@ export const BACKGROUND_OPTIONS = [
   { label: 'paintings.background_options.transparent', value: 'transparent' },
   { label: 'paintings.background_options.opaque', value: 'opaque' }
 ]
+
+// Default painting configuration for new paintings
+export const DEFAULT_PAINTING = {
+  id: '',
+  prompt: '',
+  negativePrompt: '',
+  model: 'flux',
+  aspectRatio: 'ASPECT_1_1',
+  numImages: 1,
+  seed: '',
+  files: [],
+  urls: []
+}
