@@ -27,6 +27,7 @@ import { windowService } from './services/WindowService'
 import { setUserDataDir } from './utils/file'
 import { createComponentLogger } from '@main/debug-helpers'
 
+
 Logger.initialize()
 
 // in production mode, handle uncaught exception and unhandled rejection globally

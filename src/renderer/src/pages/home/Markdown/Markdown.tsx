@@ -97,10 +97,10 @@ const Markdown: FC<Props> = ({ block }) => {
   }
 
   return (
+    <div className="markdown">
     <ReactMarkdown
       rehypePlugins={rehypePlugins}
       remarkPlugins={remarkPlugins}
-      className="markdown"
       components={components}
       disallowedElements={DISALLOWED_ELEMENTS}
       remarkRehypeOptions={{
@@ -110,6 +110,7 @@ const Markdown: FC<Props> = ({ block }) => {
       }}>
       {messageContent}
     </ReactMarkdown>
+    </div>
   )
 }
 

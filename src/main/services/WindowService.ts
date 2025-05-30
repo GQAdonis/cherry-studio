@@ -5,7 +5,12 @@ import { ThemeMode } from '@types'
 import { app, BrowserWindow, nativeTheme, shell } from 'electron'
 import Logger from 'electron-log'
 import windowStateKeeper from 'electron-window-state'
-import { join } from 'path'
+import { join } from 'path';
+// import { dirname } from 'path' // 'join' is no longer used, and dirname is no longer used
+// import { fileURLToPath } from 'url' // No longer used
+
+// const __filename = fileURLToPath(import.meta.url) // No longer used
+// const __dirname = dirname(__filename) // No longer used in this file
 
 import icon from '../../../build/icon.png?asset'
 import { titleBarOverlayDark, titleBarOverlayLight } from '../config'
@@ -71,7 +76,7 @@ export class WindowService {
       trafficLightPosition: { x: 8, y: 12 },
       ...(isLinux ? { icon } : {}),
       webPreferences: {
-        preload: join(__dirname, '../preload/index.js'),
+        preload: join(app.getAppPath(), 'out/preload/index.mjs'), // Path to output preload script
         sandbox: false,
         webSecurity: false,
         webviewTag: true,
@@ -346,7 +351,7 @@ export class WindowService {
         mainWindow.webContents.openDevTools()
       }
     } else {
-      mainWindow.loadFile(join(__dirname, '../renderer/index.html'))
+      mainWindow.loadFile(join(app.getAppPath(), 'out/renderer/index.html')) // Path to output HTML file
     }
   }
 
@@ -496,7 +501,7 @@ export class WindowService {
       maximizable: false,
       fullscreenable: false,
       webPreferences: {
-        preload: join(__dirname, '../preload/index.js'),
+        preload: join(app.getAppPath(), 'out/preload/index.mjs'), // Path to output preload script
         sandbox: false,
         webSecurity: false,
         webviewTag: true,
@@ -547,7 +552,7 @@ export class WindowService {
         this.miniWindow.webContents.openDevTools({ mode: 'detach' })
       }
     } else {
-      this.miniWindow.loadFile(join(__dirname, '../renderer/miniWindow.html'))
+      this.miniWindow.loadFile(join(app.getAppPath(), 'out/renderer/miniWindow.html')) // Path to output HTML file
     }
 
     return this.miniWindow

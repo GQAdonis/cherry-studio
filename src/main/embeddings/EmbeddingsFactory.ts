@@ -1,6 +1,6 @@
 import type { BaseEmbeddings } from '@cherrystudio/embedjs-interfaces'
 import { OpenAiEmbeddings } from '@cherrystudio/embedjs-openai'
-import { AzureOpenAiEmbeddings } from '@cherrystudio/embedjs-openai/src/azure-openai-embeddings'
+import { AzureOpenAiEmbeddings } from '@cherrystudio/embedjs-openai/src/azure-openai-embeddings.js'
 import { getInstanceName } from '@main/utils'
 import { KnowledgeBaseParams } from '@types'
 

@@ -1,7 +1,11 @@
 import react from '@vitejs/plugin-react-swc'
 import { defineConfig, externalizeDepsPlugin } from 'electron-vite'
-import { resolve } from 'path'
+import { dirname, resolve } from 'path'
 import { visualizer } from 'rollup-plugin-visualizer'
+import { fileURLToPath } from 'url'
+
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = dirname(__filename)
 
 const visualizerPlugin = (type: 'renderer' | 'main') => {
   return process.env[`VISUALIZER_${type.toUpperCase()}`] ? [visualizer({ open: true })] : []
@@ -19,7 +23,18 @@ export default defineConfig({
     },
     build: {
       rollupOptions: {
-        external: ['@libsql/client', 'bufferutil', 'utf-8-validate']
+        external: ['@libsql/client', 'bufferutil', 'utf-8-validate'],
+        output: {
+          banner: `
+import { dirname as __pathDirname } from 'path';
+import { fileURLToPath as __fileURLToPath } from 'url';
+const __dirname = __pathDirname(__fileURLToPath(import.meta.url));
+`,
+          format: 'es',
+          entryFileNames: '[name].mjs',
+          chunkFileNames: 'chunks/[name]-[hash].mjs',
+          assetFileNames: 'chunks/[name]-[hash][extname]'
+        }
       },
       sourcemap: process.env.NODE_ENV === 'development'
     },
@@ -35,6 +50,11 @@ export default defineConfig({
       }
     },
     build: {
+      rollupOptions: {
+        output: {
+          format: 'es'
+        }
+      },
       sourcemap: process.env.NODE_ENV === 'development'
     }
   },

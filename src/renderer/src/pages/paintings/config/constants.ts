@@ -154,3 +154,9 @@ export const DEFAULT_PAINTING = {
   files: [],
   urls: []
 }
+
+export const PERSON_GENERATION_OPTIONS = [
+  { label: 'paintings.person_generation_options.allow_all', value: 'ALLOW_ALL' },
+  { label: 'paintings.person_generation_options.allow_adult', value: 'ALLOW_ADULT' },
+  { label: 'paintings.person_generation_options.allow_none', value: 'DONT_ALLOW' }
+]

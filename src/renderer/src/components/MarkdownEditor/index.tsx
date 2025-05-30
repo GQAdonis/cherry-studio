@@ -21,7 +21,7 @@ interface MarkdownEditorProps {
 const MarkdownEditor: FC<MarkdownEditorProps> = ({
   value,
   onChange,
-  placeholder = '请输入Markdown格式文本...',
+  placeholder = 'Enter Markdown formatted text...',
   height = '300px',
   autoFocus = false
 }) => {
@@ -42,12 +42,13 @@ const MarkdownEditor: FC<MarkdownEditorProps> = ({
     <EditorContainer style={{ height }}>
       <InputArea value={inputValue} onChange={handleChange} placeholder={placeholder} autoFocus={autoFocus} />
       <PreviewArea>
-        <ReactMarkdown
-          remarkPlugins={[remarkGfm, remarkCjkFriendly, remarkMath]}
-          rehypePlugins={[rehypeRaw, rehypeKatex]}
-          className="markdown">
-          {inputValue || t('settings.provider.notes.markdown_editor_default_value')}
-        </ReactMarkdown>
+        <div className="markdown">
+          <ReactMarkdown
+            remarkPlugins={[remarkGfm, remarkCjkFriendly, remarkMath]}
+            rehypePlugins={[rehypeRaw, rehypeKatex]}>
+            {inputValue || t('settings.provider.notes.markdown_editor_default_value')}
+          </ReactMarkdown>
+        </div>
       </PreviewArea>
     </EditorContainer>
   )

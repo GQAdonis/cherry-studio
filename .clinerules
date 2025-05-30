@@ -6,6 +6,12 @@ yarn
 [project_type]
 electron-typescript
 
+[module_system]
+- Use ESM (ECMAScript Modules) for this project, converting from CommonJS.
+- Convert ALL require() statements in every file to be ESM compatible.
+- Use import/export statements instead of require()/module.exports.
+- Ensure package.json has "type": "module" or use .mjs extensions where appropriate.
+
 [dependency_management]
 - Use yarn for all dependency operations (add, remove, upgrade).
 - The lock file (yarn.lock) must be committed and up to date.
@@ -17,6 +23,7 @@ electron-typescript
 - Use separate tsconfig.json files for Electron and frontend code.
 - Scripts should include: dev, preview, build (see package.json best practices).
 - Use Vite for frontend build, tsc for Electron code.
+- Ensure build tools are configured for ESM compatibility.
 
 [security]
 - Always code sign the distributable before release.
@@ -29,10 +36,12 @@ electron-typescript
 - Use Prettier and ESLint for code formatting and linting.
 - Follow Electron and TypeScript community best practices for file structure.
 - Implement all web content rendering using WebContentsView exclusively, never BrowserView.
+- Use ESM import/export syntax consistently throughout the codebase.
 
 [testing]
 - Add tests for both main and renderer processes.
 - Use Jest or similar for unit tests.
+- Configure test framework for ESM compatibility.
 
 [documentation]
 - Document all custom scripts and build steps in README.md.
@@ -44,9 +53,11 @@ electron-typescript
 [ai_generation]
 - Always check the memory MCP server before generating code to avoid duplicating mistakes.
 - After successfully fixing a bug (no compile or lint errors), automatically generate a memory in MCP memory describing how the bug was fixed.
+- In doing any code generation related to ESM to CommonJS conversion, MUST check with web research via the Tavily MCP server and check the Context7 MCP server for API and documentation.
 - Before finalizing code generation, check with the Tavily search and extract MCP servers, as well as the Context7 MCP server, to ensure correct API versions are used for this project.
 - If no relevant information is found, check the node_modules code directories and package.json files to ensure the actual code for installed components matches the generated code.
 - Always check the docs/* subdirectories for markdown files that specify architectural choices, other rules, or design instructions generated from other tools, and ensure adherence to those standards.
+- When converting CommonJS to ESM, verify compatibility with all dependencies and build tools.
 
 [web_content_implementation]
 - Always use WebContentsView for all web content rendering.

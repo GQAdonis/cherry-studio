@@ -1,3 +1,4 @@
+import os from 'os';
 import fs from 'node:fs'
 import { arch } from 'node:os'
 
@@ -28,7 +29,6 @@ import { searchService } from './services/SearchService'
 import { SelectionService } from './services/SelectionService'
 import { registerShortcuts, unregisterAllShortcuts } from './services/ShortcutService'
 import storeSyncService from './services/StoreSyncService'
-import { TrayService } from './services/TrayService'
 import { setOpenLinkExternal } from './services/WebviewService'
 import { windowService } from './services/WindowService'
 import { calculateDirectorySize, getResourcePath } from './utils'
@@ -113,10 +113,8 @@ export function registerIpc(mainWindow: BrowserWindow, app: Electron.App) {
     configManager.setAutoUpdate(isActive)
   })
 
-  ipcMain.handle(IpcChannel.App_RestartTray, () => TrayService.getInstance().restartTray())
-
-  ipcMain.handle(IpcChannel.Config_Set, (_, key: string, value: any) => {
-    configManager.set(key, value)
+  ipcMain.handle(IpcChannel.Config_Set, (_, key: string, value: any, isNotify: boolean = false) => {
+    configManager.set(key, value, isNotify)
   })
 
   ipcMain.handle(IpcChannel.Config_Get, (_, key: string) => {
@@ -217,7 +215,10 @@ export function registerIpc(mainWindow: BrowserWindow, app: Electron.App) {
 
   // system
   ipcMain.handle(IpcChannel.System_GetDeviceType, () => (isMac ? 'mac' : isWin ? 'windows' : 'linux'))
-  ipcMain.handle(IpcChannel.System_GetHostname, () => require('os').hostname())
+  ipcMain.handle(IpcChannel.System_GetHostname, () => {
+    // const os = require('os') // Replaced by import at the top
+    return os.hostname()
+  })
   ipcMain.handle(IpcChannel.System_ToggleDevTools, (e) => {
     const win = BrowserWindow.fromWebContents(e.sender)
     win && win.webContents.toggleDevTools()

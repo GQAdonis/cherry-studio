@@ -251,7 +251,7 @@ export default class OpenAICompatibleProvider extends BaseOpenAIProvider {
    * @param effort Our internal reasoning effort option
    * @returns OpenAI SDK compatible reasoning effort value
    */
-  private convertToOpenAIReasoningEffort(effort?: string): 'low' | 'medium' | 'high' | null | undefined {
+  private convertToOpenAIReasoningEffort(effort?: string): 'low' | 'medium' | 'high' | undefined {
     // If effort is 'auto' or any other unsupported value, default to 'high'
     if (effort === 'auto') {
       return 'high'
@@ -259,7 +259,7 @@ export default class OpenAICompatibleProvider extends BaseOpenAIProvider {
 
     // Only return the value if it matches one of the allowed values
     if (effort === 'low' || effort === 'medium' || effort === 'high') {
-      return effort
+      return effort as 'low' | 'medium' | 'high'
     }
 
     // Otherwise return undefined
@@ -396,7 +396,7 @@ export default class OpenAICompatibleProvider extends BaseOpenAIProvider {
     const { tools } = this.setupToolsConfig<ChatCompletionTool>({ mcpTools, model, enableToolUse })
 
     if (this.useSystemPromptForTools) {
-      systemMessage.content = buildSystemPrompt(systemMessage.content || '', mcpTools)
+      systemMessage.content = await buildSystemPrompt(systemMessage.content || '', mcpTools)
     }
 
     const userMessages: ChatCompletionMessageParam[] = []

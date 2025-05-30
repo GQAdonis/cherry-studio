@@ -173,7 +173,6 @@ const ORIGIN_DEFAULT_MIN_APPS: MinAppType[] = [
     metadata: {
       // Prioritize local file for better reliability
       fallbackUrls: [
-        'file://${path.join(__dirname, "resources", "miniapps", "bolt.diy.html")}',
         'http://localhost:3000/bolt.diy'
       ],
       // Disable sandbox for better compatibility

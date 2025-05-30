@@ -76,7 +76,9 @@ const AgentsPage: FC = () => {
 
             {agent.prompt && (
               <AgentPrompt>
-                <ReactMarkdown className="markdown">{agent.prompt}</ReactMarkdown>{' '}
+                <div className="markdown">
+                  <ReactMarkdown>{agent.prompt}</ReactMarkdown>
+                </div>
               </AgentPrompt>
             )}
           </Flex>

@@ -2,6 +2,7 @@ import { WebContentsView, BrowserWindow, Rectangle, WebPreferences, app, shell, 
 import Logger from 'electron-log'
 import path from 'path'
 import fs from 'fs'
+import { EventEmitter } from 'events'
 import { getMinAppConfig } from '../../../packages/shared/config/miniapps'
 import { createComponentLogger, attachDebugListeners, getDebugConfig } from '../debug-helpers'
 
@@ -36,7 +37,7 @@ class WebContentsViewService {
     
     // Increase default max listeners to avoid warnings
     // This is needed because we attach multiple listeners to WebContents
-    require('events').EventEmitter.defaultMaxListeners = 20
+    EventEmitter.defaultMaxListeners = 20
   }
 
   /**
