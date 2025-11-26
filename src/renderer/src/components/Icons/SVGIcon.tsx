@@ -201,7 +201,7 @@ export function ExaLogo(props: SVGProps<SVGSVGElement>) {
       {...props}>
       <title>Exa</title>
       <path
-        clip-rule="evenodd"
+        clipRule="evenodd"
         d="M3 0h19v1.791L13.892 12 22 22.209V24H3V0zm9.62 10.348l6.589-8.557H6.03l6.59 8.557zM5.138 3.935v7.17h5.52l-5.52-7.17zm5.52 8.96h-5.52v7.17l5.52-7.17zM6.03 22.21l6.59-8.557 6.589 8.557H6.03z"></path>
     </svg>
   )
@@ -279,7 +279,7 @@ export function PoeLogo(props: SVGProps<SVGSVGElement>) {
           y1="7.303"
           y2="27.715">
           <stop stopColor="#46A6F7"></stop>
-          <stop offset="1" stop-color="#8364FF"></stop>
+          <stop offset="1" stopColor="#8364FF"></stop>
         </linearGradient>
         <linearGradient
           gradientUnits="userSpaceOnUse"
@@ -289,7 +289,7 @@ export function PoeLogo(props: SVGProps<SVGSVGElement>) {
           y1="23.511"
           y2="9.464">
           <stop stopColor="#FF44D3"></stop>
-          <stop offset="1" stop-color="#CF4BFF"></stop>
+          <stop offset="1" stopColor="#CF4BFF"></stop>
         </linearGradient>
       </defs>
     </svg>

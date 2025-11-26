@@ -35,15 +35,11 @@ export function useAssistantPresets() {
   }
 }
 
-export function useAssistantPreset(id: string) {
+export function useAssistantPreset(id: string | undefined) {
   const storedPresets = useAppSelector((state) => state.assistants.presets)
   const presets = ensurePresetsArray(storedPresets)
-  const preset = presets.find((a) => a.id === id)
+  const preset = id ? presets.find((a) => a.id === id) : undefined
   const dispatch = useAppDispatch()
-
-  if (!preset) {
-    logger.warn(`Assistant preset with id ${id} not found in state.`)
-  }
 
   return {
     preset: preset,

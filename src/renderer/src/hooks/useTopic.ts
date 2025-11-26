@@ -10,7 +10,7 @@ import { loadTopicMessagesThunk } from '@renderer/store/thunk/messageThunk'
 import type { Assistant, Topic } from '@renderer/types'
 import { findMainTextBlocks } from '@renderer/utils/messageUtils/find'
 import { find, isEmpty } from 'lodash'
-import { type Dispatch, type SetStateAction, useEffect, useState } from 'react'
+import { type Dispatch, type SetStateAction, useEffect, useMemo, useState } from 'react'
 
 import { useAssistant } from './useAssistant'
 import { getStoreSetting } from './useSettings'
@@ -26,6 +26,12 @@ export function useActiveTopic(assistantId: string, topic?: Topic) {
 
   _activeTopic = activeTopic
   _setActiveTopic = setActiveTopic
+
+  // Create a stable reference that only changes when topic IDs change
+  const topicIds = useMemo(
+    () => assistant?.topics?.map((t) => t.id).join(',') ?? '',
+    [assistant?.topics]
+  )
 
   useEffect(() => {
     if (activeTopic) {
@@ -57,7 +63,9 @@ export function useActiveTopic(assistantId: string, topic?: Topic) {
     if (latestTopic && latestTopic !== activeTopic) {
       setActiveTopic(latestTopic)
     }
-  }, [assistant?.topics, activeTopic])
+    // Use topicIds instead of assistant?.topics to avoid infinite loop
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [topicIds, activeTopic?.id])
 
   return { activeTopic, setActiveTopic }
 }

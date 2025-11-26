@@ -40,8 +40,8 @@ const AssistantSettingPopupContainer: React.FC<Props> = ({ resolve, tab, ...prop
   const [menu, setMenu] = useState<AssistantSettingPopupTab>(tab || 'prompt')
 
   const _useAssistant = useAssistant(props.assistant.id)
-  const _useAgent = useAssistantPreset(props.assistant.id)
   const isAgent = props.assistant.type === 'agent'
+  const _useAgent = useAssistantPreset(isAgent ? props.assistant.id : undefined)
 
   const assistant = isAgent ? (_useAgent.preset ?? props.assistant) : _useAssistant.assistant
   const updateAssistant = isAgent ? _useAgent.updateAssistantPreset : _useAssistant.updateAssistant

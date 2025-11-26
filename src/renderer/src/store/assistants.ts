@@ -65,16 +65,16 @@ const assistantsSlice = createSlice({
       for (const assistant of state.assistants) {
         const settings = action.payload.settings
         if (assistant.id === action.payload.assistantId) {
-          for (const key in settings) {
-            if (!assistant.settings) {
-              assistant.settings = {
-                temperature: DEFAULT_TEMPERATURE,
-                contextCount: DEFAULT_CONTEXTCOUNT,
-                enableMaxTokens: false,
-                maxTokens: 0,
-                streamOutput: true
-              }
+          if (!assistant.settings) {
+            assistant.settings = {
+              temperature: DEFAULT_TEMPERATURE,
+              contextCount: DEFAULT_CONTEXTCOUNT,
+              enableMaxTokens: false,
+              maxTokens: 0,
+              streamOutput: true
             }
+          }
+          for (const key in settings) {
             assistant.settings[key] = settings[key]
           }
         }
@@ -202,11 +202,7 @@ const assistantsSlice = createSlice({
     },
     updateAssistantPreset: (state, action: PayloadAction<AssistantPreset>) => {
       const preset = action.payload
-      state.presets.forEach((a) => {
-        if (a.id === preset.id) {
-          a = preset
-        }
-      })
+      state.presets = state.presets.map((a) => (a.id === preset.id ? preset : a))
     },
     updateAssistantPresetSettings: (
       state,
@@ -215,10 +211,10 @@ const assistantsSlice = createSlice({
       for (const agent of state.presets) {
         const settings = action.payload.settings
         if (agent.id === action.payload.assistantId) {
+          if (!agent.settings) {
+            agent.settings = { ...DEFAULT_ASSISTANT_SETTINGS }
+          }
           for (const key in settings) {
-            if (!agent.settings) {
-              agent.settings = DEFAULT_ASSISTANT_SETTINGS
-            }
             agent.settings[key] = settings[key]
           }
         }

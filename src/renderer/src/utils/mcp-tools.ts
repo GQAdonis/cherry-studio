@@ -214,6 +214,50 @@ export function anthropicToolUseToMcpTool(mcpTools: MCPTool[] | undefined, toolU
 }
 
 /**
+ * Recursively clean schema properties for Gemini API compatibility
+ * - Removes undefined values and "[undefined]" strings
+ * - Ensures array items have proper schema objects
+ * - Handles nested properties recursively
+ */
+function cleanSchemaForGemini(schema: any): any {
+  if (!schema || typeof schema !== 'object') {
+    return schema
+  }
+
+  if (Array.isArray(schema)) {
+    return schema.map(cleanSchemaForGemini)
+  }
+
+  const cleaned: any = {}
+
+  for (const [key, value] of Object.entries(schema)) {
+    // Handle undefined values and "[undefined]" strings
+    if (value === undefined || value === '[undefined]') {
+      // Special handling for array items - Gemini requires this field if present
+      if (key === 'items') {
+        // Provide a default schema that accepts any type
+        cleaned[key] = { type: GeminiSchemaType.STRING }
+      }
+      // Skip other undefined values
+      continue
+    }
+
+    // Recursively clean nested objects
+    if (typeof value === 'object' && value !== null) {
+      const cleanedValue = cleanSchemaForGemini(value)
+      // Only include non-empty objects (or arrays which should always be included)
+      if (Array.isArray(cleanedValue) || Object.keys(cleanedValue).length > 0) {
+        cleaned[key] = cleanedValue
+      }
+    } else {
+      cleaned[key] = value
+    }
+  }
+
+  return cleaned
+}
+
+/**
  * @param mcpTools
  * @returns
  */
@@ -222,13 +266,15 @@ export function mcpToolsToGeminiTools(mcpTools: MCPTool[]): Tool[] {
     {
       functionDeclarations: mcpTools?.map((tool) => {
         const filteredSchema = filterProperties(tool.inputSchema)
+        const cleanedProperties = cleanSchemaForGemini(filteredSchema.properties || {})
+
         return {
           name: tool.id,
           description: tool.description,
           parameters: {
             type: GeminiSchemaType.OBJECT,
-            properties: filteredSchema.properties,
-            required: tool.inputSchema.required
+            properties: cleanedProperties,
+            required: tool.inputSchema.required || []
           }
         }
       })
