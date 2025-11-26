@@ -387,6 +387,29 @@
     "zoomIn": "Zoom In",
     "zoomOut": "Zoom Out"
   },
+  "artifacts": {
+    "code": "Code",
+    "library": "Artifact Library",
+    "no_artifacts": "No artifacts found",
+    "preview": "Preview",
+    "refinement": "Refinement Chat",
+    "refinement_empty": "No messages yet",
+    "refinement_hint": "Ask the AI to modify this artifact",
+    "refinement_placeholder": "Describe the changes you want...",
+    "save_from_modal": "Open the artifact to save it",
+    "saved": "Artifact saved to library",
+    "split": "Split",
+    "type": {
+      "code": "Code",
+      "html": "HTML",
+      "htmx": "HTMX",
+      "markdown": "Markdown",
+      "mermaid": "Mermaid",
+      "react": "React",
+      "svg": "SVG"
+    },
+    "version": "Version"
+  },
   "assistants": {
     "abbr": "Assistants",
     "clear": {

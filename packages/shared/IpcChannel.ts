@@ -374,5 +374,14 @@ export enum IpcChannel {
   WebSocket_Stop = 'webSocket:stop',
   WebSocket_Status = 'webSocket:status',
   WebSocket_SendFile = 'webSocket:send-file',
-  WebSocket_GetAllCandidates = 'webSocket:get-all-candidates'
+  WebSocket_GetAllCandidates = 'webSocket:get-all-candidates',
+
+  // Artifact Server
+  Artifact_StartServer = 'artifact:start-server',
+  Artifact_StopServer = 'artifact:stop-server',
+  Artifact_GetServerStatus = 'artifact:get-server-status',
+  Artifact_ServerStatus = 'artifact:server-status',
+  Artifact_GetState = 'artifact:get-state',
+  Artifact_UpdateState = 'artifact:update-state',
+  Artifact_ClearState = 'artifact:clear-state'
 }
