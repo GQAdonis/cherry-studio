@@ -1,4 +1,9 @@
-import type { Assistant, FileMetadata, Usage } from '@renderer/types'
+import {
+  getAvailableInputBudget,
+  getEffectiveContextBudget,
+  getModelContextLimit
+} from '@renderer/config/models/contextLimits'
+import type { Assistant, FileMetadata, Model, Usage } from '@renderer/types'
 import { FileTypes } from '@renderer/types'
 import type { Message } from '@renderer/types/newMessage'
 import { findFileBlocks, getMainTextContent, getThinkingContent } from '@renderer/utils/messageUtils/find'
@@ -193,4 +198,158 @@ export async function estimateHistoryTokens(assistant: Assistant, msgs: Message[
     .join('\n')
 
   return estimateTextTokens(prompt + input) + uasageTokens
+}
+
+// ==================== Context Management Token Estimation ====================
+
+/**
+ * Estimate tokens for a single message (synchronous version for context strategies)
+ *
+ * @param message - The message to estimate
+ * @returns Estimated token count
+ */
+export function estimateSingleMessageTokens(message: Message): number {
+  const content = getMainTextContent(message)
+  const reasoningContent = getThinkingContent(message)
+  const combinedContent = [content, reasoningContent].filter((s) => s !== undefined).join(' ')
+
+  let tokens = estimateTextTokens(combinedContent)
+
+  // Add rough estimate for file blocks (we can't read async here, so use heuristic)
+  const fileBlocks = findFileBlocks(message)
+  for (const fileBlock of fileBlocks) {
+    if (fileBlock.file?.type === FileTypes.IMAGE) {
+      tokens += estimateImageTokens(fileBlock.file)
+    } else if (fileBlock.file?.size) {
+      // Rough estimate for text files: ~4 chars per token
+      tokens += Math.floor(fileBlock.file.size / 4)
+    }
+  }
+
+  return tokens
+}
+
+/**
+ * Estimate total tokens for an array of messages
+ *
+ * @param messages - Array of messages to estimate
+ * @returns Total estimated token count
+ */
+export function estimateMessagesTokens(messages: Message[]): number {
+  return messages.reduce((total, message) => total + estimateSingleMessageTokens(message), 0)
+}
+
+/**
+ * Estimate the total token usage for a conversation including system prompt
+ *
+ * @param messages - Array of messages in the conversation
+ * @param systemPrompt - Optional system prompt text
+ * @returns Total estimated token count
+ */
+export function estimateConversationTokens(messages: Message[], systemPrompt?: string): number {
+  let total = estimateMessagesTokens(messages)
+
+  if (systemPrompt) {
+    total += estimateTextTokens(systemPrompt)
+  }
+
+  return total
+}
+
+/**
+ * Calculate remaining token budget for a conversation
+ *
+ * @param model - The model being used
+ * @param messages - Current messages in the conversation
+ * @param systemPrompt - Optional system prompt
+ * @param maxOutputTokens - Expected max output tokens (for response budget)
+ * @returns Object with budget information
+ */
+export function calculateRemainingBudget(
+  model: Model,
+  messages: Message[],
+  systemPrompt?: string,
+  maxOutputTokens?: number
+): {
+  modelLimit: number
+  effectiveBudget: number
+  availableInputBudget: number
+  currentUsage: number
+  remainingBudget: number
+  isOverBudget: boolean
+  overBudgetBy: number
+} {
+  const modelLimit = getModelContextLimit(model)
+  const effectiveBudget = getEffectiveContextBudget(model)
+  const availableInputBudget = getAvailableInputBudget(model, maxOutputTokens)
+  const currentUsage = estimateConversationTokens(messages, systemPrompt)
+  const remainingBudget = availableInputBudget - currentUsage
+  const isOverBudget = currentUsage > availableInputBudget
+  const overBudgetBy = isOverBudget ? currentUsage - availableInputBudget : 0
+
+  return {
+    modelLimit,
+    effectiveBudget,
+    availableInputBudget,
+    currentUsage,
+    remainingBudget,
+    isOverBudget,
+    overBudgetBy
+  }
+}
+
+/**
+ * Find messages that fit within a token budget (from most recent)
+ *
+ * @param messages - Array of messages (oldest to newest)
+ * @param tokenBudget - Maximum tokens allowed
+ * @param systemPromptTokens - Tokens used by system prompt (already accounted for)
+ * @returns Array of messages that fit within budget (oldest to newest order preserved)
+ */
+export function findMessagesThatFit(
+  messages: Message[],
+  tokenBudget: number,
+  systemPromptTokens: number = 0
+): {
+  fittingMessages: Message[]
+  removedCount: number
+  tokensSaved: number
+} {
+  let availableBudget = tokenBudget - systemPromptTokens
+  const fittingMessages: Message[] = []
+  let removedCount = 0
+  let tokensSaved = 0
+
+  // Start from the end (most recent) and work backwards
+  for (let i = messages.length - 1; i >= 0; i--) {
+    const message = messages[i]
+    const messageTokens = estimateSingleMessageTokens(message)
+
+    if (messageTokens <= availableBudget) {
+      fittingMessages.unshift(message) // Add to front to preserve order
+      availableBudget -= messageTokens
+    } else {
+      removedCount++
+      tokensSaved += messageTokens
+    }
+  }
+
+  return {
+    fittingMessages,
+    removedCount,
+    tokensSaved
+  }
+}
+
+/**
+ * Estimate tokens for each message in an array
+ *
+ * @param messages - Array of messages
+ * @returns Array of objects with message and its estimated tokens
+ */
+export function estimateTokensPerMessage(messages: Message[]): Array<{ message: Message; tokens: number }> {
+  return messages.map((message) => ({
+    message,
+    tokens: estimateSingleMessageTokens(message)
+  }))
 }

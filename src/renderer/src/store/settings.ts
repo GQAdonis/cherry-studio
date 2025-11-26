@@ -7,6 +7,7 @@ import type {
   ApiServerConfig,
   AssistantsSortType,
   CodeStyleVarious,
+  ContextStrategyConfig,
   LanguageVarious,
   MathEngine,
   OpenAIServiceTier,
@@ -17,6 +18,7 @@ import type {
 } from '@renderer/types'
 import { ThemeMode } from '@renderer/types'
 import type { OpenAISummaryText, OpenAIVerbosity } from '@renderer/types/aiCoreTypes'
+import { DEFAULT_CONTEXT_STRATEGY_CONFIG } from '@renderer/types/contextStrategy'
 import { uuid } from '@renderer/utils'
 import { UpgradeChannel } from '@shared/config/constant'
 
@@ -219,6 +221,13 @@ export interface SettingsState {
   // API Server
   apiServer: ApiServerConfig
   showMessageOutline: boolean
+  // Context Management
+  contextStrategy: ContextStrategyConfig
+  /**
+   * Model ID to use for summarization in context strategies.
+   * If not set, uses the quick model setting.
+   */
+  contextSummarizationModelId: string | null
 }
 
 export type MultiModelMessageStyle = 'horizontal' | 'vertical' | 'fold' | 'grid'
@@ -414,7 +423,10 @@ export const initialState: SettingsState = {
     port: 23333,
     apiKey: `cs-sk-${uuid()}`
   },
-  showMessageOutline: false
+  showMessageOutline: false,
+  // Context Management
+  contextStrategy: DEFAULT_CONTEXT_STRATEGY_CONFIG,
+  contextSummarizationModelId: null
 }
 
 const settingsSlice = createSlice({
@@ -852,6 +864,16 @@ const settingsSlice = createSlice({
     },
     setShowMessageOutline: (state, action: PayloadAction<boolean>) => {
       state.showMessageOutline = action.payload
+    },
+    // Context Management actions
+    setContextStrategy: (state, action: PayloadAction<ContextStrategyConfig>) => {
+      state.contextStrategy = action.payload
+    },
+    setContextStrategyPartial: (state, action: PayloadAction<Partial<ContextStrategyConfig>>) => {
+      state.contextStrategy = { ...state.contextStrategy, ...action.payload }
+    },
+    setContextSummarizationModelId: (state, action: PayloadAction<string | null>) => {
+      state.contextSummarizationModelId = action.payload
     }
   }
 })
@@ -983,7 +1005,11 @@ export const {
   // API Server actions
   setApiServerEnabled,
   setApiServerPort,
-  setApiServerApiKey
+  setApiServerApiKey,
+  // Context Management actions
+  setContextStrategy,
+  setContextStrategyPartial,
+  setContextSummarizationModelId
 } = settingsSlice.actions
 
 export default settingsSlice.reducer

@@ -1,11 +1,12 @@
 import { loggerService } from '@logger'
 import { convertMessagesToSdkMessages } from '@renderer/aiCore/prepareParams'
-import type { Assistant, Message } from '@renderer/types'
+import type { Assistant, Message, Topic } from '@renderer/types'
 import { filterAdjacentUserMessaegs, filterLastAssistantMessage } from '@renderer/utils/messageUtils/filters'
 import type { ModelMessage } from 'ai'
 import { findLast, isEmpty, takeRight } from 'lodash'
 
 import { getAssistantSettings, getDefaultModel } from './AssistantService'
+import { applyContextStrategy, getEffectiveStrategyConfig, isContextStrategyEnabled } from './contextStrategies'
 import {
   filterAfterContextClearMessages,
   filterEmptyMessages,
@@ -37,31 +38,82 @@ export class ConversationService {
 
   static async prepareMessagesForModel(
     messages: Message[],
-    assistant: Assistant
-  ): Promise<{ modelMessages: ModelMessage[]; uiMessages: Message[] }> {
+    assistant: Assistant,
+    options: {
+      topic?: Topic
+      systemPrompt?: string
+      maxOutputTokens?: number
+    } = {}
+  ): Promise<{
+    modelMessages: ModelMessage[]
+    uiMessages: Message[]
+    contextSummary?: string
+    contextManagementApplied: boolean
+  }> {
+    const { topic, systemPrompt, maxOutputTokens } = options
     const { contextCount } = getAssistantSettings(assistant)
+    const model = assistant.model || getDefaultModel()
+
     // This logic is extracted from the original ApiService.fetchChatCompletion
-    // const contextMessages = filterContextMessages(messages)
     const lastUserMessage = findLast(messages, (m) => m.role === 'user')
     if (!lastUserMessage) {
       return {
         modelMessages: [],
-        uiMessages: []
+        uiMessages: [],
+        contextManagementApplied: false
       }
     }
 
-    const uiMessagesFromPipeline = ConversationService.filterMessagesPipeline(messages, contextCount)
+    // Step 1: Apply the existing message filtering pipeline
+    let uiMessagesFromPipeline = ConversationService.filterMessagesPipeline(messages, contextCount)
     logger.debug('uiMessagesFromPipeline', uiMessagesFromPipeline)
 
     // Fallback: ensure at least the last user message is present to avoid empty payloads
-    let uiMessages = uiMessagesFromPipeline
-    if ((!uiMessages || uiMessages.length === 0) && lastUserMessage) {
-      uiMessages = [lastUserMessage]
+    if ((!uiMessagesFromPipeline || uiMessagesFromPipeline.length === 0) && lastUserMessage) {
+      uiMessagesFromPipeline = [lastUserMessage]
+    }
+
+    // Step 2: Apply context management strategy if enabled
+    const strategyConfig = getEffectiveStrategyConfig(topic, assistant)
+    let contextSummary: string | undefined
+    let contextManagementApplied = false
+    let finalUiMessages = uiMessagesFromPipeline
+
+    if (isContextStrategyEnabled(strategyConfig)) {
+      logger.debug('Applying context management strategy', {
+        strategyType: strategyConfig.type,
+        messageCount: uiMessagesFromPipeline.length
+      })
+
+      const strategyResult = await applyContextStrategy(uiMessagesFromPipeline, model, {
+        topic,
+        assistant,
+        systemPrompt,
+        maxOutputTokens,
+        existingSummary: topic?.contextMetadata?.conversationSummary,
+        existingFacts: topic?.contextMetadata?.longTermFacts
+      })
+
+      if (strategyResult.wasApplied) {
+        finalUiMessages = strategyResult.messages
+        contextSummary = strategyResult.summary
+        contextManagementApplied = true
+
+        logger.info('Context management applied', {
+          strategy: strategyConfig.type,
+          originalCount: uiMessagesFromPipeline.length,
+          finalCount: finalUiMessages.length,
+          messagesRemoved: strategyResult.messagesRemoved,
+          tokensSaved: strategyResult.tokensSaved
+        })
+      }
     }
 
     return {
-      modelMessages: await convertMessagesToSdkMessages(uiMessages, assistant.model || getDefaultModel()),
-      uiMessages
+      modelMessages: await convertMessagesToSdkMessages(finalUiMessages, model),
+      uiMessages: finalUiMessages,
+      contextSummary,
+      contextManagementApplied
     }
   }
 
