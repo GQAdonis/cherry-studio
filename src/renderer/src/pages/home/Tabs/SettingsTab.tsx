@@ -54,10 +54,12 @@ import {
 } from '@renderer/store/settings'
 import type { Assistant, AssistantSettings, CodeStyleVarious, MathEngine } from '@renderer/types'
 import { ThemeMode } from '@renderer/types'
+import type { ContextStrategyType } from '@renderer/types/contextStrategy'
+import { CONTEXT_STRATEGY_LABELS } from '@renderer/types/contextStrategy'
 import { modalConfirm } from '@renderer/utils'
 import { getSendMessageShortcutLabel } from '@renderer/utils/input'
 import { Button, Col, InputNumber, Row, Slider, Switch } from 'antd'
-import { Settings2 } from 'lucide-react'
+import { Layers, Settings2 } from 'lucide-react'
 import type { FC } from 'react'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -84,6 +86,9 @@ const SettingsTab: FC<Props> = (props) => {
   const [maxTokens, setMaxTokens] = useState(assistant?.settings?.maxTokens ?? 0)
   const [fontSizeValue, setFontSizeValue] = useState(fontSize)
   const [streamOutput, setStreamOutput] = useState(assistant?.settings?.streamOutput)
+  const [contextStrategy, setContextStrategy] = useState<ContextStrategyType | undefined>(
+    assistant?.settings?.contextStrategy?.type
+  )
   const { translateLanguages } = useTranslate()
 
   const { t } = useTranslation()
@@ -177,7 +182,18 @@ const SettingsTab: FC<Props> = (props) => {
     setEnableMaxTokens(assistant?.settings?.enableMaxTokens ?? false)
     setMaxTokens(assistant?.settings?.maxTokens ?? DEFAULT_MAX_TOKENS)
     setStreamOutput(assistant?.settings?.streamOutput ?? true)
+    setContextStrategy(assistant?.settings?.contextStrategy?.type)
   }, [assistant])
+
+  const onContextStrategyChange = (value: ContextStrategyType | 'inherit') => {
+    if (value === 'inherit') {
+      setContextStrategy(undefined)
+      onUpdateAssistantSettings({ contextStrategy: undefined })
+    } else {
+      setContextStrategy(value)
+      onUpdateAssistantSettings({ contextStrategy: { type: value } })
+    }
+  }
 
   const model = assistant.model || getDefaultModel()
 
@@ -328,6 +344,33 @@ const SettingsTab: FC<Props> = (props) => {
                 </Col>
               </Row>
             )}
+            <SettingDivider />
+            <SettingRow>
+              <SettingRowTitleSmall>
+                <Layers size={14} style={{ marginRight: 4 }} />
+                {t('settings.contextStrategy.title', { defaultValue: 'Context Management' })}
+                <HelpTooltip
+                  title={t('settings.contextStrategy.tooltip', {
+                    defaultValue:
+                      'Automatically manages conversation context to prevent exceeding model limits. Applies to all conversations unless overridden.'
+                  })}
+                />
+              </SettingRowTitleSmall>
+              <Selector
+                value={contextStrategy ?? 'inherit'}
+                onChange={(value) => onContextStrategyChange(value as ContextStrategyType | 'inherit')}
+                options={[
+                  {
+                    value: 'inherit',
+                    label: t('assistants.settings.context.use_global', { defaultValue: 'Use Global Default' })
+                  },
+                  ...Object.entries(CONTEXT_STRATEGY_LABELS).map(([value, label]) => ({
+                    value,
+                    label: t(`settings.contextStrategy.types.${value}`, { defaultValue: label })
+                  }))
+                ]}
+              />
+            </SettingRow>
             <SettingDivider />
           </SettingGroup>
         </CollapsibleSettingGroup>

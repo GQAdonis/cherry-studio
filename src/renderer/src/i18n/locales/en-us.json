@@ -493,6 +493,13 @@
     },
     "search": "Search assistants...",
     "settings": {
+      "context": {
+        "custom_info": "Custom context strategy will override the global setting for all conversations with this assistant.",
+        "description": "Configure how this assistant manages conversation context when approaching model limits. You can use the global default or customize settings for this assistant.",
+        "label": "Context",
+        "title": "Context Management",
+        "use_global": "Use Global Default"
+      },
       "default_model": "Default Model",
       "knowledge_base": {
         "label": "Knowledge Base Settings",
@@ -936,6 +943,10 @@
       "auto_rename": "Auto Rename",
       "clear": {
         "title": "Clear Messages"
+      },
+      "context_strategy": {
+        "label": "Context Strategy",
+        "use_assistant": "Use Assistant Default"
       },
       "copy": {
         "image": "Copy as image",
@@ -3069,6 +3080,8 @@
       "title": "Default Assistant"
     },
     "contextStrategy": {
+      "configuration": "Strategy Configuration",
+      "configurationHelp": "Configure how context is managed when conversations approach model limits. Different strategies offer different tradeoffs between context preservation and token efficiency.",
       "description": "Choose how to manage conversation context when it approaches model limits. This prevents \"Prompt is too long\" errors while preserving important context.",
       "descriptions": {
         "hierarchical": "Three-tier memory system: recent messages verbatim, older messages summarized, key facts extracted.",
@@ -3077,6 +3090,9 @@
         "summarize": "Progressively summarizes older messages to preserve key information while reducing tokens.",
         "truncate_middle": "Preserves initial instructions and recent context, removes middle messages."
       },
+      "globalDescription": "Automatically manages conversation context to prevent exceeding model limits. This setting applies globally and can be overridden per assistant or conversation.",
+      "howItWorks": "How It Works",
+      "inheritedStrategy": "Currently using:",
       "keepFirst": "Keep First Messages",
       "keepFirstHelp": "Number of initial messages to preserve (system context, instructions).",
       "keepLast": "Keep Last Messages",
@@ -3087,9 +3103,15 @@
       "maxMessagesHelp": "Maximum number of messages to keep. Leave empty for automatic (token-based) management.",
       "midTermBudget": "Mid-term Budget",
       "midTermBudgetHelp": "Token budget for mid-term memory summaries.",
+      "nav_title": "Context Management",
+      "selectModel": "Model",
+      "selectModelPlaceholder": "Select summarization model",
       "shortTermTurns": "Short-term Turns",
       "shortTermTurnsHelp": "Number of recent conversation turns to keep verbatim.",
       "strategy": "Strategy",
+      "summarizationModel": "Summarization Model",
+      "summarizationModelDescription": "This model will be used to generate conversation summaries. Choose a fast model to minimize latency. If not set, the current conversation model will be used.",
+      "summarizationModelHelp": "Select a fast, lightweight model for generating summaries. Recommended: Claude Haiku, GPT-3.5 Turbo, or similar quick models.",
       "summarizeThreshold": "Min Messages Before Summarizing",
       "summarizeThresholdHelp": "Minimum number of messages before summarization kicks in.",
       "summaryMaxTokens": "Summary Budget",
@@ -3102,7 +3124,8 @@
         "sliding_window": "Sliding Window",
         "summarize": "Progressive Summarization",
         "truncate_middle": "Keep First & Last"
-      }
+      },
+      "useInherited": "Use Default"
     },
     "data": {
       "app_data": {

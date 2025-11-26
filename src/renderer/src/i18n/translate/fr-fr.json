@@ -493,6 +493,13 @@
     },
     "search": "Rechercher des assistants...",
     "settings": {
+      "context": {
+        "custom_info": "[to be translated]:Custom context strategy will override the global setting for all conversations with this assistant.",
+        "description": "[to be translated]:Configure how this assistant manages conversation context when approaching model limits. You can use the global default or customize settings for this assistant.",
+        "label": "[to be translated]:Context",
+        "title": "[to be translated]:Context Management",
+        "use_global": "[to be translated]:Use Global Default"
+      },
       "default_model": "Modèle par défaut",
       "knowledge_base": {
         "label": "Paramètres de la base de connaissances",
@@ -936,6 +943,10 @@
       "auto_rename": "Générer un nom de sujet",
       "clear": {
         "title": "Effacer le message"
+      },
+      "context_strategy": {
+        "label": "[to be translated]:Context Strategy",
+        "use_assistant": "[to be translated]:Use Assistant Default"
       },
       "copy": {
         "image": "Copier sous forme d'image",
@@ -3069,6 +3080,8 @@
       "title": "Assistant par défaut"
     },
     "contextStrategy": {
+      "configuration": "[to be translated]:Strategy Configuration",
+      "configurationHelp": "[to be translated]:Configure how context is managed when conversations approach model limits. Different strategies offer different tradeoffs between context preservation and token efficiency.",
       "description": "[to be translated]:Choose how to manage conversation context when it approaches model limits. This prevents \"Prompt is too long\" errors while preserving important context.",
       "descriptions": {
         "hierarchical": "[to be translated]:Three-tier memory system: recent messages verbatim, older messages summarized, key facts extracted.",
@@ -3077,6 +3090,9 @@
         "summarize": "[to be translated]:Progressively summarizes older messages to preserve key information while reducing tokens.",
         "truncate_middle": "[to be translated]:Preserves initial instructions and recent context, removes middle messages."
       },
+      "globalDescription": "[to be translated]:Automatically manages conversation context to prevent exceeding model limits. This setting applies globally and can be overridden per assistant or conversation.",
+      "howItWorks": "[to be translated]:How It Works",
+      "inheritedStrategy": "[to be translated]:Currently using:",
       "keepFirst": "[to be translated]:Keep First Messages",
       "keepFirstHelp": "[to be translated]:Number of initial messages to preserve (system context, instructions).",
       "keepLast": "[to be translated]:Keep Last Messages",
@@ -3087,9 +3103,15 @@
       "maxMessagesHelp": "[to be translated]:Maximum number of messages to keep. Leave empty for automatic (token-based) management.",
       "midTermBudget": "[to be translated]:Mid-term Budget",
       "midTermBudgetHelp": "[to be translated]:Token budget for mid-term memory summaries.",
+      "nav_title": "[to be translated]:Context Management",
+      "selectModel": "[to be translated]:Model",
+      "selectModelPlaceholder": "[to be translated]:Select summarization model",
       "shortTermTurns": "[to be translated]:Short-term Turns",
       "shortTermTurnsHelp": "[to be translated]:Number of recent conversation turns to keep verbatim.",
       "strategy": "[to be translated]:Strategy",
+      "summarizationModel": "[to be translated]:Summarization Model",
+      "summarizationModelDescription": "[to be translated]:This model will be used to generate conversation summaries. Choose a fast model to minimize latency. If not set, the current conversation model will be used.",
+      "summarizationModelHelp": "[to be translated]:Select a fast, lightweight model for generating summaries. Recommended: Claude Haiku, GPT-3.5 Turbo, or similar quick models.",
       "summarizeThreshold": "[to be translated]:Min Messages Before Summarizing",
       "summarizeThresholdHelp": "[to be translated]:Minimum number of messages before summarization kicks in.",
       "summaryMaxTokens": "[to be translated]:Summary Budget",
@@ -3102,7 +3124,8 @@
         "sliding_window": "[to be translated]:Sliding Window",
         "summarize": "[to be translated]:Progressive Summarization",
         "truncate_middle": "[to be translated]:Keep First & Last"
-      }
+      },
+      "useInherited": "[to be translated]:Use Default"
     },
     "data": {
       "app_data": {
