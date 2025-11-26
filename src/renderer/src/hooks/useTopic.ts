@@ -28,10 +28,7 @@ export function useActiveTopic(assistantId: string, topic?: Topic) {
   _setActiveTopic = setActiveTopic
 
   // Create a stable reference that only changes when topic IDs change
-  const topicIds = useMemo(
-    () => assistant?.topics?.map((t) => t.id).join(',') ?? '',
-    [assistant?.topics]
-  )
+  const topicIds = useMemo(() => assistant?.topics?.map((t) => t.id).join(',') ?? '', [assistant?.topics])
 
   useEffect(() => {
     if (activeTopic) {

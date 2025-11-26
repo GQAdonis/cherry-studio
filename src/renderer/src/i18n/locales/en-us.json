@@ -3068,6 +3068,42 @@
       "model_params": "Model Parameters",
       "title": "Default Assistant"
     },
+    "contextStrategy": {
+      "description": "Choose how to manage conversation context when it approaches model limits. This prevents \"Prompt is too long\" errors while preserving important context.",
+      "descriptions": {
+        "hierarchical": "Three-tier memory system: recent messages verbatim, older messages summarized, key facts extracted.",
+        "none": "No context management. May exceed model limits on long conversations.",
+        "sliding_window": "Keeps only the most recent messages within the token budget. Simple and predictable.",
+        "summarize": "Progressively summarizes older messages to preserve key information while reducing tokens.",
+        "truncate_middle": "Preserves initial instructions and recent context, removes middle messages."
+      },
+      "keepFirst": "Keep First Messages",
+      "keepFirstHelp": "Number of initial messages to preserve (system context, instructions).",
+      "keepLast": "Keep Last Messages",
+      "keepLastHelp": "Number of recent messages to preserve.",
+      "longTermBudget": "Long-term Budget",
+      "longTermBudgetHelp": "Token budget for extracted long-term facts and preferences.",
+      "maxMessages": "Max Messages",
+      "maxMessagesHelp": "Maximum number of messages to keep. Leave empty for automatic (token-based) management.",
+      "midTermBudget": "Mid-term Budget",
+      "midTermBudgetHelp": "Token budget for mid-term memory summaries.",
+      "shortTermTurns": "Short-term Turns",
+      "shortTermTurnsHelp": "Number of recent conversation turns to keep verbatim.",
+      "strategy": "Strategy",
+      "summarizeThreshold": "Min Messages Before Summarizing",
+      "summarizeThresholdHelp": "Minimum number of messages before summarization kicks in.",
+      "summaryMaxTokens": "Summary Budget",
+      "summaryMaxTokensHelp": "Maximum tokens allocated for the conversation summary.",
+      "title": "Context Management",
+      "tooltip": "Automatically manages conversation context to prevent exceeding model limits. Applies to all conversations unless overridden.",
+      "types": {
+        "hierarchical": "Hierarchical Memory",
+        "none": "None (No Management)",
+        "sliding_window": "Sliding Window",
+        "summarize": "Progressive Summarization",
+        "truncate_middle": "Keep First & Last"
+      }
+    },
     "data": {
       "app_data": {
         "copy_data_option": "Copy data, will automatically restart after copying the original directory data to the new directory",
