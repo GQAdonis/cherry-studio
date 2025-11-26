@@ -202,7 +202,10 @@ const assistantsSlice = createSlice({
     },
     updateAssistantPreset: (state, action: PayloadAction<AssistantPreset>) => {
       const preset = action.payload
-      state.presets = state.presets.map((a) => (a.id === preset.id ? preset : a))
+      const index = state.presets.findIndex((a) => a.id === preset.id)
+      if (index !== -1) {
+        state.presets[index] = preset
+      }
     },
     updateAssistantPresetSettings: (
       state,
