@@ -11,6 +11,7 @@ import {
   Hammer,
   HardDrive,
   Info,
+  Layers,
   MonitorCog,
   NotebookPen,
   Package,
@@ -26,6 +27,7 @@ import { Link, Route, Routes, useLocation } from 'react-router-dom'
 import styled from 'styled-components'
 
 import AboutSettings from './AboutSettings'
+import ContextManagementSettings from './ContextManagementSettings'
 import DataSettings from './DataSettings/DataSettings'
 import DisplaySettings from './DisplaySettings/DisplaySettings'
 import DocProcessSettings from './DocProcessSettings'
@@ -110,6 +112,12 @@ const SettingsPage: FC = () => {
               {t('memory.title')}
             </MenuItem>
           </MenuItemLink>
+          <MenuItemLink to="/settings/context">
+            <MenuItem className={isRoute('/settings/context')}>
+              <Layers size={18} />
+              {t('settings.contextStrategy.nav_title', { defaultValue: 'Context Management' })}
+            </MenuItem>
+          </MenuItemLink>
           <MenuItemLink to="/settings/api-server">
             <MenuItem className={isRoute('/settings/api-server')}>
               <Server size={18} />
@@ -165,6 +173,7 @@ const SettingsPage: FC = () => {
             <Route path="quickphrase" element={<QuickPhraseSettings />} />
             <Route path="mcp/*" element={<MCPSettings />} />
             <Route path="memory" element={<MemorySettings />} />
+            <Route path="context" element={<ContextManagementSettings />} />
             <Route path="general/*" element={<GeneralSettings />} />
             <Route path="display" element={<DisplaySettings />} />
             <Route path="shortcut" element={<ShortcutSettings />} />

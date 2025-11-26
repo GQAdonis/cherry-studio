@@ -37,6 +37,7 @@ import {
   BrushCleaning,
   FolderOpen,
   HelpCircle,
+  Layers,
   MenuIcon,
   NotebookPen,
   PackagePlus,
@@ -268,6 +269,68 @@ export const Topics: React.FC<Props> = ({ assistant: _assistant, activeTopic, se
               topic.id === activeTopic.id && setActiveTopic(updatedTopic)
             })()
         }
+      },
+      {
+        label: t('chat.topics.context_strategy.label', { defaultValue: 'Context Strategy' }),
+        key: 'context-strategy',
+        icon: <Layers size={14} />,
+        children: [
+          {
+            label: t('chat.topics.context_strategy.use_assistant', { defaultValue: 'Use Assistant Default' }),
+            key: 'context-inherit',
+            onClick: () => {
+              const updatedTopic = { ...topic, contextStrategy: undefined }
+              updateTopic(updatedTopic)
+              topic.id === activeTopic.id && setActiveTopic(updatedTopic)
+            }
+          },
+          { type: 'divider' as const },
+          {
+            label: t('settings.contextStrategy.types.sliding_window', { defaultValue: 'Sliding Window' }),
+            key: 'context-sliding_window',
+            onClick: () => {
+              const updatedTopic = { ...topic, contextStrategy: { type: 'sliding_window' as const } }
+              updateTopic(updatedTopic)
+              topic.id === activeTopic.id && setActiveTopic(updatedTopic)
+            }
+          },
+          {
+            label: t('settings.contextStrategy.types.summarize', { defaultValue: 'Progressive Summarization' }),
+            key: 'context-summarize',
+            onClick: () => {
+              const updatedTopic = { ...topic, contextStrategy: { type: 'summarize' as const } }
+              updateTopic(updatedTopic)
+              topic.id === activeTopic.id && setActiveTopic(updatedTopic)
+            }
+          },
+          {
+            label: t('settings.contextStrategy.types.hierarchical', { defaultValue: 'Hierarchical Memory' }),
+            key: 'context-hierarchical',
+            onClick: () => {
+              const updatedTopic = { ...topic, contextStrategy: { type: 'hierarchical' as const } }
+              updateTopic(updatedTopic)
+              topic.id === activeTopic.id && setActiveTopic(updatedTopic)
+            }
+          },
+          {
+            label: t('settings.contextStrategy.types.truncate_middle', { defaultValue: 'Keep First & Last' }),
+            key: 'context-truncate_middle',
+            onClick: () => {
+              const updatedTopic = { ...topic, contextStrategy: { type: 'truncate_middle' as const } }
+              updateTopic(updatedTopic)
+              topic.id === activeTopic.id && setActiveTopic(updatedTopic)
+            }
+          },
+          {
+            label: t('settings.contextStrategy.types.none', { defaultValue: 'None (No Management)' }),
+            key: 'context-none',
+            onClick: () => {
+              const updatedTopic = { ...topic, contextStrategy: { type: 'none' as const } }
+              updateTopic(updatedTopic)
+              topic.id === activeTopic.id && setActiveTopic(updatedTopic)
+            }
+          }
+        ]
       },
       {
         label: topic.pinned ? t('chat.topics.unpin') : t('chat.topics.pin'),
