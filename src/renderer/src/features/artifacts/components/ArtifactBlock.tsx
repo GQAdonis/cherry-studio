@@ -19,8 +19,6 @@ interface ArtifactBlockProps {
   conversationId: string
   /** Message ID for context */
   messageId: string
-  /** Whether to show preview thumbnails */
-  showPreview?: boolean
   /** Custom class name */
   className?: string
 }
@@ -30,13 +28,7 @@ interface ArtifactBlockProps {
  *
  * Parses message content for artifacts and renders them as cards
  */
-const ArtifactBlock: FC<ArtifactBlockProps> = ({
-  content,
-  conversationId,
-  messageId,
-  showPreview = false,
-  className
-}) => {
+const ArtifactBlock: FC<ArtifactBlockProps> = ({ content, conversationId, messageId, className }) => {
   // Parse artifacts from content
   const parseResult = useMemo(() => parseArtifacts(content), [content])
 
@@ -53,7 +45,6 @@ const ArtifactBlock: FC<ArtifactBlockProps> = ({
           artifact={artifact}
           conversationId={conversationId}
           messageId={messageId}
-          showPreview={showPreview}
         />
       ))}
     </Container>

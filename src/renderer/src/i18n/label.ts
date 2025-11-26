@@ -136,6 +136,7 @@ const titleKeyMap = {
   // TODO: update i18n key
   store: 'title.store',
   apps: 'title.apps',
+  artifacts: 'artifacts.title',
   code: 'title.code',
   files: 'title.files',
   home: 'title.home',
@@ -184,7 +185,8 @@ const sidebarIconKeyMap = {
   knowledge: 'knowledge.title',
   files: 'files.title',
   code_tools: 'code.title',
-  notes: 'notes.title'
+  notes: 'notes.title',
+  artifacts: 'artifacts.title'
 } as const
 
 export const getSidebarIconLabel = (key: string): string => {

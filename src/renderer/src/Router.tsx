@@ -9,6 +9,8 @@ import { ErrorBoundary } from './components/ErrorBoundary'
 import TabsContainer from './components/Tab/TabContainer'
 import NavigationHandler from './handler/NavigationHandler'
 import { useNavbarPosition } from './hooks/useSettings'
+import ArtifactLibraryPage from './pages/artifacts/ArtifactLibraryPage'
+import ArtifactPage from './pages/artifacts/ArtifactPage'
 import CodeToolsPage from './pages/code/CodeToolsPage'
 import FilesPage from './pages/files/FilesPage'
 import HomePage from './pages/home/HomePage'
@@ -38,6 +40,8 @@ const Router: FC = () => {
           <Route path="/knowledge" element={<KnowledgePage />} />
           <Route path="/apps/:appId" element={<MinAppPage />} />
           <Route path="/apps" element={<MinAppsPage />} />
+          <Route path="/artifacts" element={<ArtifactLibraryPage />} />
+          <Route path="/artifacts/:artifactId" element={<ArtifactPage />} />
           <Route path="/code" element={<CodeToolsPage />} />
           <Route path="/settings/*" element={<SettingsPage />} />
           <Route path="/launchpad" element={<LaunchpadPage />} />

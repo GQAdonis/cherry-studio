@@ -4,22 +4,37 @@
  * Handles AI refinement chat logic for artifacts.
  * Connects to AI provider, parses responses for updated artifact content,
  * and updates the store with new versions.
+ *
+ * Key features:
+ * - Handles ALL chunk types (text, thinking, web search, knowledge, MCP tools)
+ * - Separates conversational text from artifact content during streaming
+ * - Streams artifact content to code view in real-time
+ * - Displays AI explanations, thinking, citations in chat panel
  */
 
+import { fetchChatCompletion } from '@renderer/services/ApiService'
+import { getDefaultAssistant, getDefaultModel } from '@renderer/services/AssistantService'
 import { useAppDispatch, useAppSelector } from '@renderer/store'
 import {
   addRefinementMessage,
   saveVersion,
+  selectContextMessages,
   selectIsRefining,
+  selectParentModelId,
   selectRefinementMessages,
+  setIsArtifactStreaming,
   setIsRefining,
   updateContent,
-  updateRefinementMessage
+  updateRefinementMessage,
+  updateStreamingArtifactContent
 } from '@renderer/store/artifacts'
-import { useCallback } from 'react'
+import type { Assistant } from '@renderer/types'
+import { ChunkType } from '@renderer/types/chunk'
+import { useCallback, useRef } from 'react'
 
-import type { Artifact, RefinementMessage } from '../types'
-import { extractArtifactContent, parseArtifacts } from '../utils/artifactParser'
+import { getArtifactRefinementPrompt } from '../agent/refinementPrompt'
+import type { Artifact, ContextMessage, RefinementMessage } from '../types'
+import { extractArtifactContent, separateTextAndArtifact } from '../utils/artifactParser'
 
 interface UseArtifactRefinementOptions {
   /** The artifact being refined */
@@ -37,6 +52,8 @@ interface UseArtifactRefinementResult {
   messages: RefinementMessage[]
   /** Whether refinement is in progress */
   isRefining: boolean
+  /** Context messages from original conversation */
+  contextMessages: ContextMessage[]
   /** Send a refinement request */
   sendRefinement: (prompt: string) => Promise<void>
   /** Clear refinement messages */
@@ -45,28 +62,31 @@ interface UseArtifactRefinementResult {
 
 /**
  * Build system prompt for artifact refinement
+ * Uses the locked-in artifact refinement agent prompt
  */
-function buildSystemPrompt(artifact: Artifact): string {
-  return `You are an expert developer helping to refine and improve ${artifact.type} artifacts.
+function buildSystemPrompt(artifact: Artifact, contextMessages: ContextMessage[]): string {
+  // Get the base refinement prompt with artifact-specific instructions
+  const basePrompt = getArtifactRefinementPrompt(artifact)
 
-Current artifact:
-- Type: ${artifact.type}
-- Title: ${artifact.title}
-- Identifier: ${artifact.identifier}
+  // Build context section from original conversation
+  let contextSection = ''
+  if (contextMessages.length > 0) {
+    contextSection = `
 
-Instructions:
-1. When the user requests changes, understand the current code structure
-2. Make precise, targeted changes to fulfill the request
-3. Return the COMPLETE updated code wrapped in <cs-artifact> tags with the same attributes
-4. Preserve the original structure and style where possible
-5. Only change what's necessary
+## Original Conversation Context
 
-Response format:
-<cs-artifact identifier="${artifact.identifier}" type="${artifact.type}" title="${artifact.title}">
-[complete updated code here]
-</cs-artifact>
+The following is context from the original conversation where this artifact was created:
 
-Always return the complete artifact, not just the changes.`
+${contextMessages.map((msg) => `**${msg.role.charAt(0).toUpperCase() + msg.role.slice(1)}**: ${msg.content}`).join('\n\n')}
+
+---
+
+`
+  }
+
+  // Append context section to the base prompt
+  return `${basePrompt}
+${contextSection}`
 }
 
 /**
@@ -81,35 +101,38 @@ ${artifact.content}
 Please make the following changes: ${request}`
 }
 
+
 /**
- * Extract updated artifact content from AI response
+ * Create a refinement assistant with the artifact-specific prompt
  */
-function extractUpdatedContent(response: string): string | null {
-  // Try to parse cs-artifact tags from response
-  const parseResult = parseArtifacts(response)
+function createRefinementAssistant(artifact: Artifact, contextMessages: ContextMessage[], modelId?: string): Assistant {
+  const baseAssistant = getDefaultAssistant()
+  const model = modelId ? { ...getDefaultModel(), id: modelId } : getDefaultModel()
+  const systemPrompt = buildSystemPrompt(artifact, contextMessages)
 
-  if (parseResult.hasArtifacts && parseResult.artifacts.length > 0) {
-    return parseResult.artifacts[0].content
+  return {
+    ...baseAssistant,
+    id: 'artifact-refinement-assistant',
+    name: 'Artifact Designer',
+    model,
+    prompt: systemPrompt,
+    settings: {
+      ...baseAssistant.settings,
+      temperature: 0.7,
+      streamOutput: true
+    }
   }
-
-  // Try to extract raw artifact content
-  const extracted = extractArtifactContent(response)
-  if (extracted) {
-    return extracted
-  }
-
-  // If no artifact tags found, check if the response is mostly code
-  // (This handles cases where the AI returns code without wrapping it)
-  const codeBlockMatch = response.match(/```[\w]*\n?([\s\S]*?)```/)
-  if (codeBlockMatch) {
-    return codeBlockMatch[1].trim()
-  }
-
-  return null
 }
 
 /**
  * Hook for managing artifact refinement
+ *
+ * Handles ALL chunk types from AI responses:
+ * - TEXT_DELTA/COMPLETE: Text content and artifact code
+ * - THINKING_START/DELTA/COMPLETE: AI reasoning/thinking
+ * - WEB_SEARCH_IN_PROGRESS/COMPLETE: Web search results
+ * - KNOWLEDGE_SEARCH_IN_PROGRESS/COMPLETE: Knowledge base hits
+ * - MCP_TOOL_IN_PROGRESS/COMPLETE: MCP tool calls
  *
  * @param options - Refinement options
  * @returns Refinement methods and state
@@ -120,6 +143,13 @@ export function useArtifactRefinement(options: UseArtifactRefinementOptions): Us
 
   const messages = useAppSelector(selectRefinementMessages)
   const isRefining = useAppSelector(selectIsRefining)
+  const contextMessages = useAppSelector(selectContextMessages)
+  const parentModelId = useAppSelector(selectParentModelId)
+
+  // Track accumulated content
+  const responseContentRef = useRef<string>('')
+  const thinkingContentRef = useRef<string>('')
+  const assistantMessageIdRef = useRef<string>('')
 
   // Send refinement request
   const sendRefinement = useCallback(
@@ -139,9 +169,15 @@ export function useArtifactRefinement(options: UseArtifactRefinementOptions): Us
 
       // Set refining state
       dispatch(setIsRefining(true))
+      dispatch(setIsArtifactStreaming(false))
+      dispatch(updateStreamingArtifactContent(null))
+
+      // Reset tracking refs
+      responseContentRef.current = ''
+      thinkingContentRef.current = ''
+      assistantMessageIdRef.current = `assistant-${Date.now()}`
 
       // Add placeholder assistant message
-      const assistantMessageId = `assistant-${Date.now()}`
       dispatch(
         addRefinementMessage({
           role: 'assistant',
@@ -151,58 +187,265 @@ export function useArtifactRefinement(options: UseArtifactRefinementOptions): Us
       )
 
       try {
-        // Build prompts
-        const systemPrompt = buildSystemPrompt(artifact)
+        // Create assistant with refinement prompt
+        const assistant = createRefinementAssistant(artifact, contextMessages, parentModelId || undefined)
+
+        // Build the user prompt with artifact content
         const userPrompt = buildUserPrompt(prompt, artifact)
 
-        // TODO: Connect to actual AI provider
-        // For now, we'll simulate a response that includes the updated artifact
-        const response = await simulateAIResponse(systemPrompt, userPrompt, artifact)
+        // Call AI with streaming - handle ALL chunk types
+        await fetchChatCompletion({
+          prompt: userPrompt,
+          assistant,
+          requestOptions: {},
+          onChunkReceived: (chunk) => {
+            const msgId = assistantMessageIdRef.current
 
-        // Update the assistant message with full response
+            switch (chunk.type) {
+              // ========== TEXT CHUNKS ==========
+              case ChunkType.TEXT_DELTA:
+                if (chunk.text) {
+                  // Accumulate full response
+                  responseContentRef.current += chunk.text
+
+                  // Separate text from artifact content
+                  const { textContent, artifactContent, isArtifactStreaming } = separateTextAndArtifact(
+                    responseContentRef.current
+                  )
+
+                  // Update streaming state
+                  dispatch(setIsArtifactStreaming(isArtifactStreaming))
+
+                  // Stream artifact content to code view in real-time
+                  if (artifactContent) {
+                    dispatch(updateStreamingArtifactContent(artifactContent))
+                  }
+
+                  // Update chat message with text content only
+                  dispatch(
+                    updateRefinementMessage({
+                      id: msgId,
+                      content: textContent,
+                      isStreaming: true
+                    })
+                  )
+                }
+                break
+
+              case ChunkType.TEXT_COMPLETE:
+                // Text streaming complete
+                break
+
+              // ========== THINKING/REASONING CHUNKS ==========
+              case ChunkType.THINKING_START:
+                dispatch(
+                  updateRefinementMessage({
+                    id: msgId,
+                    isThinking: true
+                  })
+                )
+                break
+
+              case ChunkType.THINKING_DELTA:
+                if (chunk.text) {
+                  thinkingContentRef.current += chunk.text
+                  dispatch(
+                    updateRefinementMessage({
+                      id: msgId,
+                      thinking: thinkingContentRef.current,
+                      thinkingTime: chunk.thinking_millsec,
+                      isThinking: true
+                    })
+                  )
+                }
+                break
+
+              case ChunkType.THINKING_COMPLETE:
+                dispatch(
+                  updateRefinementMessage({
+                    id: msgId,
+                    thinking: chunk.text || thinkingContentRef.current,
+                    thinkingTime: chunk.thinking_millsec,
+                    isThinking: false
+                  })
+                )
+                break
+
+              // ========== WEB SEARCH CHUNKS ==========
+              case ChunkType.WEB_SEARCH_IN_PROGRESS:
+              case ChunkType.LLM_WEB_SEARCH_IN_PROGRESS:
+              case ChunkType.SEARCH_IN_PROGRESS_UNION:
+                dispatch(
+                  updateRefinementMessage({
+                    id: msgId,
+                    isSearching: true
+                  })
+                )
+                break
+
+              case ChunkType.WEB_SEARCH_COMPLETE:
+                dispatch(
+                  updateRefinementMessage({
+                    id: msgId,
+                    webSearchResults: chunk.web_search,
+                    isSearching: false
+                  })
+                )
+                break
+
+              case ChunkType.LLM_WEB_SEARCH_COMPLETE:
+                dispatch(
+                  updateRefinementMessage({
+                    id: msgId,
+                    webSearchResults: chunk.llm_web_search,
+                    isSearching: false
+                  })
+                )
+                break
+
+              case ChunkType.SEARCH_COMPLETE_UNION:
+                dispatch(
+                  updateRefinementMessage({
+                    id: msgId,
+                    isSearching: false
+                  })
+                )
+                break
+
+              // ========== KNOWLEDGE BASE CHUNKS ==========
+              case ChunkType.KNOWLEDGE_SEARCH_IN_PROGRESS:
+                dispatch(
+                  updateRefinementMessage({
+                    id: msgId,
+                    isKnowledgeSearching: true
+                  })
+                )
+                break
+
+              case ChunkType.KNOWLEDGE_SEARCH_COMPLETE:
+                dispatch(
+                  updateRefinementMessage({
+                    id: msgId,
+                    knowledgeResults: chunk.knowledge,
+                    isKnowledgeSearching: false
+                  })
+                )
+                break
+
+              // ========== MCP TOOL CHUNKS ==========
+              case ChunkType.MCP_TOOL_CREATED:
+              case ChunkType.MCP_TOOL_PENDING:
+              case ChunkType.MCP_TOOL_IN_PROGRESS:
+                dispatch(
+                  updateRefinementMessage({
+                    id: msgId,
+                    isMcpToolRunning: true
+                  })
+                )
+                break
+
+              case ChunkType.MCP_TOOL_COMPLETE:
+                dispatch(
+                  updateRefinementMessage({
+                    id: msgId,
+                    mcpTools: chunk.responses,
+                    isMcpToolRunning: false
+                  })
+                )
+                break
+
+              // ========== COMPLETION CHUNKS ==========
+              case ChunkType.BLOCK_COMPLETE:
+              case ChunkType.LLM_RESPONSE_COMPLETE:
+                dispatch(setIsArtifactStreaming(false))
+                dispatch(updateStreamingArtifactContent(null))
+                break
+
+              case ChunkType.LLM_RESPONSE_CREATED:
+              case ChunkType.LLM_RESPONSE_IN_PROGRESS:
+              case ChunkType.BLOCK_CREATED:
+              case ChunkType.BLOCK_IN_PROGRESS:
+                // Informational chunks, no action needed
+                break
+
+              // ========== ERROR CHUNK ==========
+              case ChunkType.ERROR:
+                dispatch(setIsArtifactStreaming(false))
+                dispatch(updateStreamingArtifactContent(null))
+                throw new Error(chunk.error?.message || 'Unknown error')
+
+              default:
+                // Handle any other chunk types gracefully
+                break
+            }
+          }
+        })
+
+        // Final processing after streaming completes
+        const { textContent, artifactContent } = separateTextAndArtifact(responseContentRef.current)
+
+        // Mark message as complete
         dispatch(
           updateRefinementMessage({
-            id: assistantMessageId,
-            content: response,
-            isStreaming: false
+            id: assistantMessageIdRef.current,
+            content: textContent || (artifactContent ? '_Artifact has been updated._' : ''),
+            isStreaming: false,
+            isThinking: false,
+            isSearching: false,
+            isKnowledgeSearching: false,
+            isMcpToolRunning: false
           })
         )
 
-        // Extract updated content from response
-        const newContent = extractUpdatedContent(response)
+        // Clear streaming artifact content
+        dispatch(updateStreamingArtifactContent(null))
 
-        if (newContent && newContent !== artifact.content) {
+        // Extract final artifact content and update
+        const finalContent = extractArtifactContent(responseContentRef.current)
+
+        if (finalContent && finalContent !== artifact.content) {
           // Save current version before updating
           await dispatch(
             saveVersion({
               artifact,
-              newContent,
+              newContent: finalContent,
               refinementPrompt: prompt
             })
           )
 
           // Update artifact content
-          dispatch(updateContent(newContent))
+          dispatch(updateContent(finalContent))
 
           // Notify completion
-          onComplete?.(newContent)
+          onComplete?.(finalContent)
         }
       } catch (error) {
         // eslint-disable-next-line no-restricted-syntax
         console.error('Refinement error:', error)
+        dispatch(setIsArtifactStreaming(false))
+        dispatch(updateStreamingArtifactContent(null))
+
+        // Get current text content for error display
+        const { textContent } = separateTextAndArtifact(responseContentRef.current)
+
         dispatch(
           updateRefinementMessage({
-            id: assistantMessageId,
-            content: `Error: ${(error as Error).message}`,
-            isStreaming: false
+            id: assistantMessageIdRef.current,
+            content: textContent + `\n\nError: ${(error as Error).message}`,
+            isStreaming: false,
+            isThinking: false,
+            isSearching: false,
+            isKnowledgeSearching: false,
+            isMcpToolRunning: false
           })
         )
         onError?.(error as Error)
       } finally {
         dispatch(setIsRefining(false))
+        dispatch(setIsArtifactStreaming(false))
       }
     },
-    [artifact, isRefining, dispatch, onStart, onComplete, onError]
+    [artifact, isRefining, contextMessages, parentModelId, dispatch, onStart, onComplete, onError]
   )
 
   // Clear messages
@@ -213,28 +456,10 @@ export function useArtifactRefinement(options: UseArtifactRefinementOptions): Us
   return {
     messages,
     isRefining,
+    contextMessages,
     sendRefinement,
     clearMessages
   }
-}
-
-/**
- * Simulate AI response (placeholder for actual AI integration)
- */
-async function simulateAIResponse(_systemPrompt: string, _userPrompt: string, artifact: Artifact): Promise<string> {
-  // Simulate network delay
-  await new Promise((resolve) => setTimeout(resolve, 1500))
-
-  // Return a simulated response that wraps the content in cs-artifact tags
-  return `I've reviewed your request. Here's the updated artifact:
-
-<cs-artifact identifier="${artifact.identifier}" type="${artifact.type}" title="${artifact.title}">
-${artifact.content}
-
-<!-- Note: This is a simulated response. To enable actual AI refinement, connect this hook to your AI provider. -->
-</cs-artifact>
-
-The artifact has been updated based on your request.`
 }
 
 export default useArtifactRefinement

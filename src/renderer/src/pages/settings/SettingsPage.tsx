@@ -18,6 +18,7 @@ import {
   PictureInPicture2,
   Server,
   Settings2,
+  Sparkles,
   TextCursorInput,
   Zap
 } from 'lucide-react'
@@ -27,6 +28,7 @@ import { Link, Route, Routes, useLocation } from 'react-router-dom'
 import styled from 'styled-components'
 
 import AboutSettings from './AboutSettings'
+import ArtifactSettings from './ArtifactSettings'
 import ContextManagementSettings from './ContextManagementSettings'
 import DataSettings from './DataSettings/DataSettings'
 import DisplaySettings from './DisplaySettings/DisplaySettings'
@@ -98,6 +100,12 @@ const SettingsPage: FC = () => {
             <MenuItem className={isRoute('/settings/notes')}>
               <NotebookPen size={18} />
               {t('notes.settings.title')}
+            </MenuItem>
+          </MenuItemLink>
+          <MenuItemLink to="/settings/artifacts">
+            <MenuItem className={isRoute('/settings/artifacts')}>
+              <Sparkles size={18} />
+              {t('settings.artifacts.title', 'Artifacts')}
             </MenuItem>
           </MenuItemLink>
           <MenuItemLink to="/settings/websearch">
@@ -181,6 +189,7 @@ const SettingsPage: FC = () => {
             <Route path="selectionAssistant" element={<SelectionAssistantSettings />} />
             <Route path="data" element={<DataSettings />} />
             <Route path="notes" element={<NotesSettings />} />
+            <Route path="artifacts" element={<ArtifactSettings />} />
             <Route path="about" element={<AboutSettings />} />
           </Routes>
         </SettingContent>

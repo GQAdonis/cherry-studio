@@ -28,6 +28,7 @@ import type {
   ArtifactMetadata,
   ArtifactsState,
   ArtifactStatus,
+  ContextMessage,
   ParsedArtifact,
   RefinementMessage,
   ViewMode
@@ -44,11 +45,15 @@ const initialState: ArtifactsState = {
   savedArtifacts: [],
   refinementMessages: [],
   isRefining: false,
+  isArtifactStreaming: false, // Whether artifact content is currently being streamed
+  streamingArtifactContent: null, // Partial artifact content during streaming for code view
   versionHistory: [],
   currentVersionIndex: -1,
   isLoading: false,
   error: null,
-  htmxServerPort: null
+  htmxServerPort: null,
+  parentModelId: null, // Model ID from parent conversation for refinement
+  contextMessages: [] // Context from original conversation
 }
 
 /**
@@ -171,9 +176,10 @@ const artifactsSlice = createSlice({
         parsedArtifact: ParsedArtifact
         conversationId: string
         messageId: string
+        contextMessages?: ContextMessage[]
       }>
     ) => {
-      const { parsedArtifact, conversationId, messageId } = action.payload
+      const { parsedArtifact, conversationId, messageId, contextMessages = [] } = action.payload
 
       // Create artifact from parsed data
       const artifact = createArtifactRecord({
@@ -200,6 +206,7 @@ const artifactsSlice = createSlice({
       state.versionHistory = []
       state.currentVersionIndex = -1
       state.error = null
+      state.contextMessages = contextMessages
     },
 
     /**
@@ -221,6 +228,8 @@ const artifactsSlice = createSlice({
       state.activeArtifact = null
       state.refinementMessages = []
       state.isRefining = false
+      state.isArtifactStreaming = false
+      state.streamingArtifactContent = null
       state.versionHistory = []
       state.currentVersionIndex = -1
       state.error = null
@@ -288,15 +297,39 @@ const artifactsSlice = createSlice({
     },
 
     /**
-     * Update a streaming refinement message
+     * Update a streaming refinement message with all rich content fields
      */
-    updateRefinementMessage: (state, action: PayloadAction<{ id: string; content: string; isStreaming?: boolean }>) => {
+    updateRefinementMessage: (
+      state,
+      action: PayloadAction<{
+        id: string
+        content?: string
+        isStreaming?: boolean
+        // Thinking/reasoning
+        thinking?: string
+        thinkingTime?: number
+        isThinking?: boolean
+        // Web search
+        webSearchResults?: RefinementMessage['webSearchResults']
+        isSearching?: boolean
+        // Knowledge base
+        knowledgeResults?: RefinementMessage['knowledgeResults']
+        isKnowledgeSearching?: boolean
+        // MCP tools
+        mcpTools?: RefinementMessage['mcpTools']
+        isMcpToolRunning?: boolean
+      }>
+    ) => {
       const message = state.refinementMessages.find((m) => m.id === action.payload.id)
       if (message) {
-        message.content = action.payload.content
-        if (action.payload.isStreaming !== undefined) {
-          message.isStreaming = action.payload.isStreaming
-        }
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const { id: _, ...updates } = action.payload
+        // Only update fields that are explicitly provided
+        Object.entries(updates).forEach(([key, value]) => {
+          if (value !== undefined) {
+            ;(message as any)[key] = value
+          }
+        })
       }
     },
 
@@ -312,6 +345,26 @@ const artifactsSlice = createSlice({
      */
     setIsRefining: (state, action: PayloadAction<boolean>) => {
       state.isRefining = action.payload
+    },
+
+    /**
+     * Set artifact streaming state
+     * True when an artifact tag is being streamed (incomplete)
+     */
+    setIsArtifactStreaming: (state, action: PayloadAction<boolean>) => {
+      state.isArtifactStreaming = action.payload
+      // Clear streaming content when streaming ends
+      if (!action.payload) {
+        state.streamingArtifactContent = null
+      }
+    },
+
+    /**
+     * Update streaming artifact content for real-time code view updates
+     * This allows the code view to show partial artifact content during streaming
+     */
+    updateStreamingArtifactContent: (state, action: PayloadAction<string | null>) => {
+      state.streamingArtifactContent = action.payload
     },
 
     /**
@@ -380,6 +433,13 @@ const artifactsSlice = createSlice({
       if (state.activeArtifact) {
         state.activeArtifact.status = action.payload
       }
+    },
+
+    /**
+     * Set parent model ID for refinement
+     */
+    setParentModelId: (state, action: PayloadAction<string | null>) => {
+      state.parentModelId = action.payload
     }
   },
   extraReducers: (builder) => {
@@ -470,12 +530,15 @@ export const {
   updateRefinementMessage,
   clearRefinementMessages,
   setIsRefining,
+  setIsArtifactStreaming,
+  updateStreamingArtifactContent,
   undo,
   redo,
   setError,
   setHtmxServerPort,
   setIsLoading,
-  setArtifactStatus
+  setArtifactStatus,
+  setParentModelId
 } = artifactsSlice.actions
 
 export default artifactsSlice.reducer
@@ -487,6 +550,9 @@ export const selectViewMode = (state: { artifacts: ArtifactsState }) => state.ar
 export const selectSavedArtifacts = (state: { artifacts: ArtifactsState }) => state.artifacts.savedArtifacts
 export const selectRefinementMessages = (state: { artifacts: ArtifactsState }) => state.artifacts.refinementMessages
 export const selectIsRefining = (state: { artifacts: ArtifactsState }) => state.artifacts.isRefining
+export const selectIsArtifactStreaming = (state: { artifacts: ArtifactsState }) => state.artifacts.isArtifactStreaming
+export const selectStreamingArtifactContent = (state: { artifacts: ArtifactsState }) =>
+  state.artifacts.streamingArtifactContent
 export const selectVersionHistory = (state: { artifacts: ArtifactsState }) => state.artifacts.versionHistory
 export const selectCurrentVersionIndex = (state: { artifacts: ArtifactsState }) => state.artifacts.currentVersionIndex
 export const selectCanUndo = (state: { artifacts: ArtifactsState }) => state.artifacts.currentVersionIndex > 0
@@ -495,3 +561,5 @@ export const selectCanRedo = (state: { artifacts: ArtifactsState }) =>
 export const selectArtifactError = (state: { artifacts: ArtifactsState }) => state.artifacts.error
 export const selectHtmxServerPort = (state: { artifacts: ArtifactsState }) => state.artifacts.htmxServerPort
 export const selectIsLoading = (state: { artifacts: ArtifactsState }) => state.artifacts.isLoading
+export const selectParentModelId = (state: { artifacts: ArtifactsState }) => state.artifacts.parentModelId
+export const selectContextMessages = (state: { artifacts: ArtifactsState }) => state.artifacts.contextMessages

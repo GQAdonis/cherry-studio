@@ -5,7 +5,7 @@
  * Supports various artifact types: HTML, HTMX, React, SVG, Mermaid, Markdown, Code
  */
 
-import type { Artifact, ArtifactMetadata, ArtifactStatus, ArtifactType, RenderOptions } from '../types'
+import { type Artifact, type ArtifactMetadata, ArtifactStatus, type ArtifactType, type RenderOptions } from '../types'
 
 /**
  * CDN URLs for external dependencies
@@ -36,11 +36,20 @@ const CDN_URLS = {
 
 /**
  * Generate CSS variables for theme
+ * Includes both v1.0 (--color-*) and v2.0 (--bg-*, --text-*, --accent) variables
  */
 function getThemeVariables(theme: 'light' | 'dark'): string {
   if (theme === 'dark') {
     return `
       :root {
+        /* v2.0 CSS Variables */
+        --bg-primary: #1a1a2e;
+        --bg-secondary: #16213e;
+        --text-primary: #eaeaea;
+        --text-secondary: #a0a0a0;
+        --accent: #4f8cff;
+
+        /* v1.0 CSS Variables (legacy support) */
         --color-background: #1a1a1a;
         --color-background-soft: #242424;
         --color-background-mute: #2e2e2e;
@@ -56,14 +65,22 @@ function getThemeVariables(theme: 'light' | 'dark'): string {
         --color-warning: #eab308;
       }
       body {
-        background-color: var(--color-background);
-        color: var(--color-text);
+        background-color: var(--bg-primary);
+        color: var(--text-primary);
       }
     `
   }
 
   return `
     :root {
+      /* v2.0 CSS Variables */
+      --bg-primary: #ffffff;
+      --bg-secondary: #f5f5f5;
+      --text-primary: #1a1a1a;
+      --text-secondary: #666666;
+      --accent: #2563eb;
+
+      /* v1.0 CSS Variables (legacy support) */
       --color-background: #ffffff;
       --color-background-soft: #f8f8f8;
       --color-background-mute: #f0f0f0;
@@ -79,8 +96,137 @@ function getThemeVariables(theme: 'light' | 'dark'): string {
       --color-warning: #eab308;
     }
     body {
-      background-color: var(--color-background);
-      color: var(--color-text);
+      background-color: var(--bg-primary);
+      color: var(--text-primary);
+    }
+  `
+}
+
+/**
+ * Default Tailwind-like styles for artifacts without explicit styling
+ * These provide sensible defaults for light/dark mode
+ */
+function getDefaultTailwindStyles(theme: 'light' | 'dark'): string {
+  const isDark = theme === 'dark'
+
+  return `
+    /* Default component styles when artifact has no explicit Tailwind classes */
+    
+    /* Body defaults */
+    body:not(:has([class*="bg-"])):not(:has([class*="min-h-"])) {
+      min-height: 100vh;
+    }
+    
+    /* Default button styles */
+    button:not([class*="bg-"]):not([class*="btn"]) {
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      background: ${isDark ? '#3b82f6' : '#2563eb'};
+      color: white;
+      border: none;
+    }
+    button:not([class*="bg-"]):not([class*="btn"]):hover {
+      background: ${isDark ? '#2563eb' : '#1d4ed8'};
+    }
+    button:not([class*="bg-"]):not([class*="btn"]):disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    
+    /* Default input styles */
+    input:not([class*="border"]):not([class*="bg-"]),
+    textarea:not([class*="border"]):not([class*="bg-"]),
+    select:not([class*="border"]):not([class*="bg-"]) {
+      padding: 8px 12px;
+      border: 1px solid ${isDark ? '#374151' : '#d1d5db'};
+      border-radius: 6px;
+      background: ${isDark ? '#1f2937' : '#ffffff'};
+      color: ${isDark ? '#f3f4f6' : '#111827'};
+      font-size: 14px;
+    }
+    input:not([class*="border"]):not([class*="bg-"]):focus,
+    textarea:not([class*="border"]):not([class*="bg-"]):focus,
+    select:not([class*="border"]):not([class*="bg-"]):focus {
+      outline: none;
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 3px ${isDark ? 'rgba(59, 130, 246, 0.3)' : 'rgba(59, 130, 246, 0.2)'};
+    }
+    
+    /* Default card styles */
+    .card:not([class*="bg-"]),
+    [class*="card"]:not([class*="bg-"]) {
+      background: ${isDark ? '#1f2937' : '#ffffff'};
+      border: 1px solid ${isDark ? '#374151' : '#e5e7eb'};
+      border-radius: 12px;
+      padding: 16px;
+      box-shadow: ${isDark ? '0 4px 6px -1px rgba(0, 0, 0, 0.3)' : '0 4px 6px -1px rgba(0, 0, 0, 0.1)'};
+    }
+    
+    /* Default heading styles */
+    h1:not([class*="text-"]) {
+      font-size: 2rem;
+      font-weight: 700;
+      line-height: 1.2;
+      margin-bottom: 1rem;
+      color: ${isDark ? '#f9fafb' : '#111827'};
+    }
+    h2:not([class*="text-"]) {
+      font-size: 1.5rem;
+      font-weight: 600;
+      line-height: 1.3;
+      margin-bottom: 0.75rem;
+      color: ${isDark ? '#f3f4f6' : '#1f2937'};
+    }
+    h3:not([class*="text-"]) {
+      font-size: 1.25rem;
+      font-weight: 600;
+      line-height: 1.4;
+      margin-bottom: 0.5rem;
+      color: ${isDark ? '#e5e7eb' : '#374151'};
+    }
+    
+    /* Default paragraph/text */
+    p:not([class*="text-"]) {
+      color: ${isDark ? '#d1d5db' : '#4b5563'};
+      line-height: 1.6;
+    }
+    
+    /* Default list styles */
+    ul:not([class*="list-"]),
+    ol:not([class*="list-"]) {
+      padding-left: 1.5rem;
+      color: ${isDark ? '#d1d5db' : '#4b5563'};
+    }
+    
+    /* Default link styles */
+    a:not([class*="text-"]):not([class*="no-underline"]) {
+      color: #3b82f6;
+      text-decoration: none;
+    }
+    a:not([class*="text-"]):not([class*="no-underline"]):hover {
+      text-decoration: underline;
+    }
+    
+    /* Default table styles */
+    table:not([class*="border"]) {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    table:not([class*="border"]) th,
+    table:not([class*="border"]) td {
+      padding: 12px;
+      border: 1px solid ${isDark ? '#374151' : '#e5e7eb'};
+      text-align: left;
+    }
+    table:not([class*="border"]) th {
+      background: ${isDark ? '#1f2937' : '#f9fafb'};
+      font-weight: 600;
+    }
+    table:not([class*="border"]) tr:nth-child(even) {
+      background: ${isDark ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.02)'};
     }
   `
 }
@@ -144,6 +290,7 @@ function getBaseStyles(): string {
 
 /**
  * Communication bridge script for iframe-parent messaging
+ * Implements v2.0 API: emit, onMessage, setState, getState
  */
 function getBridgeScript(artifactId: string, htmxServerPort?: number): string {
   return `
@@ -151,7 +298,10 @@ function getBridgeScript(artifactId: string, htmxServerPort?: number): string {
       window.artifactBridge = {
         artifactId: '${artifactId}',
         htmxServerPort: ${htmxServerPort || 'null'},
+        _state: {},
+        _messageCallbacks: [],
 
+        // v1.0 API: send (internal use)
         send: function(type, payload) {
           window.parent.postMessage({
             type: type,
@@ -161,17 +311,49 @@ function getBridgeScript(artifactId: string, htmxServerPort?: number): string {
           }, '*');
         },
 
+        // v2.0 API: emit - Emit custom events to parent
+        emit: function(event, data) {
+          window.parent.postMessage({
+            type: event,
+            data: data,
+            artifactId: this.artifactId,
+            timestamp: Date.now()
+          }, '*');
+        },
+
+        // v2.0 API: onMessage - Listen for commands from parent
+        onMessage: function(callback) {
+          this._messageCallbacks.push(callback);
+        },
+
+        // v2.0 API: setState - State management (persisted)
+        setState: function(state) {
+          this._state = { ...this._state, ...state };
+          this.emit('state-change', this._state);
+        },
+
+        // v2.0 API: getState - Retrieve current state
+        getState: function() {
+          return this._state || {};
+        },
+
+        // v1.0 API: ready
         ready: function() {
           this.send('ready');
+          this.emit('ready', { artifactId: this.artifactId });
         },
 
+        // v1.0 API: error
         error: function(error) {
-          this.send('error', {
+          var errorData = {
             message: error.message || String(error),
             stack: error.stack
-          });
+          };
+          this.send('error', errorData);
+          this.emit('error', errorData);
         },
 
+        // v1.0 API: resize
         resize: function() {
           this.send('resize', {
             width: document.body.scrollWidth,
@@ -179,6 +361,7 @@ function getBridgeScript(artifactId: string, htmxServerPort?: number): string {
           });
         },
 
+        // v1.0 API: log
         log: function(level, ...args) {
           this.send('console', {
             level: level,
@@ -186,6 +369,17 @@ function getBridgeScript(artifactId: string, htmxServerPort?: number): string {
           });
         }
       };
+
+      // Listen for messages from parent and dispatch to callbacks
+      window.addEventListener('message', function(event) {
+        window.artifactBridge._messageCallbacks.forEach(function(callback) {
+          try {
+            callback(event.data);
+          } catch (e) {
+            console.error('Message callback error:', e);
+          }
+        });
+      });
 
       // Capture console methods
       ['log', 'warn', 'error', 'info'].forEach(function(method) {
@@ -215,11 +409,40 @@ function getBridgeScript(artifactId: string, htmxServerPort?: number): string {
         });
       };
 
+      // Setup dark mode detection for Tailwind's dark: variants
+      function setupDarkMode() {
+        var htmlEl = document.documentElement;
+        var currentClass = htmlEl.className;
+        
+        // If theme is 'auto' or not set, detect system preference
+        if (!currentClass || currentClass === 'auto') {
+          if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            htmlEl.classList.add('dark');
+            htmlEl.classList.remove('light', 'auto');
+          } else {
+            htmlEl.classList.add('light');
+            htmlEl.classList.remove('dark', 'auto');
+          }
+        }
+        
+        // Listen for system theme changes
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function(e) {
+          if (e.matches) {
+            htmlEl.classList.add('dark');
+            htmlEl.classList.remove('light');
+          } else {
+            htmlEl.classList.add('light');
+            htmlEl.classList.remove('dark');
+          }
+        });
+      }
+
       // Setup resize observer
       var resizeObserver = new ResizeObserver(function() {
         window.artifactBridge.resize();
       });
       document.addEventListener('DOMContentLoaded', function() {
+        setupDarkMode();
         resizeObserver.observe(document.body);
         window.artifactBridge.ready();
       });
@@ -287,7 +510,9 @@ function buildHtmlDocument(
   artifactId: string,
   isHtmx: boolean
 ): string {
-  const theme = options.theme === 'auto' ? 'light' : options.theme
+  // Keep 'auto' for HTML class - script will detect system preference
+  const theme = options.theme
+  const cssTheme = options.theme === 'auto' ? 'light' : options.theme // CSS vars default to light
   const scripts: string[] = []
   const headContent: string[] = []
 
@@ -312,7 +537,7 @@ function buildHtmlDocument(
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <style>${getThemeVariables(theme)}${getBaseStyles()}</style>
+  <style>${getThemeVariables(cssTheme)}${getBaseStyles()}${getDefaultTailwindStyles(cssTheme)}</style>
   ${headContent.join('\n')}
   ${scripts.join('\n')}
   <script>${getBridgeScript(artifactId, options.htmxServerPort)}</script>
@@ -332,18 +557,22 @@ function buildReactDocument(
   options: RenderOptions,
   artifactId: string
 ): string {
-  const theme = options.theme === 'auto' ? 'light' : options.theme
+  // Keep 'auto' for HTML class - script will detect system preference
+  const theme = options.theme
+  const cssTheme = options.theme === 'auto' ? 'light' : options.theme // CSS vars default to light
 
-  // Check if content includes imports or is a component definition
+  // Check if content defines its own App component or uses imports/exports
+  // Per v2.0 spec, AI should provide `function App() {...}` directly
+  const hasAppComponent = /function\s+App\s*\(/.test(content) || /const\s+App\s*=/.test(content)
   const isModule = content.includes('import ') || content.includes('export ')
-  const componentCode = isModule ? content : `function App() {\n  return (\n${content}\n  );\n}`
+  const componentCode = hasAppComponent || isModule ? content : `function App() {\n  return (\n${content}\n  );\n}`
 
   return `<!DOCTYPE html>
 <html lang="en" class="${theme}">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <style>${getThemeVariables(theme)}${getBaseStyles()}</style>
+  <style>${getThemeVariables(cssTheme)}${getBaseStyles()}${getDefaultTailwindStyles(cssTheme)}</style>
   ${metadata.tailwind ? `<script src="${CDN_URLS.tailwind}"></script>` : ''}
   ${metadata.customStyles ? `<style>${metadata.customStyles}</style>` : ''}
   <script src="${CDN_URLS.react}"></script>
@@ -373,7 +602,9 @@ function buildSvgDocument(
   options: RenderOptions,
   artifactId: string
 ): string {
-  const theme = options.theme === 'auto' ? 'light' : options.theme
+  // Keep 'auto' for HTML class - script will detect system preference
+  const theme = options.theme
+  const cssTheme = options.theme === 'auto' ? 'light' : options.theme // CSS vars default to light
 
   // Ensure SVG has proper attributes for scaling
   let svgContent = content.trim()
@@ -387,7 +618,7 @@ function buildSvgDocument(
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
-    ${getThemeVariables(theme)}
+    ${getThemeVariables(cssTheme)}
     ${getBaseStyles()}
     body {
       display: flex;
@@ -418,8 +649,10 @@ function buildMermaidDocument(
   options: RenderOptions,
   artifactId: string
 ): string {
-  const theme = options.theme === 'auto' ? 'light' : options.theme
-  const mermaidTheme = theme === 'dark' ? 'dark' : 'default'
+  // Keep 'auto' for HTML class - script will detect system preference
+  const theme = options.theme
+  const cssTheme = options.theme === 'auto' ? 'light' : options.theme // CSS vars default to light
+  const mermaidTheme = cssTheme === 'dark' ? 'dark' : 'default'
 
   return `<!DOCTYPE html>
 <html lang="en" class="${theme}">
@@ -427,7 +660,7 @@ function buildMermaidDocument(
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
-    ${getThemeVariables(theme)}
+    ${getThemeVariables(cssTheme)}
     ${getBaseStyles()}
     body {
       display: flex;
@@ -442,9 +675,9 @@ function buildMermaidDocument(
   <script>${getBridgeScript(artifactId)}</script>
 </head>
 <body>
-  <pre class="mermaid">
+  <div class="mermaid">
 ${content}
-  </pre>
+  </div>
   <script type="module">
     import mermaid from '${CDN_URLS.mermaid}';
     mermaid.initialize({
@@ -466,7 +699,9 @@ function buildMarkdownDocument(
   options: RenderOptions,
   artifactId: string
 ): string {
-  const theme = options.theme === 'auto' ? 'light' : options.theme
+  // Keep 'auto' for HTML class - script will detect system preference
+  const theme = options.theme
+  const cssTheme = options.theme === 'auto' ? 'light' : options.theme // CSS vars default to light
 
   // Escape content for JavaScript string
   const escapedContent = content.replace(/\\/g, '\\\\').replace(/`/g, '\\`').replace(/\$/g, '\\$')
@@ -477,7 +712,7 @@ function buildMarkdownDocument(
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
-    ${getThemeVariables(theme)}
+    ${getThemeVariables(cssTheme)}
     ${getBaseStyles()}
     .markdown-body {
       max-width: 100%;
@@ -511,7 +746,7 @@ function buildMarkdownDocument(
     }
   </style>
   ${metadata.customStyles ? `<style>${metadata.customStyles}</style>` : ''}
-  <link rel="stylesheet" href="${theme === 'dark' ? CDN_URLS.highlightCssDark : CDN_URLS.highlightCss}">
+  <link rel="stylesheet" href="${cssTheme === 'dark' ? CDN_URLS.highlightCssDark : CDN_URLS.highlightCss}">
   <script src="${CDN_URLS.marked}"></script>
   <script src="${CDN_URLS.highlightJs}"></script>
   <script>${getBridgeScript(artifactId)}</script>
@@ -544,7 +779,9 @@ function buildCodeDocument(
   options: RenderOptions,
   artifactId: string
 ): string {
-  const theme = options.theme === 'auto' ? 'light' : options.theme
+  // Keep 'auto' for HTML class - script will detect system preference
+  const theme = options.theme
+  const cssTheme = options.theme === 'auto' ? 'light' : options.theme // CSS vars default to light
   const language = metadata.language || 'plaintext'
 
   // Escape content for HTML
@@ -556,7 +793,7 @@ function buildCodeDocument(
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
-    ${getThemeVariables(theme)}
+    ${getThemeVariables(cssTheme)}
     ${getBaseStyles()}
     pre {
       margin: 0;
@@ -569,7 +806,7 @@ function buildCodeDocument(
     }
   </style>
   ${metadata.customStyles ? `<style>${metadata.customStyles}</style>` : ''}
-  <link rel="stylesheet" href="${theme === 'dark' ? CDN_URLS.highlightCssDark : CDN_URLS.highlightCss}">
+  <link rel="stylesheet" href="${cssTheme === 'dark' ? CDN_URLS.highlightCssDark : CDN_URLS.highlightCss}">
   <script src="${CDN_URLS.highlightJs}"></script>
   <script>${getBridgeScript(artifactId)}</script>
 </head>
@@ -630,7 +867,7 @@ export function buildPreviewDocument(content: string, type: ArtifactType, theme:
       tailwind: true,
       theme: theme
     },
-    status: 'complete' as ArtifactStatus
+    status: ArtifactStatus.COMPLETE
   }
 
   return buildDocument(artifact, {

@@ -123,7 +123,8 @@ const SidebarIconsManager: FC<SidebarIconsManagerProps> = ({
         knowledge: <FileSearch size={16} />,
         files: <Folder size={16} />,
         notes: <NotepadText size={16} />,
-        code_tools: <Code size={16} />
+        code_tools: <Code size={16} />,
+        artifacts: <Sparkle size={16} />
       }) satisfies Record<SidebarIcon, ReactNode>,
     []
   )

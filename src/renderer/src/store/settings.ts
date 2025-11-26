@@ -228,6 +228,13 @@ export interface SettingsState {
    * If not set, uses the quick model setting.
    */
   contextSummarizationModelId: string | null
+  // Artifact settings
+  artifacts: {
+    enabled: boolean
+    autoOpen: boolean
+    enabledTypes: string[]
+    storageLimit: number
+  }
 }
 
 export type MultiModelMessageStyle = 'horizontal' | 'vertical' | 'fold' | 'grid'
@@ -426,7 +433,13 @@ export const initialState: SettingsState = {
   showMessageOutline: false,
   // Context Management
   contextStrategy: DEFAULT_CONTEXT_STRATEGY_CONFIG,
-  contextSummarizationModelId: null
+  contextSummarizationModelId: null,
+  artifacts: {
+    enabled: true,
+    autoOpen: false,
+    enabledTypes: ['htmx', 'html', 'react', 'svg', 'mermaid', 'markdown', 'code'],
+    storageLimit: 100
+  }
 }
 
 const settingsSlice = createSlice({
@@ -874,6 +887,19 @@ const settingsSlice = createSlice({
     },
     setContextSummarizationModelId: (state, action: PayloadAction<string | null>) => {
       state.contextSummarizationModelId = action.payload
+    },
+    // Artifact settings
+    setArtifactEnabled: (state, action: PayloadAction<boolean>) => {
+      state.artifacts.enabled = action.payload
+    },
+    setArtifactAutoOpen: (state, action: PayloadAction<boolean>) => {
+      state.artifacts.autoOpen = action.payload
+    },
+    setArtifactTypes: (state, action: PayloadAction<string[]>) => {
+      state.artifacts.enabledTypes = action.payload
+    },
+    setArtifactStorageLimit: (state, action: PayloadAction<number>) => {
+      state.artifacts.storageLimit = action.payload
     }
   }
 })
@@ -1009,7 +1035,14 @@ export const {
   // Context Management actions
   setContextStrategy,
   setContextStrategyPartial,
-  setContextSummarizationModelId
+  setContextSummarizationModelId,
+  setArtifactEnabled,
+  setArtifactAutoOpen,
+  setArtifactTypes,
+  setArtifactStorageLimit
 } = settingsSlice.actions
 
 export default settingsSlice.reducer
+
+// Selectors
+export const selectArtifactSettings = (state: { settings: SettingsState }) => state.settings.artifacts

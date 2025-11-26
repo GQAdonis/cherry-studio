@@ -590,6 +590,7 @@ export type SidebarIcon =
   | 'files'
   | 'code_tools'
   | 'notes'
+  | 'artifacts'
 
 export type ExternalToolResult = {
   mcpTools?: MCPTool[]

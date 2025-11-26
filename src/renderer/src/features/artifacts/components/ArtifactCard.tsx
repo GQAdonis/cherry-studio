@@ -1,27 +1,27 @@
 /**
  * Artifact Card Component
  *
- * Displays a compact card for artifacts in chat messages with:
- * - Type icon and title
- * - Version badge
- * - Thumbnail preview (optional)
- * - Quick actions (Open, Copy, Save)
+ * Displays a compact clickable panel for artifacts in chat messages.
+ * Styled similar to tool call blocks with rounded corners.
+ * Clicking navigates to the artifact mini-app page.
  */
 
 import {
   CodeOutlined,
   CopyOutlined,
-  ExpandOutlined,
   FileImageOutlined,
   FileTextOutlined,
-  Html5Outlined
+  Html5Outlined,
+  RightOutlined
 } from '@ant-design/icons'
-import { useAppDispatch } from '@renderer/store'
-import { openArtifact } from '@renderer/store/artifacts'
+import { TopicManager } from '@renderer/hooks/useTopic'
+import type { Message } from '@renderer/types/newMessage'
 import { message, Tooltip } from 'antd'
+import { Sparkles } from 'lucide-react'
 import type { FC } from 'react'
 import { memo, useCallback, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useNavigate } from 'react-router-dom'
 import styled from 'styled-components'
 
 import type { ArtifactType, ParsedArtifact } from '../types'
@@ -33,8 +33,6 @@ interface ArtifactCardProps {
   conversationId: string
   /** Message ID for context */
   messageId: string
-  /** Whether to show the thumbnail preview */
-  showPreview?: boolean
   /** Custom class name */
   className?: string
 }
@@ -105,141 +103,180 @@ function getArtifactTypeLabel(type: ArtifactType): string {
     case 'code':
       return 'Code'
     default:
-      return 'Unknown'
+      return 'Artifact'
   }
 }
 
 /**
- * Artifact Card Component
+ * Artifact Card Component - Compact clickable panel
  */
-const ArtifactCard: FC<ArtifactCardProps> = ({
-  artifact,
-  conversationId,
-  messageId,
-  showPreview = false,
-  className
-}) => {
+const ArtifactCard: FC<ArtifactCardProps> = ({ artifact, conversationId, messageId, className }) => {
   const { t } = useTranslation()
-  const dispatch = useAppDispatch()
+  const navigate = useNavigate()
 
   const typeColor = useMemo(() => getArtifactColor(artifact.type), [artifact.type])
   const typeLabel = useMemo(() => getArtifactTypeLabel(artifact.type), [artifact.type])
   const typeIcon = useMemo(() => getArtifactIcon(artifact.type), [artifact.type])
 
-  // Handle opening the artifact in modal
-  const handleOpen = useCallback(() => {
-    dispatch(
-      openArtifact({
-        parsedArtifact: artifact,
-        conversationId,
-        messageId
-      })
-    )
-  }, [dispatch, artifact, conversationId, messageId])
+  // Generate artifact ID from identifier or create one
+  const artifactId = useMemo(() => {
+    return encodeURIComponent(artifact.identifier)
+  }, [artifact.identifier])
+
+  // Handle opening the artifact in the mini-app page
+  const handleOpen = useCallback(async () => {
+    // Fetch context messages from the conversation for refinement context
+    let contextMessages: Message[] = []
+    try {
+      if (conversationId && !conversationId.startsWith('inline-')) {
+        // Fetch the last 5 messages from the conversation for context
+        const messages = await TopicManager.getTopicMessages(conversationId)
+        // Take the last 5 messages for context
+        contextMessages = messages.slice(-5)
+      }
+    } catch (error) {
+      console.warn('Failed to fetch context messages:', error)
+    }
+
+    // Store artifact data in sessionStorage for the artifact page to retrieve
+    const artifactData = {
+      artifact,
+      conversationId,
+      messageId,
+      contextMessages
+    }
+    sessionStorage.setItem(`artifact:${artifactId}`, JSON.stringify(artifactData))
+
+    // Navigate to artifact page
+    navigate(`/artifacts/${artifactId}`)
+  }, [navigate, artifactId, artifact, conversationId, messageId])
 
   // Handle copying artifact content
-  const handleCopy = useCallback(async () => {
-    try {
-      await navigator.clipboard.writeText(artifact.content)
-      message.success(t('common.copied'))
-    } catch (err) {
-      message.error(t('common.copy_failed'))
-    }
-  }, [artifact.content, t])
-
-  // Truncate content for preview
-  const previewContent = useMemo(() => {
-    const maxLength = 200
-    if (artifact.content.length <= maxLength) {
-      return artifact.content
-    }
-    return artifact.content.slice(0, maxLength) + '...'
-  }, [artifact.content])
+  const handleCopy = useCallback(
+    async (e: React.MouseEvent) => {
+      e.stopPropagation()
+      try {
+        await navigator.clipboard.writeText(artifact.content)
+        message.success(t('common.copied'))
+      } catch (_err) {
+        message.error(t('common.copy_failed'))
+      }
+    },
+    [artifact.content, t]
+  )
 
   return (
-    <Card className={className} $typeColor={typeColor} onClick={handleOpen}>
-      <CardHeader>
-        <TypeBadge $color={typeColor}>
-          {typeIcon}
-          <span>{typeLabel}</span>
-        </TypeBadge>
-        <CardTitle>{artifact.title}</CardTitle>
-      </CardHeader>
+    <CardContainer className={className} $typeColor={typeColor} onClick={handleOpen}>
+      <CardContent>
+        <IconWrapper $color={typeColor}>
+          <Sparkles size={16} />
+        </IconWrapper>
 
-      {showPreview && (
-        <PreviewArea>
-          <PreviewContent>{previewContent}</PreviewContent>
-        </PreviewArea>
-      )}
+        <TextContent>
+          <TitleRow>
+            <TypeBadge $color={typeColor}>
+              {typeIcon}
+              <span>{typeLabel}</span>
+            </TypeBadge>
+            <Title>{artifact.title}</Title>
+          </TitleRow>
+          <Subtitle>{t('artifacts.click_to_open', 'Click to open artifact')}</Subtitle>
+        </TextContent>
 
-      <CardFooter>
-        <IdentifierText>
-          <code>{artifact.identifier}</code>
-        </IdentifierText>
-
-        <ActionButtons onClick={(e) => e.stopPropagation()}>
+        <ActionArea onClick={(e) => e.stopPropagation()}>
           <Tooltip title={t('common.copy')}>
             <ActionButton onClick={handleCopy}>
               <CopyOutlined />
             </ActionButton>
           </Tooltip>
-          <Tooltip title={t('common.open')}>
-            <ActionButton onClick={handleOpen}>
-              <ExpandOutlined />
-            </ActionButton>
-          </Tooltip>
-        </ActionButtons>
-      </CardFooter>
-    </Card>
+        </ActionArea>
+
+        <ArrowIcon>
+          <RightOutlined />
+        </ArrowIcon>
+      </CardContent>
+    </CardContainer>
   )
 }
 
 // Styled components
-const Card = styled.div<{ $typeColor: string }>`
+const CardContainer = styled.div<{ $typeColor: string }>`
   display: flex;
-  flex-direction: column;
-  padding: 12px;
+  align-items: center;
   margin: 8px 0;
+  padding: 12px 16px;
   background: var(--color-background-soft);
   border: 1px solid var(--color-border);
-  border-left: 3px solid ${(props) => props.$typeColor};
-  border-radius: 8px;
+  border-radius: 12px;
   cursor: pointer;
   transition: all 0.2s ease;
-  max-width: 400px;
+  max-width: 500px;
 
   &:hover {
     background: var(--color-background-mute);
-    border-color: ${(props) => props.$typeColor};
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    border-color: ${(props) => props.$typeColor}50;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+    transform: translateY(-1px);
+  }
+
+  &:active {
+    transform: translateY(0);
   }
 `
 
-const CardHeader = styled.div`
+const CardContent = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+`
+
+const IconWrapper = styled.div<{ $color: string }>`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  background: ${(props) => props.$color}15;
+  border-radius: 10px;
+  color: ${(props) => props.$color};
+  flex-shrink: 0;
+`
+
+const TextContent = styled.div`
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+`
+
+const TitleRow = styled.div`
   display: flex;
   align-items: center;
   gap: 8px;
-  margin-bottom: 8px;
 `
 
 const TypeBadge = styled.div<{ $color: string }>`
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  padding: 2px 8px;
-  font-size: 11px;
-  font-weight: 500;
+  padding: 2px 6px;
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
   color: ${(props) => props.$color};
   background: ${(props) => props.$color}15;
   border-radius: 4px;
+  flex-shrink: 0;
 
   .anticon {
-    font-size: 12px;
+    font-size: 10px;
   }
 `
 
-const CardTitle = styled.div`
-  flex: 1;
+const Title = styled.div`
   font-size: 14px;
   font-weight: 500;
   color: var(--color-text);
@@ -248,46 +285,15 @@ const CardTitle = styled.div`
   white-space: nowrap;
 `
 
-const PreviewArea = styled.div`
-  margin-bottom: 8px;
-  padding: 8px;
-  background: var(--color-background);
-  border-radius: 4px;
-  overflow: hidden;
+const Subtitle = styled.div`
+  font-size: 12px;
+  color: var(--color-text-3);
 `
 
-const PreviewContent = styled.pre`
-  margin: 0;
-  font-size: 11px;
-  font-family: 'SF Mono', 'Fira Code', monospace;
-  color: var(--color-text-soft);
-  white-space: pre-wrap;
-  word-break: break-all;
-  max-height: 100px;
-  overflow: hidden;
-`
-
-const CardFooter = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-`
-
-const IdentifierText = styled.div`
-  font-size: 11px;
-  color: var(--color-text-muted);
-
-  code {
-    padding: 2px 4px;
-    background: var(--color-background);
-    border-radius: 3px;
-    font-family: 'SF Mono', 'Fira Code', monospace;
-  }
-`
-
-const ActionButtons = styled.div`
+const ActionArea = styled.div`
   display: flex;
   gap: 4px;
+  flex-shrink: 0;
 `
 
 const ActionButton = styled.button`
@@ -299,8 +305,8 @@ const ActionButton = styled.button`
   padding: 0;
   border: none;
   background: transparent;
-  color: var(--color-text-soft);
-  border-radius: 4px;
+  color: var(--color-text-3);
+  border-radius: 6px;
   cursor: pointer;
   transition: all 0.2s;
 
@@ -311,6 +317,18 @@ const ActionButton = styled.button`
 
   .anticon {
     font-size: 14px;
+  }
+`
+
+const ArrowIcon = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text-3);
+  flex-shrink: 0;
+
+  .anticon {
+    font-size: 12px;
   }
 `
 
