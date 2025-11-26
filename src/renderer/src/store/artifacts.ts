@@ -1,0 +1,497 @@
+/**
+ * Artifacts Redux Slice
+ *
+ * Manages state for the artifact viewer system including:
+ * - Modal open/close state
+ * - Active artifact and view mode
+ * - Refinement chat messages
+ * - Version history and undo/redo
+ */
+
+import type { PayloadAction } from '@reduxjs/toolkit'
+import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
+import { nanoid } from '@reduxjs/toolkit'
+import {
+  createArtifact as createArtifactRecord,
+  createArtifactVersion,
+  deleteArtifact as deleteArtifactFromDb,
+  getArtifact as getArtifactFromDb,
+  getArtifactVersions,
+  getSavedArtifacts as getSavedArtifactsFromDb,
+  saveArtifact as saveArtifactToDb,
+  saveArtifactVersion,
+  updateArtifact as updateArtifactInDb
+} from '@renderer/features/artifacts/db/artifactDb'
+import type {
+  Artifact,
+  ArtifactError,
+  ArtifactMetadata,
+  ArtifactsState,
+  ArtifactStatus,
+  ParsedArtifact,
+  RefinementMessage,
+  ViewMode
+} from '@renderer/features/artifacts/types'
+import { DEFAULT_ARTIFACT_METADATA } from '@renderer/features/artifacts/types'
+
+/**
+ * Initial state
+ */
+const initialState: ArtifactsState = {
+  isModalOpen: false,
+  activeArtifact: null,
+  viewMode: 'preview',
+  savedArtifacts: [],
+  refinementMessages: [],
+  isRefining: false,
+  versionHistory: [],
+  currentVersionIndex: -1,
+  isLoading: false,
+  error: null,
+  htmxServerPort: null
+}
+
+/**
+ * Async thunk: Load saved artifacts from database
+ */
+export const loadSavedArtifacts = createAsyncThunk('artifacts/loadSavedArtifacts', async () => {
+  return await getSavedArtifactsFromDb()
+})
+
+/**
+ * Async thunk: Save artifact to database
+ */
+export const saveArtifactToLibrary = createAsyncThunk(
+  'artifacts/saveToLibrary',
+  async (artifact: Artifact, { rejectWithValue }) => {
+    try {
+      const savedArtifact = { ...artifact, saved: true, updatedAt: new Date().toISOString() }
+      await saveArtifactToDb(savedArtifact)
+      return savedArtifact
+    } catch (error) {
+      return rejectWithValue({ message: (error as Error).message })
+    }
+  }
+)
+
+/**
+ * Async thunk: Delete artifact from database
+ */
+export const deleteArtifactFromLibrary = createAsyncThunk(
+  'artifacts/deleteFromLibrary',
+  async (artifactId: string, { rejectWithValue }) => {
+    try {
+      await deleteArtifactFromDb(artifactId)
+      return artifactId
+    } catch (error) {
+      return rejectWithValue({ message: (error as Error).message })
+    }
+  }
+)
+
+/**
+ * Async thunk: Load artifact by ID
+ */
+export const loadArtifact = createAsyncThunk(
+  'artifacts/loadArtifact',
+  async (artifactId: string, { rejectWithValue }) => {
+    try {
+      const artifact = await getArtifactFromDb(artifactId)
+      if (!artifact) {
+        return rejectWithValue({ message: 'Artifact not found' })
+      }
+      const versions = await getArtifactVersions(artifactId)
+      return { artifact, versions }
+    } catch (error) {
+      return rejectWithValue({ message: (error as Error).message })
+    }
+  }
+)
+
+/**
+ * Async thunk: Save current version and create new version
+ */
+export const saveVersion = createAsyncThunk(
+  'artifacts/saveVersion',
+  async (
+    {
+      artifact,
+      newContent,
+      refinementPrompt
+    }: {
+      artifact: Artifact
+      newContent: string
+      refinementPrompt?: string
+    },
+    { rejectWithValue }
+  ) => {
+    try {
+      // Save current content as a version
+      const version = createArtifactVersion({
+        artifactId: artifact.id,
+        version: artifact.version,
+        content: artifact.content,
+        refinementPrompt,
+        metadata: artifact.metadata
+      })
+      await saveArtifactVersion(version)
+
+      // Update artifact with new content
+      const updatedArtifact: Artifact = {
+        ...artifact,
+        content: newContent,
+        version: artifact.version + 1,
+        updatedAt: new Date().toISOString()
+      }
+      await updateArtifactInDb(artifact.id, {
+        content: newContent,
+        version: artifact.version + 1
+      })
+
+      return { artifact: updatedArtifact, version }
+    } catch (error) {
+      return rejectWithValue({ message: (error as Error).message })
+    }
+  }
+)
+
+/**
+ * Artifacts slice
+ */
+const artifactsSlice = createSlice({
+  name: 'artifacts',
+  initialState,
+  reducers: {
+    /**
+     * Open the artifact modal with an artifact
+     */
+    openArtifact: (
+      state,
+      action: PayloadAction<{
+        parsedArtifact: ParsedArtifact
+        conversationId: string
+        messageId: string
+      }>
+    ) => {
+      const { parsedArtifact, conversationId, messageId } = action.payload
+
+      // Create artifact from parsed data
+      const artifact = createArtifactRecord({
+        identifier: parsedArtifact.identifier,
+        type: parsedArtifact.type,
+        title: parsedArtifact.title,
+        content: parsedArtifact.content,
+        conversationId,
+        messageId,
+        metadata: {
+          ...DEFAULT_ARTIFACT_METADATA,
+          tailwind: parsedArtifact.attributes.tailwind !== 'false',
+          theme: (['light', 'dark', 'auto'].includes(parsedArtifact.attributes.theme)
+            ? parsedArtifact.attributes.theme
+            : 'auto') as 'light' | 'dark' | 'auto',
+          language: parsedArtifact.attributes.language
+        }
+      })
+
+      state.isModalOpen = true
+      state.activeArtifact = artifact
+      state.viewMode = 'preview'
+      state.refinementMessages = []
+      state.versionHistory = []
+      state.currentVersionIndex = -1
+      state.error = null
+    },
+
+    /**
+     * Open modal with existing artifact
+     */
+    openExistingArtifact: (state, action: PayloadAction<Artifact>) => {
+      state.isModalOpen = true
+      state.activeArtifact = action.payload
+      state.viewMode = 'preview'
+      state.refinementMessages = []
+      state.error = null
+    },
+
+    /**
+     * Close the artifact modal
+     */
+    closeModal: (state) => {
+      state.isModalOpen = false
+      state.activeArtifact = null
+      state.refinementMessages = []
+      state.isRefining = false
+      state.versionHistory = []
+      state.currentVersionIndex = -1
+      state.error = null
+    },
+
+    /**
+     * Set the view mode
+     */
+    setViewMode: (state, action: PayloadAction<ViewMode>) => {
+      state.viewMode = action.payload
+    },
+
+    /**
+     * Update artifact content directly
+     */
+    updateContent: (state, action: PayloadAction<string>) => {
+      if (state.activeArtifact) {
+        state.activeArtifact.content = action.payload
+        state.activeArtifact.updatedAt = new Date().toISOString()
+      }
+    },
+
+    /**
+     * Update artifact metadata
+     */
+    updateMetadata: (state, action: PayloadAction<Partial<ArtifactMetadata>>) => {
+      if (state.activeArtifact) {
+        state.activeArtifact.metadata = {
+          ...state.activeArtifact.metadata,
+          ...action.payload
+        }
+        state.activeArtifact.updatedAt = new Date().toISOString()
+      }
+    },
+
+    /**
+     * Update artifact title
+     */
+    updateTitle: (state, action: PayloadAction<string>) => {
+      if (state.activeArtifact) {
+        state.activeArtifact.title = action.payload
+        state.activeArtifact.updatedAt = new Date().toISOString()
+      }
+    },
+
+    /**
+     * Update artifact tags
+     */
+    updateTags: (state, action: PayloadAction<string[]>) => {
+      if (state.activeArtifact) {
+        state.activeArtifact.tags = action.payload
+        state.activeArtifact.updatedAt = new Date().toISOString()
+      }
+    },
+
+    /**
+     * Add a refinement message
+     */
+    addRefinementMessage: (state, action: PayloadAction<Omit<RefinementMessage, 'id' | 'timestamp'>>) => {
+      state.refinementMessages.push({
+        ...action.payload,
+        id: nanoid(),
+        timestamp: new Date().toISOString()
+      })
+    },
+
+    /**
+     * Update a streaming refinement message
+     */
+    updateRefinementMessage: (state, action: PayloadAction<{ id: string; content: string; isStreaming?: boolean }>) => {
+      const message = state.refinementMessages.find((m) => m.id === action.payload.id)
+      if (message) {
+        message.content = action.payload.content
+        if (action.payload.isStreaming !== undefined) {
+          message.isStreaming = action.payload.isStreaming
+        }
+      }
+    },
+
+    /**
+     * Clear refinement messages
+     */
+    clearRefinementMessages: (state) => {
+      state.refinementMessages = []
+    },
+
+    /**
+     * Set refining state
+     */
+    setIsRefining: (state, action: PayloadAction<boolean>) => {
+      state.isRefining = action.payload
+    },
+
+    /**
+     * Undo to previous version
+     */
+    undo: (state) => {
+      if (state.currentVersionIndex > 0 && state.activeArtifact) {
+        state.currentVersionIndex -= 1
+        const version = state.versionHistory[state.currentVersionIndex]
+        if (version) {
+          state.activeArtifact.content = version.content
+          if (version.metadata) {
+            state.activeArtifact.metadata = {
+              ...state.activeArtifact.metadata,
+              ...version.metadata
+            }
+          }
+        }
+      }
+    },
+
+    /**
+     * Redo to next version
+     */
+    redo: (state) => {
+      if (state.currentVersionIndex < state.versionHistory.length - 1 && state.activeArtifact) {
+        state.currentVersionIndex += 1
+        const version = state.versionHistory[state.currentVersionIndex]
+        if (version) {
+          state.activeArtifact.content = version.content
+          if (version.metadata) {
+            state.activeArtifact.metadata = {
+              ...state.activeArtifact.metadata,
+              ...version.metadata
+            }
+          }
+        }
+      }
+    },
+
+    /**
+     * Set error state
+     */
+    setError: (state, action: PayloadAction<ArtifactError | null>) => {
+      state.error = action.payload
+    },
+
+    /**
+     * Set HTMX server port
+     */
+    setHtmxServerPort: (state, action: PayloadAction<number | null>) => {
+      state.htmxServerPort = action.payload
+    },
+
+    /**
+     * Set loading state
+     */
+    setIsLoading: (state, action: PayloadAction<boolean>) => {
+      state.isLoading = action.payload
+    },
+
+    /**
+     * Update artifact status
+     */
+    setArtifactStatus: (state, action: PayloadAction<ArtifactStatus>) => {
+      if (state.activeArtifact) {
+        state.activeArtifact.status = action.payload
+      }
+    }
+  },
+  extraReducers: (builder) => {
+    // Load saved artifacts
+    builder
+      .addCase(loadSavedArtifacts.pending, (state) => {
+        state.isLoading = true
+      })
+      .addCase(loadSavedArtifacts.fulfilled, (state, action) => {
+        state.savedArtifacts = action.payload
+        state.isLoading = false
+      })
+      .addCase(loadSavedArtifacts.rejected, (state, action) => {
+        state.isLoading = false
+        state.error = { message: action.error.message || 'Failed to load saved artifacts' }
+      })
+
+    // Save artifact to library
+    builder
+      .addCase(saveArtifactToLibrary.fulfilled, (state, action) => {
+        state.activeArtifact = action.payload
+        // Add to saved list if not already there
+        const exists = state.savedArtifacts.some((a) => a.id === action.payload.id)
+        if (!exists) {
+          state.savedArtifacts.unshift({
+            id: action.payload.id,
+            title: action.payload.title,
+            type: action.payload.type,
+            tags: action.payload.tags,
+            updatedAt: action.payload.updatedAt,
+            versionCount: action.payload.version
+          })
+        }
+      })
+      .addCase(saveArtifactToLibrary.rejected, (state, action) => {
+        state.error = action.payload as ArtifactError
+      })
+
+    // Delete artifact from library
+    builder.addCase(deleteArtifactFromLibrary.fulfilled, (state, action) => {
+      state.savedArtifacts = state.savedArtifacts.filter((a) => a.id !== action.payload)
+      if (state.activeArtifact?.id === action.payload) {
+        state.activeArtifact = null
+        state.isModalOpen = false
+      }
+    })
+
+    // Load artifact
+    builder
+      .addCase(loadArtifact.pending, (state) => {
+        state.isLoading = true
+      })
+      .addCase(loadArtifact.fulfilled, (state, action) => {
+        state.activeArtifact = action.payload.artifact
+        state.versionHistory = action.payload.versions
+        state.currentVersionIndex = action.payload.versions.length - 1
+        state.isLoading = false
+        state.isModalOpen = true
+      })
+      .addCase(loadArtifact.rejected, (state, action) => {
+        state.isLoading = false
+        state.error = action.payload as ArtifactError
+      })
+
+    // Save version
+    builder
+      .addCase(saveVersion.fulfilled, (state, action) => {
+        state.activeArtifact = action.payload.artifact
+        state.versionHistory.push(action.payload.version)
+        state.currentVersionIndex = state.versionHistory.length - 1
+      })
+      .addCase(saveVersion.rejected, (state, action) => {
+        state.error = action.payload as ArtifactError
+      })
+  }
+})
+
+export const {
+  openArtifact,
+  openExistingArtifact,
+  closeModal,
+  setViewMode,
+  updateContent,
+  updateMetadata,
+  updateTitle,
+  updateTags,
+  addRefinementMessage,
+  updateRefinementMessage,
+  clearRefinementMessages,
+  setIsRefining,
+  undo,
+  redo,
+  setError,
+  setHtmxServerPort,
+  setIsLoading,
+  setArtifactStatus
+} = artifactsSlice.actions
+
+export default artifactsSlice.reducer
+
+// Selectors
+export const selectIsModalOpen = (state: { artifacts: ArtifactsState }) => state.artifacts.isModalOpen
+export const selectActiveArtifact = (state: { artifacts: ArtifactsState }) => state.artifacts.activeArtifact
+export const selectViewMode = (state: { artifacts: ArtifactsState }) => state.artifacts.viewMode
+export const selectSavedArtifacts = (state: { artifacts: ArtifactsState }) => state.artifacts.savedArtifacts
+export const selectRefinementMessages = (state: { artifacts: ArtifactsState }) => state.artifacts.refinementMessages
+export const selectIsRefining = (state: { artifacts: ArtifactsState }) => state.artifacts.isRefining
+export const selectVersionHistory = (state: { artifacts: ArtifactsState }) => state.artifacts.versionHistory
+export const selectCurrentVersionIndex = (state: { artifacts: ArtifactsState }) => state.artifacts.currentVersionIndex
+export const selectCanUndo = (state: { artifacts: ArtifactsState }) => state.artifacts.currentVersionIndex > 0
+export const selectCanRedo = (state: { artifacts: ArtifactsState }) =>
+  state.artifacts.currentVersionIndex < state.artifacts.versionHistory.length - 1
+export const selectArtifactError = (state: { artifacts: ArtifactsState }) => state.artifacts.error
+export const selectHtmxServerPort = (state: { artifacts: ArtifactsState }) => state.artifacts.htmxServerPort
+export const selectIsLoading = (state: { artifacts: ArtifactsState }) => state.artifacts.isLoading

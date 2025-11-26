@@ -387,6 +387,29 @@
     "zoomIn": "Μεγέθυνση",
     "zoomOut": "Σμίκρυνση"
   },
+  "artifacts": {
+    "code": "[to be translated]:Code",
+    "library": "[to be translated]:Artifact Library",
+    "no_artifacts": "[to be translated]:No artifacts found",
+    "preview": "[to be translated]:Preview",
+    "refinement": "[to be translated]:Refinement Chat",
+    "refinement_empty": "[to be translated]:No messages yet",
+    "refinement_hint": "[to be translated]:Ask the AI to modify this artifact",
+    "refinement_placeholder": "[to be translated]:Describe the changes you want...",
+    "save_from_modal": "[to be translated]:Open the artifact to save it",
+    "saved": "[to be translated]:Artifact saved to library",
+    "split": "[to be translated]:Split",
+    "type": {
+      "code": "[to be translated]:Code",
+      "html": "[to be translated]:HTML",
+      "htmx": "[to be translated]:HTMX",
+      "markdown": "[to be translated]:Markdown",
+      "mermaid": "[to be translated]:Mermaid",
+      "react": "[to be translated]:React",
+      "svg": "[to be translated]:SVG"
+    },
+    "version": "[to be translated]:Version"
+  },
   "assistants": {
     "abbr": "Βοηθός",
     "clear": {

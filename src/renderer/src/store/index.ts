@@ -5,6 +5,7 @@ import { FLUSH, PAUSE, PERSIST, persistReducer, persistStore, PURGE, REGISTER, R
 import storage from 'redux-persist/lib/storage'
 
 import storeSyncService from '../services/StoreSyncService'
+import artifacts from './artifacts'
 import assistants from './assistants'
 import backup from './backup'
 import codeTools from './codeTools'
@@ -36,6 +37,7 @@ import websearch from './websearch'
 const logger = loggerService.withContext('Store')
 
 const rootReducer = combineReducers({
+  artifacts,
   assistants,
   backup,
   codeTools,
@@ -68,7 +70,7 @@ const persistedReducer = persistReducer(
     key: 'cherry-studio',
     storage,
     version: 177,
-    blacklist: ['runtime', 'messages', 'messageBlocks', 'tabs', 'toolPermissions'],
+    blacklist: ['runtime', 'messages', 'messageBlocks', 'tabs', 'toolPermissions', 'artifacts'],
     migrate
   },
   rootReducer
