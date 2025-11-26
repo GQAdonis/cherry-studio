@@ -3,12 +3,23 @@
  *
  * These types define the structure for AI-generated interactive content
  * that can be rendered, refined, and saved within Cherry Studio.
+ *
+ * Aligned with Prometheus Artifact Specification (PAS) 4.1
  */
 
+import type { JSONSchema7 } from 'json-schema'
+
+import type { KnowledgeReference, MCPToolResponse, NormalToolResponse, WebSearchResponse } from '@renderer/types'
+
 /**
- * Supported artifact types for rendering
+ * Supported artifact types for rendering (simple artifacts)
  */
 export type ArtifactType = 'html' | 'htmx' | 'react' | 'svg' | 'mermaid' | 'markdown' | 'code'
+
+/**
+ * PAS 4.1 Artifact kinds for rich application artifacts
+ */
+export type ArtifactKind = 'application' | 'page' | 'fragment' | 'agent' | 'workflow' | 'component' | 'markdown'
 
 /**
  * View modes for the artifact workspace
@@ -28,6 +39,26 @@ export enum ArtifactStatus {
   STREAMING = 'streaming',
   COMPLETE = 'complete',
   ERROR = 'error'
+}
+
+/**
+ * PAS 4.1 Schema ports for data flow
+ */
+export interface ArtifactSchema {
+  /** Input schema for artifact */
+  inputs?: JSONSchema7
+  /** Output schema for artifact */
+  outputs?: JSONSchema7
+}
+
+/**
+ * PAS 4.1 Reference to another artifact
+ */
+export interface ArtifactReference {
+  /** Referenced artifact ID */
+  id: string
+  /** Kind of referenced artifact */
+  kind: ArtifactKind
 }
 
 /**
@@ -54,6 +85,10 @@ export interface ArtifactMetadata {
   width?: number
   /** Height constraint for rendering */
   height?: number
+  /** Human-readable description for search/embeddings (PAS 4.1) */
+  description?: string
+  /** Author of the artifact (PAS 4.1) */
+  author?: string
 }
 
 /**
@@ -64,8 +99,10 @@ export interface Artifact {
   id: string
   /** Human-readable identifier from the AI */
   identifier: string
-  /** Type of artifact */
+  /** Type of artifact (simple) */
   type: ArtifactType
+  /** PAS 4.1 kind for rich artifacts */
+  kind?: ArtifactKind
   /** Display title */
   title: string
   /** Raw content of the artifact */
@@ -88,6 +125,30 @@ export interface Artifact {
   metadata: ArtifactMetadata
   /** Current status */
   status: ArtifactStatus
+  /** PAS 4.1 schema for data flow */
+  schema?: ArtifactSchema
+  /** PAS 4.1 references to other artifacts */
+  references?: ArtifactReference[]
+}
+
+/**
+ * Extended artifact for library storage with embeddings
+ */
+export interface StoredArtifact extends Artifact {
+  /** Vector embedding of description for semantic search */
+  descriptionEmbedding?: number[]
+  /** Vector embedding of content (optional, for code search) */
+  contentEmbedding?: number[]
+  /** Whether artifact is starred/favorited */
+  starred: boolean
+  /** Previous version ID for version history */
+  previousVersionId?: string
+  /** Usage count for popularity sorting */
+  usageCount?: number
+  /** Last time the artifact was used */
+  lastUsedAt?: string
+  /** Preview thumbnail as base64 data URL */
+  thumbnail?: string
 }
 
 /**
@@ -158,13 +219,14 @@ export interface ArtifactVersion {
 
 /**
  * Message in artifact refinement chat
+ * Extended to support rich content like thinking, web search, knowledge base, and MCP tools
  */
 export interface RefinementMessage {
   /** Unique message ID */
   id: string
   /** Message role */
   role: 'user' | 'assistant' | 'system'
-  /** Message content */
+  /** Message content (text response) */
   content: string
   /** Timestamp */
   timestamp: string
@@ -172,6 +234,32 @@ export interface RefinementMessage {
   artifactVersion?: number
   /** Whether the message is still streaming */
   isStreaming?: boolean
+
+  // Thinking/Reasoning content
+  /** Thinking/reasoning content from AI */
+  thinking?: string
+  /** Thinking time in milliseconds */
+  thinkingTime?: number
+  /** Whether thinking is currently in progress */
+  isThinking?: boolean
+
+  // Web Search content
+  /** Web search results */
+  webSearchResults?: WebSearchResponse
+  /** Whether web search is in progress */
+  isSearching?: boolean
+
+  // Knowledge Base content
+  /** Knowledge base search results */
+  knowledgeResults?: KnowledgeReference[]
+  /** Whether knowledge search is in progress */
+  isKnowledgeSearching?: boolean
+
+  // MCP Tool content
+  /** MCP tool call responses */
+  mcpTools?: (MCPToolResponse | NormalToolResponse)[]
+  /** Whether MCP tools are currently being called */
+  isMcpToolRunning?: boolean
 }
 
 /**
@@ -277,7 +365,7 @@ export interface HtmxResponse {
 }
 
 /**
- * Artifact library item for saved artifacts list
+ * Artifact library item for saved artifacts list (summary view)
  */
 export interface ArtifactLibraryItem {
   /** Artifact ID */
@@ -286,14 +374,22 @@ export interface ArtifactLibraryItem {
   title: string
   /** Artifact type */
   type: ArtifactType
+  /** PAS 4.1 kind */
+  kind?: ArtifactKind
   /** Preview thumbnail (data URL) */
   thumbnail?: string
   /** Tags */
   tags: string[]
+  /** Description for search */
+  description?: string
   /** Last updated */
   updatedAt: string
   /** Version count */
   versionCount: number
+  /** Whether starred */
+  starred?: boolean
+  /** Usage count */
+  usageCount?: number
 }
 
 /**
@@ -312,6 +408,10 @@ export interface ArtifactsState {
   refinementMessages: RefinementMessage[]
   /** Whether refinement is in progress */
   isRefining: boolean
+  /** Whether artifact content is currently being streamed (incomplete <cs-artifact> tag) */
+  isArtifactStreaming: boolean
+  /** Streaming artifact content for real-time code view updates */
+  streamingArtifactContent: string | null
   /** Version history for active artifact */
   versionHistory: ArtifactVersion[]
   /** Current version index (for undo/redo) */
@@ -322,6 +422,16 @@ export interface ArtifactsState {
   error: ArtifactError | null
   /** HTMX server port */
   htmxServerPort: number | null
+  /** Model ID from parent conversation for refinement */
+  parentModelId: string | null
+  /** Context messages from the original conversation for refinement context */
+  contextMessages: ContextMessage[]
+}
+
+/** Context message for artifact refinement */
+export interface ContextMessage {
+  role: 'user' | 'assistant' | 'system'
+  content: string
 }
 
 /**

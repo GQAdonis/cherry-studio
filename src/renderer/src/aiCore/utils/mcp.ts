@@ -1,5 +1,6 @@
 import { loggerService } from '@logger'
 import type { MCPTool, MCPToolResponse } from '@renderer/types'
+import { filterProperties } from '@renderer/utils/mcp-schema'
 import { callMCPTool, getMcpServerByTool, isToolAutoApproved } from '@renderer/utils/mcp-tools'
 import { requestToolConfirmation } from '@renderer/utils/userConfirmation'
 import { type Tool, type ToolSet } from 'ai'
@@ -7,6 +8,25 @@ import { jsonSchema, tool } from 'ai'
 import type { JSONSchema7 } from 'json-schema'
 
 const logger = loggerService.withContext('MCP-utils')
+
+/**
+ * Pre-process MCP tool input schema to ensure OpenAI API compatibility.
+ * OpenAI requires object schemas to have a 'properties' field, even if empty.
+ * This is especially important for tools like 'get_stats' that have no parameters.
+ */
+function preprocessSchemaForOpenAI(schema: any): JSONSchema7 {
+  if (!schema || typeof schema !== 'object') {
+    return { type: 'object', properties: {} } as JSONSchema7
+  }
+
+  // Use the existing filterProperties function which handles:
+  // 1. Adding properties: {} for object schemas without properties
+  // 2. Setting required array with all property keys
+  // 3. Setting additionalProperties: false
+  const processed = filterProperties(schema)
+
+  return processed as JSONSchema7
+}
 
 // Setup tools configuration based on provided parameters
 export function setupToolsConfig(mcpTools?: MCPTool[]): Record<string, Tool<any, any>> | undefined {
@@ -28,9 +48,13 @@ export function convertMcpToolsToAiSdkTools(mcpTools: MCPTool[]): ToolSet {
   const tools: ToolSet = {}
 
   for (const mcpTool of mcpTools) {
+    // Pre-process schema to ensure OpenAI API compatibility
+    // This adds 'properties: {}' for empty object schemas (like get_stats, read_graph)
+    const processedSchema = preprocessSchemaForOpenAI(mcpTool.inputSchema)
+
     tools[mcpTool.name] = tool({
       description: mcpTool.description || `Tool from ${mcpTool.serverName}`,
-      inputSchema: jsonSchema(mcpTool.inputSchema as JSONSchema7),
+      inputSchema: jsonSchema(processedSchema),
       execute: async (params, { toolCallId }) => {
         // 检查是否启用自动批准
         const server = getMcpServerByTool(mcpTool)

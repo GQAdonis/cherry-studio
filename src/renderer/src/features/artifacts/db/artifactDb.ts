@@ -8,23 +8,29 @@
 import { nanoid } from '@reduxjs/toolkit'
 import { Dexie, type EntityTable } from 'dexie'
 
-import type {
-  Artifact,
-  ArtifactLibraryItem,
-  ArtifactMetadata,
+import {
+  type Artifact,
+  type ArtifactKind,
+  type ArtifactLibraryItem,
+  type ArtifactMetadata,
+  type ArtifactReference,
+  type ArtifactSchema,
   ArtifactStatus,
-  ArtifactType,
-  ArtifactVersion
+  type ArtifactType,
+  type ArtifactVersion,
+  DEFAULT_ARTIFACT_METADATA,
+  type StoredArtifact
 } from '../types'
-import { DEFAULT_ARTIFACT_METADATA } from '../types'
 
 /**
  * Artifact database record (stored in IndexedDB)
+ * Extended to support PAS 4.1 fields
  */
 export interface ArtifactRecord {
   id: string
   identifier: string
   type: ArtifactType
+  kind?: ArtifactKind
   title: string
   content: string
   version: number
@@ -33,9 +39,21 @@ export interface ArtifactRecord {
   createdAt: string
   updatedAt: string
   saved: boolean
+  starred: boolean
   tags: string[]
   metadata: ArtifactMetadata
   status: ArtifactStatus
+  schema?: ArtifactSchema
+  references?: ArtifactReference[]
+  // Embedding support
+  descriptionEmbedding?: number[]
+  contentEmbedding?: number[]
+  // Usage tracking
+  usageCount: number
+  lastUsedAt?: string
+  // Version tracking
+  previousVersionId?: string
+  thumbnail?: string
 }
 
 /**
@@ -53,6 +71,7 @@ export interface ArtifactVersionRecord {
 
 /**
  * Artifact database instance
+ * Version 2 adds PAS 4.1 fields and embedding support
  */
 class ArtifactDatabase extends Dexie {
   artifacts!: EntityTable<ArtifactRecord, 'id'>
@@ -63,10 +82,33 @@ class ArtifactDatabase extends Dexie {
       chromeTransactionDurability: 'strict'
     })
 
+    // Version 1: Original schema
     this.version(1).stores({
       artifacts: 'id, identifier, conversationId, messageId, type, saved, updatedAt, [conversationId+messageId]',
       artifactVersions: 'id, artifactId, version, [artifactId+version]'
     })
+
+    // Version 2: PAS 4.1 support with embeddings and extended fields
+    this.version(2)
+      .stores({
+        artifacts:
+          'id, identifier, conversationId, messageId, type, kind, saved, starred, updatedAt, usageCount, *tags, [conversationId+messageId]',
+        artifactVersions: 'id, artifactId, version, [artifactId+version]'
+      })
+      .upgrade((tx) => {
+        // Migrate existing records to have new fields
+        return tx
+          .table('artifacts')
+          .toCollection()
+          .modify((artifact) => {
+            if (artifact.starred === undefined) {
+              artifact.starred = false
+            }
+            if (artifact.usageCount === undefined) {
+              artifact.usageCount = 0
+            }
+          })
+      })
   }
 }
 
@@ -93,6 +135,7 @@ export async function saveArtifact(artifact: Artifact): Promise<void> {
     id: artifact.id,
     identifier: artifact.identifier,
     type: artifact.type,
+    kind: artifact.kind,
     title: artifact.title,
     content: artifact.content,
     version: artifact.version,
@@ -101,9 +144,13 @@ export async function saveArtifact(artifact: Artifact): Promise<void> {
     createdAt: artifact.createdAt,
     updatedAt: artifact.updatedAt,
     saved: artifact.saved,
+    starred: false, // Default to not starred
     tags: artifact.tags,
     metadata: artifact.metadata,
-    status: artifact.status
+    status: artifact.status,
+    schema: artifact.schema,
+    references: artifact.references,
+    usageCount: 0
   }
 
   await db.artifacts.put(record)
@@ -173,13 +220,179 @@ export async function getSavedArtifacts(): Promise<ArtifactLibraryItem[]> {
       id: record.id,
       title: record.title,
       type: record.type,
+      kind: record.kind,
       tags: record.tags,
+      description: record.metadata?.description,
       updatedAt: record.updatedAt,
-      versionCount: versionCount + 1 // +1 for current version
+      versionCount: versionCount + 1, // +1 for current version
+      starred: record.starred,
+      usageCount: record.usageCount,
+      thumbnail: record.thumbnail
     })
   }
 
   return items
+}
+
+/**
+ * Get starred artifacts
+ */
+export async function getStarredArtifacts(): Promise<ArtifactLibraryItem[]> {
+  const db = getArtifactDb()
+  const records = await db.artifacts.where('starred').equals(1).reverse().sortBy('updatedAt')
+
+  const items: ArtifactLibraryItem[] = []
+
+  for (const record of records) {
+    const versionCount = await db.artifactVersions.where('artifactId').equals(record.id).count()
+
+    items.push({
+      id: record.id,
+      title: record.title,
+      type: record.type,
+      kind: record.kind,
+      tags: record.tags,
+      description: record.metadata?.description,
+      updatedAt: record.updatedAt,
+      versionCount: versionCount + 1,
+      starred: record.starred,
+      usageCount: record.usageCount,
+      thumbnail: record.thumbnail
+    })
+  }
+
+  return items
+}
+
+/**
+ * Toggle starred status for an artifact
+ */
+export async function toggleArtifactStar(id: string): Promise<boolean> {
+  const db = getArtifactDb()
+  const record = await db.artifacts.get(id)
+
+  if (!record) return false
+
+  const newStarred = !record.starred
+  await db.artifacts.update(id, { starred: newStarred })
+
+  return newStarred
+}
+
+/**
+ * Increment usage count for an artifact
+ */
+export async function incrementArtifactUsage(id: string): Promise<void> {
+  const db = getArtifactDb()
+  const record = await db.artifacts.get(id)
+
+  if (record) {
+    await db.artifacts.update(id, {
+      usageCount: (record.usageCount || 0) + 1,
+      lastUsedAt: new Date().toISOString()
+    })
+  }
+}
+
+/**
+ * Save artifact with embedding
+ */
+export async function saveArtifactWithEmbedding(artifact: StoredArtifact): Promise<void> {
+  const db = getArtifactDb()
+
+  const record: ArtifactRecord = {
+    id: artifact.id,
+    identifier: artifact.identifier,
+    type: artifact.type,
+    kind: artifact.kind,
+    title: artifact.title,
+    content: artifact.content,
+    version: artifact.version,
+    conversationId: artifact.conversationId,
+    messageId: artifact.messageId,
+    createdAt: artifact.createdAt,
+    updatedAt: artifact.updatedAt,
+    saved: artifact.saved,
+    starred: artifact.starred,
+    tags: artifact.tags,
+    metadata: artifact.metadata,
+    status: artifact.status,
+    schema: artifact.schema,
+    references: artifact.references,
+    descriptionEmbedding: artifact.descriptionEmbedding,
+    contentEmbedding: artifact.contentEmbedding,
+    usageCount: artifact.usageCount || 0,
+    lastUsedAt: artifact.lastUsedAt,
+    previousVersionId: artifact.previousVersionId,
+    thumbnail: artifact.thumbnail
+  }
+
+  await db.artifacts.put(record)
+}
+
+/**
+ * Search artifacts by description embedding similarity
+ * Uses cosine similarity for vector search
+ */
+export async function searchArtifactsByEmbedding(
+  queryEmbedding: number[],
+  limit: number = 10
+): Promise<ArtifactLibraryItem[]> {
+  const db = getArtifactDb()
+  const allRecords = await db.artifacts.where('saved').equals(1).toArray()
+
+  // Calculate cosine similarity for each record with embeddings
+  const scoredRecords = allRecords
+    .filter((record) => record.descriptionEmbedding && record.descriptionEmbedding.length > 0)
+    .map((record) => ({
+      record,
+      score: cosineSimilarity(queryEmbedding, record.descriptionEmbedding!)
+    }))
+    .sort((a, b) => b.score - a.score)
+    .slice(0, limit)
+
+  const items: ArtifactLibraryItem[] = []
+
+  for (const { record } of scoredRecords) {
+    const versionCount = await db.artifactVersions.where('artifactId').equals(record.id).count()
+
+    items.push({
+      id: record.id,
+      title: record.title,
+      type: record.type,
+      kind: record.kind,
+      tags: record.tags,
+      description: record.metadata?.description,
+      updatedAt: record.updatedAt,
+      versionCount: versionCount + 1,
+      starred: record.starred,
+      usageCount: record.usageCount,
+      thumbnail: record.thumbnail
+    })
+  }
+
+  return items
+}
+
+/**
+ * Calculate cosine similarity between two vectors
+ */
+function cosineSimilarity(a: number[], b: number[]): number {
+  if (a.length !== b.length) return 0
+
+  let dotProduct = 0
+  let normA = 0
+  let normB = 0
+
+  for (let i = 0; i < a.length; i++) {
+    dotProduct += a[i] * b[i]
+    normA += a[i] * a[i]
+    normB += b[i] * b[i]
+  }
+
+  if (normA === 0 || normB === 0) return 0
+
+  return dotProduct / (Math.sqrt(normA) * Math.sqrt(normB))
 }
 
 /**
@@ -278,7 +491,7 @@ export function createArtifact(params: {
       ...DEFAULT_ARTIFACT_METADATA,
       ...params.metadata
     },
-    status: 'complete' as ArtifactStatus
+    status: ArtifactStatus.COMPLETE
   }
 }
 
@@ -344,6 +557,7 @@ function recordToArtifact(record: ArtifactRecord): Artifact {
     id: record.id,
     identifier: record.identifier,
     type: record.type,
+    kind: record.kind,
     title: record.title,
     content: record.content,
     version: record.version,
@@ -354,7 +568,9 @@ function recordToArtifact(record: ArtifactRecord): Artifact {
     saved: record.saved,
     tags: record.tags,
     metadata: record.metadata,
-    status: record.status
+    status: record.status,
+    schema: record.schema,
+    references: record.references
   }
 }
 

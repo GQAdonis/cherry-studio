@@ -1,5 +1,6 @@
 import type { Message } from '@renderer/types/newMessage'
 import {
+  type ArtifactMessageBlock,
   AssistantMessageStatus,
   type CitationMessageBlock,
   type CodeMessageBlock,
@@ -159,6 +160,16 @@ export function isPlaceholderBlock(block: MessageBlock): block is PlaceholderMes
  */
 export function isCompactBlock(block: MessageBlock): block is CompactMessageBlock {
   return block.type === MessageBlockType.COMPACT
+}
+
+/**
+ * Checks if a message block is an Artifact block.
+ * Acts as a TypeScript type guard.
+ * @param block - The message block to check.
+ * @returns True if the block is an ArtifactMessageBlock, false otherwise.
+ */
+export function isArtifactBlock(block: MessageBlock): block is ArtifactMessageBlock {
+  return block.type === MessageBlockType.ARTIFACT
 }
 
 export function isMessageProcessing(message: Message): boolean {

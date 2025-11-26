@@ -29,6 +29,7 @@ import remarkAlert from 'remark-github-blockquote-alert'
 import remarkMath from 'remark-math'
 import type { Pluggable } from 'unified'
 
+import ArtifactTagRenderer from './ArtifactTagRenderer'
 import CodeBlock from './CodeBlock'
 import Link from './Link'
 import MarkdownSvgRenderer from './MarkdownSvgRenderer'
@@ -140,7 +141,10 @@ const Markdown: FC<Props> = ({ block, postProcess }) => {
         if (hasImage) return <div {...props} />
         return <p {...props} />
       },
-      svg: MarkdownSvgRenderer
+      svg: MarkdownSvgRenderer,
+      // Render <cs-artifact> tags as ArtifactCard components instead of inline HTML
+      // Pass blockId for context tracking
+      'cs-artifact': (props: any) => <ArtifactTagRenderer {...props} blockId={block.id} />
     } as Partial<Components>
   }, [block.id])
 

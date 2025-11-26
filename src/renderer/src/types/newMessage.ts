@@ -32,7 +32,8 @@ export enum MessageBlockType {
   ERROR = 'error', // 错误信息
   CITATION = 'citation', // 引用类型 (Now includes web search, grounding, etc.)
   VIDEO = 'video', // 视频内容
-  COMPACT = 'compact' // Compact command response
+  COMPACT = 'compact', // Compact command response
+  ARTIFACT = 'artifact' // AI-generated artifact (HTMX, HTML, React, etc.)
 }
 
 // 块状态定义
@@ -153,6 +154,16 @@ export interface CompactMessageBlock extends BaseMessageBlock {
   compactedContent: string // 从 <local-command-stdout> 提取的内容
 }
 
+// Artifact块 - AI生成的交互式内容 (HTMX, HTML, React等)
+export interface ArtifactMessageBlock extends BaseMessageBlock {
+  type: MessageBlockType.ARTIFACT
+  identifier: string // 唯一标识符
+  artifactType: 'html' | 'htmx' | 'react' | 'svg' | 'mermaid' | 'markdown' | 'code'
+  title: string // 显示标题
+  content: string // 原始内容
+  conversationId: string // 所属会话ID
+}
+
 // MessageBlock 联合类型
 export type MessageBlock =
   | PlaceholderMessageBlock
@@ -167,6 +178,7 @@ export type MessageBlock =
   | CitationMessageBlock
   | VideoMessageBlock
   | CompactMessageBlock
+  | ArtifactMessageBlock
 
 export enum UserMessageStatus {
   SUCCESS = 'success'

@@ -1,14 +1,15 @@
 import { loggerService } from '@logger'
 import type { RootState } from '@renderer/store'
 import { messageBlocksSelectors } from '@renderer/store/messageBlock'
-import type { ImageMessageBlock, Message, MessageBlock } from '@renderer/types/newMessage'
+import type { ArtifactMessageBlock, ImageMessageBlock, Message, MessageBlock } from '@renderer/types/newMessage'
 import { MessageBlockStatus, MessageBlockType } from '@renderer/types/newMessage'
-import { isMainTextBlock, isMessageProcessing, isVideoBlock } from '@renderer/utils/messageUtils/is'
+import { isArtifactBlock, isMainTextBlock, isMessageProcessing, isVideoBlock } from '@renderer/utils/messageUtils/is'
 import { AnimatePresence, motion, type Variants } from 'motion/react'
 import React, { useMemo } from 'react'
 import { useSelector } from 'react-redux'
 import styled from 'styled-components'
 
+import ArtifactBlock from './ArtifactBlock'
 import CitationBlock from './CitationBlock'
 import CompactBlock from './CompactBlock'
 import ErrorBlock from './ErrorBlock'
@@ -203,6 +204,13 @@ const MessageBlockRenderer: React.FC<Props> = ({ blocks, message }) => {
             break
           case MessageBlockType.COMPACT:
             blockComponent = <CompactBlock key={block.id} block={block} />
+            break
+          case MessageBlockType.ARTIFACT:
+            if (!isArtifactBlock(block)) {
+              logger.warn('Expected artifact block but got different type', block)
+              break
+            }
+            blockComponent = <ArtifactBlock key={block.id} block={block as ArtifactMessageBlock} />
             break
           default:
             logger.warn('Unsupported block type in MessageBlockRenderer:', (block as any).type, block)

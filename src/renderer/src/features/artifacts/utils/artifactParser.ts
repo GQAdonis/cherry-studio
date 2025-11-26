@@ -304,3 +304,112 @@ export function countArtifacts(content: string): number {
   const matches = content.match(/<cs-artifact\s+[^>]*>[\s\S]*?<\/cs-artifact>/gi)
   return matches ? matches.length : 0
 }
+
+/**
+ * Extract partial artifact content during streaming for real-time code view updates.
+ * This function is designed to work with incomplete artifact tags that are still being streamed.
+ *
+ * @param content - The streaming content that may contain an incomplete artifact
+ * @returns Object with partial artifact content and the text before the artifact, or null if no artifact tag found
+ */
+export function extractPartialArtifactContent(content: string): {
+  artifactContent: string
+  textBefore: string
+  isComplete: boolean
+} | null {
+  if (!content) return null
+
+  // First check for complete artifacts
+  ARTIFACT_REGEX.lastIndex = 0
+  const completeMatch = ARTIFACT_REGEX.exec(content)
+  if (completeMatch) {
+    const textBefore = content.slice(0, completeMatch.index).trim()
+    return {
+      artifactContent: completeMatch[2].trim(),
+      textBefore,
+      isComplete: true
+    }
+  }
+
+  // Check for opening <cs-artifact> tag
+  const openTagMatch = content.match(/<cs-artifact\s+([^>]*)>/i)
+  if (!openTagMatch) {
+    return null // No artifact tag started yet
+  }
+
+  const artifactStart = openTagMatch.index!
+  const contentStart = artifactStart + openTagMatch[0].length
+
+  // Get text before the artifact tag
+  const textBefore = content.slice(0, artifactStart).trim()
+
+  // Get content after the opening tag (this is the partial artifact content)
+  let artifactContent = content.slice(contentStart)
+
+  // Check if there's an incomplete closing tag being typed
+  // e.g., "</cs-", "</cs-artifact", etc.
+  const incompleteClosingTag = artifactContent.match(/<\/cs-artifact?[^>]*$/i)
+  if (incompleteClosingTag) {
+    // Remove the incomplete closing tag from the content
+    artifactContent = artifactContent.slice(0, incompleteClosingTag.index)
+  }
+
+  return {
+    artifactContent: artifactContent.trim(),
+    textBefore,
+    isComplete: false
+  }
+}
+
+/**
+ * Separate text content from artifact content in a streaming response.
+ * Used to display text in chat while streaming artifact to code view.
+ *
+ * @param content - The full streaming response content
+ * @returns Object with separated text and artifact content
+ */
+export function separateTextAndArtifact(content: string): {
+  textContent: string
+  artifactContent: string | null
+  isArtifactStreaming: boolean
+} {
+  if (!content) {
+    return { textContent: '', artifactContent: null, isArtifactStreaming: false }
+  }
+
+  // Check for complete artifact first
+  const parseResult = parseArtifacts(content)
+  if (parseResult.hasArtifacts && parseResult.artifacts.length > 0) {
+    // Extract text segments only
+    const textContent = parseResult.segments
+      .filter((s) => s.type === 'text')
+      .map((s) => s.content)
+      .join('')
+      .trim()
+
+    return {
+      textContent,
+      artifactContent: parseResult.artifacts[0].content,
+      isArtifactStreaming: false
+    }
+  }
+
+  // Check for incomplete/streaming artifact
+  if (hasIncompleteArtifact(content)) {
+    const partial = extractPartialArtifactContent(content)
+    if (partial) {
+      return {
+        textContent: partial.textBefore,
+        artifactContent: partial.artifactContent,
+        isArtifactStreaming: true
+      }
+    }
+  }
+
+  // No artifact found - all content is text
+  return {
+    textContent: content,
+    artifactContent: null,
+    isArtifactStreaming: false
+  }
+}

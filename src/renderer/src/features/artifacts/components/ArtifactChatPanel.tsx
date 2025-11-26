@@ -3,27 +3,25 @@
  *
  * Chat interface for artifact refinement with:
  * - Message list showing refinement history
+ * - Rich content display (thinking, web search, knowledge base, MCP tools)
  * - Input field for new refinement requests
  * - Connection to AI provider for streaming responses
  */
 
 import { DeleteOutlined, SendOutlined } from '@ant-design/icons'
+import Spinner from '@renderer/components/Spinner'
+import ThinkingEffect from '@renderer/components/ThinkingEffect'
 import { useAppDispatch, useAppSelector } from '@renderer/store'
-import {
-  addRefinementMessage,
-  clearRefinementMessages,
-  selectIsRefining,
-  selectRefinementMessages,
-  setIsRefining,
-  updateRefinementMessage
-} from '@renderer/store/artifacts'
+import { clearRefinementMessages, selectIsRefining, selectRefinementMessages } from '@renderer/store/artifacts'
 import { Button, Input, Tooltip } from 'antd'
+import { Brain, Database, Globe, Wrench } from 'lucide-react'
 import type { FC } from 'react'
 import { memo, useCallback, useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import styled from 'styled-components'
 
-import type { Artifact } from '../types'
+import { useArtifactRefinement } from '../hooks/useArtifactRefinement'
+import type { Artifact, RefinementMessage } from '../types'
 
 interface ArtifactChatPanelProps {
   /** The artifact being refined */
@@ -39,6 +37,123 @@ function formatTime(timestamp: string): string {
 }
 
 /**
+ * Format thinking time for display
+ */
+function formatThinkingTime(ms?: number): React.ReactNode {
+  if (!ms) return 'Thinking...'
+  const seconds = Math.floor(ms / 1000)
+  return `Thinking... ${seconds}s`
+}
+
+/**
+ * Render a single message with all its rich content blocks
+ */
+const MessageRenderer: FC<{ message: RefinementMessage; t: (key: string) => string }> = memo(({ message, t }) => {
+  // Determine if this message has any in-progress indicators
+  const hasInProgressIndicator = message.isThinking || message.isSearching || message.isKnowledgeSearching || message.isMcpToolRunning
+
+  return (
+    <MessageBubble $role={message.role}>
+      {/* Thinking Block */}
+      {(message.isThinking || message.thinking) && (
+        <ThinkingBlock>
+          <ThinkingEffect
+            isThinking={message.isThinking || false}
+            thinkingTimeText={formatThinkingTime(message.thinkingTime)}
+            content={message.thinking || ''}
+            expanded={false}
+          />
+        </ThinkingBlock>
+      )}
+
+      {/* Web Search Status/Results */}
+      {message.isSearching && (
+        <StatusIndicator>
+          <Globe size={14} />
+          <Spinner text={t('message.searching')} />
+        </StatusIndicator>
+      )}
+      {message.webSearchResults && message.webSearchResults.results && (
+        <SearchResultsBlock>
+          <SearchResultsHeader>
+            <Globe size={14} />
+            <span>{t('message.web_search_results') || 'Web Search Results'}</span>
+            <span className="count">({message.webSearchResults.results.length || 0})</span>
+          </SearchResultsHeader>
+          <SearchResultsList>
+            {message.webSearchResults.results.slice(0, 5).map((result, idx) => (
+              <SearchResultItem key={idx}>
+                <a href={result.url} target="_blank" rel="noopener noreferrer">
+                  {result.title || result.url}
+                </a>
+              </SearchResultItem>
+            ))}
+          </SearchResultsList>
+        </SearchResultsBlock>
+      )}
+
+      {/* Knowledge Base Status/Results */}
+      {message.isKnowledgeSearching && (
+        <StatusIndicator>
+          <Database size={14} />
+          <Spinner text={t('message.searching_knowledge') || 'Searching knowledge base...'} />
+        </StatusIndicator>
+      )}
+      {message.knowledgeResults && message.knowledgeResults.length > 0 && (
+        <KnowledgeResultsBlock>
+          <SearchResultsHeader>
+            <Database size={14} />
+            <span>{t('message.knowledge_results') || 'Knowledge Base'}</span>
+            <span className="count">({message.knowledgeResults.length})</span>
+          </SearchResultsHeader>
+          <SearchResultsList>
+            {message.knowledgeResults.slice(0, 5).map((ref, idx) => (
+              <SearchResultItem key={idx}>
+                <span>{ref.content?.slice(0, 100)}...</span>
+              </SearchResultItem>
+            ))}
+          </SearchResultsList>
+        </KnowledgeResultsBlock>
+      )}
+
+      {/* MCP Tool Status/Results */}
+      {message.isMcpToolRunning && (
+        <StatusIndicator>
+          <Wrench size={14} />
+          <Spinner text={t('message.running_tool') || 'Running tool...'} />
+        </StatusIndicator>
+      )}
+      {message.mcpTools && message.mcpTools.length > 0 && (
+        <McpToolsBlock>
+          <SearchResultsHeader>
+            <Wrench size={14} />
+            <span>{t('message.tool_results') || 'Tool Results'}</span>
+            <span className="count">({message.mcpTools.length})</span>
+          </SearchResultsHeader>
+          <ToolResultsList>
+            {message.mcpTools.map((tool, idx) => (
+              <ToolResultItem key={idx}>
+                <span className="tool-name">{tool.tool?.name || 'Tool'}</span>
+                <span className="tool-status">✓</span>
+              </ToolResultItem>
+            ))}
+          </ToolResultsList>
+        </McpToolsBlock>
+      )}
+
+      {/* Main Text Content */}
+      <MessageContent>
+        {message.content || (message.isStreaming && !hasInProgressIndicator && <TypingIndicator />)}
+      </MessageContent>
+
+      <MessageTime>{formatTime(message.timestamp)}</MessageTime>
+    </MessageBubble>
+  )
+})
+
+MessageRenderer.displayName = 'MessageRenderer'
+
+/**
  * Artifact Chat Panel Component
  */
 const ArtifactChatPanel: FC<ArtifactChatPanelProps> = ({ artifact }) => {
@@ -51,6 +166,15 @@ const ArtifactChatPanel: FC<ArtifactChatPanelProps> = ({ artifact }) => {
   const [inputValue, setInputValue] = useState('')
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLTextAreaElement>(null)
+
+  // Use the refinement hook for AI integration
+  const { sendRefinement } = useArtifactRefinement({
+    artifact,
+    onError: (error) => {
+      // eslint-disable-next-line no-restricted-syntax
+      console.error('Refinement error:', error)
+    }
+  })
 
   // Auto-scroll to bottom when new messages arrive
   useEffect(() => {
@@ -70,46 +194,9 @@ const ArtifactChatPanel: FC<ArtifactChatPanelProps> = ({ artifact }) => {
     // Clear input
     setInputValue('')
 
-    // Add user message
-    dispatch(
-      addRefinementMessage({
-        role: 'user',
-        content: trimmedInput
-      })
-    )
-
-    // Set refining state
-    dispatch(setIsRefining(true))
-
-    // Add placeholder assistant message
-    const assistantMessageId = `assistant-${Date.now()}`
-    dispatch(
-      addRefinementMessage({
-        role: 'assistant',
-        content: '',
-        isStreaming: true
-      })
-    )
-
-    try {
-      // TODO: Connect to AI provider for actual refinement using:
-      //   buildRefinementSystemPrompt(artifact), buildRefinementUserPrompt(trimmedInput, artifact)
-      // For now, simulate a response
-      await simulateRefinementResponse(assistantMessageId, trimmedInput, artifact, dispatch)
-    } catch (error) {
-      // eslint-disable-next-line no-restricted-syntax
-      console.error('Refinement error:', error)
-      dispatch(
-        updateRefinementMessage({
-          id: assistantMessageId,
-          content: `Error: ${(error as Error).message}`,
-          isStreaming: false
-        })
-      )
-    } finally {
-      dispatch(setIsRefining(false))
-    }
-  }, [inputValue, isRefining, artifact, dispatch])
+    // Send via the refinement hook (which handles AI integration)
+    await sendRefinement(trimmedInput)
+  }, [inputValue, isRefining, sendRefinement])
 
   // Handle key press
   const handleKeyPress = useCallback(
@@ -143,17 +230,16 @@ const ArtifactChatPanel: FC<ArtifactChatPanelProps> = ({ artifact }) => {
       <MessagesContainer>
         {messages.length === 0 ? (
           <EmptyState>
-            <EmptyIcon>💬</EmptyIcon>
+            <EmptyIcon>
+              <Brain size={48} strokeWidth={1} />
+            </EmptyIcon>
             <EmptyText>{t('artifacts.refinement_empty')}</EmptyText>
             <EmptyHint>{t('artifacts.refinement_hint')}</EmptyHint>
           </EmptyState>
         ) : (
           <>
             {messages.map((message) => (
-              <MessageBubble key={message.id} $role={message.role}>
-                <MessageContent>{message.content || (message.isStreaming && <TypingIndicator />)}</MessageContent>
-                <MessageTime>{formatTime(message.timestamp)}</MessageTime>
-              </MessageBubble>
+              <MessageRenderer key={message.id} message={message} t={t} />
             ))}
             <div ref={messagesEndRef} />
           </>
@@ -183,82 +269,6 @@ const ArtifactChatPanel: FC<ArtifactChatPanelProps> = ({ artifact }) => {
   )
 }
 
-/**
- * Build system prompt for refinement
- * @todo Connect to AI provider
- */
-export function buildRefinementSystemPrompt(artifact: Artifact): string {
-  return `You are an expert developer helping to refine and improve code artifacts.
-
-Current artifact type: ${artifact.type}
-Title: ${artifact.title}
-
-When the user asks for changes:
-1. Understand the current code structure
-2. Make precise, targeted changes
-3. Return the complete updated code wrapped in <cs-artifact> tags
-4. Preserve the original structure and style where possible
-5. Only change what's necessary to fulfill the request
-
-Always respond with the complete updated artifact content.`
-}
-
-/**
- * Build user prompt for refinement
- * @todo Connect to AI provider
- */
-export function buildRefinementUserPrompt(request: string, artifact: Artifact): string {
-  return `Current artifact content:
-\`\`\`${artifact.type}
-${artifact.content}
-\`\`\`
-
-User request: ${request}
-
-Please provide the updated artifact content.`
-}
-
-/**
- * Simulate refinement response (placeholder for actual AI integration)
- */
-async function simulateRefinementResponse(
-  messageId: string,
-  request: string,
-  artifact: Artifact,
-  dispatch: any
-): Promise<void> {
-  // Simulate typing delay
-  const response = `I understand you want to: "${request}"
-
-To implement this change, I would modify the ${artifact.type} artifact. 
-
-Note: This is a simulated response. To enable actual AI refinement, connect this panel to your AI provider.
-
-The updated artifact would include your requested changes while maintaining the existing structure and functionality.`
-
-  // Simulate streaming
-  let currentContent = ''
-  for (const char of response) {
-    currentContent += char
-    dispatch(
-      updateRefinementMessage({
-        id: messageId,
-        content: currentContent,
-        isStreaming: true
-      })
-    )
-    await new Promise((resolve) => setTimeout(resolve, 10))
-  }
-
-  // Mark as complete
-  dispatch(
-    updateRefinementMessage({
-      id: messageId,
-      content: currentContent,
-      isStreaming: false
-    })
-  )
-}
 
 // Styled components
 const Container = styled.div`
@@ -415,6 +425,111 @@ const StyledTextArea = styled(Input.TextArea)`
 
 const SendButton = styled(Button)`
   flex-shrink: 0;
+`
+
+// Rich content block styles
+const ThinkingBlock = styled.div`
+  margin-bottom: 8px;
+  
+  /* Override ThinkingEffect styles for compact display */
+  > div {
+    background: var(--color-background-soft);
+  }
+`
+
+const StatusIndicator = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: var(--color-background-soft);
+  border-radius: 8px;
+  margin-bottom: 8px;
+  font-size: 12px;
+  color: var(--color-text-2);
+  
+  svg {
+    flex-shrink: 0;
+  }
+`
+
+const SearchResultsBlock = styled.div`
+  background: var(--color-background-soft);
+  border-radius: 8px;
+  padding: 8px 12px;
+  margin-bottom: 8px;
+`
+
+const KnowledgeResultsBlock = styled(SearchResultsBlock)``
+
+const McpToolsBlock = styled(SearchResultsBlock)``
+
+const SearchResultsHeader = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--color-text-2);
+  margin-bottom: 6px;
+  
+  svg {
+    flex-shrink: 0;
+  }
+  
+  .count {
+    color: var(--color-text-3);
+    font-weight: normal;
+  }
+`
+
+const SearchResultsList = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+`
+
+const SearchResultItem = styled.div`
+  font-size: 11px;
+  color: var(--color-text-2);
+  padding: 4px 0;
+  border-bottom: 1px solid var(--color-border);
+  
+  &:last-child {
+    border-bottom: none;
+  }
+  
+  a {
+    color: var(--color-link);
+    text-decoration: none;
+    
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+`
+
+const ToolResultsList = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+`
+
+const ToolResultItem = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 11px;
+  padding: 4px 0;
+  
+  .tool-name {
+    color: var(--color-text);
+    font-family: 'SF Mono', 'Fira Code', monospace;
+  }
+  
+  .tool-status {
+    color: var(--color-success, #22c55e);
+  }
 `
 
 export default memo(ArtifactChatPanel)
