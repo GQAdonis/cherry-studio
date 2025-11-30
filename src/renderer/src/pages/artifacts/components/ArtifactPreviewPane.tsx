@@ -14,11 +14,7 @@ import { CodeOutlined, EyeOutlined, LoadingOutlined } from '@ant-design/icons'
 import type { Artifact } from '@renderer/features/artifacts'
 import { buildPreviewDocument } from '@renderer/features/artifacts/utils/documentBuilder'
 import { useAppDispatch, useAppSelector } from '@renderer/store'
-import {
-  selectIsArtifactStreaming,
-  selectStreamingArtifactContent,
-  updateContent
-} from '@renderer/store/artifacts'
+import { selectIsArtifactStreaming, selectStreamingArtifactContent, updateContent } from '@renderer/store/artifacts'
 import { Spin } from 'antd'
 import type { FC } from 'react'
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react'

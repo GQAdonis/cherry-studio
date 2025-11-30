@@ -50,7 +50,8 @@ function formatThinkingTime(ms?: number): React.ReactNode {
  */
 const MessageRenderer: FC<{ message: RefinementMessage; t: (key: string) => string }> = memo(({ message, t }) => {
   // Determine if this message has any in-progress indicators
-  const hasInProgressIndicator = message.isThinking || message.isSearching || message.isKnowledgeSearching || message.isMcpToolRunning
+  const hasInProgressIndicator =
+    message.isThinking || message.isSearching || message.isKnowledgeSearching || message.isMcpToolRunning
 
   return (
     <MessageBubble $role={message.role}>
@@ -73,24 +74,26 @@ const MessageRenderer: FC<{ message: RefinementMessage; t: (key: string) => stri
           <Spinner text={t('message.searching')} />
         </StatusIndicator>
       )}
-      {message.webSearchResults && message.webSearchResults.results && (
-        <SearchResultsBlock>
-          <SearchResultsHeader>
-            <Globe size={14} />
-            <span>{t('message.web_search_results') || 'Web Search Results'}</span>
-            <span className="count">({message.webSearchResults.results.length || 0})</span>
-          </SearchResultsHeader>
-          <SearchResultsList>
-            {message.webSearchResults.results.slice(0, 5).map((result, idx) => (
-              <SearchResultItem key={idx}>
-                <a href={result.url} target="_blank" rel="noopener noreferrer">
-                  {result.title || result.url}
-                </a>
-              </SearchResultItem>
-            ))}
-          </SearchResultsList>
-        </SearchResultsBlock>
-      )}
+      {message.webSearchResults &&
+        message.webSearchResults.results &&
+        Array.isArray(message.webSearchResults.results) && (
+          <SearchResultsBlock>
+            <SearchResultsHeader>
+              <Globe size={14} />
+              <span>{t('message.web_search_results') || 'Web Search Results'}</span>
+              <span className="count">({message.webSearchResults.results.length || 0})</span>
+            </SearchResultsHeader>
+            <SearchResultsList>
+              {message.webSearchResults.results.slice(0, 5).map((result, idx) => (
+                <SearchResultItem key={idx}>
+                  <a href={result.url} target="_blank" rel="noopener noreferrer">
+                    {result.title || result.url}
+                  </a>
+                </SearchResultItem>
+              ))}
+            </SearchResultsList>
+          </SearchResultsBlock>
+        )}
 
       {/* Knowledge Base Status/Results */}
       {message.isKnowledgeSearching && (
@@ -268,7 +271,6 @@ const ArtifactChatPanel: FC<ArtifactChatPanelProps> = ({ artifact }) => {
     </Container>
   )
 }
-
 
 // Styled components
 const Container = styled.div`

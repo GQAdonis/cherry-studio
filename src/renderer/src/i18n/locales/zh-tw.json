@@ -311,7 +311,7 @@
     },
     "authHeaderText": "在授權標頭中使用：",
     "configuration": "配置",
-    "description": "透過 OpenAI 相容的 HTTP API 公開 Cherry Studio 的 AI 功能",
+    "description": "透過 OpenAI 相容的 HTTP API 公開 The Boss 的 AI 功能",
     "documentation": {
       "title": "API 文件"
     },
@@ -2945,7 +2945,7 @@
           },
           "description": {
             "0": "劃詞助手需「<strong>輔助使用權限</strong>」才能正常工作。",
-            "1": "請點擊「<strong>去設定</strong>」，並在稍後彈出的權限請求彈窗中點擊 「<strong>打開系統設定</strong>」 按鈕，然後在之後的應用程式列表中找到 「<strong>Cherry Studio</strong>」，並開啟權限開關。",
+            "1": "請點擊「<strong>去設定</strong>」，並在稍後彈出的權限請求彈窗中點擊 「<strong>打開系統設定</strong>」 按鈕，然後在之後的應用程式列表中找到 「<strong>The Boss</strong>」，並開啟權限開關。",
             "2": "完成設定後，請再次開啟劃詞助手。"
           },
           "title": "輔助使用權限"
@@ -2957,7 +2957,7 @@
         "title": "應用篩選名單",
         "user_tips": {
           "mac": "請輸入應用的 Bundle ID，每行一個，不區分大小寫，可以模糊匹配。例如：com.google.Chrome、com.apple.mail等",
-          "windows": "請輸入應用的執行檔名稱，每行一個，不區分大小寫，可以模糊匹配。例如：chrome.exe、weixin.exe、Cherry Studio.exe等"
+          "windows": "請輸入應用的執行檔名稱，每行一個，不區分大小寫，可以模糊匹配。例如：chrome.exe、weixin.exe、The Boss.exe等"
         }
       },
       "search_modal": {
@@ -3256,7 +3256,7 @@
           "confirm_close_title": "確認關閉",
           "connected": "已連線",
           "connection_failed": "連線失敗",
-          "content": "請確保電腦和手機處於同一網路以使用區域網路傳輸。請打開 Cherry Studio App 掃描此 QR 碼。",
+          "content": "請確保電腦和手機處於同一網路以使用區域網路傳輸。請打開 The Boss App 掃描此 QR 碼。",
           "error": {
             "init_failed": "初始化失敗",
             "no_file": "未選擇檔案",
@@ -4039,7 +4039,7 @@
       },
       "oauth": {
         "callback": {
-          "message": "您可以關閉此頁面並返回 Cherry Studio",
+          "message": "您可以關閉此頁面並返回 The Boss",
           "title": "認證成功"
         }
       },

@@ -311,7 +311,7 @@
     },
     "authHeaderText": "Use in Authorization header:",
     "configuration": "Configuration",
-    "description": "Expose Cherry Studio's AI capabilities through OpenAI-compatible HTTP APIs",
+    "description": "Expose The Boss's AI capabilities through OpenAI-compatible HTTP APIs",
     "documentation": {
       "title": "API Documentation"
     },
@@ -2945,7 +2945,7 @@
           },
           "description": {
             "0": "Selection Assistant requires <strong>Accessibility Permission</strong> to work properly.",
-            "1": "Please click \"<strong>Go to Settings</strong>\" and click the \"<strong>Open System Settings</strong>\" button in the permission request popup that appears later. Then find \"<strong>Cherry Studio</strong>\" in the application list that appears later and turn on the permission switch.",
+            "1": "Please click \"<strong>Go to Settings</strong>\" and click the \"<strong>Open System Settings</strong>\" button in the permission request popup that appears later. Then find \"<strong>The Boss</strong>\" in the application list that appears later and turn on the permission switch.",
             "2": "After completing the settings, please reopen the selection assistant."
           },
           "title": "Accessibility Permission"
@@ -2957,7 +2957,7 @@
         "title": "Application Filter List",
         "user_tips": {
           "mac": "Please enter the Bundle ID of the application, one per line, case insensitive, can be fuzzy matched. For example: com.google.Chrome, com.apple.mail, etc.",
-          "windows": "Please enter the executable file name of the application, one per line, case insensitive, can be fuzzy matched. For example: chrome.exe, weixin.exe, Cherry Studio.exe, etc."
+          "windows": "Please enter the executable file name of the application, one per line, case insensitive, can be fuzzy matched. For example: chrome.exe, weixin.exe, The Boss.exe, etc."
         }
       },
       "search_modal": {
@@ -3256,7 +3256,7 @@
           "confirm_close_title": "Confirm Close",
           "connected": "Connected",
           "connection_failed": "Connection failed",
-          "content": "Please ensure your computer and phone are on the same network for LAN transfer. Open the Cherry Studio App to scan this QR code.",
+          "content": "Please ensure your computer and phone are on the same network for LAN transfer. Open the The Boss App to scan this QR code.",
           "error": {
             "init_failed": "Initialization failed",
             "no_file": "No file selected",
@@ -4039,7 +4039,7 @@
       },
       "oauth": {
         "callback": {
-          "message": "You can close this page and return to Cherry Studio",
+          "message": "You can close this page and return to The Boss",
           "title": "Authentication Successful"
         }
       },

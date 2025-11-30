@@ -311,7 +311,7 @@
     },
     "authHeaderText": "認証ヘッダーで使用：",
     "configuration": "設定",
-    "description": "OpenAI 互換の HTTP API を通じて Cherry Studio の AI 機能を公開します",
+    "description": "OpenAI 互換の HTTP API を通じて The Boss の AI 機能を公開します",
     "documentation": {
       "title": "API ドキュメント"
     },
@@ -2945,7 +2945,7 @@
           },
           "description": {
             "0": "テキスト選択ツールは、<strong>アクセシビリティー権限</strong>が必要です。",
-            "1": "「<strong>設定に移動</strong>」をクリックし、後で表示される権限要求ポップアップで「<strong>システム設定を開く</strong>」ボタンをクリックします。その後、表示されるアプリケーションリストで「<strong>Cherry Studio</strong>」を見つけ、権限スイッチをオンにしてください。",
+            "1": "「<strong>設定に移動</strong>」をクリックし、後で表示される権限要求ポップアップで「<strong>システム設定を開く</strong>」ボタンをクリックします。その後、表示されるアプリケーションリストで「<strong>The Boss</strong>」を見つけ、権限スイッチをオンにしてください。",
             "2": "設定が完了したら、テキスト選択ツールを再起動してください。"
           },
           "title": "アクセシビリティー権限"
@@ -2957,7 +2957,7 @@
         "title": "アプリケーションフィルターリスト",
         "user_tips": {
           "mac": "アプリケーションのBundle IDを1行ずつ入力してください。大文字小文字は区別しません。例: com.google.Chrome, com.apple.mail, など。",
-          "windows": "アプリケーションの実行ファイル名を1行ずつ入力してください。大文字小文字は区別しません。例: chrome.exe, weixin.exe, Cherry Studio.exe, など。"
+          "windows": "アプリケーションの実行ファイル名を1行ずつ入力してください。大文字小文字は区別しません。例: chrome.exe, weixin.exe, The Boss.exe, など。"
         }
       },
       "search_modal": {
@@ -3256,7 +3256,7 @@
           "confirm_close_title": "閉じることを確認",
           "connected": "接続済み",
           "connection_failed": "接続に失敗しました",
-          "content": "コンピューターとスマートフォンが同じネットワークに接続されていることを確認し、ローカルエリアネットワーク転送を使用してください。Cherry Studioアプリを開き、このQRコードをスキャンしてください。",
+          "content": "コンピューターとスマートフォンが同じネットワークに接続されていることを確認し、ローカルエリアネットワーク転送を使用してください。The Bossアプリを開き、このQRコードをスキャンしてください。",
           "error": {
             "init_failed": "初期化に失敗しました",
             "no_file": "ファイルが選択されていません",
@@ -4039,7 +4039,7 @@
       },
       "oauth": {
         "callback": {
-          "message": "このページを閉じてCherry Studioに戻ることができます",
+          "message": "このページを閉じてThe Bossに戻ることができます",
           "title": "認証成功"
         }
       },

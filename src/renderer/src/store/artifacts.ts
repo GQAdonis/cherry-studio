@@ -322,7 +322,6 @@ const artifactsSlice = createSlice({
     ) => {
       const message = state.refinementMessages.find((m) => m.id === action.payload.id)
       if (message) {
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const { id: _, ...updates } = action.payload
         // Only update fields that are explicitly provided
         Object.entries(updates).forEach(([key, value]) => {
