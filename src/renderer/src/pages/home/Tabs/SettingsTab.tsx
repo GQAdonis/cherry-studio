@@ -9,7 +9,7 @@ import {
   DEFAULT_TEMPERATURE,
   MAX_CONTEXT_COUNT
 } from '@renderer/config/constant'
-import { isOpenAIModel } from '@renderer/config/models'
+import { isOpenAIModel, isSupportVerbosityModel } from '@renderer/config/models'
 import { UNKNOWN } from '@renderer/config/translate'
 import { useCodeStyle } from '@renderer/context/CodeStyleProvider'
 import { useTheme } from '@renderer/context/ThemeProvider'
@@ -58,7 +58,7 @@ import type { ContextStrategyType } from '@renderer/types/contextStrategy'
 import { CONTEXT_STRATEGY_LABELS } from '@renderer/types/contextStrategy'
 import { modalConfirm } from '@renderer/utils'
 import { getSendMessageShortcutLabel } from '@renderer/utils/input'
-import { isSupportServiceTierProvider } from '@renderer/utils/provider'
+import { isSupportServiceTierProvider, isSupportVerbosityProvider } from '@renderer/utils/provider'
 import { Button, Col, InputNumber, Row, Slider, Switch } from 'antd'
 import { Layers, Settings2 } from 'lucide-react'
 import type { FC } from 'react'
@@ -199,7 +199,10 @@ const SettingsTab: FC<Props> = (props) => {
 
   const model = assistant.model || getDefaultModel()
 
-  const showOpenAiSettings = isOpenAIModel(model) || isSupportServiceTierProvider(provider)
+  const showOpenAiSettings =
+    isOpenAIModel(model) ||
+    isSupportServiceTierProvider(provider) ||
+    (isSupportVerbosityModel(model) && isSupportVerbosityProvider(provider))
 
   return (
     <Container className="settings-tab">
