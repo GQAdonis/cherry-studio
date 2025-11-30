@@ -218,6 +218,9 @@ const assistantsSlice = createSlice({
             agent.settings = { ...DEFAULT_ASSISTANT_SETTINGS }
           }
           for (const key in settings) {
+            if (!agent.settings) {
+              agent.settings = { ...DEFAULT_ASSISTANT_SETTINGS }
+            }
             agent.settings[key] = settings[key]
           }
         }
