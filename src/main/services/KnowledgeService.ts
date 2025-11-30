@@ -598,7 +598,13 @@ class KnowledgeService {
   private appendProcessingQueue(task: LoaderTask): Promise<LoaderReturn> {
     return new Promise((resolve) => {
       this.knowledgeItemProcessingQueueMappingPromise.set(loaderTaskIntoOfSet(task), () => {
-        resolve(task.loaderDoneReturn!)
+        // Ensure loaderDoneReturn is not null, provide fallback error result if needed
+        const result = task.loaderDoneReturn || {
+          ...KnowledgeService.ERROR_LOADER_RETURN,
+          message: 'Task completed but no result was returned',
+          messageSource: 'embedding'
+        }
+        resolve(result)
       })
     })
   }
@@ -627,8 +633,8 @@ class KnowledgeService {
           })()
 
           if (task) {
-            this.appendProcessingQueue(task).then(() => {
-              resolve(task.loaderDoneReturn!)
+            this.appendProcessingQueue(task).then((result) => {
+              resolve(result)
             })
             this.processingQueueHandle()
           } else {

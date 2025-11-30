@@ -101,7 +101,6 @@ ${artifact.content}
 Please make the following changes: ${request}`
 }
 
-
 /**
  * Create a refinement assistant with the artifact-specific prompt
  */

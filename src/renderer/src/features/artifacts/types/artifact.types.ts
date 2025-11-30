@@ -7,9 +7,8 @@
  * Aligned with Prometheus Artifact Specification (PAS) 4.1
  */
 
-import type { JSONSchema7 } from 'json-schema'
-
 import type { KnowledgeReference, MCPToolResponse, NormalToolResponse, WebSearchResponse } from '@renderer/types'
+import type { JSONSchema7 } from 'json-schema'
 
 /**
  * Supported artifact types for rendering (simple artifacts)
