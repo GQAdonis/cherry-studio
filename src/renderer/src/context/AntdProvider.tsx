@@ -111,7 +111,19 @@ const AntdProvider: FC<PropsWithChildren> = ({ children }) => {
           colorPrimary: colorPrimary,
           fontFamily: 'var(--font-family)',
           colorBgMask: _theme === 'dark' ? 'rgba(0,0,0,0.7)' : 'rgba(255,255,255,0.8)',
-          motionDurationMid: '100ms'
+          motionDurationMid: '100ms',
+          // Text colors - use CSS variables for theme consistency
+          colorText: 'var(--color-text-1)',
+          colorTextSecondary: 'var(--color-text-2)',
+          colorTextTertiary: 'var(--color-text-3)',
+          colorTextQuaternary: 'var(--color-text-3)',
+          // Background colors
+          colorBgContainer: 'var(--color-background)',
+          colorBgElevated: 'var(--color-background-soft)',
+          colorBgLayout: 'var(--color-background)',
+          // Border colors
+          colorBorder: 'var(--color-border)',
+          colorBorderSecondary: 'var(--color-border-soft)'
         }
       }}>
       {children}

@@ -78,23 +78,100 @@ Let's refine this artifact together!`
 function getTypeSpecificInstructions(type: Artifact['type']): string {
   switch (type) {
     case 'html':
-    case 'htmx':
-      return `### HTML/HTMX Specific Rules
+      return `### HTML Specific Rules
 
 - Provide only the content that goes inside \`<body>\`
-- Use Tailwind CSS utilities for styling
+- Use Tailwind CSS utilities for styling (automatically injected)
 - For JavaScript interactivity, use inline \`<script>\` tags
-- For HTMX interactions, the local server handles requests automatically
+- Use \`window.artifactBridge.setState()\` for state persistence
+- You have access to localStorage and sessionStorage
+- You can make fetch() requests to external APIs`
+
+    case 'htmx':
+      return `### HTMX Specific Rules
+
+- Provide only the content that goes inside \`<body>\`
+- Use Tailwind CSS utilities for styling (automatically injected)
+- **Alpine.js is available** for reactive UI (\`x-data\`, \`x-bind\`, \`x-on\`, etc.)
+- HTMX attributes: \`hx-get\`, \`hx-post\`, \`hx-put\`, \`hx-delete\`, \`hx-trigger\`, \`hx-target\`, \`hx-swap\`
+- The local HTMX server handles requests automatically
+- Combine Alpine.js for client-side reactivity with HTMX for server interactions
+- Example: \`<div x-data="{ count: 0 }" x-text="count" @click="count++"></div>\`
 - Use \`window.artifactBridge.setState()\` for state persistence`
 
     case 'react':
       return `### React Specific Rules
 
 - Define a component named \`App\` as the entry point
-- Use React hooks (\`React.useState\`, \`React.useEffect\`, etc.)
+- Use React hooks (\`useState\`, \`useEffect\`, \`useMemo\`, \`useCallback\`, etc.)
 - Use Tailwind CSS className utilities for styling
-- Don't use external state management libraries
-- The component is automatically rendered via \`ReactDOM.createRoot()\``
+- The component is automatically rendered via \`ReactDOM.createRoot()\`
+
+#### Available NPM Packages (Pre-installed)
+
+You can import and use these packages directly:
+
+**UI Components:**
+- \`lucide-react\` - Icon library (e.g., \`import { Search, Menu } from 'lucide-react'\`)
+- \`@radix-ui/react-icons\` - Radix icon set
+- \`class-variance-authority\` - For variant-based styling
+- \`clsx\` and \`tailwind-merge\` - For conditional class names
+
+**Data & API:**
+- \`@supabase/supabase-js\` - Supabase client for database/auth
+- \`axios\` - HTTP client for API requests
+
+**Diagrams & Visualization:**
+- \`@xyflow/react\` - Node-based diagrams and flowcharts
+- \`recharts\` - Charting library
+
+**State & Forms:**
+- \`zustand\` - Lightweight state management
+- \`react-hook-form\` - Form handling
+- \`@hookform/resolvers\` - Form validation resolvers
+- \`zod\` - Schema validation
+
+**Utilities:**
+- \`date-fns\` - Date manipulation
+- \`lodash-es\` - Utility functions
+- \`uuid\` - UUID generation
+
+#### Web APIs Available
+- \`localStorage\` and \`sessionStorage\` for persistence
+- \`IndexedDB\` for larger data storage
+- \`fetch()\` for API requests
+- \`navigator\` APIs (geolocation, clipboard, etc.)
+
+#### Example with Dependencies
+\`\`\`jsx
+import { useState } from 'react';
+import { Search } from 'lucide-react';
+import axios from 'axios';
+
+export default function App() {
+  const [query, setQuery] = useState('');
+
+  const handleSearch = async () => {
+    const response = await axios.get(\`/api/search?q=\${query}\`);
+    // handle response
+  };
+
+  return (
+    <div className="p-4">
+      <div className="flex gap-2">
+        <input
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          className="border rounded px-3 py-2"
+        />
+        <button onClick={handleSearch} className="bg-blue-500 text-white px-4 py-2 rounded">
+          <Search className="w-4 h-4" />
+        </button>
+      </div>
+    </div>
+  );
+}
+\`\`\``
 
     case 'svg':
       return `### SVG Specific Rules
@@ -102,29 +179,33 @@ function getTypeSpecificInstructions(type: Artifact['type']): string {
 - Provide raw SVG markup
 - Include \`viewBox\` attribute for proper scaling
 - Use CSS animations via \`<animate>\` or inline styles
-- Ensure SVG scales responsively`
+- Ensure SVG scales responsively
+- Use \`currentColor\` for theme-aware colors`
 
     case 'mermaid':
       return `### Mermaid Specific Rules
 
 - Provide raw Mermaid diagram syntax
 - Do NOT wrap in \`<pre>\` tags
-- Supported diagram types: flowchart, sequence, class, state, ER, gantt, pie, etc.
-- The theme automatically matches the user's preference`
+- Supported diagram types: flowchart, sequence, class, state, ER, gantt, pie, mindmap, timeline, etc.
+- The theme automatically matches the user's preference
+- Use clear, descriptive labels for nodes and connections`
 
     case 'markdown':
       return `### Markdown Specific Rules
 
 - Use standard GitHub-flavored Markdown
 - Code blocks are automatically syntax highlighted
-- Tables, blockquotes, and lists are styled automatically`
+- Tables, blockquotes, and lists are styled automatically
+- LaTeX math is supported with \`$inline$\` and \`$$block$$\` syntax`
 
     case 'code':
       return `### Code Display Specific Rules
 
 - This type is for displaying code, not executing it
 - Specify the language in the \`language\` attribute
-- The code is syntax highlighted automatically`
+- The code is syntax highlighted automatically
+- Supports all major programming languages`
 
     default:
       return '### General Rules\n\nFollow standard web development best practices.'

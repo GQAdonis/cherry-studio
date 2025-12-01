@@ -48,17 +48,13 @@ export function convertMcpToolsToAiSdkTools(mcpTools: MCPTool[]): ToolSet {
   const tools: ToolSet = {}
 
   for (const mcpTool of mcpTools) {
-<<<<<<< HEAD
     // Pre-process schema to ensure OpenAI API compatibility
     // This adds 'properties: {}' for empty object schemas (like get_stats, read_graph)
     const processedSchema = preprocessSchemaForOpenAI(mcpTool.inputSchema)
 
-    tools[mcpTool.name] = tool({
-=======
     // Use mcpTool.id (which includes serverId suffix) to ensure uniqueness
     // when multiple instances of the same MCP server type are configured
     tools[mcpTool.id] = tool({
->>>>>>> b3a58ec321b22551a70532c8f2173564bf137096
       description: mcpTool.description || `Tool from ${mcpTool.serverName}`,
       inputSchema: jsonSchema(processedSchema),
       execute: async (params, { toolCallId }) => {

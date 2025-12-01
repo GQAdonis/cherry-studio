@@ -1,9 +1,13 @@
 import { isDev, isWin } from '@main/constant'
-import { app } from 'electron'
 
 import { getDataPath } from './utils'
 
-if (isDev) {
+// Use dynamic require to avoid bundler issues with electron module
+
+const electron = require('electron')
+const app = electron.app
+
+if (isDev && app) {
   app.setPath('userData', app.getPath('userData') + 'Dev')
 }
 

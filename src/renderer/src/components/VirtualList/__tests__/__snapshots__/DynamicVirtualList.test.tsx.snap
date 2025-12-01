@@ -16,17 +16,21 @@ exports[`DynamicVirtualList > basic rendering > snapshot test 1`] = `
     aria-hidden="false"
     aria-label="Dynamic Virtual List"
     class="c0 dynamic-virtual-list"
+    data-insp-path="src/renderer/src/components/VirtualList/dynamic.tsx:202:5:ScrollContainer"
     role="region"
     style="overflow: auto; height: 100%;"
   >
     <div
+      data-insp-path="src/renderer/src/components/VirtualList/dynamic.tsx:216:7:div"
       style="position: relative; width: 100%; height: 150px;"
     >
       <div
         data-index="0"
+        data-insp-path="src/renderer/src/components/VirtualList/dynamic.tsx:244:13:div"
         style="position: absolute; top: 0px; left: 0px; transform: translateY(0px); width: 100%;"
       >
         <div
+          data-insp-path="src/renderer/src/components/VirtualList/__tests__/DynamicVirtualList.test.tsx:55:50:div"
           data-testid="item-0"
         >
           Item 1
@@ -34,9 +38,11 @@ exports[`DynamicVirtualList > basic rendering > snapshot test 1`] = `
       </div>
       <div
         data-index="1"
+        data-insp-path="src/renderer/src/components/VirtualList/dynamic.tsx:244:13:div"
         style="position: absolute; top: 0px; left: 0px; transform: translateY(50px); width: 100%;"
       >
         <div
+          data-insp-path="src/renderer/src/components/VirtualList/__tests__/DynamicVirtualList.test.tsx:55:50:div"
           data-testid="item-1"
         >
           Item 2
@@ -44,9 +50,11 @@ exports[`DynamicVirtualList > basic rendering > snapshot test 1`] = `
       </div>
       <div
         data-index="2"
+        data-insp-path="src/renderer/src/components/VirtualList/dynamic.tsx:244:13:div"
         style="position: absolute; top: 0px; left: 0px; transform: translateY(100px); width: 100%;"
       >
         <div
+          data-insp-path="src/renderer/src/components/VirtualList/__tests__/DynamicVirtualList.test.tsx:55:50:div"
           data-testid="item-2"
         >
           Item 3

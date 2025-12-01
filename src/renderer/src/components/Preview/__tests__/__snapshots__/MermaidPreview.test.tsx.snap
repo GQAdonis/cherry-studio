@@ -9,19 +9,23 @@ exports[`MermaidPreview > basic rendering > should match snapshot 1`] = `
 
 <div>
   <div
+    data-insp-path="src/renderer/src/components/Preview/__tests__/MermaidPreview.test.tsx:10:5:div"
     data-source="mermaid"
     data-testid="image-preview-layout"
   >
     <div
+      data-insp-path="src/renderer/src/components/Preview/__tests__/MermaidPreview.test.tsx:11:25:div"
       data-testid="toolbar"
     >
       Toolbar
     </div>
     <div
+      data-insp-path="src/renderer/src/components/Preview/__tests__/MermaidPreview.test.tsx:14:7:div"
       data-testid="preview-content"
     >
       <div
         class="c0 mermaid special-preview"
+        data-insp-path="src/renderer/src/components/Preview/MermaidPreview.tsx:133:7:ShadowTransparentContainer"
       />
     </div>
   </div>

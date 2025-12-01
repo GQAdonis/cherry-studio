@@ -1,11 +1,18 @@
 import { occupiedDirs } from '@shared/config/constant'
-import { app } from 'electron'
 import fs from 'fs'
 import path from 'path'
 
 import { initAppDataDir } from './utils/init'
 
-app.isPackaged && initAppDataDir()
+// Use dynamic require to avoid bundler issues with electron module
+
+const electron = require('electron')
+const app = electron.app
+
+// Guard against app being undefined during bundling
+if (app?.isPackaged) {
+  initAppDataDir()
+}
 
 // 在主进程中复制 appData 中某些一直被占用的文件
 // 在renderer进程还没有启动时，主进程可以复制这些文件到新的appData中
@@ -18,7 +25,7 @@ function copyOccupiedDirsInMainProcess() {
     return
   }
 
-  if (process.platform === 'win32') {
+  if (process.platform === 'win32' && app) {
     const appDataPath = app.getPath('userData')
     occupiedDirs.forEach((dir) => {
       const dirPath = path.join(appDataPath, dir)

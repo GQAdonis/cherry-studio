@@ -286,6 +286,81 @@ describe('filterProperties', () => {
     })
   })
 
+  describe('undefined and null property handling', () => {
+    it('should filter out undefined property values', () => {
+      const input = {
+        type: 'object',
+        properties: {
+          url: { type: 'string', description: 'URL to fetch' },
+          headers: undefined // This should be filtered out
+        },
+        required: ['url', 'headers'] // headers should be removed from required
+      }
+
+      const result = filterProperties(input)
+
+      // headers should be removed from properties
+      expect(result.properties).toEqual({
+        url: { type: 'string', description: 'URL to fetch' }
+      })
+      // required should only contain 'url' since 'headers' was filtered out
+      expect(result.required).toEqual(['url'])
+    })
+
+    it('should filter out null property values', () => {
+      const input = {
+        type: 'object',
+        properties: {
+          path: { type: 'string' },
+          options: null // This should be filtered out
+        },
+        required: ['path', 'options']
+      }
+
+      const result = filterProperties(input)
+
+      expect(result.properties).toEqual({
+        path: { type: 'string' }
+      })
+      expect(result.required).toEqual(['path'])
+    })
+
+    it('should handle schema with all undefined properties', () => {
+      const input = {
+        type: 'object',
+        properties: {
+          a: undefined,
+          b: undefined
+        },
+        required: ['a', 'b']
+      }
+
+      const result = filterProperties(input)
+
+      expect(result.properties).toEqual({})
+      expect(result.required).toEqual([])
+    })
+
+    it('should handle Gemini-style MCP tool schema with undefined headers', () => {
+      // This is the actual schema pattern that was causing Gemini API errors
+      const input = {
+        type: 'object',
+        properties: {
+          url: { type: 'string', description: 'URL of the website to fetch' },
+          headers: undefined // MCP server returns undefined for optional complex types
+        },
+        required: ['url', 'headers']
+      }
+
+      const result = filterProperties(input)
+
+      // The result should be valid for Gemini API
+      expect(result.properties.headers).toBeUndefined()
+      expect(result.required).not.toContain('headers')
+      expect(result.required).toContain('url')
+    })
+  })
+
   describe('complex real-world scenarios', () => {
     it('should handle complex nested schema with multiple composition patterns', () => {
       const input = {

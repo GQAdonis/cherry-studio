@@ -54,30 +54,37 @@ exports[`CodeToolbar > basic rendering > should match snapshot with mixed tools 
 <div>
   <div
     class="c0"
+    data-insp-path="src/renderer/src/components/CodeToolbar/toolbar.tsx:37:5:StickyWrapper"
   >
     <div
       class="c1 code-toolbar"
+      data-insp-path="src/renderer/src/components/CodeToolbar/__tests__/CodeToolbar.test.tsx:23:5:div"
       data-testid="hstack"
     >
       <div
+        data-insp-path="src/renderer/src/components/CodeToolbar/__tests__/CodeToolbar.test.tsx:18:5:div"
         data-testid="tooltip"
         data-title="code_block.more"
       >
         <div
           class="c2"
+          data-insp-path="src/renderer/src/components/CodeToolbar/toolbar.tsx:43:13:ToolWrapper"
         >
           <div
             class="tool-icon"
+            data-insp-path="src/renderer/src/components/CodeToolbar/__tests__/CodeToolbar.test.tsx:32:33:div"
             data-testid="ellipsis-icon"
           />
         </div>
       </div>
       <div
+        data-insp-path="src/renderer/src/components/CodeToolbar/__tests__/CodeToolbar.test.tsx:13:5:div"
         data-testid="tool-button-core1"
         data-tool-id="core1"
         data-tool-type="core"
       >
         <div
+          data-insp-path="src/renderer/src/components/CodeToolbar/__tests__/CodeToolbar.test.tsx:67:9:div"
           data-testid="test-icon"
         >
           Icon
@@ -107,17 +114,21 @@ exports[`CodeToolbar > basic rendering > should match snapshot with only core to
 <div>
   <div
     class="c0"
+    data-insp-path="src/renderer/src/components/CodeToolbar/toolbar.tsx:37:5:StickyWrapper"
   >
     <div
       class="c1 code-toolbar"
+      data-insp-path="src/renderer/src/components/CodeToolbar/__tests__/CodeToolbar.test.tsx:23:5:div"
       data-testid="hstack"
     >
       <div
+        data-insp-path="src/renderer/src/components/CodeToolbar/__tests__/CodeToolbar.test.tsx:13:5:div"
         data-testid="tool-button-core1"
         data-tool-id="core1"
         data-tool-type="core"
       >
         <div
+          data-insp-path="src/renderer/src/components/CodeToolbar/__tests__/CodeToolbar.test.tsx:67:9:div"
           data-testid="test-icon"
         >
           Icon

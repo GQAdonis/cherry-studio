@@ -7,6 +7,7 @@ import {
   useCopyTool,
   useDownloadTool,
   useExpandTool,
+  usePreviewTool,
   useRunTool,
   useSaveTool,
   useSplitViewTool,
@@ -229,6 +230,19 @@ export const CodeBlockView: React.FC<Props> = memo(({ children, language, onSave
     wrapped: shouldWrap,
     wrappable: codeWrappable,
     toggle: useCallback(() => setWrapOverride((prev) => !prev), []),
+    setTools
+  })
+
+  // React 预览按钮
+  const handlePreview = useCallback(() => {
+    // This will be handled by the ReactArtifactsCard component
+    // The preview tool is mainly for visual indication
+  }, [])
+
+  usePreviewTool({
+    enabled: true,
+    language,
+    onPreview: handlePreview,
     setTools
   })
 

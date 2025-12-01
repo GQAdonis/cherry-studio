@@ -19,22 +19,29 @@ exports[`AdvancedSettingsPanel > basic rendering > should match snapshot 1`] = `
 
 <div
   class="c0"
+  data-insp-path="src/renderer/src/pages/knowledge/components/KnowledgeSettings/AdvancedSettingsPanel.tsx:44:5:SettingsPanel"
 >
   <div
     class="c1"
+    data-insp-path="src/renderer/src/pages/knowledge/components/KnowledgeSettings/AdvancedSettingsPanel.tsx:45:7:SettingsItem"
   >
     <div
       class="settings-label"
+      data-insp-path="src/renderer/src/pages/knowledge/components/KnowledgeSettings/AdvancedSettingsPanel.tsx:46:9:div"
     >
       文档预处理
-      <div>
+      <div
+        data-insp-path="src/renderer/src/pages/knowledge/__tests__/AdvancedSettingsPanel.test.tsx:34:50:div"
+      >
         settings.tool.preprocess.tooltip
       </div>
     </div>
     <select
+      data-insp-path="src/renderer/src/pages/knowledge/__tests__/AdvancedSettingsPanel.test.tsx:63:5:select"
       data-testid="select"
     >
       <option
+        data-insp-path="src/renderer/src/pages/knowledge/__tests__/AdvancedSettingsPanel.test.tsx:64:7:option"
         value=""
       >
         settings.tool.preprocess.provider_placeholder
@@ -43,19 +50,25 @@ exports[`AdvancedSettingsPanel > basic rendering > should match snapshot 1`] = `
   </div>
   <div
     class="c1"
+    data-insp-path="src/renderer/src/pages/knowledge/components/KnowledgeSettings/AdvancedSettingsPanel.tsx:60:7:SettingsItem"
   >
     <div
       class="settings-label"
+      data-insp-path="src/renderer/src/pages/knowledge/components/KnowledgeSettings/AdvancedSettingsPanel.tsx:61:9:div"
     >
       重排模型
-      <div>
+      <div
+        data-insp-path="src/renderer/src/pages/knowledge/__tests__/AdvancedSettingsPanel.test.tsx:34:50:div"
+      >
         models.rerank_model_tooltip
       </div>
     </div>
     <select
+      data-insp-path="src/renderer/src/pages/knowledge/__tests__/AdvancedSettingsPanel.test.tsx:76:5:select"
       data-testid="model-selector"
     >
       <option
+        data-insp-path="src/renderer/src/pages/knowledge/__tests__/AdvancedSettingsPanel.test.tsx:77:7:option"
         value=""
       >
         未选择
@@ -64,17 +77,22 @@ exports[`AdvancedSettingsPanel > basic rendering > should match snapshot 1`] = `
   </div>
   <div
     class="c1"
+    data-insp-path="src/renderer/src/pages/knowledge/components/KnowledgeSettings/AdvancedSettingsPanel.tsx:76:7:SettingsItem"
   >
     <div
       class="settings-label"
+      data-insp-path="src/renderer/src/pages/knowledge/components/KnowledgeSettings/AdvancedSettingsPanel.tsx:77:9:div"
     >
       分块大小
-      <div>
+      <div
+        data-insp-path="src/renderer/src/pages/knowledge/__tests__/AdvancedSettingsPanel.test.tsx:34:50:div"
+      >
         knowledge.chunk_size_tooltip
       </div>
     </div>
     <input
       aria-label="分块大小"
+      data-insp-path="src/renderer/src/pages/knowledge/__tests__/AdvancedSettingsPanel.test.tsx:50:5:input"
       data-testid="input-number"
       placeholder="knowledge.chunk_size_placeholder"
       style="width: 100%;"
@@ -84,17 +102,22 @@ exports[`AdvancedSettingsPanel > basic rendering > should match snapshot 1`] = `
   </div>
   <div
     class="c1"
+    data-insp-path="src/renderer/src/pages/knowledge/components/KnowledgeSettings/AdvancedSettingsPanel.tsx:91:7:SettingsItem"
   >
     <div
       class="settings-label"
+      data-insp-path="src/renderer/src/pages/knowledge/components/KnowledgeSettings/AdvancedSettingsPanel.tsx:92:9:div"
     >
       分块重叠
-      <div>
+      <div
+        data-insp-path="src/renderer/src/pages/knowledge/__tests__/AdvancedSettingsPanel.test.tsx:34:50:div"
+      >
         knowledge.chunk_overlap_tooltip
       </div>
     </div>
     <input
       aria-label="分块重叠"
+      data-insp-path="src/renderer/src/pages/knowledge/__tests__/AdvancedSettingsPanel.test.tsx:50:5:input"
       data-testid="input-number"
       placeholder="knowledge.chunk_overlap_placeholder"
       style="width: 100%;"
@@ -104,17 +127,22 @@ exports[`AdvancedSettingsPanel > basic rendering > should match snapshot 1`] = `
   </div>
   <div
     class="c1"
+    data-insp-path="src/renderer/src/pages/knowledge/components/KnowledgeSettings/AdvancedSettingsPanel.tsx:106:7:SettingsItem"
   >
     <div
       class="settings-label"
+      data-insp-path="src/renderer/src/pages/knowledge/components/KnowledgeSettings/AdvancedSettingsPanel.tsx:107:9:div"
     >
       检索相似度阈值
-      <div>
+      <div
+        data-insp-path="src/renderer/src/pages/knowledge/__tests__/AdvancedSettingsPanel.test.tsx:34:50:div"
+      >
         knowledge.threshold_tooltip
       </div>
     </div>
     <input
       aria-label="检索相似度阈值"
+      data-insp-path="src/renderer/src/pages/knowledge/__tests__/AdvancedSettingsPanel.test.tsx:50:5:input"
       data-testid="input-number"
       placeholder="knowledge.threshold_placeholder"
       style="width: 100%;"
@@ -123,6 +151,7 @@ exports[`AdvancedSettingsPanel > basic rendering > should match snapshot 1`] = `
     />
   </div>
   <div
+    data-insp-path="src/renderer/src/pages/knowledge/__tests__/AdvancedSettingsPanel.test.tsx:48:48:div"
     role="alert"
   >
     避免修改这个高级设置。

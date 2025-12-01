@@ -393,6 +393,7 @@
     "change_model": "Click to change model",
     "click_to_open": "Click to open artifact",
     "code": "Code",
+    "console": "Console",
     "description_help": "Used for searching artifacts in your library",
     "description_placeholder": "What does this artifact do?",
     "generating": "Generating artifact...",
@@ -423,7 +424,12 @@
       "react": "React",
       "svg": "SVG"
     },
-    "version": "Version"
+    "version": "Version",
+    "view": {
+      "code": "Code",
+      "preview": "Preview",
+      "split": "Split"
+    }
   },
   "assistants": {
     "abbr": "Assistants",
@@ -3109,6 +3115,40 @@
     "advanced": {
       "auto_switch_to_topics": "Auto switch to topic",
       "title": "Advanced Settings"
+    },
+    "artifacts": {
+      "auto_open": "Auto-open Artifacts",
+      "auto_open_help": "Automatically open the artifact viewer when a new artifact is created.",
+      "enable": "Enable Artifact Support",
+      "enable_help": "When enabled, AI-generated interactive content will be detected and rendered as artifacts.",
+      "enabled_types": "Enabled Artifact Types",
+      "items": "items",
+      "react": {
+        "add_dep": "Add",
+        "custom_bundler_url": "Custom Bundler URL",
+        "custom_bundler_url_help": "Optional: URL for a self-hosted Sandpack bundler. Leave empty to use the default CodeSandbox bundler.",
+        "dep_actions": "Actions",
+        "dep_name": "Package",
+        "dep_name_placeholder": "Package name (e.g., framer-motion)",
+        "dep_version": "Version",
+        "dependencies_help": "These packages will be available in Sandpack React artifacts. Add commonly used packages here.",
+        "dependencies_title": "Available Dependencies",
+        "no_deps": "No dependencies configured",
+        "show_console": "Show Console",
+        "show_console_help": "Show the console output panel for debugging React artifacts.",
+        "show_editor": "Show Code Editor",
+        "show_editor_help": "Show the code editor panel alongside the preview in Sandpack mode.",
+        "title": "React Artifact Settings",
+        "use_sandpack": "Use Sandpack Runtime",
+        "use_sandpack_help": "Use CodeSandbox Sandpack for React artifacts. Enables NPM dependencies, hot reload, and better error handling. Disable for simple Babel-only transpilation."
+      },
+      "required": "Required",
+      "storage_limit": "Storage Limit",
+      "storage_limit_help": "Maximum number of artifacts to store. Older artifacts will be automatically removed.",
+      "storage_title": "Storage",
+      "title": "Artifacts",
+      "types_help": "Select which types of artifacts should be generated. HTMX is always enabled.",
+      "types_title": "Artifact Types"
     },
     "assistant": {
       "icon": {
