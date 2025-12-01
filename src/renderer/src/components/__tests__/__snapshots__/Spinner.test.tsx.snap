@@ -11,6 +11,7 @@ exports[`Spinner > should match snapshot 1`] = `
 <div
   animate="defaultColor,dimmed"
   class="c0"
+  data-insp-path="src/renderer/src/components/Spinner.tsx:21:5:Searching"
   initial="defaultColor"
   transition="[object Object]"
   variants="[object Object]"
@@ -18,6 +19,7 @@ exports[`Spinner > should match snapshot 1`] = `
   <svg
     aria-hidden="true"
     class="lucide lucide-search"
+    data-insp-path="src/renderer/src/components/Spinner.tsx:31:7:Search"
     fill="none"
     height="16"
     stroke="currentColor"
@@ -37,7 +39,9 @@ exports[`Spinner > should match snapshot 1`] = `
       r="8"
     />
   </svg>
-  <span>
+  <span
+    data-insp-path="src/renderer/src/components/Spinner.tsx:32:7:span"
+  >
     Loading files...
   </span>
 </div>

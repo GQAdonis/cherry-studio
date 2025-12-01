@@ -3,13 +3,17 @@
 exports[`ImagePreviewLayout > should match snapshot 1`] = `
 <div>
   <div
+    data-insp-path="src/renderer/src/components/Preview/__tests__/ImagePreviewLayout.test.tsx:19:5:div"
     data-testid="spin"
   >
     <div
+      data-insp-path="src/renderer/src/components/Preview/__tests__/ImagePreviewLayout.test.tsx:37:5:div"
       data-testid="preview-container"
       data-vertical="true"
     >
-      <div>
+      <div
+        data-insp-path="src/renderer/src/components/Preview/__tests__/ImagePreviewLayout.test.tsx:55:15:div"
+      >
         Test Content
       </div>
     </div>

@@ -6,15 +6,23 @@
  * - PostMessage communication bridge
  * - Theme synchronization
  * - Error handling and display
+ *
+ * For React artifacts, uses Sandpack for:
+ * - NPM dependency support
+ * - Hot Module Reloading
+ * - Professional error overlay
  */
 
 import { useTheme } from '@renderer/context/ThemeProvider'
+import { useAppSelector } from '@renderer/store'
+import { selectArtifactReactSettings } from '@renderer/store/settings'
 import type { FC } from 'react'
 import { memo, useCallback, useEffect, useRef, useState } from 'react'
 import styled from 'styled-components'
 
 import type { Artifact, ArtifactBridgeMessage, ArtifactError, RenderOptions } from '../types'
 import { buildDocument } from '../utils/documentBuilder'
+import SandpackReactRenderer from './SandpackReactRenderer'
 
 interface ArtifactRendererProps {
   /** The artifact to render */
@@ -39,6 +47,12 @@ interface ArtifactRendererProps {
   onHtmxEvent?: (event: string, payload: Record<string, unknown>) => void
   /** Custom class name */
   className?: string
+  /** Whether to use Sandpack for React artifacts (default: true) */
+  useSandpack?: boolean
+  /** Whether to show code editor in Sandpack mode */
+  showEditor?: boolean
+  /** Whether to show console in Sandpack mode */
+  showConsole?: boolean
 }
 
 /**
@@ -57,9 +71,18 @@ const ArtifactRenderer: FC<ArtifactRendererProps> = ({
   onResize,
   onConsole,
   onHtmxEvent,
-  className
+  className,
+  useSandpack: useSandpackProp,
+  showEditor: showEditorProp,
+  showConsole: showConsoleProp
 }) => {
   const { theme } = useTheme()
+  const reactSettings = useAppSelector(selectArtifactReactSettings)
+
+  // Use props if provided, otherwise fall back to settings
+  const useSandpack = useSandpackProp ?? reactSettings?.useSandpack ?? true
+  const showEditor = showEditorProp ?? reactSettings?.showEditor ?? false
+  const showConsole = showConsoleProp ?? reactSettings?.showConsole ?? false
   const iframeRef = useRef<HTMLIFrameElement>(null)
   const [isReady, setIsReady] = useState(false)
   const [error, setError] = useState<ArtifactError | null>(null)
@@ -166,6 +189,24 @@ const ArtifactRenderer: FC<ArtifactRendererProps> = ({
     }
   }, [])
 
+  // Use Sandpack for React artifacts when enabled
+  const shouldUseSandpack = useSandpack && artifact.type === 'react'
+
+  // Render Sandpack for React artifacts
+  if (shouldUseSandpack) {
+    return (
+      <SandpackReactRenderer
+        artifact={artifact}
+        showEditor={showEditor}
+        showConsole={showConsole}
+        width={width}
+        height={height}
+        className={className}
+      />
+    )
+  }
+
+  // Render iframe for all other artifact types (HTML, HTMX, SVG, Mermaid, Markdown, Code)
   return (
     <Container className={className} style={{ width, height }}>
       {!isReady && !error && (

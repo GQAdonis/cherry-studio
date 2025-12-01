@@ -2,7 +2,11 @@ import fs from 'node:fs'
 import fsAsync from 'node:fs/promises'
 import path from 'node:path'
 
-import { app } from 'electron'
+// Use dynamic require to avoid bundler issues with electron module
+// The ESM import `import { app } from 'electron'` causes issues because
+// it's evaluated at module load time before Electron is fully initialized
+const electron = require('electron')
+const app = electron.app
 
 export function getResourcePath() {
   return path.join(app.getAppPath(), 'resources')

@@ -3,22 +3,30 @@
 exports[`DraggableList > snapshot > should match snapshot 1`] = `
 <div>
   <div
+    data-insp-path="src/renderer/src/components/DraggableList/__tests__/DraggableList.test.tsx:27:14:div"
     data-testid="drag-drop-context"
   >
     <div
+      data-insp-path="src/renderer/src/components/DraggableList/__tests__/DraggableList.test.tsx:30:7:div"
       data-testid="droppable"
     >
-      <div>
+      <div
+        data-insp-path="src/renderer/src/components/DraggableList/list.tsx:65:11:div"
+      >
         <div
           class="draggable-list-container"
+          data-insp-path="src/renderer/src/components/DraggableList/list.tsx:66:13:div"
         >
           <div
+            data-insp-path="src/renderer/src/components/DraggableList/__tests__/DraggableList.test.tsx:35:7:div"
             data-testid="draggable-a-0"
           >
             <div
+              data-insp-path="src/renderer/src/components/DraggableList/list.tsx:72:23:div"
               style="margin-bottom: 8px;"
             >
               <div
+                data-insp-path="src/renderer/src/components/DraggableList/__tests__/DraggableList.test.tsx:272:22:div"
                 data-testid="item"
               >
                 A
@@ -26,12 +34,15 @@ exports[`DraggableList > snapshot > should match snapshot 1`] = `
             </div>
           </div>
           <div
+            data-insp-path="src/renderer/src/components/DraggableList/__tests__/DraggableList.test.tsx:35:7:div"
             data-testid="draggable-b-1"
           >
             <div
+              data-insp-path="src/renderer/src/components/DraggableList/list.tsx:72:23:div"
               style="margin-bottom: 8px;"
             >
               <div
+                data-insp-path="src/renderer/src/components/DraggableList/__tests__/DraggableList.test.tsx:272:22:div"
                 data-testid="item"
               >
                 B
@@ -39,12 +50,15 @@ exports[`DraggableList > snapshot > should match snapshot 1`] = `
             </div>
           </div>
           <div
+            data-insp-path="src/renderer/src/components/DraggableList/__tests__/DraggableList.test.tsx:35:7:div"
             data-testid="draggable-c-2"
           >
             <div
+              data-insp-path="src/renderer/src/components/DraggableList/list.tsx:72:23:div"
               style="margin-bottom: 8px;"
             >
               <div
+                data-insp-path="src/renderer/src/components/DraggableList/__tests__/DraggableList.test.tsx:272:22:div"
                 data-testid="item"
               >
                 C
@@ -53,6 +67,7 @@ exports[`DraggableList > snapshot > should match snapshot 1`] = `
           </div>
         </div>
         <div
+          data-insp-path="src/renderer/src/components/DraggableList/__tests__/DraggableList.test.tsx:31:74:div"
           data-testid="placeholder"
         />
       </div>

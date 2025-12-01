@@ -269,13 +269,21 @@ export function mcpToolsToGeminiTools(mcpTools: MCPTool[]): Tool[] {
         const filteredSchema = filterProperties(tool.inputSchema)
         const cleanedProperties = cleanSchemaForGemini(filteredSchema.properties || {})
 
+        // Get the actual property keys from cleanedProperties
+        // This ensures required only contains properties that exist after both filtering and cleaning
+        const actualPropertyKeys = Object.keys(cleanedProperties)
+
+        // Filter the required array to only include properties that actually exist
+        // This prevents Gemini API errors like "property is not defined"
+        const validRequired = (filteredSchema.required || []).filter((key: string) => actualPropertyKeys.includes(key))
+
         return {
           name: tool.id,
           description: tool.description,
           parameters: {
             type: GeminiSchemaType.OBJECT,
             properties: cleanedProperties,
-            required: tool.inputSchema.required || []
+            required: validRequired
           }
         }
       })

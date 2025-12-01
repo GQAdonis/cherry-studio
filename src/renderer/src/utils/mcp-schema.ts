@@ -20,9 +20,14 @@ export function filterProperties(schema: any): any {
   const filtered = { ...schema }
 
   // Process all properties recursively first
+  // Also filter out undefined/null property values which cause Gemini API errors
   if (filtered.properties && typeof filtered.properties === 'object') {
     const newProperties: any = {}
     for (const [key, value] of Object.entries(filtered.properties)) {
+      // Skip undefined or null property values - Gemini requires all properties in 'required' to be defined
+      if (value === undefined || value === null) {
+        continue
+      }
       newProperties[key] = filterProperties(value)
     }
     filtered.properties = newProperties
@@ -67,12 +72,20 @@ export function filterProperties(schema: any): any {
     }
 
     // o3 strict requirement 1: ALL properties must be in required array
+    // But we must ensure required only contains properties that actually exist
     const propertyKeys = Object.keys(filtered.properties)
     filtered.required = propertyKeys
 
     // o3 strict requirement 2: additionalProperties must ALWAYS be false for strict validation
     // This applies regardless of the original value (true, undefined, etc.)
     filtered.additionalProperties = false
+  }
+
+  // Final safety check: if there's a required array, ensure all items exist in properties
+  // This handles cases where the original schema had required items for undefined properties
+  if (filtered.required && Array.isArray(filtered.required) && filtered.properties) {
+    const validPropertyKeys = new Set(Object.keys(filtered.properties))
+    filtered.required = filtered.required.filter((key: string) => validPropertyKeys.has(key))
   }
 
   return filtered

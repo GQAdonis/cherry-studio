@@ -4,9 +4,11 @@ exports[`Link > should match snapshot 1`] = `
 <div>
   <div
     data-href="https://example.com"
+    data-insp-path="src/renderer/src/pages/home/Markdown/__tests__/Link.test.tsx:17:5:div"
     data-testid="hyperlink"
   >
     <a
+      data-insp-path="src/renderer/src/pages/home/Markdown/Link.tsx:52:7:a"
       href="https://example.com"
       rel="noreferrer"
       target="_blank"

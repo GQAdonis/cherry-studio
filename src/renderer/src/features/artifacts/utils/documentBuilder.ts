@@ -17,6 +17,9 @@ const CDN_URLS = {
   // HTMX
   htmx: 'https://unpkg.com/htmx.org@2.0.4',
 
+  // Alpine.js - Lightweight reactive framework, great companion for HTMX
+  alpinejs: 'https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js',
+
   // React + ReactDOM + Babel
   react: 'https://unpkg.com/react@19/umd/react.development.js',
   reactDom: 'https://unpkg.com/react-dom@19/umd/react-dom.development.js',
@@ -111,12 +114,12 @@ function getDefaultTailwindStyles(theme: 'light' | 'dark'): string {
 
   return `
     /* Default component styles when artifact has no explicit Tailwind classes */
-    
+
     /* Body defaults */
     body:not(:has([class*="bg-"])):not(:has([class*="min-h-"])) {
       min-height: 100vh;
     }
-    
+
     /* Default button styles */
     button:not([class*="bg-"]):not([class*="btn"]) {
       padding: 8px 16px;
@@ -135,7 +138,7 @@ function getDefaultTailwindStyles(theme: 'light' | 'dark'): string {
       opacity: 0.5;
       cursor: not-allowed;
     }
-    
+
     /* Default input styles */
     input:not([class*="border"]):not([class*="bg-"]),
     textarea:not([class*="border"]):not([class*="bg-"]),
@@ -154,7 +157,7 @@ function getDefaultTailwindStyles(theme: 'light' | 'dark'): string {
       border-color: #3b82f6;
       box-shadow: 0 0 0 3px ${isDark ? 'rgba(59, 130, 246, 0.3)' : 'rgba(59, 130, 246, 0.2)'};
     }
-    
+
     /* Default card styles */
     .card:not([class*="bg-"]),
     [class*="card"]:not([class*="bg-"]) {
@@ -164,7 +167,7 @@ function getDefaultTailwindStyles(theme: 'light' | 'dark'): string {
       padding: 16px;
       box-shadow: ${isDark ? '0 4px 6px -1px rgba(0, 0, 0, 0.3)' : '0 4px 6px -1px rgba(0, 0, 0, 0.1)'};
     }
-    
+
     /* Default heading styles */
     h1:not([class*="text-"]) {
       font-size: 2rem;
@@ -187,20 +190,20 @@ function getDefaultTailwindStyles(theme: 'light' | 'dark'): string {
       margin-bottom: 0.5rem;
       color: ${isDark ? '#e5e7eb' : '#374151'};
     }
-    
+
     /* Default paragraph/text */
     p:not([class*="text-"]) {
       color: ${isDark ? '#d1d5db' : '#4b5563'};
       line-height: 1.6;
     }
-    
+
     /* Default list styles */
     ul:not([class*="list-"]),
     ol:not([class*="list-"]) {
       padding-left: 1.5rem;
       color: ${isDark ? '#d1d5db' : '#4b5563'};
     }
-    
+
     /* Default link styles */
     a:not([class*="text-"]):not([class*="no-underline"]) {
       color: #3b82f6;
@@ -209,7 +212,7 @@ function getDefaultTailwindStyles(theme: 'light' | 'dark'): string {
     a:not([class*="text-"]):not([class*="no-underline"]):hover {
       text-decoration: underline;
     }
-    
+
     /* Default table styles */
     table:not([class*="border"]) {
       width: 100%;
@@ -413,7 +416,7 @@ function getBridgeScript(artifactId: string, htmxServerPort?: number): string {
       function setupDarkMode() {
         var htmlEl = document.documentElement;
         var currentClass = htmlEl.className;
-        
+
         // If theme is 'auto' or not set, detect system preference
         if (!currentClass || currentClass === 'auto') {
           if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
@@ -424,7 +427,7 @@ function getBridgeScript(artifactId: string, htmxServerPort?: number): string {
             htmlEl.classList.remove('dark', 'auto');
           }
         }
-        
+
         // Listen for system theme changes
         window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function(e) {
           if (e.matches) {
@@ -521,10 +524,19 @@ function buildHtmlDocument(
     scripts.push(`<script src="${CDN_URLS.tailwind}"></script>`)
   }
 
-  // Add HTMX if needed
-  if (isHtmx && options.htmxServerPort) {
-    scripts.push(`<script src="${CDN_URLS.htmx}"></script>`)
-    scripts.push(`<script>${getHtmxConfigScript(options.htmxServerPort, artifactId)}</script>`)
+  // Add HTMX and Alpine.js if needed
+  if (isHtmx) {
+    // Alpine.js - lightweight reactive framework, great companion for HTMX
+    // Must be loaded with defer attribute and before HTMX for proper initialization
+    scripts.push(`<script defer src="${CDN_URLS.alpinejs}"></script>`)
+
+    if (options.htmxServerPort) {
+      scripts.push(`<script src="${CDN_URLS.htmx}"></script>`)
+      scripts.push(`<script>${getHtmxConfigScript(options.htmxServerPort, artifactId)}</script>`)
+    } else {
+      // Still include HTMX even without server port for client-side only usage
+      scripts.push(`<script src="${CDN_URLS.htmx}"></script>`)
+    }
   }
 
   // Custom styles

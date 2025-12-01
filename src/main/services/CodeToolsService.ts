@@ -720,14 +720,10 @@ class CodeToolsService {
         // Build bat file content, including debug information
         const batContent = [
           '@echo off',
-<<<<<<< HEAD
-          `title ${cliTool} - The Boss`, // Set window title in bat file
-=======
           'chcp 65001 >nul 2>&1', // Switch to UTF-8 code page for international path support
           `title ${cliTool} - Cherry Studio`, // Set window title in bat file
->>>>>>> b3a58ec321b22551a70532c8f2173564bf137096
           'echo ================================================',
-          'echo The Boss CLI Tool Launcher',
+          'echo Cherry Studio CLI Tool Launcher',
           `echo Tool: ${cliTool}`,
           `echo Directory: ${directory}`,
           `echo Time: ${new Date().toLocaleString()}`,

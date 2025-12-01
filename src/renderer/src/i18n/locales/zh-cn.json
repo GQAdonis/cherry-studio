@@ -393,6 +393,7 @@
     "change_model": "[to be translated]:Click to change model",
     "click_to_open": "[to be translated]:Click to open artifact",
     "code": "[to be translated]:Code",
+    "console": "[to be translated]:Console",
     "description_help": "[to be translated]:Used for searching artifacts in your library",
     "description_placeholder": "[to be translated]:What does this artifact do?",
     "generating": "[to be translated]:Generating artifact...",
@@ -423,7 +424,12 @@
       "react": "[to be translated]:React",
       "svg": "[to be translated]:SVG"
     },
-    "version": "[to be translated]:Version"
+    "version": "[to be translated]:Version",
+    "view": {
+      "code": "[to be translated]:Code",
+      "preview": "[to be translated]:Preview",
+      "split": "[to be translated]:Split"
+    }
   },
   "assistants": {
     "abbr": "助手",
@@ -3109,6 +3115,40 @@
     "advanced": {
       "auto_switch_to_topics": "自动切换到话题",
       "title": "高级设置"
+    },
+    "artifacts": {
+      "auto_open": "[to be translated]:Auto-open Artifacts",
+      "auto_open_help": "[to be translated]:Automatically open the artifact viewer when a new artifact is created.",
+      "enable": "[to be translated]:Enable Artifact Support",
+      "enable_help": "[to be translated]:When enabled, AI-generated interactive content will be detected and rendered as artifacts.",
+      "enabled_types": "[to be translated]:Enabled Artifact Types",
+      "items": "[to be translated]:items",
+      "react": {
+        "add_dep": "[to be translated]:Add",
+        "custom_bundler_url": "[to be translated]:Custom Bundler URL",
+        "custom_bundler_url_help": "[to be translated]:Optional: URL for a self-hosted Sandpack bundler. Leave empty to use the default CodeSandbox bundler.",
+        "dep_actions": "[to be translated]:Actions",
+        "dep_name": "[to be translated]:Package",
+        "dep_name_placeholder": "[to be translated]:Package name (e.g., framer-motion)",
+        "dep_version": "[to be translated]:Version",
+        "dependencies_help": "[to be translated]:These packages will be available in Sandpack React artifacts. Add commonly used packages here.",
+        "dependencies_title": "[to be translated]:Available Dependencies",
+        "no_deps": "[to be translated]:No dependencies configured",
+        "show_console": "[to be translated]:Show Console",
+        "show_console_help": "[to be translated]:Show the console output panel for debugging React artifacts.",
+        "show_editor": "[to be translated]:Show Code Editor",
+        "show_editor_help": "[to be translated]:Show the code editor panel alongside the preview in Sandpack mode.",
+        "title": "[to be translated]:React Artifact Settings",
+        "use_sandpack": "[to be translated]:Use Sandpack Runtime",
+        "use_sandpack_help": "[to be translated]:Use CodeSandbox Sandpack for React artifacts. Enables NPM dependencies, hot reload, and better error handling. Disable for simple Babel-only transpilation."
+      },
+      "required": "[to be translated]:Required",
+      "storage_limit": "[to be translated]:Storage Limit",
+      "storage_limit_help": "[to be translated]:Maximum number of artifacts to store. Older artifacts will be automatically removed.",
+      "storage_title": "[to be translated]:Storage",
+      "title": "[to be translated]:Artifacts",
+      "types_help": "[to be translated]:Select which types of artifacts should be generated. HTMX is always enabled.",
+      "types_title": "[to be translated]:Artifact Types"
     },
     "assistant": {
       "icon": {

@@ -234,6 +234,19 @@ export interface SettingsState {
     autoOpen: boolean
     enabledTypes: string[]
     storageLimit: number
+    // React/Sandpack specific settings
+    react: {
+      /** Use Sandpack for React artifacts (vs simple Babel transpilation) */
+      useSandpack: boolean
+      /** Show code editor in Sandpack preview */
+      showEditor: boolean
+      /** Show console in Sandpack preview */
+      showConsole: boolean
+      /** Custom bundler URL for self-hosted Sandpack bundler */
+      customBundlerUrl: string
+      /** Pre-installed dependencies available in React artifacts */
+      dependencies: Record<string, string>
+    }
   }
 }
 
@@ -438,7 +451,37 @@ export const initialState: SettingsState = {
     enabled: true,
     autoOpen: false,
     enabledTypes: ['htmx', 'html', 'react', 'svg', 'mermaid', 'markdown', 'code'],
-    storageLimit: 100
+    storageLimit: 100,
+    // React/Sandpack specific settings
+    react: {
+      useSandpack: true,
+      showEditor: false,
+      showConsole: false,
+      customBundlerUrl: '',
+      dependencies: {
+        // UI Components
+        '@radix-ui/react-icons': 'latest',
+        'lucide-react': 'latest',
+        'class-variance-authority': 'latest',
+        clsx: 'latest',
+        'tailwind-merge': 'latest',
+        // Data & API
+        '@supabase/supabase-js': 'latest',
+        axios: 'latest',
+        // Diagrams & Visualization
+        '@xyflow/react': 'latest',
+        recharts: 'latest',
+        // State & Forms
+        zustand: 'latest',
+        'react-hook-form': 'latest',
+        '@hookform/resolvers': 'latest',
+        zod: 'latest',
+        // Utilities
+        'date-fns': 'latest',
+        'lodash-es': 'latest',
+        uuid: 'latest'
+      }
+    }
   }
 }
 
@@ -900,6 +943,28 @@ const settingsSlice = createSlice({
     },
     setArtifactStorageLimit: (state, action: PayloadAction<number>) => {
       state.artifacts.storageLimit = action.payload
+    },
+    // React/Sandpack settings
+    setArtifactReactUseSandpack: (state, action: PayloadAction<boolean>) => {
+      state.artifacts.react.useSandpack = action.payload
+    },
+    setArtifactReactShowEditor: (state, action: PayloadAction<boolean>) => {
+      state.artifacts.react.showEditor = action.payload
+    },
+    setArtifactReactShowConsole: (state, action: PayloadAction<boolean>) => {
+      state.artifacts.react.showConsole = action.payload
+    },
+    setArtifactReactCustomBundlerUrl: (state, action: PayloadAction<string>) => {
+      state.artifacts.react.customBundlerUrl = action.payload
+    },
+    setArtifactReactDependencies: (state, action: PayloadAction<Record<string, string>>) => {
+      state.artifacts.react.dependencies = action.payload
+    },
+    setArtifactReactDependency: (state, action: PayloadAction<{ name: string; version: string }>) => {
+      state.artifacts.react.dependencies[action.payload.name] = action.payload.version
+    },
+    removeArtifactReactDependency: (state, action: PayloadAction<string>) => {
+      delete state.artifacts.react.dependencies[action.payload]
     }
   }
 })
@@ -1039,10 +1104,18 @@ export const {
   setArtifactEnabled,
   setArtifactAutoOpen,
   setArtifactTypes,
-  setArtifactStorageLimit
+  setArtifactStorageLimit,
+  setArtifactReactUseSandpack,
+  setArtifactReactShowEditor,
+  setArtifactReactShowConsole,
+  setArtifactReactCustomBundlerUrl,
+  setArtifactReactDependencies,
+  setArtifactReactDependency,
+  removeArtifactReactDependency
 } = settingsSlice.actions
 
 export default settingsSlice.reducer
 
 // Selectors
 export const selectArtifactSettings = (state: { settings: SettingsState }) => state.settings.artifacts
+export const selectArtifactReactSettings = (state: { settings: SettingsState }) => state.settings.artifacts?.react
