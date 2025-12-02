@@ -121,24 +121,21 @@ function parseArtifactContent(
     appContent = processedContent.replace(/(function\s+App\s*\(|const\s+App\s*=)/, 'export default $1')
   }
 
-  // Determine file extension based on content
-  const hasTypeScript =
-    /:\s*(string|number|boolean|any|void|never|unknown|object)\b/.test(processedContent) ||
-    /<\w+>/.test(processedContent) // Generic types
-  const extension = hasTypeScript ? 'tsx' : 'jsx'
-
-  files[`/App.${extension}`] = appContent
+  // Always use /App.js to override the default template file
+  // Sandpack's react template uses /App.js as the entry point
+  // Using /App.tsx or /App.jsx creates a new file without overriding the default
+  files['/App.js'] = appContent
 
   // Add custom styles if provided
   if (metadata.customStyles) {
     files['/styles.css'] = metadata.customStyles
     // Add import to App file if not already importing styles
     if (!appContent.includes("import './styles.css'") && !appContent.includes('import "./styles.css"')) {
-      files[`/App.${extension}`] = `import './styles.css';\n\n${appContent}`
+      files['/App.js'] = `import './styles.css';\n\n${appContent}`
     }
   }
 
-  return { files, dependencies, extension }
+  return { files, dependencies }
 }
 
 /**

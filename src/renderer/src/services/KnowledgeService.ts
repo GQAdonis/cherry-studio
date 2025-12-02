@@ -26,9 +26,7 @@ import FileManager from './FileManager'
 const logger = loggerService.withContext('RendererKnowledgeService')
 
 export const getKnowledgeBaseParams = (base: KnowledgeBase): KnowledgeBaseParams => {
-  const rerankProvider = getProviderByModel(base.rerankModel)
   const aiProvider = new ModernAiProvider(base.model)
-  const rerankAiProvider = new AiProvider(rerankProvider)
 
   // get preprocess provider from store instead of base.preprocessProvider
   const preprocessProvider = store
@@ -45,7 +43,6 @@ export const getKnowledgeBaseParams = (base: KnowledgeBase): KnowledgeBaseParams
 
   let { baseURL } = routeToEndpoint(actualProvider.apiHost)
 
-  const rerankHost = rerankAiProvider.getBaseURL()
   if (isGeminiProvider(actualProvider)) {
     baseURL = baseURL + '/openai'
   } else if (isAzureOpenAIProvider(actualProvider)) {
@@ -66,6 +63,21 @@ export const getKnowledgeBaseParams = (base: KnowledgeBase): KnowledgeBaseParams
     }
   }
 
+  // Only create rerankApiClient if a rerank model is actually selected
+  let rerankApiClient: KnowledgeBaseParams['rerankApiClient']
+  if (base.rerankModel) {
+    const rerankProvider = getProviderByModel(base.rerankModel)
+    const rerankAiProvider = new AiProvider(rerankProvider)
+    const rerankHost = rerankAiProvider.getBaseURL()
+
+    rerankApiClient = {
+      model: base.rerankModel.id,
+      provider: rerankProvider.name.toLowerCase(),
+      apiKey: rerankAiProvider.getApiKey() || 'secret',
+      baseURL: rerankHost
+    }
+  }
+
   return {
     id: base.id,
     dimensions: base.dimensions,
@@ -77,12 +89,7 @@ export const getKnowledgeBaseParams = (base: KnowledgeBase): KnowledgeBaseParams
     },
     chunkSize,
     chunkOverlap: base.chunkOverlap,
-    rerankApiClient: {
-      model: base.rerankModel?.id || '',
-      provider: rerankProvider.name.toLowerCase(),
-      apiKey: rerankAiProvider.getApiKey() || 'secret',
-      baseURL: rerankHost
-    },
+    rerankApiClient,
     documentCount: base.documentCount,
     preprocessProvider: updatedPreprocessProvider
   }

@@ -10,16 +10,21 @@
  * - Streaming indicator when artifact is being generated
  */
 
-import { CodeOutlined, EyeOutlined, LoadingOutlined } from '@ant-design/icons'
+import { CodeOutlined, EyeOutlined, GlobalOutlined, LoadingOutlined } from '@ant-design/icons'
+import { loggerService } from '@logger'
 import type { Artifact } from '@renderer/features/artifacts'
+import SandpackReactRenderer from '@renderer/features/artifacts/components/SandpackReactRenderer'
 import { buildPreviewDocument } from '@renderer/features/artifacts/utils/documentBuilder'
 import { useAppDispatch, useAppSelector } from '@renderer/store'
 import { selectIsArtifactStreaming, selectStreamingArtifactContent, updateContent } from '@renderer/store/artifacts'
-import { Spin } from 'antd'
+import { selectArtifactReactSettings } from '@renderer/store/settings'
+import { Spin, Tooltip } from 'antd'
 import type { FC } from 'react'
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import styled from 'styled-components'
+
+const logger = loggerService.withContext('ArtifactPreviewPane')
 
 import ArtifactMonacoEditor from './ArtifactMonacoEditor'
 
@@ -33,6 +38,9 @@ const ArtifactPreviewPane: FC<ArtifactPreviewPaneProps> = ({ artifact, viewMode 
   const dispatch = useAppDispatch()
   const iframeRef = useRef<HTMLIFrameElement>(null)
   const [refreshKey, setRefreshKey] = useState(0)
+
+  // Get React artifact settings for Sandpack
+  const reactSettings = useAppSelector(selectArtifactReactSettings)
 
   // Check if artifact content is currently being streamed
   const isArtifactStreaming = useAppSelector(selectIsArtifactStreaming)
@@ -117,6 +125,43 @@ const ArtifactPreviewPane: FC<ArtifactPreviewPaneProps> = ({ artifact, viewMode 
     }
   }, [])
 
+  // Handle opening artifact in external browser
+  const handleOpenExternal = useCallback(async () => {
+    try {
+      const htmlContent = buildPreviewDocument(
+        editedContent,
+        artifact.type,
+        artifact.metadata?.theme === 'dark' ? 'dark' : 'light'
+      )
+      const path = await window.api.file.createTempFile('artifacts-preview.html')
+      await window.api.file.write(path, htmlContent)
+      const filePath = `file://${path}`
+
+      if (window.api.shell?.openExternal) {
+        window.api.shell.openExternal(filePath)
+      } else {
+        logger.error('shell.openExternal not available')
+        window.toast.error(t('chat.artifacts.preview.openExternal.error.content'))
+      }
+    } catch (error) {
+      logger.error('Failed to open artifact in browser:', error as Error)
+      window.toast.error(t('chat.artifacts.preview.openExternal.error.content'))
+    }
+  }, [editedContent, artifact.type, artifact.metadata, t])
+
+  // Check if this is a React artifact and Sandpack should be used
+  const isReactArtifact = artifact.type === 'react'
+  const useSandpackForReact = isReactArtifact && reactSettings?.useSandpack !== false
+
+  // Create artifact with edited content for Sandpack
+  const sandpackArtifact = useMemo(
+    () => ({
+      ...artifact,
+      content: editedContent
+    }),
+    [artifact, editedContent]
+  )
+
   // Render preview iframe with streaming indicator
   const renderPreview = () => {
     // Show streaming indicator when artifact content is being generated
@@ -131,6 +176,24 @@ const ArtifactPreviewPane: FC<ArtifactPreviewPaneProps> = ({ artifact, viewMode 
       )
     }
 
+    // Use SandpackReactRenderer for React artifacts
+    if (useSandpackForReact) {
+      return (
+        <PreviewContainer>
+          <SandpackReactRenderer
+            key={refreshKey}
+            artifact={sandpackArtifact}
+            showEditor={reactSettings?.showEditor ?? false}
+            showPreview={true}
+            showConsole={reactSettings?.showConsole ?? false}
+            width="100%"
+            height="100%"
+          />
+        </PreviewContainer>
+      )
+    }
+
+    // Use iframe for non-React artifacts
     return (
       <PreviewContainer>
         <IframeWrapper>
@@ -181,6 +244,11 @@ const ArtifactPreviewPane: FC<ArtifactPreviewPaneProps> = ({ artifact, viewMode 
           <span>Code</span>
           {hasUnsavedChanges && <UnsavedDot />}
         </TabButton>
+        <Tooltip title={t('chat.artifacts.button.openExternal')}>
+          <OpenExternalButton onClick={handleOpenExternal}>
+            <GlobalOutlined />
+          </OpenExternalButton>
+        </Tooltip>
         {hasUnsavedChanges && (
           <SaveButton onClick={handleSaveChanges}>
             Save <kbd>⌘S</kbd>
@@ -263,12 +331,37 @@ const UnsavedDot = styled.span`
   margin-left: 4px;
 `
 
+const OpenExternalButton = styled.button`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  cursor: pointer;
+  background: transparent;
+  color: var(--color-text-2);
+  transition: all 0.15s ease;
+  margin-left: auto;
+
+  &:hover {
+    background: var(--color-background-mute);
+    color: var(--color-primary);
+  }
+
+  .anticon {
+    font-size: 16px;
+  }
+`
+
 const SaveButton = styled.button`
   display: flex;
   align-items: center;
   gap: 6px;
   padding: 6px 12px;
-  margin-left: auto;
   border: none;
   border-radius: 6px;
   font-size: 12px;

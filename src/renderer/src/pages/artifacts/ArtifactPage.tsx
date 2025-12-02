@@ -21,10 +21,8 @@ import { useTranslation } from 'react-i18next'
 import { useNavigate, useParams } from 'react-router-dom'
 import styled from 'styled-components'
 
-import ArtifactChatPanel from './components/ArtifactChatPanel'
 import ArtifactHeader from './components/ArtifactHeader'
 import ArtifactPreviewPane from './components/ArtifactPreviewPane'
-import ResizablePanes from './components/ResizablePanes'
 
 interface ArtifactData {
   artifact: {
@@ -131,14 +129,7 @@ const ArtifactPage: React.FC = () => {
         artifact={activeArtifact}
       />
       <MainContent>
-        <ResizablePanes
-          left={<ArtifactChatPanel artifact={activeArtifact} />}
-          right={<ArtifactPreviewPane artifact={activeArtifact} viewMode={viewMode} />}
-          initialLeftWidth={320}
-          minLeftWidth={240}
-          maxLeftWidth={500}
-          storageKey="artifact-chat-width"
-        />
+        <ArtifactPreviewPane artifact={activeArtifact} viewMode={viewMode} />
       </MainContent>
     </Container>
   )

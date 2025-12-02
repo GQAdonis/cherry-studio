@@ -1,3 +1,4 @@
+import { loggerService } from '@logger'
 import type { CodeEditorHandles } from '@renderer/components/CodeEditor'
 import CodeEditor from '@renderer/components/CodeEditor'
 import { CopyIcon, FilePngIcon } from '@renderer/components/Icons'
@@ -7,10 +8,12 @@ import { classNames } from '@renderer/utils'
 import { extractHtmlTitle, getFileNameFromHtmlTitle } from '@renderer/utils/formats'
 import { captureScrollableIframeAsBlob, captureScrollableIframeAsDataURL } from '@renderer/utils/image'
 import { Button, Dropdown, Modal, Splitter, Tooltip, Typography } from 'antd'
-import { Camera, Check, Code, Eye, Maximize2, Minimize2, SaveIcon, SquareSplitHorizontal, X } from 'lucide-react'
+import { Camera, Check, Code, Eye, Globe, Maximize2, Minimize2, SaveIcon, SquareSplitHorizontal, X } from 'lucide-react'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import styled from 'styled-components'
+
+const logger = loggerService.withContext('HtmlArtifactsPopup')
 
 interface HtmlArtifactsPopupProps {
   open: boolean
@@ -71,6 +74,24 @@ const HtmlArtifactsPopup: React.FC<HtmlArtifactsPopupProps> = ({ open, title, ht
     [html, t]
   )
 
+  const handleOpenExternal = useCallback(async () => {
+    try {
+      const path = await window.api.file.createTempFile('artifacts-preview.html')
+      await window.api.file.write(path, html)
+      const filePath = `file://${path}`
+
+      if (window.api.shell?.openExternal) {
+        window.api.shell.openExternal(filePath)
+      } else {
+        logger.error('shell.openExternal not available')
+        window.toast.error(t('chat.artifacts.preview.openExternal.error.content'))
+      }
+    } catch (error) {
+      logger.error('Failed to open artifact in browser:', error as Error)
+      window.toast.error(t('chat.artifacts.preview.openExternal.error.content'))
+    }
+  }, [html, t])
+
   const renderHeader = () => (
     <ModalHeader onDoubleClick={() => setIsFullscreen(!isFullscreen)} className={classNames({ drag: isFullscreen })}>
       <HeaderLeft $isFullscreen={isFullscreen}>
@@ -104,6 +125,9 @@ const HtmlArtifactsPopup: React.FC<HtmlArtifactsPopupProps> = ({ open, title, ht
       </HeaderCenter>
 
       <HeaderRight onDoubleClick={(e) => e.stopPropagation()}>
+        <Tooltip title={t('chat.artifacts.button.openExternal')} mouseLeaveDelay={0}>
+          <Button type="text" icon={<Globe size={16} />} onClick={handleOpenExternal} className="nodrag" />
+        </Tooltip>
         <Dropdown
           trigger={['click']}
           menu={{

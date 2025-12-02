@@ -219,6 +219,7 @@ export function anthropicToolUseToMcpTool(mcpTools: MCPTool[] | undefined, toolU
  * - Removes undefined values and "[undefined]" strings
  * - Ensures array items have proper schema objects
  * - Handles nested properties recursively
+ * - Validates 'required' arrays against actual properties to prevent Gemini API errors
  */
 function cleanSchemaForGemini(schema: any): any {
   if (!schema || typeof schema !== 'object') {
@@ -253,6 +254,20 @@ function cleanSchemaForGemini(schema: any): any {
     } else {
       cleaned[key] = value
     }
+  }
+
+  // CRITICAL: Validate 'required' array against actual properties
+  // Gemini API returns "property is not defined" error if required references non-existent properties
+  if (cleaned.required && Array.isArray(cleaned.required) && cleaned.properties) {
+    const actualPropertyKeys = new Set(Object.keys(cleaned.properties))
+    cleaned.required = cleaned.required.filter((key: string) => actualPropertyKeys.has(key))
+    // Remove empty required array
+    if (cleaned.required.length === 0) {
+      delete cleaned.required
+    }
+  } else if (cleaned.required && !cleaned.properties) {
+    // If there's a required array but no properties, remove it
+    delete cleaned.required
   }
 
   return cleaned
