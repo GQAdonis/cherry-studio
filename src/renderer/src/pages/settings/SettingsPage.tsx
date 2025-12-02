@@ -4,6 +4,7 @@ import Scrollbar from '@renderer/components/Scrollbar'
 import ModelSettings from '@renderer/pages/settings/ModelSettings/ModelSettings'
 import { Divider as AntDivider } from 'antd'
 import {
+  AppWindow,
   Brain,
   Cloud,
   Command,
@@ -36,6 +37,7 @@ import DocProcessSettings from './DocProcessSettings'
 import GeneralSettings from './GeneralSettings'
 import MCPSettings from './MCPSettings'
 import MemorySettings from './MemorySettings'
+import MinAppSettings from './MinAppSettings'
 import NotesSettings from './NotesSettings'
 import { ProviderList } from './ProviderSettings'
 import QuickAssistantSettings from './QuickAssistantSettings'
@@ -94,6 +96,12 @@ const SettingsPage: FC = () => {
             <MenuItem className={isRoute('/settings/mcp')}>
               <Hammer size={18} />
               {t('settings.mcp.title')}
+            </MenuItem>
+          </MenuItemLink>
+          <MenuItemLink to="/settings/minapp">
+            <MenuItem className={isRoute('/settings/minapp')}>
+              <AppWindow size={18} />
+              {t('minapp.automation.title')}
             </MenuItem>
           </MenuItemLink>
           <MenuItemLink to="/settings/notes">
@@ -180,6 +188,7 @@ const SettingsPage: FC = () => {
             <Route path="docprocess" element={<DocProcessSettings />} />
             <Route path="quickphrase" element={<QuickPhraseSettings />} />
             <Route path="mcp/*" element={<MCPSettings />} />
+            <Route path="minapp" element={<MinAppSettings />} />
             <Route path="memory" element={<MemorySettings />} />
             <Route path="context" element={<ContextManagementSettings />} />
             <Route path="general/*" element={<GeneralSettings />} />

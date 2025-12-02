@@ -2043,7 +2043,76 @@
         "title": "Delete Custom App"
       }
     },
-    "title": "MinApp"
+    "title": "MinApp",
+    "context": {
+      "sendToChat": "Send to Chat",
+      "sendToKB": "Send to Knowledge Base...",
+      "askAbout": "Ask about this...",
+      "saveAsNote": "Save as Note",
+      "extractPage": "Extract Page Content",
+      "extractConversations": "Extract Conversations",
+      "currentConversation": "Current Conversation",
+      "allConversations": "All Recent Conversations",
+      "selectKnowledgeBase": "Select Knowledge Base",
+      "contentPreview": "Content Preview",
+      "noKnowledgeBases": "No knowledge bases yet"
+    },
+    "automation": {
+      "title": "Mini-App Automation",
+      "description": "Control and extract data from embedded mini-apps",
+      "enabled": "Enable automation features",
+      "enabledDescription": "Allow AI assistants to control mini-apps via MCP tools",
+      "contextMenu": "Enhanced context menu",
+      "contextMenuDescription": "Add 'Send to Chat' and 'Send to KB' options to right-click menu",
+      "contentScript": "Content script injection",
+      "contentScriptDescription": "Enable communication bridge with mini-apps",
+      "conversationExtraction": "Conversation extraction",
+      "conversationExtractionDescription": "Extract conversations from AI chat apps (ChatGPT, Claude, etc.)"
+    },
+    "sdk": {
+      "title": "Developer SDK",
+      "description": "Allow external apps to integrate with Cherry Studio",
+      "enableServer": "Enable SDK server",
+      "enableServerDescription": "Start WebSocket server for external app connections",
+      "port": "Server port",
+      "portDescription": "Port for the SDK WebSocket server",
+      "autoStart": "Auto-start server",
+      "autoStartDescription": "Start SDK server when Cherry Studio launches",
+      "requireApproval": "Require approval",
+      "requireApprovalDescription": "Ask for permission when new apps connect"
+    },
+    "trust": {
+      "title": "App Trust Request",
+      "description": "{{appName}} wants to connect to Cherry Studio",
+      "requestedCapabilities": "Requested permissions:",
+      "capabilities": {
+        "ai": "AI Completion",
+        "aiDescription": "Access AI chat completion services",
+        "knowledge": "Knowledge Bases",
+        "knowledgeDescription": "Search and add to knowledge bases",
+        "memory": "Memory Storage",
+        "memoryDescription": "Store and retrieve persistent data",
+        "mcp": "MCP Tools",
+        "mcpDescription": "Call available MCP tools",
+        "files": "File Access",
+        "filesDescription": "Sandboxed file system access",
+        "settings": "Settings",
+        "settingsDescription": "Read app settings",
+        "clipboard": "Clipboard",
+        "clipboardDescription": "Read and write clipboard",
+        "notifications": "Notifications",
+        "notificationsDescription": "Show system notifications",
+        "tools": "Tool Registration",
+        "toolsDescription": "Register as an MCP tool"
+      },
+      "approve": "Allow",
+      "deny": "Deny",
+      "remember": "Remember this choice",
+      "trustedApps": "Trusted Apps",
+      "noTrustedApps": "No trusted apps",
+      "revoke": "Revoke",
+      "revokeConfirm": "Are you sure you want to revoke trust for {{appName}}?"
+    }
   },
   "minapps": {
     "ant-ling": "Ant Ling",
@@ -3992,14 +4061,17 @@
       "builtinServers": "Builtin Servers",
       "builtinServersDescriptions": {
         "brave_search": "An MCP server implementation integrating the Brave Search API, providing both web and local search functionalities. Requires configuring the BRAVE_API_KEY environment variable",
+        "browser_automation": "Vision-optimized browser automation for embedded mini-apps. Provides high-level tools for AI models to interact with web content using screenshots and element detection.",
         "didi_mcp": "DiDi MCP server providing ride-hailing services including map search, price estimation, order management, and driver tracking. Only available in Mainland China. Requires configuring the DIDI_API_KEY environment variable",
         "dify_knowledge": "Dify's MCP server implementation provides a simple API to interact with Dify. Requires configuring the Dify Key",
         "fetch": "MCP server for retrieving URL web content",
         "filesystem": "A Node.js server implementing the Model Context Protocol (MCP) for file system operations. Requires configuration of directories allowed for access.",
         "mcp_auto_install": "Automatically install MCP service (beta)",
         "memory": "Persistent memory implementation based on a local knowledge graph. This enables the model to remember user-related information across different conversations. Requires configuring the MEMORY_FILE_PATH environment variable.",
+        "minapp_controller": "Control and extract data from embedded mini-apps. Provides tools for conversation extraction, page content scraping, and automated interaction with ChatGPT, Claude, Perplexity, and other web apps.",
         "no": "No description",
         "python": "Execute Python code in a secure sandbox environment. Run Python with Pyodide, supporting most standard libraries and scientific computing packages",
+        "sdk_bridge": "Bridge for dynamically registered tools from mini-apps using the @theboss/sdk. Enables third-party apps to register custom MCP tools at runtime.",
         "sequentialthinking": "A MCP server implementation that provides tools for dynamic and reflective problem solving through structured thinking processes"
       },
       "command": "Command",

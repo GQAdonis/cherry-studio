@@ -344,7 +344,10 @@ const builtInMcpDescriptionKeyMap: Record<BuiltinMCPServerName, string> = {
   [BuiltinMCPServerNames.filesystem]: 'settings.mcp.builtinServersDescriptions.filesystem',
   [BuiltinMCPServerNames.difyKnowledge]: 'settings.mcp.builtinServersDescriptions.dify_knowledge',
   [BuiltinMCPServerNames.python]: 'settings.mcp.builtinServersDescriptions.python',
-  [BuiltinMCPServerNames.didiMCP]: 'settings.mcp.builtinServersDescriptions.didi_mcp'
+  [BuiltinMCPServerNames.didiMCP]: 'settings.mcp.builtinServersDescriptions.didi_mcp',
+  [BuiltinMCPServerNames.minappController]: 'settings.mcp.builtinServersDescriptions.minapp_controller',
+  [BuiltinMCPServerNames.browserAutomation]: 'settings.mcp.builtinServersDescriptions.browser_automation',
+  [BuiltinMCPServerNames.sdkBridge]: 'settings.mcp.builtinServersDescriptions.sdk_bridge'
 } as const
 
 export const getBuiltInMcpServerDescriptionLabel = (key: string): string => {

@@ -173,6 +173,28 @@ export interface SettingsState {
   maxKeepAliveMinapps: number
   showOpenedMinappsInSidebar: boolean
   minappsOpenLinkExternal: boolean
+  // Mini-App Automation
+  minappAutomation: {
+    /** Enable CDP-based automation for mini-apps */
+    enabled: boolean
+    /** Enable enhanced context menu with Send to Chat/KB options */
+    enableContextMenu: boolean
+    /** Auto-inject content script into webviews */
+    injectContentScript: boolean
+    /** Enable conversation extraction from AI chat apps */
+    enableConversationExtraction: boolean
+  }
+  // SDK Settings
+  sdk: {
+    /** Enable the SDK WebSocket server for external apps */
+    enableWebSocketServer: boolean
+    /** WebSocket server port */
+    webSocketPort: number
+    /** Auto-start WebSocket server on app launch */
+    autoStartServer: boolean
+    /** Require approval for new apps */
+    requireApproval: boolean
+  }
   // 隐私设置
   enableDataCollection: boolean
   enableSpellCheck: boolean
@@ -379,6 +401,20 @@ export const initialState: SettingsState = {
   maxKeepAliveMinapps: 3,
   showOpenedMinappsInSidebar: true,
   minappsOpenLinkExternal: false,
+  // Mini-App Automation
+  minappAutomation: {
+    enabled: true,
+    enableContextMenu: true,
+    injectContentScript: true,
+    enableConversationExtraction: true
+  },
+  // SDK Settings
+  sdk: {
+    enableWebSocketServer: false,
+    webSocketPort: 23847,
+    autoStartServer: false,
+    requireApproval: true
+  },
   enableDataCollection: false,
   enableSpellCheck: false,
   spellCheckLanguages: [],
@@ -835,6 +871,12 @@ const settingsSlice = createSlice({
     setMinappsOpenLinkExternal: (state, action: PayloadAction<boolean>) => {
       state.minappsOpenLinkExternal = action.payload
     },
+    setMinappAutomation: (state, action: PayloadAction<Partial<SettingsState['minappAutomation']>>) => {
+      state.minappAutomation = { ...state.minappAutomation, ...action.payload }
+    },
+    setSdkSettings: (state, action: PayloadAction<Partial<SettingsState['sdk']>>) => {
+      state.sdk = { ...state.sdk, ...action.payload }
+    },
     setEnableDataCollection: (state, action: PayloadAction<boolean>) => {
       state.enableDataCollection = action.payload
     },
@@ -1070,6 +1112,8 @@ export const {
   setMaxKeepAliveMinapps,
   setShowOpenedMinappsInSidebar,
   setMinappsOpenLinkExternal,
+  setMinappAutomation,
+  setSdkSettings,
   setEnableDataCollection,
   setEnableSpellCheck,
   setSpellCheckLanguages,
