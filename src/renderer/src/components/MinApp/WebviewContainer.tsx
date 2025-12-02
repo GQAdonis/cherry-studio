@@ -1,5 +1,6 @@
 import { loggerService } from '@logger'
 import { useSettings } from '@renderer/hooks/useSettings'
+import { getMinAppContentScript } from '@renderer/utils/minAppContentScript'
 import type { WebviewTag } from 'electron'
 import { memo, useEffect, useRef } from 'react'
 
@@ -78,6 +79,20 @@ const WebviewContainer = memo(
           window.api?.webview?.setSpellCheckEnabled?.(webviewId, enableSpellCheck)
           // Set link opening behavior for this webview
           window.api?.webview?.setOpenLinkExternal?.(webviewId, minappsOpenLinkExternal)
+
+          // Register context menu for this webview
+          window.api?.minapp?.registerContextMenu?.(webviewId)
+
+          // Register webview with the registry service
+          window.api?.minapp?.registerWebview?.(webviewId, appid, url)
+        }
+
+        // Inject content script for Cherry Bridge
+        if (webviewRef.current) {
+          const contentScript = getMinAppContentScript(appid)
+          webviewRef.current.executeJavaScript(contentScript).catch((err) => {
+            logger.debug(`Failed to inject content script for ${appid}:`, err)
+          })
         }
       }
 

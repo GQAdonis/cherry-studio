@@ -1,0 +1,59 @@
+{
+  "name": "@theboss/sdk",
+  "version": "1.0.0",
+  "description": "SDK for integrating applications with Cherry Studio",
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./webview": {
+      "import": "./dist/webview.mjs",
+      "require": "./dist/webview.js",
+      "types": "./dist/webview.d.ts"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "typecheck": "tsc --noEmit",
+    "lint": "biome lint src",
+    "clean": "rimraf dist"
+  },
+  "keywords": [
+    "cherry-studio",
+    "sdk",
+    "ai",
+    "mcp",
+    "integration"
+  ],
+  "author": "Cherry Studio Team",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/kangfenmao/cherry-studio.git",
+    "directory": "packages/theboss-sdk"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.0",
+    "rimraf": "^5.0.5",
+    "tsup": "^8.0.0",
+    "typescript": "^5.3.0"
+  },
+  "peerDependencies": {
+    "typescript": ">=5.0.0"
+  },
+  "peerDependenciesMeta": {
+    "typescript": {
+      "optional": true
+    }
+  }
+}
+

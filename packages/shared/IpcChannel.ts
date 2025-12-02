@@ -383,5 +383,42 @@ export enum IpcChannel {
   Artifact_ServerStatus = 'artifact:server-status',
   Artifact_GetState = 'artifact:get-state',
   Artifact_UpdateState = 'artifact:update-state',
-  Artifact_ClearState = 'artifact:clear-state'
+  Artifact_ClearState = 'artifact:clear-state',
+
+  // Mini-App Control
+  MinApp_ListWebviews = 'minapp:list-webviews',
+  MinApp_RegisterWebview = 'minapp:register-webview',
+  MinApp_ExecuteScript = 'minapp:execute-script',
+  MinApp_Screenshot = 'minapp:screenshot',
+  MinApp_CDPCommand = 'minapp:cdp-command',
+  MinApp_Navigate = 'minapp:navigate',
+  MinApp_Click = 'minapp:click',
+  MinApp_Type = 'minapp:type',
+  MinApp_Scroll = 'minapp:scroll',
+  MinApp_GetElementInfo = 'minapp:get-element-info',
+  MinApp_WaitForElement = 'minapp:wait-for-element',
+  MinApp_GetPageContent = 'minapp:get-page-content',
+  MinApp_ExtractConversations = 'minapp:extract-conversations',
+
+  // Mini-App Context Menu Actions
+  MinApp_SendToChat = 'minapp:send-to-chat',
+  MinApp_SendToKB = 'minapp:send-to-kb',
+  MinApp_ExtractPage = 'minapp:extract-page',
+  MinApp_ShowKBSelector = 'minapp:show-kb-selector',
+  MinApp_ContextMenuAction = 'minapp:context-menu-action',
+
+  // SDK Communication
+  MinApp_SDK_Connect = 'minapp:sdk-connect',
+  MinApp_SDK_Disconnect = 'minapp:sdk-disconnect',
+  MinApp_SDK_Message = 'minapp:sdk-message',
+  MinApp_SDK_RegisterTool = 'minapp:sdk-register-tool',
+  MinApp_SDK_UnregisterTool = 'minapp:sdk-unregister-tool',
+  MinApp_SDK_ToolCall = 'minapp:sdk-tool-call',
+  MinApp_SDK_ToolResult = 'minapp:sdk-tool-result',
+
+  // App Trust
+  MinApp_Trust_Request = 'minapp:trust-request',
+  MinApp_Trust_Response = 'minapp:trust-response',
+  MinApp_Trust_Revoke = 'minapp:trust-revoke',
+  MinApp_Trust_List = 'minapp:trust-list'
 }

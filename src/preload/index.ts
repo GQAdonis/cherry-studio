@@ -430,6 +430,44 @@ const api = {
       }
     }
   },
+  minapp: {
+    registerWebview: (webContentsId: number, appId: string, url: string) =>
+      ipcRenderer.invoke(IpcChannel.MinApp_RegisterWebview, webContentsId, appId, url),
+    registerContextMenu: (webContentsId: number) =>
+      ipcRenderer.invoke(IpcChannel.MinApp_ContextMenuAction, { action: 'register', webContentsId }),
+    listWebviews: () => ipcRenderer.invoke(IpcChannel.MinApp_ListWebviews),
+    executeScript: (appId: string, script: string) =>
+      ipcRenderer.invoke(IpcChannel.MinApp_ExecuteScript, appId, script),
+    screenshot: (appId: string, options?: { fullPage?: boolean; format?: string }) =>
+      ipcRenderer.invoke(IpcChannel.MinApp_Screenshot, appId, options),
+    navigate: (appId: string, url: string) => ipcRenderer.invoke(IpcChannel.MinApp_Navigate, appId, url),
+    click: (appId: string, x: number, y: number) => ipcRenderer.invoke(IpcChannel.MinApp_Click, appId, x, y),
+    type: (appId: string, text: string) => ipcRenderer.invoke(IpcChannel.MinApp_Type, appId, text),
+    scroll: (appId: string, deltaX: number, deltaY: number) =>
+      ipcRenderer.invoke(IpcChannel.MinApp_Scroll, appId, deltaX, deltaY),
+    getPageContent: (appId: string, format?: string) =>
+      ipcRenderer.invoke(IpcChannel.MinApp_GetPageContent, appId, format),
+    extractConversations: (appId: string, options?: { limit?: number; currentOnly?: boolean }) =>
+      ipcRenderer.invoke(IpcChannel.MinApp_ExtractConversations, appId, options),
+    onContextMenuAction: (
+      callback: (payload: {
+        action: string
+        text?: string
+        url?: string
+        title?: string
+        appId?: string
+        metadata?: Record<string, unknown>
+      }) => void
+    ) => {
+      const listener = (_event: Electron.IpcRendererEvent, payload: any) => {
+        callback(payload)
+      }
+      ipcRenderer.on(IpcChannel.MinApp_ContextMenuAction, listener)
+      return () => {
+        ipcRenderer.off(IpcChannel.MinApp_ContextMenuAction, listener)
+      }
+    }
+  },
   storeSync: {
     subscribe: () => ipcRenderer.invoke(IpcChannel.StoreSync_Subscribe),
     unsubscribe: () => ipcRenderer.invoke(IpcChannel.StoreSync_Unsubscribe),

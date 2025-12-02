@@ -755,7 +755,10 @@ export const BuiltinMCPServerNames = {
   filesystem: '@cherry/filesystem',
   difyKnowledge: '@cherry/dify-knowledge',
   python: '@cherry/python',
-  didiMCP: '@cherry/didi-mcp'
+  didiMCP: '@cherry/didi-mcp',
+  minappController: '@cherry/minapp-controller',
+  browserAutomation: '@cherry/browser-automation',
+  sdkBridge: '@cherry/sdk-bridge'
 } as const
 
 export type BuiltinMCPServerName = (typeof BuiltinMCPServerNames)[keyof typeof BuiltinMCPServerNames]
