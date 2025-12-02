@@ -106,7 +106,7 @@ describe('documentBuilder', () => {
       expect(doc).toContain('unique-id-123')
     })
 
-    it('should build React document with Babel', () => {
+    it('should build React document with esm.sh and shadcn/ui support', () => {
       const artifact = createTestArtifact({
         type: 'react',
         content: 'function App() { return <div>React Component</div>; }'
@@ -115,10 +115,10 @@ describe('documentBuilder', () => {
 
       const doc = buildDocument(artifact, options)
 
-      expect(doc).toContain('react.development.js')
-      expect(doc).toContain('react-dom')
-      expect(doc).toContain('babel')
-      expect(doc).toContain('type="text/babel"')
+      // Now uses esm.sh for React artifacts with full shadcn/ui support
+      expect(doc).toContain('esm.sh/react')
+      expect(doc).toContain('esm.sh/react-dom')
+      expect(doc).toContain('type="module"')
     })
 
     it('should build SVG document', () => {
@@ -209,7 +209,8 @@ describe('documentBuilder', () => {
     it('should handle different artifact types', () => {
       const reactDoc = buildPreviewDocument('function App() { return <div/>; }', 'react')
       expect(reactDoc).toContain('react')
-      expect(reactDoc).toContain('babel')
+      // Now uses esm.sh instead of babel for React artifacts
+      expect(reactDoc).toContain('esm.sh')
 
       const mermaidDoc = buildPreviewDocument('graph TD\n    A-->B', 'mermaid')
       expect(mermaidDoc).toContain('mermaid')

@@ -6,6 +6,7 @@
  */
 
 import { type Artifact, type ArtifactMetadata, ArtifactStatus, type ArtifactType, type RenderOptions } from '../types'
+import { buildReactBrowserDocument } from './reactBrowserTemplate'
 
 /**
  * CDN URLs for external dependencies
@@ -562,47 +563,16 @@ ${content}
 
 /**
  * Build document for React artifacts
+ * Uses the shared React browser template with full shadcn/ui support
  */
 function buildReactDocument(
   content: string,
-  metadata: ArtifactMetadata,
+  _metadata: ArtifactMetadata,
   options: RenderOptions,
-  artifactId: string
+  _artifactId: string
 ): string {
-  // Keep 'auto' for HTML class - script will detect system preference
-  const theme = options.theme
-  const cssTheme = options.theme === 'auto' ? 'light' : options.theme // CSS vars default to light
-
-  // Check if content defines its own App component or uses imports/exports
-  // Per v2.0 spec, AI should provide `function App() {...}` directly
-  const hasAppComponent = /function\s+App\s*\(/.test(content) || /const\s+App\s*=/.test(content)
-  const isModule = content.includes('import ') || content.includes('export ')
-  const componentCode = hasAppComponent || isModule ? content : `function App() {\n  return (\n${content}\n  );\n}`
-
-  return `<!DOCTYPE html>
-<html lang="en" class="${theme}">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <style>${getThemeVariables(cssTheme)}${getBaseStyles()}${getDefaultTailwindStyles(cssTheme)}</style>
-  ${metadata.tailwind ? `<script src="${CDN_URLS.tailwind}"></script>` : ''}
-  ${metadata.customStyles ? `<style>${metadata.customStyles}</style>` : ''}
-  <script src="${CDN_URLS.react}"></script>
-  <script src="${CDN_URLS.reactDom}"></script>
-  <script src="${CDN_URLS.babel}"></script>
-  <script>${getBridgeScript(artifactId)}</script>
-</head>
-<body>
-  <div id="root"></div>
-  <script type="text/babel" data-presets="react">
-    ${componentCode}
-
-    // Render the app
-    const root = ReactDOM.createRoot(document.getElementById('root'));
-    root.render(<App />);
-  </script>
-</body>
-</html>`
+  const cssTheme = options.theme === 'auto' ? 'light' : options.theme
+  return buildReactBrowserDocument(content, 'React Artifact', cssTheme)
 }
 
 /**

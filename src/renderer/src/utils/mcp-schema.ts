@@ -64,28 +64,27 @@ export function filterProperties(schema: any): any {
     }
   }
 
-  // For ALL object schemas in strict mode, ensure proper o3 compliance
+  // For ALL object schemas, ensure proper schema compliance
   if (filtered.type === 'object') {
-    // o3 requirement: object schemas must have a properties field (even if empty)
+    // Requirement: object schemas must have a properties field (even if empty)
     if (!filtered.properties) {
       filtered.properties = {}
     }
 
-    // o3 strict requirement 1: ALL properties must be in required array
-    // But we must ensure required only contains properties that actually exist
-    const propertyKeys = Object.keys(filtered.properties)
-    filtered.required = propertyKeys
-
-    // o3 strict requirement 2: additionalProperties must ALWAYS be false for strict validation
-    // This applies regardless of the original value (true, undefined, etc.)
-    filtered.additionalProperties = false
-  }
-
-  // Final safety check: if there's a required array, ensure all items exist in properties
-  // This handles cases where the original schema had required items for undefined properties
-  if (filtered.required && Array.isArray(filtered.required) && filtered.properties) {
+    // CRITICAL: Validate required array against actual properties
+    // This prevents Gemini API "property is not defined" errors
+    // Do NOT force all properties to be required - preserve original intent
     const validPropertyKeys = new Set(Object.keys(filtered.properties))
-    filtered.required = filtered.required.filter((key: string) => validPropertyKeys.has(key))
+    if (filtered.required && Array.isArray(filtered.required)) {
+      filtered.required = filtered.required.filter((key: string) => validPropertyKeys.has(key))
+      // Remove empty required array to avoid issues
+      if (filtered.required.length === 0) {
+        delete filtered.required
+      }
+    }
+
+    // Set additionalProperties to false for strict validation
+    filtered.additionalProperties = false
   }
 
   return filtered

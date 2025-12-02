@@ -1,13 +1,17 @@
+import { loggerService } from '@logger'
 import SandpackReactRenderer from '@renderer/features/artifacts/components/SandpackReactRenderer'
 import { type Artifact, ArtifactStatus } from '@renderer/features/artifacts/types'
+import { buildReactBrowserDocument } from '@renderer/features/artifacts/utils/reactBrowserTemplate'
 import { useAppSelector } from '@renderer/store'
 import { selectArtifactReactSettings } from '@renderer/store/settings'
-import { Button, Modal, Segmented } from 'antd'
-import { Code2, Columns, Eye, Terminal } from 'lucide-react'
+import { Button, Modal, Segmented, Tooltip } from 'antd'
+import { Code2, Columns, Eye, Globe, Terminal } from 'lucide-react'
 import type { FC } from 'react'
-import { useMemo, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import styled from 'styled-components'
+
+const logger = loggerService.withContext('ReactArtifactsPopup')
 
 type ViewMode = 'preview' | 'code' | 'split'
 
@@ -58,6 +62,25 @@ const ReactArtifactsPopup: FC<Props> = ({ open, title, code, onSave, onClose }) 
     onClose()
   }
 
+  const handleOpenExternal = useCallback(async () => {
+    try {
+      const htmlContent = buildReactBrowserDocument(code, title, 'light')
+      const path = await window.api.file.createTempFile('react-preview.html')
+      await window.api.file.write(path, htmlContent)
+      const filePath = `file://${path}`
+
+      if (window.api.shell?.openExternal) {
+        window.api.shell.openExternal(filePath)
+      } else {
+        logger.error('shell.openExternal not available')
+        window.toast.error(t('chat.artifacts.preview.openExternal.error.content'))
+      }
+    } catch (error) {
+      logger.error('Failed to open artifact in browser:', error as Error)
+      window.toast.error(t('chat.artifacts.preview.openExternal.error.content'))
+    }
+  }, [code, title, t])
+
   const viewModeOptions = [
     { value: 'preview', icon: <Eye size={14} />, label: t('artifacts.view.preview', 'Preview') },
     { value: 'code', icon: <Code2 size={14} />, label: t('artifacts.view.code', 'Code') },
@@ -95,6 +118,9 @@ const ReactArtifactsPopup: FC<Props> = ({ open, title, code, onSave, onClose }) 
           />
         </HeaderCenter>
         <HeaderRight>
+          <Tooltip title={t('chat.artifacts.button.openExternal')}>
+            <Button type="text" icon={<Globe size={14} />} onClick={handleOpenExternal} size="small" />
+          </Tooltip>
           <Button
             type={showConsole ? 'primary' : 'text'}
             icon={<Terminal size={14} />}

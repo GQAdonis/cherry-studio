@@ -10,10 +10,12 @@ import {
   CopyOutlined,
   DownloadOutlined,
   EyeOutlined,
+  GlobalOutlined,
   ReloadOutlined,
   SaveOutlined,
   SplitCellsOutlined
 } from '@ant-design/icons'
+import { loggerService } from '@logger'
 import { Navbar, NavbarCenter } from '@renderer/components/app/Navbar'
 import { useTheme } from '@renderer/context/ThemeProvider'
 import type { Artifact } from '@renderer/features/artifacts'
@@ -25,6 +27,8 @@ import { useTranslation } from 'react-i18next'
 import styled from 'styled-components'
 
 import SaveArtifactModal from './SaveArtifactModal'
+
+const logger = loggerService.withContext('ArtifactHeader')
 
 interface ArtifactHeaderProps {
   title: string
@@ -106,6 +110,24 @@ const ArtifactHeader: FC<ArtifactHeaderProps> = ({ title, viewMode, onViewModeCh
     window.dispatchEvent(new CustomEvent('artifact:refresh'))
   }, [])
 
+  const handleOpenExternal = useCallback(async () => {
+    try {
+      const path = await window.api.file.createTempFile('artifacts-preview.html')
+      await window.api.file.write(path, artifact.content)
+      const filePath = `file://${path}`
+
+      if (window.api.shell?.openExternal) {
+        window.api.shell.openExternal(filePath)
+      } else {
+        logger.error('shell.openExternal not available')
+        message.error(t('chat.artifacts.preview.openExternal.error.content'))
+      }
+    } catch (error) {
+      logger.error('Failed to open artifact in browser:', error as Error)
+      message.error(t('chat.artifacts.preview.openExternal.error.content'))
+    }
+  }, [artifact.content, t])
+
   return (
     <>
       <Navbar>
@@ -145,6 +167,11 @@ const ArtifactHeader: FC<ArtifactHeaderProps> = ({ title, viewMode, onViewModeCh
               <Tooltip title={t('common.download')}>
                 <ActionButton onClick={handleDownload}>
                   <DownloadOutlined />
+                </ActionButton>
+              </Tooltip>
+              <Tooltip title={t('chat.artifacts.button.openExternal')}>
+                <ActionButton onClick={handleOpenExternal}>
+                  <GlobalOutlined />
                 </ActionButton>
               </Tooltip>
               <Tooltip title={t('artifacts.save_to_library')}>

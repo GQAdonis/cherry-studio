@@ -29,7 +29,7 @@ describe('filterProperties', () => {
       expect(result[0]).toEqual({
         type: 'object',
         properties: { name: { type: 'string' } },
-        required: ['name'],
+        // No required array since none was in input
         additionalProperties: false
       })
       expect(result[1]).toEqual({ type: 'string' })
@@ -48,12 +48,12 @@ describe('filterProperties', () => {
       expect(result).toEqual({
         type: 'object',
         properties: {},
-        required: [],
+        // No required array when there are no properties
         additionalProperties: false
       })
     })
 
-    it('should set all property keys as required for object type', () => {
+    it('should NOT set all property keys as required - preserve original intent', () => {
       const input = {
         type: 'object',
         properties: {
@@ -61,25 +61,27 @@ describe('filterProperties', () => {
           age: { type: 'number' },
           active: { type: 'boolean' }
         }
+        // No required array in input
       }
       const result = filterProperties(input)
 
-      expect(result.required).toEqual(['name', 'age', 'active'])
+      // Should NOT have required array since none was provided
+      expect(result.required).toBeUndefined()
       expect(result.additionalProperties).toBe(false)
     })
 
-    it('should override existing required array for object type', () => {
+    it('should preserve and validate existing required array', () => {
       const input = {
         type: 'object',
         properties: {
           name: { type: 'string' },
           age: { type: 'number' }
         },
-        required: ['name'] // This should be overridden
+        required: ['name'] // This should be preserved
       }
       const result = filterProperties(input)
 
-      expect(result.required).toEqual(['name', 'age']) // All properties required
+      expect(result.required).toEqual(['name']) // Only originally required properties
     })
 
     it('should set additionalProperties to false regardless of original value', () => {
@@ -103,7 +105,7 @@ describe('filterProperties', () => {
   })
 
   describe('nested object processing', () => {
-    it('should recursively process nested object properties', () => {
+    it('should recursively process nested object properties and validate required arrays', () => {
       const input = {
         type: 'object',
         properties: {
@@ -116,26 +118,29 @@ describe('filterProperties', () => {
                 properties: {
                   street: { type: 'string' },
                   city: { type: 'string' }
-                }
+                },
+                required: ['street'] // Only street is required
               }
-            }
+            },
+            required: ['name'] // Only name is required
           },
           count: { type: 'number' }
-        }
+        },
+        required: ['user'] // Only user is required at top level
       }
 
       const result = filterProperties(input)
 
-      // Check top level
-      expect(result.required).toEqual(['user', 'count'])
+      // Check top level - preserves original required
+      expect(result.required).toEqual(['user'])
       expect(result.additionalProperties).toBe(false)
 
-      // Check nested user object
-      expect(result.properties.user.required).toEqual(['name', 'address'])
+      // Check nested user object - preserves original required
+      expect(result.properties.user.required).toEqual(['name'])
       expect(result.properties.user.additionalProperties).toBe(false)
 
-      // Check deeply nested address object
-      expect(result.properties.user.properties.address.required).toEqual(['street', 'city'])
+      // Check deeply nested address object - preserves original required
+      expect(result.properties.user.properties.address.required).toEqual(['street'])
       expect(result.properties.user.properties.address.additionalProperties).toBe(false)
     })
   })
@@ -144,8 +149,8 @@ describe('filterProperties', () => {
     it('should process allOf schemas', () => {
       const input = {
         allOf: [
-          { type: 'object', properties: { name: { type: 'string' } } },
-          { type: 'object', properties: { age: { type: 'number' } } }
+          { type: 'object', properties: { name: { type: 'string' } }, required: ['name'] },
+          { type: 'object', properties: { age: { type: 'number' } }, required: ['age'] }
         ]
       }
 
@@ -158,7 +163,7 @@ describe('filterProperties', () => {
 
     it('should process anyOf schemas', () => {
       const input = {
-        anyOf: [{ type: 'object', properties: { name: { type: 'string' } } }, { type: 'string' }]
+        anyOf: [{ type: 'object', properties: { name: { type: 'string' } }, required: ['name'] }, { type: 'string' }]
       }
 
       const result = filterProperties(input)
@@ -171,8 +176,8 @@ describe('filterProperties', () => {
     it('should process oneOf schemas', () => {
       const input = {
         oneOf: [
-          { type: 'object', properties: { id: { type: 'number' } } },
-          { type: 'object', properties: { name: { type: 'string' } } }
+          { type: 'object', properties: { id: { type: 'number' } }, required: ['id'] },
+          { type: 'object', properties: { name: { type: 'string' } }, required: ['name'] }
         ]
       }
 
@@ -187,7 +192,8 @@ describe('filterProperties', () => {
       const input = {
         not: {
           type: 'object',
-          properties: { forbidden: { type: 'string' } }
+          properties: { forbidden: { type: 'string' } },
+          required: ['forbidden']
         }
       }
 
@@ -199,9 +205,9 @@ describe('filterProperties', () => {
 
     it('should process if/then/else schemas', () => {
       const input = {
-        if: { type: 'object', properties: { type: { const: 'user' } } },
-        then: { type: 'object', properties: { name: { type: 'string' } } },
-        else: { type: 'object', properties: { id: { type: 'number' } } }
+        if: { type: 'object', properties: { type: { const: 'user' } }, required: ['type'] },
+        then: { type: 'object', properties: { name: { type: 'string' } }, required: ['name'] },
+        else: { type: 'object', properties: { id: { type: 'number' } }, required: ['id'] }
       }
 
       const result = filterProperties(input)
@@ -221,7 +227,8 @@ describe('filterProperties', () => {
           properties: {
             name: { type: 'string' },
             value: { type: 'number' }
-          }
+          },
+          required: ['name', 'value']
         }
       }
 
@@ -258,11 +265,13 @@ describe('filterProperties', () => {
         patternProperties: {
           '^[a-z]+$': {
             type: 'object',
-            properties: { value: { type: 'string' } }
+            properties: { value: { type: 'string' } },
+            required: ['value']
           },
           '^[A-Z]+$': {
             type: 'object',
-            properties: { count: { type: 'number' } }
+            properties: { count: { type: 'number' } },
+            required: ['count']
           }
         }
       }
@@ -338,7 +347,8 @@ describe('filterProperties', () => {
       const result = filterProperties(input)
 
       expect(result.properties).toEqual({})
-      expect(result.required).toEqual([])
+      // Required array should be removed since all properties were filtered out
+      expect(result.required).toBeUndefined()
     })
 
     it('should handle Gemini-style MCP tool schema with undefined headers', () => {
@@ -368,11 +378,11 @@ describe('filterProperties', () => {
         properties: {
           user: {
             allOf: [
-              { type: 'object', properties: { id: { type: 'string' } } },
+              { type: 'object', properties: { id: { type: 'string' } }, required: ['id'] },
               {
                 anyOf: [
-                  { type: 'object', properties: { name: { type: 'string' } } },
-                  { type: 'object', properties: { email: { type: 'string' } } }
+                  { type: 'object', properties: { name: { type: 'string' } }, required: ['name'] },
+                  { type: 'object', properties: { email: { type: 'string' } }, required: ['email'] }
                 ]
               }
             ]
@@ -385,31 +395,34 @@ describe('filterProperties', () => {
                 title: { type: 'string' },
                 metadata: {
                   type: 'object',
-                  properties: { tags: { type: 'array' } }
+                  properties: { tags: { type: 'array' } },
+                  required: ['tags']
                 }
-              }
+              },
+              required: ['title', 'metadata']
             }
           }
-        }
+        },
+        required: ['user', 'items']
       }
 
       const result = filterProperties(input)
 
-      // Check root level
+      // Check root level - preserves original required
       expect(result.required).toEqual(['user', 'items'])
       expect(result.additionalProperties).toBe(false)
 
-      // Check nested schemas
+      // Check nested schemas - preserves original required
       expect(result.properties.user.allOf[0].required).toEqual(['id'])
       expect(result.properties.user.allOf[1].anyOf[0].required).toEqual(['name'])
       expect(result.properties.user.allOf[1].anyOf[1].required).toEqual(['email'])
 
-      // Check array items
+      // Check array items - preserves original required
       expect(result.properties.items.items.required).toEqual(['title', 'metadata'])
       expect(result.properties.items.items.properties.metadata.required).toEqual(['tags'])
     })
 
-    it('should handle MCP tool schema example', () => {
+    it('should handle MCP tool schema example - preserving original required', () => {
       const mcpToolSchema = {
         type: 'object',
         properties: {
@@ -433,23 +446,25 @@ describe('filterProperties', () => {
                   start: { type: 'string', format: 'date' },
                   end: { type: 'string', format: 'date' }
                 }
+                // No required array - all optional
               }
             }
+            // No required array - all optional
           }
         },
-        required: ['query']
+        required: ['query'] // Only query is required
       }
 
       const result = filterProperties(mcpToolSchema)
 
-      // Check that all properties are now required for o3 strict mode
-      expect(result.required).toEqual(['query', 'limit', 'filters'])
+      // Check that only originally required properties are in required array
+      expect(result.required).toEqual(['query'])
       expect(result.additionalProperties).toBe(false)
 
-      // Check nested objects
-      expect(result.properties.filters.required).toEqual(['category', 'dateRange'])
+      // Check nested objects - no required arrays since none were provided
+      expect(result.properties.filters.required).toBeUndefined()
       expect(result.properties.filters.additionalProperties).toBe(false)
-      expect(result.properties.filters.properties.dateRange.required).toEqual(['start', 'end'])
+      expect(result.properties.filters.properties.dateRange.required).toBeUndefined()
       expect(result.properties.filters.properties.dateRange.additionalProperties).toBe(false)
     })
   })
