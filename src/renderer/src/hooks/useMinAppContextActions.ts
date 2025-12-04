@@ -5,11 +5,16 @@
  * Listens for IPC events and routes actions to appropriate handlers.
  */
 
-import { IpcChannel } from '@shared/IpcChannel'
-import { useCallback, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
-
 import KnowledgeBaseSelectorPopup from '@renderer/components/MinApp/KnowledgeBaseSelector'
+import { getKnowledgeBaseParams } from '@renderer/services/KnowledgeService'
+import type { KnowledgeBase, KnowledgeItem } from '@renderer/types'
+import { uuid } from '@renderer/utils'
+import { minappControllerServer } from '@renderer/utils/mcpServerUtils'
+import { IpcChannel } from '@shared/IpcChannel'
+import { message } from 'antd'
+import { useCallback, useEffect } from 'react'
+import { useSelector } from 'react-redux'
+import { useNavigate } from 'react-router-dom'
 
 export interface ContextMenuActionPayload {
   action: 'send-to-chat' | 'send-to-kb' | 'ask-about' | 'save-as-note' | 'extract-page' | 'extract-conversations'
@@ -20,8 +25,42 @@ export interface ContextMenuActionPayload {
   metadata?: Record<string, unknown>
 }
 
+interface RootState {
+  knowledge: {
+    bases: KnowledgeBase[]
+  }
+}
+
 export function useMinAppContextActions() {
   const navigate = useNavigate()
+  const knowledgeBases = useSelector((state: RootState) => state.knowledge.bases)
+
+  /**
+   * Helper to add content to a knowledge base
+   */
+  const addToKnowledgeBase = useCallback(async (knowledgeBase: KnowledgeBase, content: string, sourceUrl?: string) => {
+    const item: KnowledgeItem = {
+      id: uuid(),
+      type: 'note',
+      content: content,
+      sourceUrl: sourceUrl,
+      created_at: Date.now(),
+      updated_at: Date.now(),
+      processingStatus: 'pending'
+    } as KnowledgeItem & { sourceUrl?: string }
+
+    try {
+      const baseParams = getKnowledgeBaseParams(knowledgeBase)
+      await window.api.knowledgeBase.add({
+        base: baseParams,
+        item
+      })
+      return true
+    } catch (error) {
+      console.error('Failed to add to knowledge base:', error)
+      return false
+    }
+  }, [])
 
   /**
    * Handle send to chat action
@@ -50,40 +89,34 @@ export function useMinAppContextActions() {
   /**
    * Handle send to knowledge base action
    */
-  const handleSendToKB = useCallback(async (payload: ContextMenuActionPayload) => {
-    const { text, url, title } = payload
+  const handleSendToKB = useCallback(
+    async (payload: ContextMenuActionPayload) => {
+      const { text, url, title } = payload
 
-    // Show KB selector
-    const result = await KnowledgeBaseSelectorPopup.show({
-      title: 'Add to Knowledge Base',
-      contentPreview: text
-    })
-
-    if (result.cancelled || !result.knowledgeBaseId) {
-      return
-    }
-
-    // Format content for KB
-    const content = `# ${title || 'Extracted Content'}\n\nSource: ${url || 'Mini-App'}\n\n${text || ''}`
-
-    // Add to knowledge base
-    try {
-      await window.api?.knowledgeBase?.add?.(result.knowledgeBaseId, {
-        content,
-        metadata: {
-          source: 'minapp',
-          url,
-          title,
-          extractedAt: new Date().toISOString()
-        }
+      // Show KB selector
+      const result = await KnowledgeBaseSelectorPopup.show({
+        title: 'Add to Knowledge Base',
+        contentPreview: text
       })
 
-      window.message?.success?.(`Added to "${result.knowledgeBaseName}"`)
-    } catch (error) {
-      console.error('Failed to add to knowledge base:', error)
-      window.message?.error?.('Failed to add to knowledge base')
-    }
-  }, [])
+      if (result.cancelled || !result.knowledgeBase) {
+        return
+      }
+
+      // Format content for KB
+      const content = `# ${title || 'Extracted Content'}\n\nSource: ${url || 'Mini-App'}\n\n${text || ''}`
+
+      // Add to knowledge base
+      const success = await addToKnowledgeBase(result.knowledgeBase, content, url)
+
+      if (success) {
+        message.success(`Added to "${result.knowledgeBaseName}"`)
+      } else {
+        message.error('Failed to add to knowledge base')
+      }
+    },
+    [addToKnowledgeBase]
+  )
 
   /**
    * Handle ask about this action
@@ -118,15 +151,15 @@ export function useMinAppContextActions() {
     try {
       // For now, copy to clipboard as a fallback
       await navigator.clipboard.writeText(noteContent)
-      window.message?.success?.('Note copied to clipboard')
+      message.success('Note copied to clipboard')
     } catch (error) {
       console.error('Failed to save note:', error)
-      window.message?.error?.('Failed to save note')
+      message.error('Failed to save note')
     }
   }, [])
 
   /**
-   * Handle extract page action
+   * Handle extract page action using MCP tool
    */
   const handleExtractPage = useCallback(
     async (payload: ContextMenuActionPayload) => {
@@ -134,76 +167,122 @@ export function useMinAppContextActions() {
       const target = metadata?.target as 'chat' | 'kb'
 
       if (!appId) {
-        window.message?.error?.('No mini-app specified')
+        message.error('No mini-app specified')
         return
       }
 
       try {
+        message.loading('Extracting page content...')
+
         // Call the MCP tool to extract page content
-        const result = await window.api?.mcp?.callTool?.('@cherry/minapp-controller', 'extract_page_content', {
-          appId,
-          format: 'markdown'
+        const result = await window.api.mcp.callTool({
+          server: minappControllerServer,
+          name: 'extract_page_content',
+          args: { appId, format: 'markdown' }
         })
 
-        if (result?.content?.[0]?.text) {
-          const extractedContent = result.content[0].text
+        message.destroy()
 
-          if (target === 'kb') {
-            // Show KB selector
-            const kbResult = await KnowledgeBaseSelectorPopup.show({
-              title: 'Add Page to Knowledge Base',
-              contentPreview: extractedContent
-            })
+        // Check for errors
+        if (result?.isError) {
+          const errorText = result?.content?.[0]?.text || 'Failed to extract content'
+          message.error(errorText)
+          return
+        }
 
-            if (!kbResult.cancelled && kbResult.knowledgeBaseId) {
-              await window.api?.knowledgeBase?.add?.(kbResult.knowledgeBaseId, {
-                content: extractedContent,
-                metadata: {
-                  source: 'minapp-extraction',
-                  appId,
-                  extractedAt: new Date().toISOString()
-                }
-              })
-              window.message?.success?.(`Page added to "${kbResult.knowledgeBaseName}"`)
+        const extractedContent = result?.content?.[0]?.text
+        if (!extractedContent) {
+          message.error('No content extracted from page')
+          return
+        }
+
+        if (target === 'kb') {
+          // Show KB selector
+          const kbResult = await KnowledgeBaseSelectorPopup.show({
+            title: 'Add Page to Knowledge Base',
+            contentPreview: extractedContent.substring(0, 200)
+          })
+
+          if (!kbResult.cancelled && kbResult.knowledgeBase) {
+            const success = await addToKnowledgeBase(kbResult.knowledgeBase, extractedContent)
+            if (success) {
+              message.success(`Page added to "${kbResult.knowledgeBaseName}"`)
+            } else {
+              message.error('Failed to add page to knowledge base')
             }
-          } else {
-            // Send to chat
-            if (window.api?.quoteToMainWindow) {
-              window.api.quoteToMainWindow(extractedContent)
-            }
-            navigate('/')
           }
+        } else {
+          // Send to chat
+          if (window.api?.quoteToMainWindow) {
+            window.api.quoteToMainWindow(extractedContent)
+          }
+          navigate('/')
+          message.success('Page content sent to chat')
         }
       } catch (error) {
         console.error('Failed to extract page:', error)
-        window.message?.error?.('Failed to extract page content')
+        message.destroy()
+        message.error('Failed to extract page content')
       }
     },
-    [navigate]
+    [navigate, addToKnowledgeBase]
   )
 
   /**
-   * Handle extract conversations action
+   * Handle extract conversations action using MCP tool
    */
-  const handleExtractConversations = useCallback(async (payload: ContextMenuActionPayload) => {
-    const { appId, metadata } = payload
-    const currentOnly = metadata?.currentOnly as boolean
+  const handleExtractConversations = useCallback(
+    async (payload: ContextMenuActionPayload) => {
+      const { appId, metadata } = payload
+      const currentOnly = metadata?.currentOnly as boolean
 
-    if (!appId) {
-      window.message?.error?.('No mini-app specified')
-      return
-    }
+      if (!appId) {
+        message.error('No mini-app specified')
+        return
+      }
 
-    try {
-      // Call the MCP tool to extract conversations
-      const result = await window.api?.mcp?.callTool?.('@cherry/minapp-controller', 'extract_conversations', {
-        appId,
-        currentOnly,
-        limit: 10
-      })
+      try {
+        message.loading('Extracting conversations...')
 
-      if (result?.content?.[0]?.text) {
-        const conversations = JSON.parse(result.content[0].text)
+        // Call the MCP tool to extract conversations
+        const result = await window.api.mcp.callTool({
+          server: minappControllerServer,
+          name: 'extract_conversations',
+          args: { appId, currentOnly: currentOnly ?? false, limit: 10 }
+        })
+
+        message.destroy()
+
+        // Check for errors
+        if (result?.isError) {
+          const errorText = result?.content?.[0]?.text || 'Failed to extract conversations'
+          message.error(errorText)
+          return
+        }
+
+        const conversationsJson = result?.content?.[0]?.text
+        if (!conversationsJson) {
+          message.error('No conversations extracted')
+          return
+        }
+
+        let conversations: { title: string; messages: { role: string; content: string }[] }[]
+        try {
+          conversations = JSON.parse(conversationsJson)
+        } catch {
+          // If not JSON, treat as plain text content
+          message.info('Extracted content is not in conversation format')
+          if (window.api?.quoteToMainWindow) {
+            window.api.quoteToMainWindow(conversationsJson)
+          }
+          navigate('/')
+          return
+        }
+
+        if (!Array.isArray(conversations) || conversations.length === 0) {
+          message.warning('No conversations found')
+          return
+        }
 
         // Show KB selector
         const kbResult = await KnowledgeBaseSelectorPopup.show({
@@ -211,10 +290,10 @@ export function useMinAppContextActions() {
           contentPreview: `${conversations.length} conversation(s) extracted`
         })
 
-        if (!kbResult.cancelled && kbResult.knowledgeBaseId) {
+        if (!kbResult.cancelled && kbResult.knowledgeBase) {
           // Format conversations for KB
           const formattedContent = conversations
-            .map((conv: { title: string; messages: { role: string; content: string }[] }) => {
+            .map((conv) => {
               const messages = conv.messages
                 .map((m: { role: string; content: string }) => `**${m.role}**: ${m.content}`)
                 .join('\n\n')
@@ -222,24 +301,21 @@ export function useMinAppContextActions() {
             })
             .join('\n\n---\n\n')
 
-          await window.api?.knowledgeBase?.add?.(kbResult.knowledgeBaseId, {
-            content: formattedContent,
-            metadata: {
-              source: 'minapp-conversations',
-              appId,
-              conversationCount: conversations.length,
-              extractedAt: new Date().toISOString()
-            }
-          })
-
-          window.message?.success?.(`${conversations.length} conversation(s) saved to "${kbResult.knowledgeBaseName}"`)
+          const success = await addToKnowledgeBase(kbResult.knowledgeBase, formattedContent)
+          if (success) {
+            message.success(`${conversations.length} conversation(s) saved to "${kbResult.knowledgeBaseName}"`)
+          } else {
+            message.error('Failed to save conversations to knowledge base')
+          }
         }
+      } catch (error) {
+        console.error('Failed to extract conversations:', error)
+        message.destroy()
+        message.error('Failed to extract conversations')
       }
-    } catch (error) {
-      console.error('Failed to extract conversations:', error)
-      window.message?.error?.('Failed to extract conversations')
-    }
-  }, [])
+    },
+    [navigate, addToKnowledgeBase]
+  )
 
   /**
    * Main action handler
@@ -295,9 +371,9 @@ export function useMinAppContextActions() {
     handleAskAbout,
     handleSaveAsNote,
     handleExtractPage,
-    handleExtractConversations
+    handleExtractConversations,
+    knowledgeBases
   }
 }
 
 export default useMinAppContextActions
-

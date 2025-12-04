@@ -1,8 +1,8 @@
 import { CheckCircleOutlined, CloseCircleOutlined, SafetyOutlined } from '@ant-design/icons'
 import { HStack, VStack } from '@renderer/components/Layout'
 import { useAppDispatch } from '@renderer/store'
-import { setSdkSettings } from '@renderer/store/settings'
 import type { SettingsState } from '@renderer/store/settings'
+import { setSdkSettings } from '@renderer/store/settings'
 import { Button, Checkbox, Divider, Modal, Tag, Typography } from 'antd'
 import type { FC } from 'react'
 import { useState } from 'react'
@@ -13,7 +13,16 @@ import styled from 'styled-components'
 const { Text, Title } = Typography
 
 // SDK Capability types
-export type SDKCapability = 'ai' | 'knowledge' | 'memory' | 'mcp' | 'files' | 'settings' | 'clipboard' | 'notifications' | 'tools'
+export type SDKCapability =
+  | 'ai'
+  | 'knowledge'
+  | 'memory'
+  | 'mcp'
+  | 'files'
+  | 'settings'
+  | 'clipboard'
+  | 'notifications'
+  | 'tools'
 
 export interface AppTrustRequest {
   appId: string
@@ -48,12 +57,7 @@ const CapabilityIcon: FC<{ capability: SDKCapability }> = ({ capability }) => {
   return <span>{iconMap[capability]}</span>
 }
 
-const AppTrustDialog: FC<AppTrustDialogProps> = ({
-  visible,
-  request,
-  onApprove,
-  onDeny
-}) => {
+const AppTrustDialog: FC<AppTrustDialogProps> = ({ visible, request, onApprove, onDeny }) => {
   const { t } = useTranslation()
   const [rememberChoice, setRememberChoice] = useState(true)
   const dispatch = useAppDispatch()
@@ -78,14 +82,7 @@ const AppTrustDialog: FC<AppTrustDialogProps> = ({
   }
 
   return (
-    <Modal
-      open={visible}
-      onCancel={handleDeny}
-      footer={null}
-      centered
-      width={480}
-      closable={false}
-    >
+    <Modal open={visible} onCancel={handleDeny} footer={null} centered width={480} closable={false}>
       <Container>
         <VStack gap={16} style={{ width: '100%' }}>
           {/* Header */}
@@ -97,9 +94,7 @@ const AppTrustDialog: FC<AppTrustDialogProps> = ({
               <Title level={4} style={{ margin: 0 }}>
                 {t('minapp.trust.title')}
               </Title>
-              <Text type="secondary">
-                {t('minapp.trust.description', { appName: request.appName })}
-              </Text>
+              <Text type="secondary">{t('minapp.trust.description', { appName: request.appName })}</Text>
             </VStack>
           </HStack>
 
@@ -141,10 +136,7 @@ const AppTrustDialog: FC<AppTrustDialogProps> = ({
           </VStack>
 
           {/* Remember Choice */}
-          <Checkbox
-            checked={rememberChoice}
-            onChange={(e) => setRememberChoice(e.target.checked)}
-          >
+          <Checkbox checked={rememberChoice} onChange={(e) => setRememberChoice(e.target.checked)}>
             {t('minapp.trust.remember')}
           </Checkbox>
 
@@ -152,17 +144,10 @@ const AppTrustDialog: FC<AppTrustDialogProps> = ({
 
           {/* Actions */}
           <HStack justifyContent="flex-end" gap={8}>
-            <Button
-              icon={<CloseCircleOutlined />}
-              onClick={handleDeny}
-            >
+            <Button icon={<CloseCircleOutlined />} onClick={handleDeny}>
               {t('minapp.trust.deny')}
             </Button>
-            <Button
-              type="primary"
-              icon={<CheckCircleOutlined />}
-              onClick={handleApprove}
-            >
+            <Button type="primary" icon={<CheckCircleOutlined />} onClick={handleApprove}>
               {t('minapp.trust.approve')}
             </Button>
           </HStack>
@@ -209,4 +194,3 @@ const CapabilityItem = styled.div`
 `
 
 export default AppTrustDialog
-

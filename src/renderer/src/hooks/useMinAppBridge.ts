@@ -168,4 +168,3 @@ export function useMinAppBridge(handlers: MinAppBridgeHandlers = {}) {
 }
 
 export default useMinAppBridge
-

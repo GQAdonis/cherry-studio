@@ -23,6 +23,7 @@ import { SettingContainer, SettingDescription, SettingGroup, SettingTitle } from
 import TranslateSettingsPopup from '../TranslateSettingsPopup/TranslateSettingsPopup'
 import ContextManagementSettings from './ContextManagementSettings'
 import DefaultAssistantSettings from './DefaultAssistantSettings'
+import McpContentSettings from './McpContentSettings'
 import TopicNamingModalPopup from './QuickModelPopup'
 
 const ModelSettings: FC = () => {
@@ -133,6 +134,7 @@ const ModelSettings: FC = () => {
         <SettingDescription>{t('settings.models.translate_model_description')}</SettingDescription>
       </SettingGroup>
       <ContextManagementSettings />
+      <McpContentSettings />
     </SettingContainer>
   )
 }

@@ -4,7 +4,7 @@
  * Provides access to Cherry Studio memory storage.
  */
 
-import type { Transport, MemoryService, MemoryEntry, MemorySearchOptions } from '../types'
+import type { MemoryEntry, MemorySearchOptions, MemoryService, Transport } from '../types'
 
 export function createMemoryService(transport: Transport): MemoryService {
   return {
@@ -43,4 +43,3 @@ export function createMemoryService(transport: Transport): MemoryService {
     }
   }
 }
-

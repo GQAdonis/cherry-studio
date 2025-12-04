@@ -2015,6 +2015,31 @@
   "minapp": {
     "add_to_launchpad": "Agregar al panel de inicio",
     "add_to_sidebar": "Agregar a la barra lateral",
+    "automation": {
+      "contentScript": "[to be translated]:Content script injection",
+      "contentScriptDescription": "[to be translated]:Enable communication bridge with mini-apps",
+      "contextMenu": "[to be translated]:Enhanced context menu",
+      "contextMenuDescription": "[to be translated]:Add 'Send to Chat' and 'Send to KB' options to right-click menu",
+      "conversationExtraction": "[to be translated]:Conversation extraction",
+      "conversationExtractionDescription": "[to be translated]:Extract conversations from AI chat apps (ChatGPT, Claude, etc.)",
+      "description": "[to be translated]:Control and extract data from embedded mini-apps",
+      "enabled": "[to be translated]:Enable automation features",
+      "enabledDescription": "[to be translated]:Allow AI assistants to control mini-apps via MCP tools",
+      "title": "[to be translated]:Mini-App Automation"
+    },
+    "context": {
+      "allConversations": "[to be translated]:All Recent Conversations",
+      "askAbout": "[to be translated]:Ask about this...",
+      "contentPreview": "[to be translated]:Content Preview",
+      "currentConversation": "[to be translated]:Current Conversation",
+      "extractConversations": "[to be translated]:Extract Conversations",
+      "extractPage": "[to be translated]:Extract Page Content",
+      "noKnowledgeBases": "[to be translated]:No knowledge bases yet",
+      "saveAsNote": "[to be translated]:Save as Note",
+      "selectKnowledgeBase": "[to be translated]:Select Knowledge Base",
+      "sendToChat": "[to be translated]:Send to Chat",
+      "sendToKB": "[to be translated]:Send to Knowledge Base..."
+    },
     "popup": {
       "close": "Cerrar la aplicación",
       "devtools": "Herramientas de desarrollo",
@@ -2029,6 +2054,18 @@
     },
     "remove_from_launchpad": "Eliminar del panel de inicio",
     "remove_from_sidebar": "Eliminar de la barra lateral",
+    "sdk": {
+      "autoStart": "[to be translated]:Auto-start server",
+      "autoStartDescription": "[to be translated]:Start SDK server when Cherry Studio launches",
+      "description": "[to be translated]:Allow external apps to integrate with Cherry Studio",
+      "enableServer": "[to be translated]:Enable SDK server",
+      "enableServerDescription": "[to be translated]:Start WebSocket server for external app connections",
+      "port": "[to be translated]:Server port",
+      "portDescription": "[to be translated]:Port for the SDK WebSocket server",
+      "requireApproval": "[to be translated]:Require approval",
+      "requireApprovalDescription": "[to be translated]:Ask for permission when new apps connect",
+      "title": "[to be translated]:Developer SDK"
+    },
     "sidebar": {
       "close": {
         "title": "Cerrar"
@@ -2043,7 +2080,39 @@
         "title": "Eliminar aplicación personalizada"
       }
     },
-    "title": "Mini programa"
+    "title": "Mini programa",
+    "trust": {
+      "approve": "[to be translated]:Allow",
+      "capabilities": {
+        "ai": "[to be translated]:AI Completion",
+        "aiDescription": "[to be translated]:Access AI chat completion services",
+        "clipboard": "[to be translated]:Clipboard",
+        "clipboardDescription": "[to be translated]:Read and write clipboard",
+        "files": "[to be translated]:File Access",
+        "filesDescription": "[to be translated]:Sandboxed file system access",
+        "knowledge": "[to be translated]:Knowledge Bases",
+        "knowledgeDescription": "[to be translated]:Search and add to knowledge bases",
+        "mcp": "[to be translated]:MCP Tools",
+        "mcpDescription": "[to be translated]:Call available MCP tools",
+        "memory": "[to be translated]:Memory Storage",
+        "memoryDescription": "[to be translated]:Store and retrieve persistent data",
+        "notifications": "[to be translated]:Notifications",
+        "notificationsDescription": "[to be translated]:Show system notifications",
+        "settings": "[to be translated]:Settings",
+        "settingsDescription": "[to be translated]:Read app settings",
+        "tools": "[to be translated]:Tool Registration",
+        "toolsDescription": "[to be translated]:Register as an MCP tool"
+      },
+      "deny": "[to be translated]:Deny",
+      "description": "[to be translated]:{{appName}} wants to connect to Cherry Studio",
+      "noTrustedApps": "[to be translated]:No trusted apps",
+      "remember": "[to be translated]:Remember this choice",
+      "requestedCapabilities": "[to be translated]:Requested permissions:",
+      "revoke": "[to be translated]:Revoke",
+      "revokeConfirm": "[to be translated]:Are you sure you want to revoke trust for {{appName}}?",
+      "title": "[to be translated]:App Trust Request",
+      "trustedApps": "[to be translated]:Trusted Apps"
+    }
   },
   "minapps": {
     "ant-ling": "Ant Ling",
@@ -3992,14 +4061,17 @@
       "builtinServers": "Servidores integrados",
       "builtinServersDescriptions": {
         "brave_search": "Una implementación de servidor MCP que integra la API de búsqueda de Brave, proporcionando funciones de búsqueda web y búsqueda local. Requiere configurar la variable de entorno BRAVE_API_KEY",
+        "browser_automation": "[to be translated]:Vision-optimized browser automation for embedded mini-apps. Provides high-level tools for AI models to interact with web content using screenshots and element detection.",
         "didi_mcp": "Servidor DiDi MCP que proporciona servicios de transporte incluyendo búsqueda de mapas, estimación de precios, gestión de pedidos y seguimiento de conductores. Disponible solo en China Continental. Requiere configurar la variable de entorno DIDI_API_KEY",
         "dify_knowledge": "Implementación del servidor MCP de Dify, que proporciona una API sencilla para interactuar con Dify. Se requiere configurar la clave de Dify.",
         "fetch": "Servidor MCP para obtener el contenido de la página web de una URL",
         "filesystem": "Servidor Node.js que implementa el protocolo de contexto del modelo (MCP) para operaciones del sistema de archivos. Requiere configuración del directorio permitido para el acceso",
         "mcp_auto_install": "Instalación automática del servicio MCP (versión beta)",
         "memory": "Implementación básica de memoria persistente basada en un grafo de conocimiento local. Esto permite que el modelo recuerde información relevante del usuario entre diferentes conversaciones. Es necesario configurar la variable de entorno MEMORY_FILE_PATH.",
+        "minapp_controller": "[to be translated]:Control and extract data from embedded mini-apps. Provides tools for conversation extraction, page content scraping, and automated interaction with ChatGPT, Claude, Perplexity, and other web apps.",
         "no": "sin descripción",
         "python": "Ejecuta código Python en un entorno sandbox seguro. Usa Pyodide para ejecutar Python, compatible con la mayoría de las bibliotecas estándar y paquetes de cálculo científico.",
+        "sdk_bridge": "[to be translated]:Bridge for dynamically registered tools from mini-apps using the @theboss/sdk. Enables third-party apps to register custom MCP tools at runtime.",
         "sequentialthinking": "Una implementación de servidor MCP que proporciona herramientas para la resolución dinámica y reflexiva de problemas mediante un proceso de pensamiento estructurado"
       },
       "command": "Comando",
@@ -4191,6 +4263,21 @@
       "updateSuccess": "Servidor actualizado exitosamente",
       "url": "URL",
       "user": "Usuario"
+    },
+    "mcpContent": {
+      "autoSummarization": "[to be translated]:Auto-Summarization",
+      "autoSummarizationHelp": "[to be translated]:When enabled, large MCP tool results will be automatically summarized using the quick model. When disabled, large results will be truncated instead.",
+      "description": "[to be translated]:These settings help prevent \"Prompt is too long\" errors when MCP tools return large content (e.g., web search results, extracted pages). Large content is automatically summarized or truncated before being sent to the model.",
+      "maxCharactersForTruncation": "[to be translated]:Truncation Limit (chars)",
+      "maxCharactersForTruncationHelp": "[to be translated]:Maximum characters to keep when truncating (fallback when summarization fails or is disabled). Content beyond this is removed.",
+      "maxToolResultTokens": "[to be translated]:Max Result Tokens",
+      "maxToolResultTokensHelp": "[to be translated]:Absolute maximum tokens allowed for a single MCP tool result. Results exceeding this will always be processed regardless of other settings.",
+      "summarizationThreshold": "[to be translated]:Summarization Threshold",
+      "summarizationThresholdHelp": "[to be translated]:Token count that triggers automatic summarization. Content exceeding this will be processed. Lower values mean more aggressive summarization.",
+      "targetSummarizedTokens": "[to be translated]:Target Summary Size",
+      "targetSummarizedTokensHelp": "[to be translated]:Target token count after summarization. Larger values preserve more detail but use more context. Recommended: 4000-12000 tokens.",
+      "title": "[to be translated]:MCP Tool Content Management",
+      "tooltip": "[to be translated]:Automatically manages large content from MCP tools (like web search) to prevent \"Prompt is too long\" errors. Large results are summarized or truncated before being sent to the model."
     },
     "messages": {
       "divider": {

@@ -7,8 +7,8 @@
  */
 
 import { loggerService } from '@logger'
+import { type WebContents, webContents } from 'electron'
 import { EventEmitter } from 'events'
-import { webContents, type WebContents } from 'electron'
 
 const logger = loggerService.withContext('CDPBridgeService')
 
@@ -184,15 +184,12 @@ class CDPBridgeService extends EventEmitter {
   /**
    * Take a screenshot of the webview
    */
-  async screenshot(
-    webContentsId: number,
-    options: ScreenshotOptions = {}
-  ): Promise<CDPCommandResult<string>> {
+  async screenshot(webContentsId: number, options: ScreenshotOptions = {}): Promise<CDPCommandResult<string>> {
     try {
       const { format = 'png', quality = 80, clip, fullPage = false } = options
 
       // If fullPage, get the full document dimensions first
-      let captureParams: Record<string, unknown> = {
+      const captureParams: Record<string, unknown> = {
         format,
         quality: format === 'jpeg' ? quality : undefined
       }
@@ -211,11 +208,7 @@ class CDPBridgeService extends EventEmitter {
         captureParams.clip = { ...clip, scale: 1 }
       }
 
-      const result = await this.sendCommand<{ data: string }>(
-        webContentsId,
-        'Page.captureScreenshot',
-        captureParams
-      )
+      const result = await this.sendCommand<{ data: string }>(webContentsId, 'Page.captureScreenshot', captureParams)
 
       if (!result.success) {
         return { success: false, error: result.error }
@@ -299,11 +292,7 @@ class CDPBridgeService extends EventEmitter {
   /**
    * Type text into the focused element
    */
-  async type(
-    webContentsId: number,
-    text: string,
-    options: TypeOptions = {}
-  ): Promise<CDPCommandResult<void>> {
+  async type(webContentsId: number, text: string, options: TypeOptions = {}): Promise<CDPCommandResult<void>> {
     try {
       const { delay = 0 } = options
 
@@ -666,4 +655,3 @@ class CDPBridgeService extends EventEmitter {
 // Export singleton instance
 export const cdpBridgeService = new CDPBridgeService()
 export default cdpBridgeService
-

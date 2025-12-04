@@ -171,13 +171,7 @@ export interface ToolDefinition {
 // Event Types
 // ============================================================================
 
-export type CherryEventType =
-  | 'connected'
-  | 'disconnected'
-  | 'error'
-  | 'tool-call'
-  | 'message'
-  | 'capabilities-changed'
+export type CherryEventType = 'connected' | 'disconnected' | 'error' | 'tool-call' | 'message' | 'capabilities-changed'
 
 export interface CherryEvent<T = unknown> {
   type: CherryEventType
@@ -235,4 +229,3 @@ export interface ToolService {
   unregister(name: string): Promise<void>
   list(): ToolDefinition[]
 }
-

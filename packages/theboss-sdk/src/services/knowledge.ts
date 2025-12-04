@@ -5,12 +5,12 @@
  */
 
 import type {
-  Transport,
-  KnowledgeService,
+  KnowledgeAddOptions,
   KnowledgeBase,
   KnowledgeSearchOptions,
   KnowledgeSearchResult,
-  KnowledgeAddOptions
+  KnowledgeService,
+  Transport
 } from '../types'
 
 export function createKnowledgeService(transport: Transport): KnowledgeService {
@@ -40,11 +40,7 @@ export function createKnowledgeService(transport: Transport): KnowledgeService {
     /**
      * Add content to a knowledge base
      */
-    async add(
-      knowledgeBaseId: string,
-      content: string,
-      options: KnowledgeAddOptions = {}
-    ): Promise<{ id: string }> {
+    async add(knowledgeBaseId: string, content: string, options: KnowledgeAddOptions = {}): Promise<{ id: string }> {
       return transport.request<{ id: string }>('knowledge:add', {
         knowledgeBaseId,
         content,
@@ -53,4 +49,3 @@ export function createKnowledgeService(transport: Transport): KnowledgeService {
     }
   }
 }
-

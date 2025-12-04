@@ -7,8 +7,8 @@
  */
 
 import { loggerService } from '@logger'
+import { app, type WebContents, webContents } from 'electron'
 import { EventEmitter } from 'events'
-import { app, webContents, type WebContents } from 'electron'
 
 const logger = loggerService.withContext('WebViewRegistryService')
 
@@ -274,4 +274,3 @@ class WebViewRegistryService extends EventEmitter {
 // Export singleton instance
 export const webViewRegistryService = new WebViewRegistryService()
 export default webViewRegistryService
-

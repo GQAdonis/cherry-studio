@@ -36,7 +36,8 @@ export const BUILTIN_MCP_SERVER_DESCRIPTIONS: Record<string, string> = {
     'Vision-friendly browser automation tools. Take screenshots, click at coordinates, scroll, and type.',
   '@cherry/sdk-bridge':
     'Bridge for external applications using @theboss/sdk. Enables third-party apps to register as MCP tools.',
-  '@cherry/memory': 'Persistent memory storage using a knowledge graph. Store and retrieve information across sessions.',
+  '@cherry/memory':
+    'Persistent memory storage using a knowledge graph. Store and retrieve information across sessions.',
   '@cherry/sequentialthinking':
     'Sequential thinking tool for complex problem-solving through structured thought processes.',
   '@cherry/brave-search': 'Web search using Brave Search API. Requires BRAVE_API_KEY.',
@@ -60,4 +61,3 @@ export function isDefaultExternalServer(serverId: string): boolean {
 export function getBuiltinServerDescription(serverName: string): string | undefined {
   return BUILTIN_MCP_SERVER_DESCRIPTIONS[serverName]
 }
-

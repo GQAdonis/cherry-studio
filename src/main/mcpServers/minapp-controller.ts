@@ -55,8 +55,7 @@ const TOOLS = [
   },
   {
     name: 'extract_page_content',
-    description:
-      'Extract the text content from a mini-app page. Returns the main text content, useful for analysis.',
+    description: 'Extract the text content from a mini-app page. Returns the main text content, useful for analysis.',
     inputSchema: {
       type: 'object',
       properties: {
@@ -368,7 +367,11 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       }
 
       case 'extract_conversations': {
-        const { appId, limit = 10, currentOnly = false } = args as {
+        const {
+          appId,
+          limit = 10,
+          currentOnly = false
+        } = args as {
           appId: string
           limit?: number
           currentOnly?: boolean
@@ -420,7 +423,11 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       }
 
       case 'screenshot': {
-        const { appId, fullPage = false, format = 'png' } = args as {
+        const {
+          appId,
+          fullPage = false,
+          format = 'png'
+        } = args as {
           appId: string
           fullPage?: boolean
           format?: 'png' | 'jpeg' | 'webp'
@@ -453,7 +460,12 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       }
 
       case 'click': {
-        const { appId, x, y, button = 'left' } = args as {
+        const {
+          appId,
+          x,
+          y,
+          button = 'left'
+        } = args as {
           appId: string
           x: number
           y: number
@@ -504,7 +516,12 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       }
 
       case 'type_text': {
-        const { appId, text, selector, clear = false } = args as {
+        const {
+          appId,
+          text,
+          selector,
+          clear = false
+        } = args as {
           appId: string
           text: string
           selector?: string
@@ -551,7 +568,11 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       }
 
       case 'scroll': {
-        const { appId, deltaX = 0, deltaY = 0 } = args as {
+        const {
+          appId,
+          deltaX = 0,
+          deltaY = 0
+        } = args as {
           appId: string
           deltaX?: number
           deltaY?: number
@@ -599,14 +620,19 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
           content: [
             {
               type: 'text',
-              text: result.data !== undefined ? JSON.stringify(result.data, null, 2) : 'Script executed (no return value)'
+              text:
+                result.data !== undefined ? JSON.stringify(result.data, null, 2) : 'Script executed (no return value)'
             }
           ]
         }
       }
 
       case 'wait_for_element': {
-        const { appId, selector, timeout = 30000 } = args as {
+        const {
+          appId,
+          selector,
+          timeout = 30000
+        } = args as {
           appId: string
           selector: string
           timeout?: number
@@ -681,4 +707,3 @@ class MinAppControllerServer {
 }
 
 export default MinAppControllerServer
-

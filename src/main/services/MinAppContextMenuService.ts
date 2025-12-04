@@ -305,4 +305,3 @@ class MinAppContextMenuService {
 
 export const minAppContextMenuService = new MinAppContextMenuService()
 export default minAppContextMenuService
-

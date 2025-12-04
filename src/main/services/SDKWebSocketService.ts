@@ -8,18 +8,18 @@
 import { loggerService } from '@logger'
 import { EventEmitter } from 'events'
 import { createServer, type Server as HttpServer } from 'http'
-import { WebSocketServer, type WebSocket } from 'ws'
+import { type WebSocket, WebSocketServer } from 'ws'
 
-import { appTrustService, type AppCapabilities, type TrustRequest } from './AppTrustService'
 import {
-  registerSDKTool,
-  unregisterAllToolsForApp,
   handleSDKToolResponse,
-  sdkToolEvents,
+  registerSDKTool,
   type SDKTool,
   type SDKToolCallRequest,
-  type SDKToolCallResponse
+  type SDKToolCallResponse,
+  sdkToolEvents,
+  unregisterAllToolsForApp
 } from '../mcpServers/sdk-bridge'
+import { type AppCapabilities, appTrustService, type TrustRequest } from './AppTrustService'
 
 const logger = loggerService.withContext('SDKWebSocketService')
 
@@ -203,7 +203,7 @@ class SDKWebSocketService extends EventEmitter {
   /**
    * Handle incoming message
    */
-  private async handleMessage(ws: WebSocket, tempId: string, message: SDKMessage): Promise<void> {
+  private async handleMessage(ws: WebSocket, _tempId: string, message: SDKMessage): Promise<void> {
     const client = this.getClientByWs(ws)
 
     switch (message.type) {
@@ -467,4 +467,3 @@ class SDKWebSocketService extends EventEmitter {
 
 export const sdkWebSocketService = new SDKWebSocketService()
 export default sdkWebSocketService
-

@@ -2015,6 +2015,31 @@
   "minapp": {
     "add_to_launchpad": "Add to Launchpad",
     "add_to_sidebar": "Add to Sidebar",
+    "automation": {
+      "contentScript": "Content script injection",
+      "contentScriptDescription": "Enable communication bridge with mini-apps",
+      "contextMenu": "Enhanced context menu",
+      "contextMenuDescription": "Add 'Send to Chat' and 'Send to KB' options to right-click menu",
+      "conversationExtraction": "Conversation extraction",
+      "conversationExtractionDescription": "Extract conversations from AI chat apps (ChatGPT, Claude, etc.)",
+      "description": "Control and extract data from embedded mini-apps",
+      "enabled": "Enable automation features",
+      "enabledDescription": "Allow AI assistants to control mini-apps via MCP tools",
+      "title": "Mini-App Automation"
+    },
+    "context": {
+      "allConversations": "All Recent Conversations",
+      "askAbout": "Ask about this...",
+      "contentPreview": "Content Preview",
+      "currentConversation": "Current Conversation",
+      "extractConversations": "Extract Conversations",
+      "extractPage": "Extract Page Content",
+      "noKnowledgeBases": "No knowledge bases yet",
+      "saveAsNote": "Save as Note",
+      "selectKnowledgeBase": "Select Knowledge Base",
+      "sendToChat": "Send to Chat",
+      "sendToKB": "Send to Knowledge Base..."
+    },
     "popup": {
       "close": "Close MinApp",
       "devtools": "Developer Tools",
@@ -2029,6 +2054,18 @@
     },
     "remove_from_launchpad": "Remove from Launchpad",
     "remove_from_sidebar": "Remove from Sidebar",
+    "sdk": {
+      "autoStart": "Auto-start server",
+      "autoStartDescription": "Start SDK server when Cherry Studio launches",
+      "description": "Allow external apps to integrate with Cherry Studio",
+      "enableServer": "Enable SDK server",
+      "enableServerDescription": "Start WebSocket server for external app connections",
+      "port": "Server port",
+      "portDescription": "Port for the SDK WebSocket server",
+      "requireApproval": "Require approval",
+      "requireApprovalDescription": "Ask for permission when new apps connect",
+      "title": "Developer SDK"
+    },
     "sidebar": {
       "close": {
         "title": "Close"
@@ -2044,74 +2081,37 @@
       }
     },
     "title": "MinApp",
-    "context": {
-      "sendToChat": "Send to Chat",
-      "sendToKB": "Send to Knowledge Base...",
-      "askAbout": "Ask about this...",
-      "saveAsNote": "Save as Note",
-      "extractPage": "Extract Page Content",
-      "extractConversations": "Extract Conversations",
-      "currentConversation": "Current Conversation",
-      "allConversations": "All Recent Conversations",
-      "selectKnowledgeBase": "Select Knowledge Base",
-      "contentPreview": "Content Preview",
-      "noKnowledgeBases": "No knowledge bases yet"
-    },
-    "automation": {
-      "title": "Mini-App Automation",
-      "description": "Control and extract data from embedded mini-apps",
-      "enabled": "Enable automation features",
-      "enabledDescription": "Allow AI assistants to control mini-apps via MCP tools",
-      "contextMenu": "Enhanced context menu",
-      "contextMenuDescription": "Add 'Send to Chat' and 'Send to KB' options to right-click menu",
-      "contentScript": "Content script injection",
-      "contentScriptDescription": "Enable communication bridge with mini-apps",
-      "conversationExtraction": "Conversation extraction",
-      "conversationExtractionDescription": "Extract conversations from AI chat apps (ChatGPT, Claude, etc.)"
-    },
-    "sdk": {
-      "title": "Developer SDK",
-      "description": "Allow external apps to integrate with Cherry Studio",
-      "enableServer": "Enable SDK server",
-      "enableServerDescription": "Start WebSocket server for external app connections",
-      "port": "Server port",
-      "portDescription": "Port for the SDK WebSocket server",
-      "autoStart": "Auto-start server",
-      "autoStartDescription": "Start SDK server when Cherry Studio launches",
-      "requireApproval": "Require approval",
-      "requireApprovalDescription": "Ask for permission when new apps connect"
-    },
     "trust": {
-      "title": "App Trust Request",
-      "description": "{{appName}} wants to connect to Cherry Studio",
-      "requestedCapabilities": "Requested permissions:",
+      "approve": "Allow",
       "capabilities": {
         "ai": "AI Completion",
         "aiDescription": "Access AI chat completion services",
-        "knowledge": "Knowledge Bases",
-        "knowledgeDescription": "Search and add to knowledge bases",
-        "memory": "Memory Storage",
-        "memoryDescription": "Store and retrieve persistent data",
-        "mcp": "MCP Tools",
-        "mcpDescription": "Call available MCP tools",
-        "files": "File Access",
-        "filesDescription": "Sandboxed file system access",
-        "settings": "Settings",
-        "settingsDescription": "Read app settings",
         "clipboard": "Clipboard",
         "clipboardDescription": "Read and write clipboard",
+        "files": "File Access",
+        "filesDescription": "Sandboxed file system access",
+        "knowledge": "Knowledge Bases",
+        "knowledgeDescription": "Search and add to knowledge bases",
+        "mcp": "MCP Tools",
+        "mcpDescription": "Call available MCP tools",
+        "memory": "Memory Storage",
+        "memoryDescription": "Store and retrieve persistent data",
         "notifications": "Notifications",
         "notificationsDescription": "Show system notifications",
+        "settings": "Settings",
+        "settingsDescription": "Read app settings",
         "tools": "Tool Registration",
         "toolsDescription": "Register as an MCP tool"
       },
-      "approve": "Allow",
       "deny": "Deny",
-      "remember": "Remember this choice",
-      "trustedApps": "Trusted Apps",
+      "description": "{{appName}} wants to connect to Cherry Studio",
       "noTrustedApps": "No trusted apps",
+      "remember": "Remember this choice",
+      "requestedCapabilities": "Requested permissions:",
       "revoke": "Revoke",
-      "revokeConfirm": "Are you sure you want to revoke trust for {{appName}}?"
+      "revokeConfirm": "Are you sure you want to revoke trust for {{appName}}?",
+      "title": "App Trust Request",
+      "trustedApps": "Trusted Apps"
     }
   },
   "minapps": {
@@ -4263,6 +4263,21 @@
       "updateSuccess": "Server updated successfully",
       "url": "URL",
       "user": "User"
+    },
+    "mcpContent": {
+      "autoSummarization": "Auto-Summarization",
+      "autoSummarizationHelp": "When enabled, large MCP tool results will be automatically summarized using the quick model. When disabled, large results will be truncated instead.",
+      "description": "These settings help prevent \"Prompt is too long\" errors when MCP tools return large content (e.g., web search results, extracted pages). Large content is automatically summarized or truncated before being sent to the model.",
+      "maxCharactersForTruncation": "Truncation Limit (chars)",
+      "maxCharactersForTruncationHelp": "Maximum characters to keep when truncating (fallback when summarization fails or is disabled). Content beyond this is removed.",
+      "maxToolResultTokens": "Max Result Tokens",
+      "maxToolResultTokensHelp": "Absolute maximum tokens allowed for a single MCP tool result. Results exceeding this will always be processed regardless of other settings.",
+      "summarizationThreshold": "Summarization Threshold",
+      "summarizationThresholdHelp": "Token count that triggers automatic summarization. Content exceeding this will be processed. Lower values mean more aggressive summarization.",
+      "targetSummarizedTokens": "Target Summary Size",
+      "targetSummarizedTokensHelp": "Target token count after summarization. Larger values preserve more detail but use more context. Recommended: 4000-12000 tokens.",
+      "title": "MCP Tool Content Management",
+      "tooltip": "Automatically manages large content from MCP tools (like web search) to prevent \"Prompt is too long\" errors. Large results are summarized or truncated before being sent to the model."
     },
     "messages": {
       "divider": {

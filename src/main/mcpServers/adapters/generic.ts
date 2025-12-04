@@ -11,7 +11,6 @@ export const genericAdapter: ExtractionAdapter = {
   name: 'Generic',
   urlPatterns: [/.*/], // Matches everything as fallback
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   getConversationsScript: (_limit: number) => `
     (function() {
       try {
@@ -125,4 +124,3 @@ export const genericAdapter: ExtractionAdapter = {
     })()
   `
 }
-

@@ -155,12 +155,15 @@ class AppTrustService extends EventEmitter {
       })
 
       // Timeout after 5 minutes
-      setTimeout(() => {
-        if (this.pendingRequests.has(requestId)) {
-          this.pendingRequests.delete(requestId)
-          resolve({ approved: false })
-        }
-      }, 5 * 60 * 1000)
+      setTimeout(
+        () => {
+          if (this.pendingRequests.has(requestId)) {
+            this.pendingRequests.delete(requestId)
+            resolve({ approved: false })
+          }
+        },
+        5 * 60 * 1000
+      )
     })
   }
 
@@ -261,4 +264,3 @@ class AppTrustService extends EventEmitter {
 
 export const appTrustService = new AppTrustService()
 export default appTrustService
-

@@ -139,4 +139,3 @@ export class WebViewTransport implements Transport {
 }
 
 export default WebViewTransport
-

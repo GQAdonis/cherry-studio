@@ -1,4 +1,5 @@
 import { loggerService } from '@logger'
+import { processMcpToolResult, shouldProcessMcpContent } from '@renderer/services/McpContentManager'
 import type { MCPCallToolResponse, MCPTool, MCPToolResponse, Model } from '@renderer/types'
 import type { MCPToolCreatedChunk } from '@renderer/types/chunk'
 import { ChunkType } from '@renderer/types/chunk'
@@ -472,9 +473,35 @@ export async function parseAndCallTools<R>(
           try {
             const images: string[] = []
             // 根据工具类型选择不同的调用方式
-            const toolCallResponse = toolResponse.tool.isBuiltIn
+            let toolCallResponse = toolResponse.tool.isBuiltIn
               ? await callBuiltInTool(toolResponse)
               : await callMCPTool(toolResponse, topicId, model.name)
+
+            if (!toolCallResponse) {
+              return
+            }
+
+            // Process large MCP results to prevent "prompt too long" errors
+            if (shouldProcessMcpContent() && !toolCallResponse.isError) {
+              try {
+                const processedResult = await processMcpToolResult(toolCallResponse, model)
+                if (processedResult.wasModified) {
+                  logger.info(`MCP tool result processed: ${processedResult.action}`, {
+                    tool: toolResponse.tool.name,
+                    originalTokens: processedResult.originalTokens,
+                    finalTokens: processedResult.finalTokens,
+                    warning: processedResult.warning
+                  })
+                  toolCallResponse = {
+                    ...toolCallResponse,
+                    content: processedResult.content
+                  }
+                }
+              } catch (processingError) {
+                logger.warn('Failed to process MCP tool result, using original', processingError as Error)
+                // Fall through to use original result
+              }
+            }
 
             // 立即更新为done状态
             upsertMCPToolResponse(
@@ -486,10 +513,6 @@ export async function parseAndCallTools<R>(
               },
               onChunk!
             )
-
-            if (!toolCallResponse) {
-              return
-            }
 
             // 处理图片
             for (const content of toolCallResponse.content) {

@@ -194,6 +194,8 @@ export interface SettingsState {
     autoStartServer: boolean
     /** Require approval for new apps */
     requireApproval: boolean
+    /** Trusted apps and their granted capabilities */
+    trustedApps: Record<string, string[]>
   }
   // 隐私设置
   enableDataCollection: boolean
@@ -250,6 +252,17 @@ export interface SettingsState {
    * If not set, uses the quick model setting.
    */
   contextSummarizationModelId: string | null
+  // MCP Content Management - prevents "prompt too long" errors from large MCP tool results
+  /** Enable auto-summarization of large MCP tool results */
+  mcpAutoSummarization: boolean
+  /** Maximum tokens allowed for a single MCP tool result */
+  mcpMaxToolResultTokens: number
+  /** Token threshold that triggers summarization */
+  mcpSummarizationThreshold: number
+  /** Target token count after summarization */
+  mcpTargetSummarizedTokens: number
+  /** Maximum characters for truncation fallback */
+  mcpMaxCharactersForTruncation: number
   // Artifact settings
   artifacts: {
     enabled: boolean
@@ -413,7 +426,8 @@ export const initialState: SettingsState = {
     enableWebSocketServer: false,
     webSocketPort: 23847,
     autoStartServer: false,
-    requireApproval: true
+    requireApproval: true,
+    trustedApps: {}
   },
   enableDataCollection: false,
   enableSpellCheck: false,
@@ -483,6 +497,12 @@ export const initialState: SettingsState = {
   // Context Management
   contextStrategy: DEFAULT_CONTEXT_STRATEGY_CONFIG,
   contextSummarizationModelId: null,
+  // MCP Content Management
+  mcpAutoSummarization: true,
+  mcpMaxToolResultTokens: 50_000,
+  mcpSummarizationThreshold: 30_000,
+  mcpTargetSummarizedTokens: 8_000,
+  mcpMaxCharactersForTruncation: 100_000,
   artifacts: {
     enabled: true,
     autoOpen: false,
@@ -973,6 +993,22 @@ const settingsSlice = createSlice({
     setContextSummarizationModelId: (state, action: PayloadAction<string | null>) => {
       state.contextSummarizationModelId = action.payload
     },
+    // MCP Content Management actions
+    setMcpAutoSummarization: (state, action: PayloadAction<boolean>) => {
+      state.mcpAutoSummarization = action.payload
+    },
+    setMcpMaxToolResultTokens: (state, action: PayloadAction<number>) => {
+      state.mcpMaxToolResultTokens = action.payload
+    },
+    setMcpSummarizationThreshold: (state, action: PayloadAction<number>) => {
+      state.mcpSummarizationThreshold = action.payload
+    },
+    setMcpTargetSummarizedTokens: (state, action: PayloadAction<number>) => {
+      state.mcpTargetSummarizedTokens = action.payload
+    },
+    setMcpMaxCharactersForTruncation: (state, action: PayloadAction<number>) => {
+      state.mcpMaxCharactersForTruncation = action.payload
+    },
     // Artifact settings
     setArtifactEnabled: (state, action: PayloadAction<boolean>) => {
       state.artifacts.enabled = action.payload
@@ -1145,6 +1181,12 @@ export const {
   setContextStrategy,
   setContextStrategyPartial,
   setContextSummarizationModelId,
+  // MCP Content Management actions
+  setMcpAutoSummarization,
+  setMcpMaxToolResultTokens,
+  setMcpSummarizationThreshold,
+  setMcpTargetSummarizedTokens,
+  setMcpMaxCharactersForTruncation,
   setArtifactEnabled,
   setArtifactAutoOpen,
   setArtifactTypes,

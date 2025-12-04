@@ -7,12 +7,13 @@
  */
 
 import { loggerService } from '@logger'
+
 import { cdpBridgeService, type CDPCommandResult } from '../../services/CDPBridgeService'
 import { chatGPTAdapter } from './chatgpt'
 import { claudeAdapter } from './claude'
-import { perplexityAdapter } from './perplexity'
 import { geminiAdapter } from './gemini'
 import { genericAdapter } from './generic'
+import { perplexityAdapter } from './perplexity'
 
 const logger = loggerService.withContext('ExtractionAdapters')
 
@@ -192,7 +193,6 @@ export async function extractPageContent(
 
 export { chatGPTAdapter } from './chatgpt'
 export { claudeAdapter } from './claude'
-export { perplexityAdapter } from './perplexity'
 export { geminiAdapter } from './gemini'
 export { genericAdapter } from './generic'
-
+export { perplexityAdapter } from './perplexity'

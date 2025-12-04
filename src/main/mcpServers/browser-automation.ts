@@ -264,7 +264,12 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       }
 
       case 'browser_click_at': {
-        const { appId, x, y, double: isDouble = false } = args as {
+        const {
+          appId,
+          x,
+          y,
+          double: isDouble = false
+        } = args as {
           appId: string
           x: number
           y: number
@@ -293,7 +298,13 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       }
 
       case 'browser_type': {
-        const { appId, text, x, y, pressEnter = false } = args as {
+        const {
+          appId,
+          text,
+          x,
+          y,
+          pressEnter = false
+        } = args as {
           appId: string
           text: string
           x?: number
@@ -349,7 +360,11 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       }
 
       case 'browser_scroll': {
-        const { appId, direction, amount = 300 } = args as {
+        const {
+          appId,
+          direction,
+          amount = 300
+        } = args as {
           appId: string
           direction: 'up' | 'down' | 'left' | 'right'
           amount?: number
@@ -534,4 +549,3 @@ class BrowserAutomationServer {
 }
 
 export default BrowserAutomationServer
-

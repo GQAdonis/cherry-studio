@@ -239,4 +239,3 @@ export function getMinimalContentScript(): string {
 }
 
 export default getMinAppContentScript
-

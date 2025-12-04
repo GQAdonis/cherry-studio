@@ -1,4 +1,5 @@
 import { loggerService } from '@logger'
+import { processMcpToolResult, shouldProcessMcpContent } from '@renderer/services/McpContentManager'
 import type { MCPTool, MCPToolResponse } from '@renderer/types'
 import { filterProperties } from '@renderer/utils/mcp-schema'
 import { callMCPTool, getMcpServerByTool, isToolAutoApproved } from '@renderer/utils/mcp-tools'
@@ -103,6 +104,29 @@ export function convertMcpToolsToAiSdkTools(mcpTools: MCPTool[]): ToolSet {
           // throw new Error(result.content?.[0]?.text || 'Tool execution failed')
           return Promise.reject(result)
         }
+
+        // Process large MCP results to prevent "prompt too long" errors
+        if (shouldProcessMcpContent()) {
+          try {
+            const processedResult = await processMcpToolResult(result)
+            if (processedResult.wasModified) {
+              logger.info(`MCP tool result processed: ${processedResult.action}`, {
+                tool: mcpTool.name,
+                originalTokens: processedResult.originalTokens,
+                finalTokens: processedResult.finalTokens,
+                warning: processedResult.warning
+              })
+              return {
+                ...result,
+                content: processedResult.content
+              }
+            }
+          } catch (processingError) {
+            logger.warn('Failed to process MCP tool result, using original', processingError as Error)
+            // Fall through to return original result
+          }
+        }
+
         // 返回工具执行结果
         return result
         // } catch (error) {

@@ -6,17 +6,19 @@
  */
 
 import { BookOutlined, PlusOutlined } from '@ant-design/icons'
-import TopView from '@renderer/components/TopView'
+import { TopView } from '@renderer/components/TopView'
 import { useKnowledgeBases } from '@renderer/hooks/useKnowledge'
-import { Button, Empty, Input, Modal, Radio, Space, Spin } from 'antd'
-import type { FC} from 'react';
-import { useState } from 'react'
+import type { KnowledgeBase } from '@renderer/types'
+import { Button, Empty, Input, Modal, Radio, Space } from 'antd'
+import type { FC } from 'react'
+import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import styled from 'styled-components'
 
 export interface KnowledgeBaseSelectorResult {
   knowledgeBaseId?: string
   knowledgeBaseName?: string
+  knowledgeBase?: KnowledgeBase
   cancelled: boolean
 }
 
@@ -26,9 +28,14 @@ interface Props {
   resolve: (result: KnowledgeBaseSelectorResult) => void
 }
 
+const TopViewKey = 'KnowledgeBaseSelectorPopup'
+
+// Store the hide function reference outside the component
+let currentHideFn: (() => void) | null = null
+
 const PopupContainer: FC<Props> = ({ title, contentPreview, resolve }) => {
   const { t } = useTranslation()
-  const { knowledgeBases, loading } = useKnowledgeBases()
+  const { bases: knowledgeBases } = useKnowledgeBases()
   const [open, setOpen] = useState(true)
   const [selectedKB, setSelectedKB] = useState<string | null>(null)
   const [searchQuery, setSearchQuery] = useState('')
@@ -41,6 +48,7 @@ const PopupContainer: FC<Props> = ({ title, contentPreview, resolve }) => {
     resolve({
       knowledgeBaseId: selectedKB,
       knowledgeBaseName: kb?.name,
+      knowledgeBase: kb,
       cancelled: false
     })
   }
@@ -61,7 +69,13 @@ const PopupContainer: FC<Props> = ({ title, contentPreview, resolve }) => {
       kb.description?.toLowerCase().includes(searchQuery.toLowerCase())
   )
 
-  KnowledgeBaseSelectorPopup.hide = onCancel
+  // Store the hide function
+  useEffect(() => {
+    currentHideFn = onCancel
+    return () => {
+      currentHideFn = null
+    }
+  }, [])
 
   return (
     <Modal
@@ -96,11 +110,7 @@ const PopupContainer: FC<Props> = ({ title, contentPreview, resolve }) => {
           allowClear
         />
 
-        {loading ? (
-          <LoadingContainer>
-            <Spin />
-          </LoadingContainer>
-        ) : filteredKBs.length === 0 ? (
+        {filteredKBs.length === 0 ? (
           <Empty
             description={
               knowledgeBases.length === 0
@@ -140,11 +150,12 @@ const PopupContainer: FC<Props> = ({ title, contentPreview, resolve }) => {
   )
 }
 
-const TopViewKey = 'KnowledgeBaseSelectorPopup'
-
 export default class KnowledgeBaseSelectorPopup {
   static topviewId = 0
-  static hide: () => void = () => {}
+
+  static hide(): void {
+    currentHideFn?.()
+  }
 
   static show(params: Omit<Props, 'resolve'>): Promise<KnowledgeBaseSelectorResult> {
     return new Promise((resolve) => {
@@ -190,12 +201,6 @@ const PreviewText = styled.div`
 
 const SearchInput = styled(Input.Search)`
   margin-bottom: 8px;
-`
-
-const LoadingContainer = styled.div`
-  display: flex;
-  justify-content: center;
-  padding: 40px;
 `
 
 const KnowledgeBaseList = styled.div`
@@ -245,4 +250,3 @@ const KBMeta = styled.div`
   color: var(--color-text-tertiary);
   margin-top: 4px;
 `
-

@@ -15,4 +15,3 @@ export default defineConfig({
   target: 'es2020',
   outDir: 'dist'
 })
-

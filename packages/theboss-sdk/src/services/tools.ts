@@ -4,7 +4,7 @@
  * Allows apps to register themselves as MCP tools callable from Cherry Studio.
  */
 
-import type { Transport, ToolService, ToolDefinition } from '../types'
+import type { ToolDefinition, ToolService, Transport } from '../types'
 
 export function createToolService(transport: Transport, appId: string, appName: string): ToolService {
   const registeredTools: Map<string, ToolDefinition> = new Map()
@@ -84,4 +84,3 @@ export function createToolService(transport: Transport, appId: string, appName: 
     }
   }
 }
-

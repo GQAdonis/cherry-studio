@@ -4,7 +4,7 @@
  * Provides access to MCP tools available in Cherry Studio.
  */
 
-import type { Transport, MCPService, MCPTool, MCPToolCallResult } from '../types'
+import type { MCPService, MCPTool, MCPToolCallResult, Transport } from '../types'
 
 export function createMCPService(transport: Transport): MCPService {
   return {
@@ -27,4 +27,3 @@ export function createMCPService(transport: Transport): MCPService {
     }
   }
 }
-

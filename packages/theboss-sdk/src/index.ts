@@ -45,42 +45,41 @@
 
 // Core
 export { CherryClient, createCherryClient } from './core/CherryClient'
-export { WebViewTransport } from './core/WebViewTransport'
 export { WebSocketTransport } from './core/WebSocketTransport'
+export { WebViewTransport } from './core/WebViewTransport'
 
 // Services
 export { createAIService } from './services/ai'
 export { createKnowledgeService } from './services/knowledge'
-export { createMemoryService } from './services/memory'
 export { createMCPService } from './services/mcp'
+export { createMemoryService } from './services/memory'
 export { createToolService } from './services/tools'
 
 // Types
 export type {
-  CherryClientConfig,
-  AppCapabilities,
-  AIMessage,
   AICompletionOptions,
   AICompletionResult,
-  AIStreamChunk,
   AIEmbeddingResult,
+  AIMessage,
+  AIService,
+  AIStreamChunk,
+  AppCapabilities,
+  CherryClientConfig,
+  CherryEvent,
+  CherryEventHandler,
+  CherryEventType,
+  KnowledgeAddOptions,
   KnowledgeBase,
   KnowledgeSearchOptions,
   KnowledgeSearchResult,
-  KnowledgeAddOptions,
-  MemoryEntry,
-  MemorySearchOptions,
+  KnowledgeService,
+  MCPService,
   MCPTool,
   MCPToolCallResult,
-  ToolDefinition,
-  CherryEventType,
-  CherryEvent,
-  CherryEventHandler,
-  Transport,
-  AIService,
-  KnowledgeService,
+  MemoryEntry,
+  MemorySearchOptions,
   MemoryService,
-  MCPService,
-  ToolService
+  ToolDefinition,
+  ToolService,
+  Transport
 } from './types'
-

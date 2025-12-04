@@ -4,26 +4,26 @@
  * The primary interface for interacting with Cherry Studio from external applications.
  */
 
-import type {
-  CherryClientConfig,
-  AppCapabilities,
-  CherryEventType,
-  CherryEventHandler,
-  Transport,
-  AIService,
-  KnowledgeService,
-  MemoryService,
-  MCPService,
-  ToolService,
-  ToolDefinition
-} from '../types'
-import { WebViewTransport } from './WebViewTransport'
-import { WebSocketTransport } from './WebSocketTransport'
 import { createAIService } from '../services/ai'
 import { createKnowledgeService } from '../services/knowledge'
-import { createMemoryService } from '../services/memory'
 import { createMCPService } from '../services/mcp'
+import { createMemoryService } from '../services/memory'
 import { createToolService } from '../services/tools'
+import type {
+  AIService,
+  AppCapabilities,
+  CherryClientConfig,
+  CherryEventHandler,
+  CherryEventType,
+  KnowledgeService,
+  MCPService,
+  MemoryService,
+  ToolDefinition,
+  ToolService,
+  Transport
+} from '../types'
+import { WebSocketTransport } from './WebSocketTransport'
+import { WebViewTransport } from './WebViewTransport'
 
 export class CherryClient {
   private config: CherryClientConfig
@@ -238,4 +238,3 @@ export function createCherryClient(config: CherryClientConfig): CherryClient {
 }
 
 export default CherryClient
-

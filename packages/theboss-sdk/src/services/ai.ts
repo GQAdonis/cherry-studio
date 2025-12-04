@@ -5,13 +5,13 @@
  */
 
 import type {
-  Transport,
-  AIService,
-  AIMessage,
   AICompletionOptions,
   AICompletionResult,
+  AIEmbeddingResult,
+  AIMessage,
+  AIService,
   AIStreamChunk,
-  AIEmbeddingResult
+  Transport
 } from '../types'
 
 export function createAIService(transport: Transport): AIService {
@@ -88,4 +88,3 @@ export function createAIService(transport: Transport): AIService {
     }
   }
 }
-
