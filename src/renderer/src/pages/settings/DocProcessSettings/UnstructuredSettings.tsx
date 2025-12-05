@@ -2,7 +2,10 @@ import { ExportOutlined } from '@ant-design/icons'
 import { InfoTooltip } from '@renderer/components/TooltipIcons'
 import { getPreprocessProviderLogo, PREPROCESS_PROVIDER_CONFIG } from '@renderer/config/preprocessProviders'
 import { usePreprocessProvider } from '@renderer/hooks/usePreprocess'
+import { useAppDispatch, useAppSelector } from '@renderer/store'
+import { updateMCPServer } from '@renderer/store/mcp'
 import type { PreprocessProvider, UnstructuredOptions } from '@renderer/types'
+import { BuiltinMCPServerNames } from '@renderer/types'
 import { formatApiKeys } from '@renderer/utils'
 import { Avatar, Button, Divider, Flex, Input, InputNumber, Select, Slider, Switch } from 'antd'
 import Link from 'antd/es/typography/Link'
@@ -30,6 +33,8 @@ interface Props {
 export const UnstructuredSettings: FC<Props> = ({ provider: _provider }) => {
   const { provider, updateProvider } = usePreprocessProvider(_provider.id)
   const { t } = useTranslation()
+  const dispatch = useAppDispatch()
+  const mcpServers = useAppSelector((state) => state.mcp.servers)
 
   const [apiKey, setApiKey] = useState(provider.apiKey || '')
   const [apiHost, setApiHost] = useState(provider.apiHost || '')
@@ -58,9 +63,30 @@ export const UnstructuredSettings: FC<Props> = ({ provider: _provider }) => {
     setEnabledMimeTypes(opts.enabledMimeTypes || [])
   }, [provider])
 
+  // Sync MCP server configuration with Unstructured config
+  const syncMCPServer = useCallback(
+    (updates: { apiKey?: string; apiHost?: string; isActive?: boolean }) => {
+      const unstructuredServer = mcpServers.find((s) => s.name === BuiltinMCPServerNames.unstructured)
+      if (unstructuredServer) {
+        const updatedServer = {
+          ...unstructuredServer,
+          env: {
+            ...unstructuredServer.env,
+            ...(updates.apiKey !== undefined && { UNSTRUCTURED_API_KEY: updates.apiKey }),
+            ...(updates.apiHost !== undefined && { UNSTRUCTURED_API_URL: updates.apiHost })
+          },
+          ...(updates.isActive !== undefined && { isActive: updates.isActive })
+        }
+        dispatch(updateMCPServer(updatedServer))
+      }
+    },
+    [mcpServers, dispatch]
+  )
+
   const onUpdateApiKey = () => {
     if (apiKey !== provider.apiKey) {
       updateProvider({ apiKey, quota: undefined })
+      syncMCPServer({ apiKey })
     }
   }
 
@@ -71,6 +97,7 @@ export const UnstructuredSettings: FC<Props> = ({ provider: _provider }) => {
     }
     if (trimmedHost !== provider.apiHost) {
       updateProvider({ apiHost: trimmedHost })
+      syncMCPServer({ apiHost: trimmedHost })
     } else {
       setApiHost(provider.apiHost || '')
     }
@@ -108,6 +135,8 @@ export const UnstructuredSettings: FC<Props> = ({ provider: _provider }) => {
   const handleEnableChatToolChange = (checked: boolean) => {
     setEnableChatTool(checked)
     updateOptions({ enableChatTool: checked })
+    // Sync with MCP server
+    syncMCPServer({ isActive: checked })
   }
 
   const handleMimeTypesChange = (types: string[]) => {

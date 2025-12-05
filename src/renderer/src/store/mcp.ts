@@ -198,7 +198,7 @@ export const builtinMCPServers: BuiltinMCPServer[] = [
     isActive: false,
     env: {
       UNSTRUCTURED_API_KEY: 'YOUR_UNSTRUCTURED_API_KEY',
-      UNSTRUCTURED_API_URL: 'https://api.unstructured.io'
+      UNSTRUCTURED_API_URL: 'https://api.unstructuredapp.io/general/v0/general'
     },
     shouldConfig: true,
     provider: 'CherryAI',

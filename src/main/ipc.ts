@@ -1027,24 +1027,40 @@ export function registerIpc(mainWindow: BrowserWindow, app: Electron.App) {
   ipcMain.handle(IpcChannel.OCR_ListProviders, () => ocrService.listProviderIds())
 
   // Unstructured
-  ipcMain.handle(IpcChannel.Unstructured_ProcessDocument, unstructuredService.processDocument)
-  ipcMain.handle(IpcChannel.Unstructured_BatchProcess, unstructuredService.batchProcessDocuments)
-  ipcMain.handle(IpcChannel.Unstructured_TestConnection, unstructuredService.testConnection)
-  ipcMain.handle(IpcChannel.Unstructured_GetSupportedTypes, unstructuredService.getSupportedMimeTypes)
-  ipcMain.handle(IpcChannel.Unstructured_ProcessForTool, unstructuredService.processDocumentForTool)
+  ipcMain.handle(IpcChannel.Unstructured_ProcessDocument, (event, filePath, options) =>
+    unstructuredService.processDocument(event, filePath, options)
+  )
+  ipcMain.handle(IpcChannel.Unstructured_BatchProcess, (event, filePaths, options) =>
+    unstructuredService.batchProcessDocuments(event, filePaths, options)
+  )
+  ipcMain.handle(IpcChannel.Unstructured_TestConnection, (event, apiKey, apiHost) =>
+    unstructuredService.testConnection(event, apiKey, apiHost)
+  )
+  ipcMain.handle(IpcChannel.Unstructured_GetSupportedTypes, () => unstructuredService.getSupportedMimeTypes())
+  ipcMain.handle(IpcChannel.Unstructured_ProcessForTool, (event, params) =>
+    unstructuredService.processDocumentForTool(event, params)
+  )
 
   // E2B
-  ipcMain.handle(IpcChannel.E2B_ExecuteCode, e2bService.executeCode)
-  ipcMain.handle(IpcChannel.E2B_ListFiles, e2bService.listFiles)
-  ipcMain.handle(IpcChannel.E2B_ReadFile, e2bService.readFile)
-  ipcMain.handle(IpcChannel.E2B_WriteFile, e2bService.writeFile)
-  ipcMain.handle(IpcChannel.E2B_GetDownloadUrl, e2bService.getDownloadUrl)
-  ipcMain.handle(IpcChannel.E2B_DeleteFile, e2bService.deleteFile)
-  ipcMain.handle(IpcChannel.E2B_MakeDirectory, e2bService.makeDirectory)
-  ipcMain.handle(IpcChannel.E2B_GetSandboxInfo, e2bService.getSandboxInfo)
-  ipcMain.handle(IpcChannel.E2B_TestConnection, e2bService.testConnection)
-  ipcMain.handle(IpcChannel.E2B_CloseSandbox, e2bService.closeSandbox)
-  ipcMain.handle(IpcChannel.E2B_ExecuteForTool, e2bService.executeCodeForTool)
+  ipcMain.handle(IpcChannel.E2B_ExecuteCode, (event, codeOrOptions) => e2bService.executeCode(event, codeOrOptions))
+  ipcMain.handle(IpcChannel.E2B_ListFiles, (event, path?, sessionId?) => e2bService.listFiles(event, path, sessionId))
+  ipcMain.handle(IpcChannel.E2B_ReadFile, (event, options, sessionId) => e2bService.readFile(event, options, sessionId))
+  ipcMain.handle(IpcChannel.E2B_WriteFile, (event, options, sessionId) =>
+    e2bService.writeFile(event, options, sessionId)
+  )
+  ipcMain.handle(IpcChannel.E2B_GetDownloadUrl, (event, path, sessionId) =>
+    e2bService.getDownloadUrl(event, path, sessionId)
+  )
+  ipcMain.handle(IpcChannel.E2B_DeleteFile, (event, path, sessionId) => e2bService.deleteFile(event, path, sessionId))
+  ipcMain.handle(IpcChannel.E2B_MakeDirectory, (event, path, sessionId) =>
+    e2bService.makeDirectory(event, path, sessionId)
+  )
+  ipcMain.handle(IpcChannel.E2B_GetSandboxInfo, (event, sessionId) => e2bService.getSandboxInfo(event, sessionId))
+  ipcMain.handle(IpcChannel.E2B_TestConnection, (event, apiKey, apiUrl) =>
+    e2bService.testConnection(event, apiKey, apiUrl)
+  )
+  ipcMain.handle(IpcChannel.E2B_CloseSandbox, (event, sessionId) => e2bService.closeSandbox(event, sessionId))
+  ipcMain.handle(IpcChannel.E2B_ExecuteForTool, (event, params) => e2bService.executeCodeForTool(event, params))
 
   // OVMS
   ipcMain.handle(IpcChannel.Ovms_AddModel, (_, modelName: string, modelId: string, modelSource: string, task: string) =>

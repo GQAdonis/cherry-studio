@@ -4,7 +4,9 @@ import { InfoTooltip } from '@renderer/components/TooltipIcons'
 import { useTheme } from '@renderer/context/ThemeProvider'
 import { useAppDispatch, useAppSelector } from '@renderer/store'
 import { updateE2BConfig, updateE2BOptions } from '@renderer/store/e2b'
+import { updateMCPServer } from '@renderer/store/mcp'
 import type { E2BOptions } from '@renderer/types'
+import { BuiltinMCPServerNames } from '@renderer/types'
 import { formatApiKeys } from '@renderer/utils'
 import { Avatar, Button, Divider, Flex, Input, InputNumber, Select, Slider, Switch } from 'antd'
 import Link from 'antd/es/typography/Link'
@@ -31,6 +33,7 @@ const E2BSettings: FC = () => {
   const { theme: themeMode } = useTheme()
   const dispatch = useAppDispatch()
   const config = useAppSelector((state) => state.e2b)
+  const mcpServers = useAppSelector((state) => state.mcp.servers)
 
   const [apiKey, setApiKey] = useState(config.apiKey || '')
   const [apiUrl, setApiUrl] = useState(config.apiHost || 'https://api.e2b.dev')
@@ -50,9 +53,30 @@ const E2BSettings: FC = () => {
     setEnableChatTool(config.options?.enableChatTool ?? false)
   }, [config])
 
+  // Sync MCP server configuration with E2B config
+  const syncMCPServer = useCallback(
+    (updates: { apiKey?: string; apiUrl?: string; isActive?: boolean }) => {
+      const e2bServer = mcpServers.find((s) => s.name === BuiltinMCPServerNames.e2b)
+      if (e2bServer) {
+        const updatedServer = {
+          ...e2bServer,
+          env: {
+            ...e2bServer.env,
+            ...(updates.apiKey !== undefined && { E2B_API_KEY: updates.apiKey }),
+            ...(updates.apiUrl !== undefined && { E2B_API_URL: updates.apiUrl })
+          },
+          ...(updates.isActive !== undefined && { isActive: updates.isActive })
+        }
+        dispatch(updateMCPServer(updatedServer))
+      }
+    },
+    [mcpServers, dispatch]
+  )
+
   const onUpdateApiKey = () => {
     if (apiKey !== config.apiKey) {
       dispatch(updateE2BConfig({ apiKey }))
+      syncMCPServer({ apiKey })
     }
   }
 
@@ -63,6 +87,7 @@ const E2BSettings: FC = () => {
     }
     if (trimmedUrl !== config.apiHost) {
       dispatch(updateE2BConfig({ apiHost: trimmedUrl }))
+      syncMCPServer({ apiUrl: trimmedUrl })
     } else {
       setApiUrl(config.apiHost || 'https://api.e2b.dev')
     }
@@ -94,6 +119,8 @@ const E2BSettings: FC = () => {
   const handleEnableChatToolChange = (checked: boolean) => {
     setEnableChatTool(checked)
     updateOptions({ enableChatTool: checked })
+    // Sync with MCP server
+    syncMCPServer({ isActive: checked })
   }
 
   const testConnection = async () => {
