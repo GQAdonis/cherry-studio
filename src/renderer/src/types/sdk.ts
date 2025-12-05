@@ -7,7 +7,17 @@ import type {
   ToolUnion,
   ToolUseBlock
 } from '@anthropic-ai/sdk/resources'
-import type { MessageStream } from '@anthropic-ai/sdk/resources/messages/messages'
+// MessageStream is a class, but the type export may not be available in newer SDK versions
+// The class itself is imported where needed for instanceof checks
+// Using a type that matches the MessageStream interface
+type MessageStream = {
+  on(event: 'error', handler: (error: Error) => void): MessageStream
+  on(event: 'message', handler: (message: Message) => void): MessageStream
+  on(event: 'end', handler: () => void): MessageStream
+  on(event: 'streamEvent', handler: (event: RawMessageStreamEvent) => void): MessageStream
+  on(event: 'contentBlock', handler: (block: unknown) => void): MessageStream
+  on(event: 'finalMessage', handler: (message: Message) => void): MessageStream
+}
 import type AnthropicVertex from '@anthropic-ai/vertex-sdk'
 import type { BedrockClient } from '@aws-sdk/client-bedrock'
 import type { BedrockRuntimeClient } from '@aws-sdk/client-bedrock-runtime'

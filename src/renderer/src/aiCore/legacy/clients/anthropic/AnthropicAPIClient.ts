@@ -22,7 +22,8 @@ import type {
   WebSearchToolResultBlockParam,
   WebSearchToolResultError
 } from '@anthropic-ai/sdk/resources/messages'
-import { MessageStream } from '@anthropic-ai/sdk/resources/messages/messages'
+// MessageStream class may not be exported in newer SDK versions
+// Check for MessageStream by checking if it has the 'on' method instead of instanceof
 import type AnthropicVertex from '@anthropic-ai/vertex-sdk'
 import { loggerService } from '@logger'
 import { DEFAULT_MAX_TOKENS } from '@renderer/config/constant'
@@ -403,36 +404,37 @@ export class AnthropicAPIClient extends BaseApiClient<
     logger.debug(`Attaching stream listener to raw output`)
     // 专用的Anthropic事件处理
     const anthropicListener = listener as AnthropicStreamListener
-    // 检查是否为MessageStream
-    if (rawOutput instanceof MessageStream) {
+    // 检查是否为MessageStream (has 'on' method for event handling)
+    if (rawOutput && typeof rawOutput === 'object' && 'on' in rawOutput && typeof rawOutput.on === 'function') {
       logger.debug(`Detected Anthropic MessageStream, attaching specialized listener`)
+      const messageStream = rawOutput as any // MessageStream-like object
 
       if (listener.onStart) {
         listener.onStart()
       }
 
       if (listener.onChunk) {
-        rawOutput.on('streamEvent', (event: AnthropicSdkRawChunk) => {
+        messageStream.on('streamEvent', (event: AnthropicSdkRawChunk) => {
           listener.onChunk!(event)
         })
       }
 
       if (anthropicListener.onContentBlock) {
-        rawOutput.on('contentBlock', anthropicListener.onContentBlock)
+        messageStream.on('contentBlock', anthropicListener.onContentBlock)
       }
 
       if (anthropicListener.onMessage) {
-        rawOutput.on('finalMessage', anthropicListener.onMessage)
+        messageStream.on('finalMessage', anthropicListener.onMessage)
       }
 
       if (listener.onEnd) {
-        rawOutput.on('end', () => {
+        messageStream.on('end', () => {
           listener.onEnd!()
         })
       }
 
       if (listener.onError) {
-        rawOutput.on('error', (error: Error) => {
+        messageStream.on('error', (error: Error) => {
           listener.onError!(error)
         })
       }
@@ -440,8 +442,9 @@ export class AnthropicAPIClient extends BaseApiClient<
       return rawOutput
     }
 
-    if (anthropicListener.onMessage) {
-      anthropicListener.onMessage(rawOutput)
+    if (anthropicListener.onMessage && rawOutput && typeof rawOutput === 'object' && 'content' in rawOutput) {
+      // rawOutput is a Message object, not a stream
+      anthropicListener.onMessage(rawOutput as any)
     }
 
     // 对于非MessageStream响应

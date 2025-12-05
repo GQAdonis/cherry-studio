@@ -1,4 +1,6 @@
-import { MessageStream } from '@anthropic-ai/sdk/resources/messages/messages'
+// MessageStream class may not be exported in newer SDK versions
+// Using type assertion where needed
+type MessageStream = any
 import { Stream } from '@cherrystudio/openai/streaming'
 import { loggerService } from '@logger'
 import type { SpanEntity, TokenUsage } from '@mcp-trace/trace-core'
@@ -342,8 +344,15 @@ export function withSpanResult<F extends (...args: any) => any>(
 
           if (data instanceof Stream) {
             return handleStream(data, span, params.topicId, params.modelName)
-          } else if (data instanceof MessageStream) {
-            return handleMessageStream(data, span, params.topicId, params.modelName)
+          } else if (
+            data &&
+            typeof data === 'object' &&
+            'on' in data &&
+            typeof data.on === 'function' &&
+            'message' in data
+          ) {
+            // Check for MessageStream by checking if it has the 'on' method and 'message' event
+            return handleMessageStream(data as MessageStream, span, params.topicId, params.modelName)
           } else if (isAsyncIterable<SdkRawChunk>(data)) {
             return handleAsyncIterable(data, span, params.topicId, params.modelName)
           } else {

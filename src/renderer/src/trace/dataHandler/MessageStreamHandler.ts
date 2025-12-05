@@ -1,4 +1,10 @@
-import type { Message, MessageStream } from '@anthropic-ai/sdk/resources/messages/messages'
+import type { Message } from '@anthropic-ai/sdk/resources/messages/messages'
+// MessageStream class may not be exported in newer SDK versions
+type MessageStream = {
+  on(event: 'error', handler: (error: Error) => void): void
+  on(event: 'message', handler: (message: Message) => void): void
+  on(event: 'end', handler: () => void): void
+}
 import type { TokenUsage } from '@mcp-trace/trace-core'
 import type { Span } from '@opentelemetry/api'
 import { endSpan } from '@renderer/services/SpanManagerService'

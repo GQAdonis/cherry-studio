@@ -33,7 +33,7 @@ export class AppMenuService {
         label: app.name,
         submenu: [
           {
-            label: appMenu.about + ' ' + app.name,
+            label: appMenu.about + ' The Boss',
             click: () => {
               // Emit event to navigate to About page
               const mainWindow = windowService.getMainWindow()
@@ -46,11 +46,11 @@ export class AppMenuService {
           { type: 'separator' },
           { role: 'services', label: appMenu.services },
           { type: 'separator' },
-          { role: 'hide', label: `${appMenu.hide} ${app.name}` },
+          { role: 'hide', label: `${appMenu.hide} The Boss` },
           { role: 'hideOthers', label: appMenu.hideOthers },
           { role: 'unhide', label: appMenu.unhide },
           { type: 'separator' },
-          { role: 'quit', label: `${appMenu.quit} ${app.name}` }
+          { role: 'quit', label: `${appMenu.quit} The Boss` }
         ]
       },
       {

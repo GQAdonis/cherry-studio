@@ -289,11 +289,12 @@ const artifactsSlice = createSlice({
      * Add a refinement message
      */
     addRefinementMessage: (state, action: PayloadAction<Omit<RefinementMessage, 'id' | 'timestamp'>>) => {
-      state.refinementMessages.push({
+      const newMessage = {
         ...action.payload,
         id: nanoid(),
         timestamp: new Date().toISOString()
-      })
+      } as RefinementMessage
+      ;(state.refinementMessages as RefinementMessage[]).push(newMessage)
     },
 
     /**
