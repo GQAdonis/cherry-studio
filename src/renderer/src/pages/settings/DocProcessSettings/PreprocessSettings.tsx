@@ -8,6 +8,7 @@ import { useTranslation } from 'react-i18next'
 
 import { SettingDivider, SettingGroup, SettingRow, SettingRowTitle, SettingTitle } from '..'
 import PreprocessProviderSettings from './PreprocessProviderSettings'
+import { UnstructuredSettings } from './UnstructuredSettings'
 
 const PreprocessSettings: FC = () => {
   const { preprocessProviders } = usePreprocessProviders()
@@ -50,7 +51,11 @@ const PreprocessSettings: FC = () => {
       </SettingGroup>
       {selectedProvider && (
         <SettingGroup theme={themeMode}>
-          <PreprocessProviderSettings provider={selectedProvider} />
+          {selectedProvider.id === 'unstructured' ? (
+            <UnstructuredSettings provider={selectedProvider} />
+          ) : (
+            <PreprocessProviderSettings provider={selectedProvider} />
+          )}
         </SettingGroup>
       )}
     </>

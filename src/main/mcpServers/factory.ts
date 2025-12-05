@@ -7,6 +7,7 @@ import BraveSearchServer from './brave-search'
 import BrowserAutomationServer from './browser-automation'
 import DiDiMcpServer from './didi-mcp'
 import DifyKnowledgeServer from './dify-knowledge'
+import E2BServer from './e2b'
 import FetchServer from './fetch'
 import FileSystemServer from './filesystem'
 import MemoryServer from './memory'
@@ -14,6 +15,7 @@ import MinAppControllerServer from './minapp-controller'
 import PythonServer from './python'
 import SDKBridgeServer from './sdk-bridge'
 import ThinkingServer from './sequentialthinking'
+import UnstructuredServer from './unstructured'
 
 const logger = loggerService.withContext('MCPFactory')
 
@@ -59,6 +61,16 @@ export function createInMemoryMCPServer(
     }
     case BuiltinMCPServerNames.sdkBridge: {
       return new SDKBridgeServer().server
+    }
+    case BuiltinMCPServerNames.e2b: {
+      const apiKey = envs.E2B_API_KEY || ''
+      const apiUrl = envs.E2B_API_URL
+      return new E2BServer(apiKey, apiUrl).server
+    }
+    case BuiltinMCPServerNames.unstructured: {
+      const apiKey = envs.UNSTRUCTURED_API_KEY || ''
+      const apiHost = envs.UNSTRUCTURED_API_URL
+      return new UnstructuredServer(apiKey, apiHost).server
     }
     default:
       throw new Error(`Unknown in-memory MCP server: ${name}`)

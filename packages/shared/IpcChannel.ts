@@ -420,5 +420,25 @@ export enum IpcChannel {
   MinApp_Trust_Request = 'minapp:trust-request',
   MinApp_Trust_Response = 'minapp:trust-response',
   MinApp_Trust_Revoke = 'minapp:trust-revoke',
-  MinApp_Trust_List = 'minapp:trust-list'
+  MinApp_Trust_List = 'minapp:trust-list',
+
+  // Unstructured
+  Unstructured_ProcessDocument = 'unstructured:process-document',
+  Unstructured_BatchProcess = 'unstructured:batch-process',
+  Unstructured_TestConnection = 'unstructured:test-connection',
+  Unstructured_GetSupportedTypes = 'unstructured:get-supported-types',
+  Unstructured_ProcessForTool = 'unstructured:process-for-tool',
+
+  // E2B
+  E2B_ExecuteCode = 'e2b:execute-code',
+  E2B_ListFiles = 'e2b:list-files',
+  E2B_ReadFile = 'e2b:read-file',
+  E2B_WriteFile = 'e2b:write-file',
+  E2B_GetDownloadUrl = 'e2b:get-download-url',
+  E2B_DeleteFile = 'e2b:delete-file',
+  E2B_MakeDirectory = 'e2b:make-directory',
+  E2B_GetSandboxInfo = 'e2b:get-sandbox-info',
+  E2B_TestConnection = 'e2b:test-connection',
+  E2B_CloseSandbox = 'e2b:close-sandbox',
+  E2B_ExecuteForTool = 'e2b:execute-for-tool'
 }

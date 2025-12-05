@@ -45,7 +45,9 @@ export const BUILTIN_MCP_SERVER_DESCRIPTIONS: Record<string, string> = {
   '@cherry/filesystem': 'Sandboxed file system access for reading and writing files.',
   '@cherry/dify-knowledge': 'Integration with Dify knowledge bases.',
   '@cherry/python': 'Execute Python code in a sandboxed environment.',
-  '@cherry/didi-mcp': 'DiDi ride-hailing services (China only). Requires DIDI_API_KEY.'
+  '@cherry/didi-mcp': 'DiDi ride-hailing services (China only). Requires DIDI_API_KEY.',
+  '@cherry/e2b': 'Execute Python code in secure E2B cloud sandboxes with file operations. Requires E2B_API_KEY.',
+  '@cherry/unstructured': 'Process and extract content from 50+ document formats. Requires UNSTRUCTURED_API_KEY.'
 }
 
 /**

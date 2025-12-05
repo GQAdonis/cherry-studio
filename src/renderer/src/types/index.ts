@@ -22,6 +22,7 @@ export * from './agent'
 export * from './apiModels'
 export * from './apiServer'
 export * from './contextStrategy'
+export * from './e2b'
 export * from './knowledge'
 export * from './mcp'
 export * from './notification'
@@ -768,7 +769,9 @@ export const BuiltinMCPServerNames = {
   didiMCP: '@cherry/didi-mcp',
   minappController: '@cherry/minapp-controller',
   browserAutomation: '@cherry/browser-automation',
-  sdkBridge: '@cherry/sdk-bridge'
+  sdkBridge: '@cherry/sdk-bridge',
+  e2b: '@cherry/e2b',
+  unstructured: '@cherry/unstructured'
 } as const
 
 export type BuiltinMCPServerName = (typeof BuiltinMCPServerNames)[keyof typeof BuiltinMCPServerNames]

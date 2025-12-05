@@ -174,6 +174,36 @@ export const builtinMCPServers: BuiltinMCPServer[] = [
     provider: 'CherryAI',
     installSource: 'builtin',
     isTrusted: true
+  },
+  {
+    id: nanoid(),
+    name: BuiltinMCPServerNames.e2b,
+    reference: 'https://e2b.dev/docs',
+    type: 'inMemory',
+    isActive: false,
+    env: {
+      E2B_API_KEY: 'YOUR_E2B_API_KEY',
+      E2B_API_URL: 'https://api.e2b.dev'
+    },
+    shouldConfig: true,
+    provider: 'CherryAI',
+    installSource: 'builtin',
+    isTrusted: true
+  },
+  {
+    id: nanoid(),
+    name: BuiltinMCPServerNames.unstructured,
+    reference: 'https://unstructured.io',
+    type: 'inMemory',
+    isActive: false,
+    env: {
+      UNSTRUCTURED_API_KEY: 'YOUR_UNSTRUCTURED_API_KEY',
+      UNSTRUCTURED_API_URL: 'https://api.unstructured.io'
+    },
+    shouldConfig: true,
+    provider: 'CherryAI',
+    installSource: 'builtin',
+    isTrusted: true
   }
 ] as const
 

@@ -38,6 +38,7 @@ import { codeToolsService } from './services/CodeToolsService'
 import { configManager } from './services/ConfigManager'
 import CopilotService from './services/CopilotService'
 import DxtService from './services/DxtService'
+import { e2bService } from './services/E2BService'
 import { ExportService } from './services/ExportService'
 import { fileStorage as fileManager } from './services/FileStorage'
 import FileService from './services/FileSystemService'
@@ -72,6 +73,7 @@ import {
 } from './services/SpanCacheService'
 import storeSyncService from './services/StoreSyncService'
 import { themeService } from './services/ThemeService'
+import { unstructuredService } from './services/UnstructuredService'
 import VertexAIService from './services/VertexAIService'
 import WebSocketService from './services/WebSocketService'
 import { setOpenLinkExternal } from './services/WebviewService'
@@ -1023,6 +1025,26 @@ export function registerIpc(mainWindow: BrowserWindow, app: Electron.App) {
     ocrService.ocr(file, provider)
   )
   ipcMain.handle(IpcChannel.OCR_ListProviders, () => ocrService.listProviderIds())
+
+  // Unstructured
+  ipcMain.handle(IpcChannel.Unstructured_ProcessDocument, unstructuredService.processDocument)
+  ipcMain.handle(IpcChannel.Unstructured_BatchProcess, unstructuredService.batchProcessDocuments)
+  ipcMain.handle(IpcChannel.Unstructured_TestConnection, unstructuredService.testConnection)
+  ipcMain.handle(IpcChannel.Unstructured_GetSupportedTypes, unstructuredService.getSupportedMimeTypes)
+  ipcMain.handle(IpcChannel.Unstructured_ProcessForTool, unstructuredService.processDocumentForTool)
+
+  // E2B
+  ipcMain.handle(IpcChannel.E2B_ExecuteCode, e2bService.executeCode)
+  ipcMain.handle(IpcChannel.E2B_ListFiles, e2bService.listFiles)
+  ipcMain.handle(IpcChannel.E2B_ReadFile, e2bService.readFile)
+  ipcMain.handle(IpcChannel.E2B_WriteFile, e2bService.writeFile)
+  ipcMain.handle(IpcChannel.E2B_GetDownloadUrl, e2bService.getDownloadUrl)
+  ipcMain.handle(IpcChannel.E2B_DeleteFile, e2bService.deleteFile)
+  ipcMain.handle(IpcChannel.E2B_MakeDirectory, e2bService.makeDirectory)
+  ipcMain.handle(IpcChannel.E2B_GetSandboxInfo, e2bService.getSandboxInfo)
+  ipcMain.handle(IpcChannel.E2B_TestConnection, e2bService.testConnection)
+  ipcMain.handle(IpcChannel.E2B_CloseSandbox, e2bService.closeSandbox)
+  ipcMain.handle(IpcChannel.E2B_ExecuteForTool, e2bService.executeCodeForTool)
 
   // OVMS
   ipcMain.handle(IpcChannel.Ovms_AddModel, (_, modelName: string, modelId: string, modelSource: string, task: string) =>

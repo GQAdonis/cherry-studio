@@ -1,0 +1,25 @@
+{
+  "name": "@cherry-studio/e2b-extended-mcp",
+  "version": "1.0.0",
+  "description": "Extended E2B MCP server with file operations for Cherry Studio",
+  "main": "dist/index.js",
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsx src/index.ts",
+    "start": "node dist/index.js"
+  },
+  "dependencies": {
+    "@e2b/code-interpreter": "^1.0.4",
+    "@modelcontextprotocol/sdk": "^1.12.1",
+    "zod": "^3.24.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.2",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

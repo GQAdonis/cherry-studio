@@ -108,7 +108,8 @@ export const PreprocessProviderIds = {
   doc2x: 'doc2x',
   mistral: 'mistral',
   mineru: 'mineru',
-  'open-mineru': 'open-mineru'
+  'open-mineru': 'open-mineru',
+  unstructured: 'unstructured'
 } as const
 
 export type PreprocessProviderId = keyof typeof PreprocessProviderIds
@@ -117,13 +118,24 @@ export const isPreprocessProviderId = (id: string): id is PreprocessProviderId =
   return Object.hasOwn(PreprocessProviderIds, id)
 }
 
+export interface UnstructuredOptions {
+  strategy?: 'auto' | 'fast' | 'hi_res' | 'ocr_only'
+  chunkingStrategy?: 'basic' | 'by_title'
+  splitPdfPage?: boolean
+  splitPdfConcurrencyLevel?: number
+  vlmModel?: string
+  vlmModelProvider?: string
+  enabledMimeTypes?: string[]
+  enableChatTool?: boolean
+}
+
 export interface PreprocessProvider {
   id: PreprocessProviderId
   name: string
   apiKey?: string
   apiHost?: string
   model?: string
-  options?: any
+  options?: any | UnstructuredOptions
   quota?: number
 }
 

@@ -10,6 +10,7 @@ import assistants from './assistants'
 import backup from './backup'
 import codeTools from './codeTools'
 import copilot from './copilot'
+import e2b from './e2b'
 import inputToolsReducer from './inputTools'
 import knowledge from './knowledge'
 import llm from './llm'
@@ -56,6 +57,7 @@ const rootReducer = combineReducers({
   selectionStore,
   tabs,
   preprocess,
+  e2b,
   messages: newMessagesReducer,
   messageBlocks: messageBlocksReducer,
   inputTools: inputToolsReducer,
@@ -69,7 +71,7 @@ const persistedReducer = persistReducer(
   {
     key: 'cherry-studio',
     storage,
-    version: 182,
+    version: 184,
     blacklist: ['runtime', 'messages', 'messageBlocks', 'tabs', 'toolPermissions', 'artifacts'],
     migrate
   },

@@ -168,6 +168,13 @@ const PreprocessProviderSettings: FC<Props> = ({ provider: _provider }) => {
           </SettingRow>
         </>
       )} */}
+
+      {/* Special handling for unstructured provider */}
+      {preprocessProvider.id === 'unstructured' && (
+        <div style={{ display: 'none' }}>
+          {/* This content is replaced by UnstructuredSettings component in parent */}
+        </div>
+      )}
     </>
   )
 }

@@ -66,6 +66,15 @@ asarUnpack:
   - resources/**
   - "**/*.{metal,exp,lib}"
   - "node_modules/@img/sharp-libvips-*/**"
+  - "node_modules/@e2b/**"
+  - "node_modules/e2b/**"
+  - "node_modules/jsdom/**"
+  - "node_modules/vary/**"
+  - "node_modules/iconv-lite/**"
+  - "node_modules/safer-buffer/**"
+  - "node_modules/whatwg-encoding/**"
+  - "node_modules/html-encoding-sniffer/**"
+  - "node_modules/unstructured-client/**"
 
 # copy from node_modules/claude-code-plugins/plugins to resources/data/claude-code-pluginso
 extraResources:

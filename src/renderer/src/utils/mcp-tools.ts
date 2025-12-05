@@ -128,6 +128,37 @@ export async function callBuiltInTool(toolResponse: MCPToolResponse): Promise<MC
     }
   }
 
+  if (
+    toolResponse.tool.name === 'process_document_with_unstructured' &&
+    typeof toolResponse.arguments === 'object' &&
+    toolResponse.arguments !== null &&
+    !Array.isArray(toolResponse.arguments)
+  ) {
+    try {
+      const result = await window.api.unstructured.processForTool(toolResponse.arguments as any)
+      return {
+        isError: false,
+        content: [
+          {
+            type: 'text',
+            text: `Document processed successfully:\n\n${result.content}\n\n---\nMetadata: File type: ${result.metadata.fileType}, Strategy: ${result.metadata.strategy}, Elements: ${result.metadata.elementCount}`
+          }
+        ]
+      }
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : String(error)
+      return {
+        isError: true,
+        content: [
+          {
+            type: 'text',
+            text: `Failed to process document: ${errorMessage}`
+          }
+        ]
+      }
+    }
+  }
+
   return undefined
 }
 

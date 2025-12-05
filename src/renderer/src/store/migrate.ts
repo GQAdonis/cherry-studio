@@ -2976,6 +2976,64 @@ const migrateConfig = {
       logger.error('migrate 182 error', error as Error)
       return state
     }
+  },
+  '183': (state: RootState) => {
+    try {
+      // Add unstructured and e2b document processing providers
+      addPreprocessProviders(state, 'unstructured')
+      addPreprocessProviders(state, 'e2b')
+      logger.info('migrate 183 success')
+      return state
+    } catch (error) {
+      logger.error('migrate 183 error', error as Error)
+      return state
+    }
+  },
+  '184': (state: RootState) => {
+    try {
+      // Move E2B settings from preprocess to dedicated e2b store
+      const e2bProvider = state.preprocess?.providers?.find((p: any) => p.id === 'e2b')
+
+      if (e2bProvider) {
+        // Initialize e2b store with settings from preprocess
+        state.e2b = {
+          apiKey: e2bProvider.apiKey || '',
+          apiHost: e2bProvider.apiHost || 'https://api.e2b.dev',
+          options: e2bProvider.options || {
+            sandboxMode: 'per-session',
+            timeout: 300,
+            template: '',
+            enableChatTool: false
+          }
+        }
+
+        // Remove E2B from preprocess providers
+        state.preprocess.providers = state.preprocess.providers.filter((p: any) => p.id !== 'e2b')
+
+        // If the default provider was e2b, switch to mineru
+        if (state.preprocess.defaultProvider === 'e2b') {
+          state.preprocess.defaultProvider = 'mineru'
+        }
+      } else {
+        // Initialize with default values if no existing E2B config
+        state.e2b = {
+          apiKey: '',
+          apiHost: 'https://api.e2b.dev',
+          options: {
+            sandboxMode: 'per-session',
+            timeout: 300,
+            template: '',
+            enableChatTool: false
+          }
+        }
+      }
+
+      logger.info('migrate 184 success - E2B settings moved to dedicated store')
+      return state
+    } catch (error) {
+      logger.error('migrate 184 error', error as Error)
+      return state
+    }
   }
 }
 

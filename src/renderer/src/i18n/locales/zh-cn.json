@@ -4065,6 +4065,7 @@
         "browser_automation": "[to be translated]:Vision-optimized browser automation for embedded mini-apps. Provides high-level tools for AI models to interact with web content using screenshots and element detection.",
         "didi_mcp": "一个集成了滴滴 MCP 服务器实现，提供网约车服务包括地图搜索、价格预估、订单管理和司机跟踪。仅支持中国大陆地区。需要配置 DIDI_API_KEY 环境变量",
         "dify_knowledge": "Dify 的 MCP 服务器实现，提供了一个简单的 API 来与 Dify 进行交互。需要配置 Dify Key",
+        "e2b": "[to be translated]:Execute Python code in secure E2B cloud sandboxes with full file operations support. Provides persistent Jupyter-like environments with common data science libraries pre-installed. Requires configuring the E2B_API_KEY environment variable. Supports both hosted and self-hosted deployments via E2B_API_URL.",
         "fetch": "用于获取 URL 网页内容的 MCP 服务器",
         "filesystem": "实现文件系统操作的模型上下文协议（MCP）的 Node.js 服务器。需要配置允许访问的目录",
         "mcp_auto_install": "自动安装 MCP 服务（测试版）",
@@ -4073,7 +4074,8 @@
         "no": "无描述",
         "python": "在安全的沙盒环境中执行 Python 代码。使用 Pyodide 运行 Python，支持大多数标准库和科学计算包",
         "sdk_bridge": "[to be translated]:Bridge for dynamically registered tools from mini-apps using the @theboss/sdk. Enables third-party apps to register custom MCP tools at runtime.",
-        "sequentialthinking": "一个 MCP 服务器实现，提供了通过结构化思维过程进行动态和反思性问题解决的工具"
+        "sequentialthinking": "一个 MCP 服务器实现，提供了通过结构化思维过程进行动态和反思性问题解决的工具",
+        "unstructured": "[to be translated]:Process and extract content from 50+ document formats including PDF, Word, Excel, PowerPoint, images (with OCR), HTML, and more. Returns structured text that can be analyzed or summarized. Requires configuring the UNSTRUCTURED_API_KEY environment variable. Supports both hosted and self-hosted deployments via UNSTRUCTURED_API_URL."
       },
       "command": "命令",
       "config_description": "配置模型上下文协议服务器",
@@ -4872,10 +4874,106 @@
         "title": "OCR 服务"
       },
       "preprocess": {
+        "e2b": {
+          "api_key": "[to be translated]:API Key",
+          "api_key_placeholder": "[to be translated]:Enter your E2B API key",
+          "api_url": "[to be translated]:API URL",
+          "api_url_placeholder": "[to be translated]:https://api.e2b.dev or self-hosted URL",
+          "chat_tool": {
+            "description": "[to be translated]:When enabled, AI can run Python code in E2B sandboxes",
+            "label": "[to be translated]:Enable Chat Tool",
+            "requires_api_key": "[to be translated]:Requires valid API key to enable",
+            "tool_name": "[to be translated]:Tool name: execute_code_in_e2b",
+            "tooltip": "[to be translated]:Allow AI to execute code during conversations"
+          },
+          "description": "[to be translated]:Run AI-generated code in secure cloud sandboxes",
+          "health_check": {
+            "button": "[to be translated]:Test Connection",
+            "failed": "[to be translated]:E2B connection failed. Check your API key and URL.",
+            "success": "[to be translated]:E2B connection successful!"
+          },
+          "options": {
+            "sandbox_mode": {
+              "label": "[to be translated]:Sandbox Mode",
+              "per_session": "[to be translated]:Per Session - New sandbox each chat",
+              "persistent": "[to be translated]:Persistent - Reuse sandbox",
+              "tooltip": "[to be translated]:Per-session creates fresh sandboxes; persistent reuses them for better performance"
+            },
+            "template": {
+              "label": "[to be translated]:Custom Template ID",
+              "placeholder": "[to be translated]:Optional: custom E2B template",
+              "tooltip": "[to be translated]:Use a custom E2B template for specialized environments"
+            },
+            "timeout": {
+              "label": "[to be translated]:Execution Timeout",
+              "tooltip": "[to be translated]:Maximum time for code execution (seconds)"
+            }
+          },
+          "title": "[to be translated]:E2B Code Interpreter"
+        },
         "provider": "文档处理服务商",
         "provider_placeholder": "选择一个文档处理服务商",
         "title": "文档处理",
-        "tooltip": "在设置 -> 工具中设置文档处理服务商，文档处理可以有效提升复杂格式文档与扫描版文档的检索效果"
+        "tooltip": "在设置 -> 工具中设置文档处理服务商，文档处理可以有效提升复杂格式文档与扫描版文档的检索效果",
+        "unstructured": {
+          "api_host": "[to be translated]:API Host",
+          "api_host_placeholder": "[to be translated]:https://api.unstructured.io or self-hosted URL",
+          "api_key": "[to be translated]:API Key",
+          "api_key_placeholder": "[to be translated]:Enter your Unstructured API key",
+          "chat_tool": {
+            "description": "[to be translated]:Allow AI to process documents during conversations",
+            "label": "[to be translated]:Enable Chat Tool",
+            "requires_api_key": "[to be translated]:Requires valid API key to enable",
+            "tool_name": "[to be translated]:Tool name: process_document_with_unstructured",
+            "tooltip": "[to be translated]:When enabled, the AI can use the 'process_document_with_unstructured' tool to extract content from documents"
+          },
+          "description": "[to be translated]:Enterprise-grade document processing supporting 50+ file types",
+          "health_check": {
+            "button": "[to be translated]:Test Connection",
+            "failed": "[to be translated]:Connection failed",
+            "success": "[to be translated]:Connection successful"
+          },
+          "options": {
+            "chunking_strategy": {
+              "basic": "[to be translated]:Basic - Simple chunking",
+              "by_title": "[to be translated]:By Title - Semantic chunking",
+              "label": "[to be translated]:Chunking Strategy"
+            },
+            "concurrency": {
+              "label": "[to be translated]:Concurrency Level",
+              "tooltip": "[to be translated]:Number of parallel requests (1-15)"
+            },
+            "mime_types": {
+              "categories": {
+                "document": "[to be translated]:Documents",
+                "image": "[to be translated]:Images (OCR)",
+                "other": "[to be translated]:Other Formats",
+                "presentation": "[to be translated]:Presentations",
+                "spreadsheet": "[to be translated]:Spreadsheets",
+                "text": "[to be translated]:Text Files",
+                "web": "[to be translated]:Web Pages"
+              },
+              "description": "[to be translated]:Select which file types should be processed by Unstructured.io",
+              "deselect_all": "[to be translated]:Deselect All",
+              "label": "[to be translated]:Supported File Types",
+              "search_placeholder": "[to be translated]:Search file types...",
+              "select_all": "[to be translated]:Select All",
+              "selected_count": "[to be translated]:{{count}} file type(s) selected"
+            },
+            "split_pdf": {
+              "label": "[to be translated]:Split PDF Pages",
+              "tooltip": "[to be translated]:Process PDF pages in parallel for faster processing"
+            },
+            "strategy": {
+              "auto": "[to be translated]:Auto - Automatic detection",
+              "fast": "[to be translated]:Fast - Quick processing",
+              "hi_res": "[to be translated]:High Resolution - Best quality",
+              "label": "[to be translated]:Processing Strategy",
+              "ocr_only": "[to be translated]:OCR Only - Text extraction"
+            }
+          },
+          "title": "[to be translated]:Unstructured.io"
+        }
       },
       "title": "其他设置",
       "websearch": {

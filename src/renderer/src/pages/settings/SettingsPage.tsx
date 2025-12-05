@@ -7,6 +7,7 @@ import {
   AppWindow,
   Brain,
   Cloud,
+  Code2,
   Command,
   FileCode,
   Hammer,
@@ -34,6 +35,7 @@ import ContextManagementSettings from './ContextManagementSettings'
 import DataSettings from './DataSettings/DataSettings'
 import DisplaySettings from './DisplaySettings/DisplaySettings'
 import DocProcessSettings from './DocProcessSettings'
+import E2BSettings from './E2BSettings'
 import GeneralSettings from './GeneralSettings'
 import MCPSettings from './MCPSettings'
 import MemorySettings from './MemorySettings'
@@ -146,6 +148,12 @@ const SettingsPage: FC = () => {
               {t('settings.tool.preprocess.title')}
             </MenuItem>
           </MenuItemLink>
+          <MenuItemLink to="/settings/e2b">
+            <MenuItem className={isRoute('/settings/e2b')}>
+              <Code2 size={18} />
+              E2B Code Interpreter
+            </MenuItem>
+          </MenuItemLink>
           <MenuItemLink to="/settings/quickphrase">
             <MenuItem className={isRoute('/settings/quickphrase')}>
               <Zap size={18} />
@@ -186,6 +194,7 @@ const SettingsPage: FC = () => {
             <Route path="websearch" element={<WebSearchSettings />} />
             <Route path="api-server" element={<ApiServerSettings />} />
             <Route path="docprocess" element={<DocProcessSettings />} />
+            <Route path="e2b" element={<E2BSettings />} />
             <Route path="quickphrase" element={<QuickPhraseSettings />} />
             <Route path="mcp/*" element={<MCPSettings />} />
             <Route path="minapp" element={<MinAppSettings />} />

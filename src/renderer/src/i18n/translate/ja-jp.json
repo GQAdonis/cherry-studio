@@ -4065,6 +4065,7 @@
         "browser_automation": "[to be translated]:Vision-optimized browser automation for embedded mini-apps. Provides high-level tools for AI models to interact with web content using screenshots and element detection.",
         "didi_mcp": "DiDi MCPサーバーは、地図検索、料金見積もり、注文管理、ドライバー追跡を含むライドシェアサービスを提供します。中国本土でのみ利用可能です。DIDI_API_KEY環境変数の設定が必要です",
         "dify_knowledge": "DifyのMCPサーバー実装は、Difyと対話するためのシンプルなAPIを提供します。Dify Keyの設定が必要です。",
+        "e2b": "[to be translated]:Execute Python code in secure E2B cloud sandboxes with full file operations support. Provides persistent Jupyter-like environments with common data science libraries pre-installed. Requires configuring the E2B_API_KEY environment variable. Supports both hosted and self-hosted deployments via E2B_API_URL.",
         "fetch": "URLのウェブページコンテンツを取得するためのMCPサーバー",
         "filesystem": "Node.jsサーバーによるファイルシステム操作を実現するモデルコンテキストプロトコル（MCP）。アクセスを許可するディレクトリの設定が必要です",
         "mcp_auto_install": "MCPサービスの自動インストール（ベータ版）",
@@ -4073,7 +4074,8 @@
         "no": "説明なし",
         "python": "安全なサンドボックス環境でPythonコードを実行します。Pyodideを使用してPythonを実行し、ほとんどの標準ライブラリと科学計算パッケージをサポートしています。",
         "sdk_bridge": "[to be translated]:Bridge for dynamically registered tools from mini-apps using the @theboss/sdk. Enables third-party apps to register custom MCP tools at runtime.",
-        "sequentialthinking": "構造化された思考プロセスを通じて動的かつ反省的な問題解決を行うためのツールを提供するMCPサーバーの実装"
+        "sequentialthinking": "構造化された思考プロセスを通じて動的かつ反省的な問題解決を行うためのツールを提供するMCPサーバーの実装",
+        "unstructured": "[to be translated]:Process and extract content from 50+ document formats including PDF, Word, Excel, PowerPoint, images (with OCR), HTML, and more. Returns structured text that can be analyzed or summarized. Requires configuring the UNSTRUCTURED_API_KEY environment variable. Supports both hosted and self-hosted deployments via UNSTRUCTURED_API_URL."
       },
       "command": "コマンド",
       "config_description": "モデルコンテキストプロトコルサーバーの設定",
@@ -4872,10 +4874,106 @@
         "title": "OCRサービス"
       },
       "preprocess": {
+        "e2b": {
+          "api_key": "[to be translated]:API Key",
+          "api_key_placeholder": "[to be translated]:Enter your E2B API key",
+          "api_url": "[to be translated]:API URL",
+          "api_url_placeholder": "[to be translated]:https://api.e2b.dev or self-hosted URL",
+          "chat_tool": {
+            "description": "[to be translated]:When enabled, AI can run Python code in E2B sandboxes",
+            "label": "[to be translated]:Enable Chat Tool",
+            "requires_api_key": "[to be translated]:Requires valid API key to enable",
+            "tool_name": "[to be translated]:Tool name: execute_code_in_e2b",
+            "tooltip": "[to be translated]:Allow AI to execute code during conversations"
+          },
+          "description": "[to be translated]:Run AI-generated code in secure cloud sandboxes",
+          "health_check": {
+            "button": "[to be translated]:Test Connection",
+            "failed": "[to be translated]:E2B connection failed. Check your API key and URL.",
+            "success": "[to be translated]:E2B connection successful!"
+          },
+          "options": {
+            "sandbox_mode": {
+              "label": "[to be translated]:Sandbox Mode",
+              "per_session": "[to be translated]:Per Session - New sandbox each chat",
+              "persistent": "[to be translated]:Persistent - Reuse sandbox",
+              "tooltip": "[to be translated]:Per-session creates fresh sandboxes; persistent reuses them for better performance"
+            },
+            "template": {
+              "label": "[to be translated]:Custom Template ID",
+              "placeholder": "[to be translated]:Optional: custom E2B template",
+              "tooltip": "[to be translated]:Use a custom E2B template for specialized environments"
+            },
+            "timeout": {
+              "label": "[to be translated]:Execution Timeout",
+              "tooltip": "[to be translated]:Maximum time for code execution (seconds)"
+            }
+          },
+          "title": "[to be translated]:E2B Code Interpreter"
+        },
         "provider": "プレプロセスプロバイダー",
         "provider_placeholder": "前処理プロバイダーを選択してください",
         "title": "前処理",
-        "tooltip": "設定 → ツールで、ドキュメント前処理サービスプロバイダーを設定します。ドキュメント前処理は、複雑な形式のドキュメントやスキャンされたドキュメントの検索性能を効果的に向上させます。"
+        "tooltip": "設定 → ツールで、ドキュメント前処理サービスプロバイダーを設定します。ドキュメント前処理は、複雑な形式のドキュメントやスキャンされたドキュメントの検索性能を効果的に向上させます。",
+        "unstructured": {
+          "api_host": "[to be translated]:API Host",
+          "api_host_placeholder": "[to be translated]:https://api.unstructured.io or self-hosted URL",
+          "api_key": "[to be translated]:API Key",
+          "api_key_placeholder": "[to be translated]:Enter your Unstructured API key",
+          "chat_tool": {
+            "description": "[to be translated]:Allow AI to process documents during conversations",
+            "label": "[to be translated]:Enable Chat Tool",
+            "requires_api_key": "[to be translated]:Requires valid API key to enable",
+            "tool_name": "[to be translated]:Tool name: process_document_with_unstructured",
+            "tooltip": "[to be translated]:When enabled, the AI can use the 'process_document_with_unstructured' tool to extract content from documents"
+          },
+          "description": "[to be translated]:Enterprise-grade document processing supporting 50+ file types",
+          "health_check": {
+            "button": "[to be translated]:Test Connection",
+            "failed": "[to be translated]:Connection failed",
+            "success": "[to be translated]:Connection successful"
+          },
+          "options": {
+            "chunking_strategy": {
+              "basic": "[to be translated]:Basic - Simple chunking",
+              "by_title": "[to be translated]:By Title - Semantic chunking",
+              "label": "[to be translated]:Chunking Strategy"
+            },
+            "concurrency": {
+              "label": "[to be translated]:Concurrency Level",
+              "tooltip": "[to be translated]:Number of parallel requests (1-15)"
+            },
+            "mime_types": {
+              "categories": {
+                "document": "[to be translated]:Documents",
+                "image": "[to be translated]:Images (OCR)",
+                "other": "[to be translated]:Other Formats",
+                "presentation": "[to be translated]:Presentations",
+                "spreadsheet": "[to be translated]:Spreadsheets",
+                "text": "[to be translated]:Text Files",
+                "web": "[to be translated]:Web Pages"
+              },
+              "description": "[to be translated]:Select which file types should be processed by Unstructured.io",
+              "deselect_all": "[to be translated]:Deselect All",
+              "label": "[to be translated]:Supported File Types",
+              "search_placeholder": "[to be translated]:Search file types...",
+              "select_all": "[to be translated]:Select All",
+              "selected_count": "[to be translated]:{{count}} file type(s) selected"
+            },
+            "split_pdf": {
+              "label": "[to be translated]:Split PDF Pages",
+              "tooltip": "[to be translated]:Process PDF pages in parallel for faster processing"
+            },
+            "strategy": {
+              "auto": "[to be translated]:Auto - Automatic detection",
+              "fast": "[to be translated]:Fast - Quick processing",
+              "hi_res": "[to be translated]:High Resolution - Best quality",
+              "label": "[to be translated]:Processing Strategy",
+              "ocr_only": "[to be translated]:OCR Only - Text extraction"
+            }
+          },
+          "title": "[to be translated]:Unstructured.io"
+        }
       },
       "title": "その他の設定",
       "websearch": {

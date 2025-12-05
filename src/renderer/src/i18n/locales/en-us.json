@@ -4065,6 +4065,7 @@
         "browser_automation": "Vision-optimized browser automation for embedded mini-apps. Provides high-level tools for AI models to interact with web content using screenshots and element detection.",
         "didi_mcp": "DiDi MCP server providing ride-hailing services including map search, price estimation, order management, and driver tracking. Only available in Mainland China. Requires configuring the DIDI_API_KEY environment variable",
         "dify_knowledge": "Dify's MCP server implementation provides a simple API to interact with Dify. Requires configuring the Dify Key",
+        "e2b": "Execute Python code in secure E2B cloud sandboxes with full file operations support. Provides persistent Jupyter-like environments with common data science libraries pre-installed. Requires configuring the E2B_API_KEY environment variable. Supports both hosted and self-hosted deployments via E2B_API_URL.",
         "fetch": "MCP server for retrieving URL web content",
         "filesystem": "A Node.js server implementing the Model Context Protocol (MCP) for file system operations. Requires configuration of directories allowed for access.",
         "mcp_auto_install": "Automatically install MCP service (beta)",
@@ -4073,7 +4074,8 @@
         "no": "No description",
         "python": "Execute Python code in a secure sandbox environment. Run Python with Pyodide, supporting most standard libraries and scientific computing packages",
         "sdk_bridge": "Bridge for dynamically registered tools from mini-apps using the @theboss/sdk. Enables third-party apps to register custom MCP tools at runtime.",
-        "sequentialthinking": "A MCP server implementation that provides tools for dynamic and reflective problem solving through structured thinking processes"
+        "sequentialthinking": "A MCP server implementation that provides tools for dynamic and reflective problem solving through structured thinking processes",
+        "unstructured": "Process and extract content from 50+ document formats including PDF, Word, Excel, PowerPoint, images (with OCR), HTML, and more. Returns structured text that can be analyzed or summarized. Requires configuring the UNSTRUCTURED_API_KEY environment variable. Supports both hosted and self-hosted deployments via UNSTRUCTURED_API_URL."
       },
       "command": "Command",
       "config_description": "Configure Model Context Protocol servers",
@@ -4872,10 +4874,106 @@
         "title": "OCR service"
       },
       "preprocess": {
+        "e2b": {
+          "api_key": "API Key",
+          "api_key_placeholder": "Enter your E2B API key",
+          "api_url": "API URL",
+          "api_url_placeholder": "https://api.e2b.dev or self-hosted URL",
+          "chat_tool": {
+            "description": "When enabled, AI can run Python code in E2B sandboxes",
+            "label": "Enable Chat Tool",
+            "requires_api_key": "Requires valid API key to enable",
+            "tool_name": "Tool name: execute_code_in_e2b",
+            "tooltip": "Allow AI to execute code during conversations"
+          },
+          "description": "Run AI-generated code in secure cloud sandboxes",
+          "health_check": {
+            "button": "Test Connection",
+            "failed": "E2B connection failed. Check your API key and URL.",
+            "success": "E2B connection successful!"
+          },
+          "options": {
+            "sandbox_mode": {
+              "label": "Sandbox Mode",
+              "per_session": "Per Session - New sandbox each chat",
+              "persistent": "Persistent - Reuse sandbox",
+              "tooltip": "Per-session creates fresh sandboxes; persistent reuses them for better performance"
+            },
+            "template": {
+              "label": "Custom Template ID",
+              "placeholder": "Optional: custom E2B template",
+              "tooltip": "Use a custom E2B template for specialized environments"
+            },
+            "timeout": {
+              "label": "Execution Timeout",
+              "tooltip": "Maximum time for code execution (seconds)"
+            }
+          },
+          "title": "E2B Code Interpreter"
+        },
         "provider": "Document Processing Provider",
         "provider_placeholder": "Choose a document processing provider",
         "title": "Document Processing",
-        "tooltip": "In Settings -> Tools, set a document processing service provider. Document processing can effectively improve the retrieval performance of complex format documents and scanned documents."
+        "tooltip": "In Settings -> Tools, set a document processing service provider. Document processing can effectively improve the retrieval performance of complex format documents and scanned documents.",
+        "unstructured": {
+          "api_host": "API Host",
+          "api_host_placeholder": "https://api.unstructured.io or self-hosted URL",
+          "api_key": "API Key",
+          "api_key_placeholder": "Enter your Unstructured API key",
+          "chat_tool": {
+            "description": "Allow AI to process documents during conversations",
+            "label": "Enable Chat Tool",
+            "requires_api_key": "Requires valid API key to enable",
+            "tool_name": "Tool name: process_document_with_unstructured",
+            "tooltip": "When enabled, the AI can use the 'process_document_with_unstructured' tool to extract content from documents"
+          },
+          "description": "Enterprise-grade document processing supporting 50+ file types",
+          "health_check": {
+            "button": "Test Connection",
+            "failed": "Connection failed",
+            "success": "Connection successful"
+          },
+          "options": {
+            "chunking_strategy": {
+              "basic": "Basic - Simple chunking",
+              "by_title": "By Title - Semantic chunking",
+              "label": "Chunking Strategy"
+            },
+            "concurrency": {
+              "label": "Concurrency Level",
+              "tooltip": "Number of parallel requests (1-15)"
+            },
+            "mime_types": {
+              "categories": {
+                "document": "Documents",
+                "image": "Images (OCR)",
+                "other": "Other Formats",
+                "presentation": "Presentations",
+                "spreadsheet": "Spreadsheets",
+                "text": "Text Files",
+                "web": "Web Pages"
+              },
+              "description": "Select which file types should be processed by Unstructured.io",
+              "deselect_all": "Deselect All",
+              "label": "Supported File Types",
+              "search_placeholder": "Search file types...",
+              "select_all": "Select All",
+              "selected_count": "{{count}} file type(s) selected"
+            },
+            "split_pdf": {
+              "label": "Split PDF Pages",
+              "tooltip": "Process PDF pages in parallel for faster processing"
+            },
+            "strategy": {
+              "auto": "Auto - Automatic detection",
+              "fast": "Fast - Quick processing",
+              "hi_res": "High Resolution - Best quality",
+              "label": "Processing Strategy",
+              "ocr_only": "OCR Only - Text extraction"
+            }
+          },
+          "title": "Unstructured.io"
+        }
       },
       "title": "Other Settings",
       "websearch": {

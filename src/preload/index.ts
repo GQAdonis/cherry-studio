@@ -555,6 +555,33 @@ const api = {
       ipcRenderer.invoke(IpcChannel.OCR_ocr, file, provider),
     listProviders: (): Promise<string[]> => ipcRenderer.invoke(IpcChannel.OCR_ListProviders)
   },
+  unstructured: {
+    processDocument: (filePath: string, options?: any) =>
+      ipcRenderer.invoke(IpcChannel.Unstructured_ProcessDocument, filePath, options),
+    batchProcess: (filePaths: string[], options?: any) =>
+      ipcRenderer.invoke(IpcChannel.Unstructured_BatchProcess, filePaths, options),
+    testConnection: (apiKey?: string, apiHost?: string) =>
+      ipcRenderer.invoke(IpcChannel.Unstructured_TestConnection, apiKey, apiHost),
+    getSupportedTypes: () => ipcRenderer.invoke(IpcChannel.Unstructured_GetSupportedTypes),
+    processForTool: (params: any) => ipcRenderer.invoke(IpcChannel.Unstructured_ProcessForTool, params)
+  },
+  e2b: {
+    executeCode: (codeOrOptions: string | any, sessionId?: string) =>
+      ipcRenderer.invoke(IpcChannel.E2B_ExecuteCode, codeOrOptions, sessionId),
+    listFiles: (path?: string, sessionId?: string) => ipcRenderer.invoke(IpcChannel.E2B_ListFiles, path, sessionId),
+    readFile: (options: any, sessionId?: string) => ipcRenderer.invoke(IpcChannel.E2B_ReadFile, options, sessionId),
+    writeFile: (options: any, sessionId?: string) => ipcRenderer.invoke(IpcChannel.E2B_WriteFile, options, sessionId),
+    getDownloadUrl: (path: string, sessionId?: string) =>
+      ipcRenderer.invoke(IpcChannel.E2B_GetDownloadUrl, path, sessionId),
+    deleteFile: (path: string, sessionId?: string) => ipcRenderer.invoke(IpcChannel.E2B_DeleteFile, path, sessionId),
+    makeDirectory: (path: string, sessionId?: string) =>
+      ipcRenderer.invoke(IpcChannel.E2B_MakeDirectory, path, sessionId),
+    getSandboxInfo: (sessionId?: string) => ipcRenderer.invoke(IpcChannel.E2B_GetSandboxInfo, sessionId),
+    testConnection: (apiKey?: string, apiUrl?: string) =>
+      ipcRenderer.invoke(IpcChannel.E2B_TestConnection, apiKey, apiUrl),
+    closeSandbox: (sessionId?: string) => ipcRenderer.invoke(IpcChannel.E2B_CloseSandbox, sessionId),
+    executeForTool: (params: any) => ipcRenderer.invoke(IpcChannel.E2B_ExecuteForTool, params)
+  },
   cherryai: {
     generateSignature: (params: { method: string; path: string; query: string; body: Record<string, any> }) =>
       ipcRenderer.invoke(IpcChannel.Cherryai_GetSignature, params)

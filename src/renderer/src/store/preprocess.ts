@@ -1,5 +1,6 @@
 import type { PayloadAction } from '@reduxjs/toolkit'
 import { createSlice } from '@reduxjs/toolkit'
+import { getDefaultEnabledMimeTypes } from '@renderer/config/unstructuredMimeTypes'
 import type { PreprocessProvider } from '@renderer/types'
 
 export interface PreprocessState {
@@ -33,6 +34,20 @@ const initialState: PreprocessState = {
       name: 'Open MinerU',
       apiKey: '',
       apiHost: ''
+    },
+    {
+      id: 'unstructured',
+      name: 'Unstructured.io',
+      apiKey: '',
+      apiHost: 'https://api.unstructuredapp.io/general/v0/general',
+      options: {
+        strategy: 'auto',
+        chunkingStrategy: 'by_title',
+        splitPdfPage: true,
+        splitPdfConcurrencyLevel: 5,
+        enableChatTool: false,
+        enabledMimeTypes: getDefaultEnabledMimeTypes()
+      }
     }
   ],
   defaultProvider: 'mineru'
