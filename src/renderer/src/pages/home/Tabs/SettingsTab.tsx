@@ -58,7 +58,11 @@ import type { ContextStrategyType } from '@renderer/types/contextStrategy'
 import { CONTEXT_STRATEGY_LABELS } from '@renderer/types/contextStrategy'
 import { modalConfirm } from '@renderer/utils'
 import { getSendMessageShortcutLabel } from '@renderer/utils/input'
-import { isSupportServiceTierProvider, isSupportVerbosityProvider } from '@renderer/utils/provider'
+import {
+  isOpenAICompatibleProvider,
+  isSupportServiceTierProvider,
+  isSupportVerbosityProvider
+} from '@renderer/utils/provider'
 import { Button, Col, InputNumber, Row, Slider, Switch } from 'antd'
 import { Layers, Settings2 } from 'lucide-react'
 import type { FC } from 'react'
@@ -200,6 +204,7 @@ const SettingsTab: FC<Props> = (props) => {
   const model = assistant.model || getDefaultModel()
 
   const showOpenAiSettings =
+    isOpenAICompatibleProvider(provider) ||
     isOpenAIModel(model) ||
     isSupportServiceTierProvider(provider) ||
     (isSupportVerbosityModel(model) && isSupportVerbosityProvider(provider))

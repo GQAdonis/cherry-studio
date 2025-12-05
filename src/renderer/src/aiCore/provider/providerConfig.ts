@@ -11,6 +11,7 @@ import { createVertexProvider, isVertexAIConfigured } from '@renderer/hooks/useV
 import { getProviderByModel } from '@renderer/services/AssistantService'
 import store from '@renderer/store'
 import { isSystemProvider, type Model, type Provider, SystemProviderIds } from '@renderer/types'
+import type { OpenAICompletionsStreamOptions } from '@renderer/types/aiCoreTypes'
 import {
   formatApiHost,
   formatAzureOpenAIApiHost,
@@ -36,32 +37,6 @@ import { aihubmixProviderCreator, newApiResolverCreator, vertexAnthropicProvider
 import { azureAnthropicProviderCreator } from './config/azure-anthropic'
 import { COPILOT_DEFAULT_HEADERS } from './constants'
 import { getAiSdkProviderId } from './factory'
-
-/**
- * 获取轮询的API key
- * 复用legacy架构的多key轮询逻辑
- */
-function getRotatedApiKey(provider: Provider): string {
-  const keys = provider.apiKey.split(',').map((key) => key.trim())
-  const keyName = `provider:${provider.id}:last_used_key`
-
-  if (keys.length === 1) {
-    return keys[0]
-  }
-
-  const lastUsedKey = window.keyv.get(keyName)
-  if (!lastUsedKey) {
-    window.keyv.set(keyName, keys[0])
-    return keys[0]
-  }
-
-  const currentIndex = keys.indexOf(lastUsedKey)
-  const nextIndex = (currentIndex + 1) % keys.length
-  const nextKey = keys[nextIndex]
-  window.keyv.set(keyName, nextKey)
-
-  return nextKey
-}
 
 /**
  * 处理特殊provider的转换逻辑
@@ -171,7 +146,11 @@ export function providerToAiSdkConfig(actualProvider: Provider, model: Model): A
   const { baseURL, endpoint } = routeToEndpoint(actualProvider.apiHost)
   const baseConfig = {
     baseURL: baseURL,
-    apiKey: getRotatedApiKey(actualProvider)
+    apiKey: actualProvider.apiKey
+  }
+  let includeUsage: OpenAICompletionsStreamOptions['include_usage'] = undefined
+  if (isSupportStreamOptionsProvider(actualProvider)) {
+    includeUsage = store.getState().settings.openAI?.streamOptions?.includeUsage
   }
 
   const isCopilotProvider = actualProvider.id === SystemProviderIds.copilot
@@ -184,7 +163,7 @@ export function providerToAiSdkConfig(actualProvider: Provider, model: Model): A
         ...actualProvider.extra_headers
       },
       name: actualProvider.id,
-      includeUsage: true
+      includeUsage
     })
 
     return {
@@ -287,7 +266,7 @@ export function providerToAiSdkConfig(actualProvider: Provider, model: Model): A
       ...options,
       name: actualProvider.id,
       ...extraOptions,
-      includeUsage: isSupportStreamOptionsProvider(actualProvider)
+      includeUsage
     }
   }
 }
