@@ -7,9 +7,11 @@ import type { OpenAIVerbosity } from './aiCoreTypes'
 export const ProviderTypeSchema = z.enum([
   'openai',
   'openai-response',
+  'openai-compatible',
   'anthropic',
   'gemini',
   'azure-openai',
+  'azure-foundry',
   'vertexai',
   'mistral',
   'aws-bedrock',
@@ -100,6 +102,7 @@ export type Provider = {
   name: string
   apiKey: string
   apiHost: string
+  openaiApiHost?: string
   anthropicApiHost?: string
   isAnthropicModel?: (m: Model) => boolean
   apiVersion?: string
@@ -153,6 +156,7 @@ export const SystemProviderIdSchema = z.enum([
   'anthropic',
   'openai',
   'azure-openai',
+  'azure-foundry',
   'gemini',
   'vertexai',
   'github',
@@ -223,6 +227,7 @@ export const SystemProviderIds = {
   anthropic: 'anthropic',
   openai: 'openai',
   'azure-openai': 'azure-openai',
+  'azure-foundry': 'azure-foundry',
   gemini: 'gemini',
   vertexai: 'vertexai',
   github: 'github',
@@ -281,6 +286,12 @@ export type VertexProvider = Provider & {
 export type AzureOpenAIProvider = Provider & {
   type: 'azure-openai'
   apiVersion: string
+}
+
+export type AzureFoundryProvider = Provider & {
+  type: 'azure-foundry'
+  apiVersion: string
+  openaiApiHost?: string
 }
 
 /**

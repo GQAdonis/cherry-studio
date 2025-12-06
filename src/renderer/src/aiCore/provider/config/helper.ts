@@ -15,8 +15,8 @@ export const endpointIs = (type: string) => (model: Model) => model.endpoint_typ
 export function provider2Provider(ruleSet: RuleSet, model: Model, provider: Provider): Provider {
   for (const rule of ruleSet.rules) {
     if (rule.match(model)) {
-      return rule.provider(provider)
+      return rule.provider(provider, model)
     }
   }
-  return ruleSet.fallbackRule(provider)
+  return ruleSet.fallbackRule(provider, model)
 }

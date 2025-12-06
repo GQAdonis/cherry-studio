@@ -56,6 +56,7 @@ export function supportsPdfInput(model: Model): boolean {
     supportedModels: ['qwen-long', 'qwen-doc'],
     supportedProviders: [
       'openai',
+      'azure',
       'azure-openai',
       'anthropic',
       'google',

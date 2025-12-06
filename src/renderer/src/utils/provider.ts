@@ -1,5 +1,5 @@
 import { CLAUDE_SUPPORTED_PROVIDERS } from '@renderer/pages/code'
-import type { AzureOpenAIProvider, ProviderType, VertexProvider } from '@renderer/types'
+import type { AzureFoundryProvider, AzureOpenAIProvider, ProviderType, VertexProvider } from '@renderer/types'
 import { isSystemProvider, type Provider, type SystemProviderId, SystemProviderIds } from '@renderer/types'
 
 export const isAzureResponsesEndpoint = (provider: AzureOpenAIProvider) => {
@@ -149,6 +149,22 @@ export function isOpenAICompatibleProvider(provider: Provider): boolean {
 
 export function isAzureOpenAIProvider(provider: Provider): provider is AzureOpenAIProvider {
   return provider.type === 'azure-openai'
+}
+
+export function isAzureFoundryProvider(provider: Provider): provider is AzureFoundryProvider {
+  return provider.type === 'azure-foundry' || provider.id.startsWith('azure-foundry-')
+}
+
+export function isAzureFoundryFamily(provider: Provider): boolean {
+  return (
+    isAzureFoundryProvider(provider) ||
+    [
+      'azure-foundry-openai',
+      'azure-foundry-openai-embedding',
+      'azure-foundry-anthropic',
+      'azure-foundry-inference'
+    ].includes(provider.id)
+  )
 }
 
 export function isOpenAIProvider(provider: Provider): boolean {

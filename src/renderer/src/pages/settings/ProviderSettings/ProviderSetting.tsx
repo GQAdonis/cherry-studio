@@ -26,6 +26,7 @@ import { formatErrorMessage } from '@renderer/utils/error'
 import {
   isAIGatewayProvider,
   isAnthropicProvider,
+  isAzureFoundryProvider,
   isAzureOpenAIProvider,
   isGeminiProvider,
   isNewApiProvider,
@@ -97,6 +98,7 @@ const ProviderSetting: FC<Props> = ({ providerId }) => {
   const { updateProviders } = useProviders()
   const [apiHost, setApiHost] = useState(provider.apiHost)
   const [anthropicApiHost, setAnthropicHost] = useState<string | undefined>(provider.anthropicApiHost)
+  const [openaiApiHost, setOpenaiApiHost] = useState<string>(provider.openaiApiHost ?? '')
   const [apiVersion, setApiVersion] = useState(provider.apiVersion)
   const [activeHostField, setActiveHostField] = useState<HostField>('apiHost')
   const { t } = useTranslation()
@@ -105,6 +107,8 @@ const ProviderSetting: FC<Props> = ({ providerId }) => {
   const dispatch = useAppDispatch()
 
   const isAzureOpenAI = isAzureOpenAIProvider(provider)
+  const isAzureFoundry = isAzureFoundryProvider(provider)
+  const isAzureFamily = isAzureOpenAI || isAzureFoundry
   const isDmxapi = provider.id === 'dmxapi'
   const noAPIInputProviders = ['aws-bedrock'] as const satisfies SystemProviderId[]
   const hideApiInput = noAPIInputProviders.some((id) => id === provider.id)
@@ -173,6 +177,27 @@ const ProviderSetting: FC<Props> = ({ providerId }) => {
     [allProviders, updateProviders]
   )
 
+  const warnIfIncorrectAzureHost = useCallback(
+    (host: string, type: 'project' | 'openai') => {
+      if (!isAzureFoundry) return
+      const normalized = host.trim().toLowerCase()
+      if (!normalized) return
+
+      const hasServices = normalized.includes('.services.ai.azure.com')
+      const hasOpenAI = normalized.includes('.openai.azure.com')
+      const hasCognitive = normalized.includes('.cognitiveservices.azure.com')
+
+      if (type === 'project' && (hasOpenAI || hasCognitive)) {
+        window.toast.warning(t('settings.provider.azure-foundry.project_host_warning'))
+      }
+
+      if (type === 'openai' && (!hasOpenAI || hasServices || hasCognitive)) {
+        window.toast.warning(t('settings.provider.azure-foundry.openai_host_warning'))
+      }
+    },
+    [isAzureFoundry, t]
+  )
+
   const onUpdateApiHost = () => {
     if (!validateApiHost(apiHost)) {
       setApiHost(provider.apiHost)
@@ -181,6 +206,7 @@ const ProviderSetting: FC<Props> = ({ providerId }) => {
     }
     if (isVertexProvider(provider) || apiHost.trim()) {
       updateProvider({ apiHost })
+      warnIfIncorrectAzureHost(apiHost, 'project')
     } else {
       setApiHost(provider.apiHost)
     }
@@ -196,6 +222,24 @@ const ProviderSetting: FC<Props> = ({ providerId }) => {
       updateProvider({ anthropicApiHost: undefined })
       setAnthropicHost(undefined)
     }
+  }
+  const onUpdateOpenAIApiHost = () => {
+    const trimmedHost = openaiApiHost.trim()
+
+    if (!trimmedHost) {
+      updateProvider({ openaiApiHost: undefined })
+      setOpenaiApiHost('')
+      return
+    }
+
+    if (!validateApiHost(trimmedHost)) {
+      setOpenaiApiHost(provider.openaiApiHost ?? '')
+      window.toast.error(t('settings.provider.api_host_no_valid'))
+      return
+    }
+
+    updateProvider({ openaiApiHost: trimmedHost })
+    warnIfIncorrectAzureHost(trimmedHost, 'openai')
   }
   const onUpdateApiVersion = () => updateProvider({ apiVersion })
 
@@ -336,6 +380,10 @@ const ProviderSetting: FC<Props> = ({ providerId }) => {
   useEffect(() => {
     setAnthropicHost(provider.anthropicApiHost)
   }, [provider.anthropicApiHost])
+
+  useEffect(() => {
+    setOpenaiApiHost(provider.openaiApiHost ?? '')
+  }, [provider.openaiApiHost])
 
   const canConfigureAnthropicHost = useMemo(() => {
     if (isNewApiProvider(provider)) {
@@ -542,6 +590,13 @@ const ProviderSetting: FC<Props> = ({ providerId }) => {
                       {t('settings.provider.api_host_preview', { url: hostPreview() })}
                     </SettingHelpText>
                   </SettingHelpTextRow>
+                  {isAzureFoundry && (
+                    <SettingHelpTextRow>
+                      <SettingHelpText style={{ marginLeft: 6 }}>
+                        {t('settings.provider.azure-foundry.project_host_help')}
+                      </SettingHelpText>
+                    </SettingHelpTextRow>
+                  )}
                 </>
               )}
 
@@ -565,24 +620,47 @@ const ProviderSetting: FC<Props> = ({ providerId }) => {
                   </SettingHelpTextRow>
                 </>
               )}
+              {isAzureFoundry && (
+                <>
+                  <SettingSubtitle style={{ marginTop: 12, display: 'flex', alignItems: 'center', gap: 4 }}>
+                    {t('settings.provider.azure-foundry.openai_host_label')}
+                    <HelpTooltip title={t('settings.provider.azure-foundry.openai_host_help')} />
+                  </SettingSubtitle>
+                  <Space.Compact style={{ width: '100%', marginTop: 5 }}>
+                    <Input
+                      value={openaiApiHost}
+                      placeholder={t('settings.provider.azure-foundry.openai_host_placeholder')}
+                      onChange={(e) => setOpenaiApiHost(e.target.value)}
+                      onBlur={onUpdateOpenAIApiHost}
+                    />
+                  </Space.Compact>
+                  <SettingHelpTextRow style={{ flexDirection: 'column', alignItems: 'flex-start', gap: 4 }}>
+                    <SettingHelpText style={{ marginLeft: 6, wordBreak: 'break-all' }}>
+                      {t('settings.provider.azure-foundry.openai_host_preview', {
+                        url: openaiApiHost?.trim() || '—'
+                      })}
+                    </SettingHelpText>
+                  </SettingHelpTextRow>
+                </>
+              )}
             </>
           )}
         </>
       )}
-      {isAzureOpenAI && (
+      {isAzureFamily && (
         <>
           <SettingSubtitle>{t('settings.provider.api_version')}</SettingSubtitle>
           <Space.Compact style={{ width: '100%', marginTop: 5 }}>
             <Input
               value={apiVersion}
-              placeholder="2024-xx-xx-preview"
+              placeholder={isAzureFoundry ? '2024-10-21' : '2024-xx-xx-preview'}
               onChange={(e) => setApiVersion(e.target.value)}
               onBlur={onUpdateApiVersion}
             />
           </Space.Compact>
           <SettingHelpTextRow style={{ justifyContent: 'space-between' }}>
             <SettingHelpText style={{ minWidth: 'fit-content' }}>
-              {t('settings.provider.azure.apiversion.tip')}
+              {isAzureFoundry ? t('settings.provider.azure-foundry.help') : t('settings.provider.azure.apiversion.tip')}
             </SettingHelpText>
           </SettingHelpTextRow>
         </>

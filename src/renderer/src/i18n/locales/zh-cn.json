@@ -2665,6 +2665,7 @@
     "alayanew": "Alaya NeW",
     "anthropic": "Anthropic",
     "aws-bedrock": "AWS Bedrock",
+    "azure-foundry": "Azure AI Foundry",
     "azure-openai": "Azure OpenAI",
     "baichuan": "百川",
     "baidu-cloud": "百度云千帆",
@@ -4640,6 +4641,17 @@
         "apiversion": {
           "tip": "Azure OpenAI 的 API 版本，如果想要使用 Response API，请输入 v1 版本"
         }
+      },
+      "azure-foundry": {
+        "description": "统一访问 10+ 个模型提供商",
+        "help": "通过单一端点支持 OpenAI、Anthropic、Meta、Mistral、Cohere、DeepSeek、xAI、Microsoft、AI21 等模型",
+        "openai_host_help": "用于 GPT / o 系列 / Embedding 部署，格式 https://{resource}.openai.azure.com",
+        "openai_host_label": "OpenAI 部署端点",
+        "openai_host_placeholder": "https://<resource>.openai.azure.com",
+        "openai_host_preview": "当前 OpenAI 端点：{{url}}",
+        "openai_host_warning": "OpenAI 端点应使用 https://{resource}.openai.azure.com，请勿填入项目或旧版 Cognitive Services 地址。",
+        "project_host_help": "项目基础地址需为 https://{resource}.services.ai.azure.com/api/projects/<project>",
+        "project_host_warning": "项目端点应使用 https://{resource}.services.ai.azure.com/api/projects/<project>，请勿填入 OpenAI 或 Cognitive Services 地址。"
       },
       "basic_auth": {
         "label": "HTTP 认证",

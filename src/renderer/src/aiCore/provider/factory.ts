@@ -2,7 +2,7 @@ import { hasProviderConfigByAlias, type ProviderId, resolveProviderConfigId } fr
 import { createProvider as createProviderCore } from '@cherrystudio/ai-core/provider'
 import { loggerService } from '@logger'
 import type { Provider } from '@renderer/types'
-import { isAzureOpenAIProvider, isAzureResponsesEndpoint } from '@renderer/utils/provider'
+import { isAzureFoundryProvider, isAzureOpenAIProvider, isAzureResponsesEndpoint } from '@renderer/utils/provider'
 import type { Provider as AiSdkProvider } from 'ai'
 
 import type { AiSdkConfig } from '../types'
@@ -29,6 +29,11 @@ const logger = loggerService.withContext('ProviderFactory')
 const STATIC_PROVIDER_MAPPING: Record<string, ProviderId> = {
   gemini: 'google', // Google Gemini -> google
   'azure-openai': 'azure', // Azure OpenAI -> azure
+  'azure-foundry': 'azure', // Azure AI Foundry -> azure (base mapping)
+  'azure-foundry-openai': 'azure', // Azure Foundry OpenAI models -> azure
+  'azure-foundry-openai-embedding': 'azure', // Azure Foundry OpenAI embeddings -> azure
+  'azure-foundry-anthropic': 'anthropic', // Azure Foundry Claude models -> anthropic
+  'azure-foundry-inference': 'openai-compatible', // Azure Foundry unified inference -> openai-compatible
   'openai-response': 'openai', // OpenAI Responses -> openai
   grok: 'xai', // Grok -> xai
   copilot: 'github-copilot-openai-compatible'
@@ -61,6 +66,18 @@ function tryResolveProviderId(identifier: string): ProviderId | null {
 export function getAiSdkProviderId(provider: Provider): string {
   // 1. 尝试解析provider.id
   const resolvedFromId = tryResolveProviderId(provider.id)
+
+  // Handle Azure Foundry providers
+  if (isAzureFoundryProvider(provider)) {
+    // Check if it's an AzureOpenAIProvider first (type guard)
+    if ((provider as any).type === 'azure-foundry' && isAzureResponsesEndpoint(provider as any)) {
+      return 'azure-responses'
+    }
+    // Return the already-routed provider ID from azure-foundry.ts
+    return resolvedFromId || 'azure'
+  }
+
+  // Handle Azure OpenAI providers
   if (isAzureOpenAIProvider(provider)) {
     if (isAzureResponsesEndpoint(provider)) {
       return 'azure-responses'

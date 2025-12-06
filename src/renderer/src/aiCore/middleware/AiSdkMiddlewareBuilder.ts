@@ -192,7 +192,8 @@ function addProviderSpecificMiddlewares(builder: AiSdkMiddlewareBuilder, config:
       // Anthropic特定中间件
       break
     case 'openai':
-    case 'azure-openai': {
+    case 'azure-openai':
+    case 'azure-foundry': {
       if (config.enableReasoning) {
         const tagName = getReasoningTagName(config.model?.id.toLowerCase())
         builder.add({

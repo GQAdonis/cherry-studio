@@ -398,6 +398,92 @@ export const SYSTEM_MODELS: Record<SystemProviderId | 'defaultModel', Model[]> =
       group: 'GPT 4o'
     }
   ],
+  'azure-foundry': [
+    // OpenAI Models
+    { id: 'gpt-5.1-chat', name: 'GPT-5.1 Chat', provider: 'azure-foundry', group: 'OpenAI GPT' },
+    { id: 'gpt-5-mini', name: 'GPT-5 Mini', provider: 'azure-foundry', group: 'OpenAI GPT' },
+    { id: 'gpt-4o', name: 'GPT-4o', provider: 'azure-foundry', group: 'OpenAI GPT' },
+    { id: 'o1', name: 'OpenAI o1', provider: 'azure-foundry', group: 'OpenAI o1' },
+
+    // OpenAI Embedding Models
+    {
+      id: 'text-embedding-3-large',
+      name: 'Text Embedding 3 Large',
+      provider: 'azure-foundry',
+      group: 'OpenAI Embeddings'
+    },
+    {
+      id: 'text-embedding-3-small',
+      name: 'Text Embedding 3 Small',
+      provider: 'azure-foundry',
+      group: 'OpenAI Embeddings'
+    },
+    {
+      id: 'text-embedding-ada-002',
+      name: 'Text Embedding Ada 002',
+      provider: 'azure-foundry',
+      group: 'OpenAI Embeddings'
+    },
+
+    // Anthropic Models
+    { id: 'claude-sonnet-4-5', name: 'Claude Sonnet 4.5', provider: 'azure-foundry', group: 'Anthropic Claude' },
+    { id: 'claude-opus-4-5', name: 'Claude Opus 4.5', provider: 'azure-foundry', group: 'Anthropic Claude' },
+    { id: 'claude-haiku-4', name: 'Claude Haiku 4', provider: 'azure-foundry', group: 'Anthropic Claude' },
+
+    // Meta Models
+    {
+      id: 'Meta-Llama-3.3-70B-Instruct',
+      name: 'Llama 3.3 70B Instruct',
+      provider: 'azure-foundry',
+      group: 'Meta Llama'
+    },
+    {
+      id: 'Meta-Llama-3.1-405B-Instruct',
+      name: 'Llama 3.1 405B Instruct',
+      provider: 'azure-foundry',
+      group: 'Meta Llama'
+    },
+    {
+      id: 'Meta-Llama-3.1-70B-Instruct',
+      name: 'Llama 3.1 70B Instruct',
+      provider: 'azure-foundry',
+      group: 'Meta Llama'
+    },
+
+    // Mistral AI Models
+    { id: 'Mistral-large-2411', name: 'Mistral Large 2411', provider: 'azure-foundry', group: 'Mistral AI' },
+    { id: 'Ministral-3B', name: 'Ministral 3B', provider: 'azure-foundry', group: 'Mistral AI' },
+    { id: 'Mistral-Nemo', name: 'Mistral Nemo', provider: 'azure-foundry', group: 'Mistral AI' },
+
+    // Microsoft Models
+    { id: 'Phi-4', name: 'Phi-4', provider: 'azure-foundry', group: 'Microsoft Phi' },
+    {
+      id: 'Phi-3.5-vision-instruct',
+      name: 'Phi-3.5 Vision Instruct',
+      provider: 'azure-foundry',
+      group: 'Microsoft Phi'
+    },
+
+    // Cohere Models
+    { id: 'command-r-plus', name: 'Command R+', provider: 'azure-foundry', group: 'Cohere' },
+    { id: 'embed-v3-english', name: 'Cohere Embed v3 English', provider: 'azure-foundry', group: 'Cohere Embeddings' },
+    {
+      id: 'embed-v3-multilingual',
+      name: 'Cohere Embed v3 Multilingual',
+      provider: 'azure-foundry',
+      group: 'Cohere Embeddings'
+    },
+
+    // DeepSeek Models
+    { id: 'DeepSeek-V3', name: 'DeepSeek V3', provider: 'azure-foundry', group: 'DeepSeek' },
+    { id: 'DeepSeek-R1', name: 'DeepSeek R1', provider: 'azure-foundry', group: 'DeepSeek' },
+
+    // xAI Models
+    { id: 'grok-2', name: 'Grok 2', provider: 'azure-foundry', group: 'xAI' },
+
+    // AI21 Labs Models
+    { id: 'jamba-1.5-large', name: 'Jamba 1.5 Large', provider: 'azure-foundry', group: 'AI21 Labs' }
+  ],
   gemini: [
     {
       id: 'gemini-1.5-flash',

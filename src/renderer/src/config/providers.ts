@@ -348,6 +348,20 @@ export const SYSTEM_PROVIDERS_CONFIG: Record<SystemProviderId, SystemProvider> =
     isSystem: true,
     enabled: false
   },
+  'azure-foundry': {
+    id: 'azure-foundry',
+    name: 'Azure AI Foundry',
+    type: 'azure-foundry',
+    apiKey: '',
+    apiHost: '',
+    openaiApiHost: '',
+    apiVersion: '2024-10-21',
+    models: SYSTEM_MODELS['azure-foundry'],
+    isSystem: true,
+    enabled: false,
+    notes:
+      'Unified access to 10+ model providers: OpenAI, Anthropic, Meta, Mistral, Cohere, DeepSeek, xAI, Microsoft, and more.'
+  },
   gemini: {
     id: 'gemini',
     name: 'Gemini',
@@ -735,6 +749,7 @@ export const PROVIDER_LOGO_MAP: AtLeast<SystemProviderId, string> = {
   zhinao: ZhinaoProviderLogo,
   nvidia: NvidiaProviderLogo,
   'azure-openai': AzureProviderLogo,
+  'azure-foundry': AzureProviderLogo,
   hunyuan: HunyuanProviderLogo,
   grok: GrokProviderLogo,
   hyperbolic: HyperbolicProviderLogo,
@@ -1249,6 +1264,17 @@ export const PROVIDER_URLS: Record<SystemProviderId, ProviderUrls> = {
       apiKey: 'https://portal.azure.com/#view/Microsoft_Azure_ProjectOxford/CognitiveServicesHub/~/OpenAI',
       docs: 'https://learn.microsoft.com/en-us/azure/ai-services/openai/',
       models: 'https://learn.microsoft.com/en-us/azure/ai-services/openai/concepts/models'
+    }
+  },
+  'azure-foundry': {
+    api: {
+      url: ''
+    },
+    websites: {
+      official: 'https://ai.azure.com/',
+      apiKey: 'https://portal.azure.com/',
+      docs: 'https://learn.microsoft.com/en-us/azure/ai-foundry/',
+      models: 'https://ai.azure.com/explore/models'
     }
   },
   'baidu-cloud': {

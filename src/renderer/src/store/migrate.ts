@@ -3034,6 +3034,16 @@ const migrateConfig = {
       logger.error('migrate 184 error', error as Error)
       return state
     }
+  },
+  '185': (state: RootState) => {
+    try {
+      addProvider(state, 'azure-foundry')
+      logger.info('migrate 185 success - Added Azure AI Foundry provider')
+      return state
+    } catch (error) {
+      logger.error('migrate 185 error', error as Error)
+      return state
+    }
   }
 }
 

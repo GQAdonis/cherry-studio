@@ -31,6 +31,7 @@ const providerKeyMap = {
   anthropic: 'provider.anthropic',
   'aws-bedrock': 'provider.aws-bedrock',
   'azure-openai': 'provider.azure-openai',
+  'azure-foundry': 'provider.azure-foundry',
   baichuan: 'provider.baichuan',
   'baidu-cloud': 'provider.baidu-cloud',
   burncloud: 'provider.burncloud',

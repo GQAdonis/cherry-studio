@@ -3,6 +3,7 @@ import type { Model } from '@renderer/types'
 import { SystemProviderIds } from '@renderer/types'
 import { getLowerBaseModelName, isUserSelectedModelType } from '@renderer/utils'
 import {
+  isAzureFoundryProvider,
   isAzureOpenAIProvider,
   isGeminiProvider,
   isNewApiProvider,
@@ -63,7 +64,7 @@ export function isWebSearchModel(model: Model): boolean {
 
   // TODO: 当其他供应商采用Response端点时，这个地方逻辑需要改进
   // azure现在也支持了websearch
-  if (isOpenAIProvider(provider) || isAzureOpenAIProvider(provider)) {
+  if (isOpenAIProvider(provider) || isAzureOpenAIProvider(provider) || isAzureFoundryProvider(provider)) {
     if (isOpenAIWebSearchModel(model)) {
       return true
     }

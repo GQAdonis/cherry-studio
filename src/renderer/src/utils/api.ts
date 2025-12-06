@@ -132,6 +132,20 @@ export function formatAzureOpenAIApiHost(host: string): string {
   return formatApiHost(normalizedHost + '/openai', false)
 }
 
+/**
+ * 格式化 Azure AI Foundry 的 API 主机地址。
+ * Azure Foundry uses a base project endpoint without /openai suffix
+ */
+export function formatAzureFoundryApiHost(host: string): string {
+  const normalizedHost = withoutTrailingSlash(host)
+    .replace(/\/v1$/, '')
+    .replace(/\/openai$/, '')
+    .replace(/\/anthropic\/v1$/, '')
+    .replace(/\/models$/, '')
+  // Return base project endpoint - routing will append appropriate paths
+  return formatApiHost(normalizedHost, false)
+}
+
 export function formatVertexApiHost(provider: VertexProvider): string {
   const { apiHost } = provider
   const { projectId: project, location } = store.getState().llm.settings.vertexai

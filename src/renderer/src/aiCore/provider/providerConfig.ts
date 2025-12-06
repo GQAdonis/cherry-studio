@@ -14,6 +14,7 @@ import { isSystemProvider, type Model, type Provider, SystemProviderIds } from '
 import type { OpenAICompletionsStreamOptions } from '@renderer/types/aiCoreTypes'
 import {
   formatApiHost,
+  formatAzureFoundryApiHost,
   formatAzureOpenAIApiHost,
   formatOllamaApiHost,
   formatVertexApiHost,
@@ -21,6 +22,7 @@ import {
 } from '@renderer/utils/api'
 import {
   isAnthropicProvider,
+  isAzureFoundryProvider,
   isAzureOpenAIProvider,
   isCherryAIProvider,
   isGeminiProvider,
@@ -35,6 +37,7 @@ import { cloneDeep, isEmpty } from 'lodash'
 import type { AiSdkConfig } from '../types'
 import { aihubmixProviderCreator, newApiResolverCreator, vertexAnthropicProviderCreator } from './config'
 import { azureAnthropicProviderCreator } from './config/azure-anthropic'
+import { azureFoundryProviderCreator } from './config/azure-foundry'
 import { COPILOT_DEFAULT_HEADERS } from './constants'
 import { getAiSdkProviderId } from './factory'
 
@@ -54,9 +57,17 @@ function handleSpecialProviders(model: Model, provider: Provider): Provider {
       return vertexAnthropicProviderCreator(model, provider)
     }
   }
+
+  // Handle Azure Foundry multi-model routing
+  if (isAzureFoundryProvider(provider)) {
+    return azureFoundryProviderCreator(model, provider)
+  }
+
+  // Legacy Azure OpenAI Anthropic routing
   if (isAzureOpenAIProvider(provider)) {
     return azureAnthropicProviderCreator(model, provider)
   }
+
   return provider
 }
 
@@ -88,6 +99,11 @@ export function formatProviderApiHost(provider: Provider): Provider {
     formatted.apiHost = formatApiHost(formatted.apiHost, true, 'v1beta')
   } else if (isAzureOpenAIProvider(formatted)) {
     formatted.apiHost = formatAzureOpenAIApiHost(formatted.apiHost)
+  } else if (isAzureFoundryProvider(formatted)) {
+    formatted.apiHost = formatAzureFoundryApiHost(formatted.apiHost)
+    if (formatted.openaiApiHost) {
+      formatted.openaiApiHost = formatAzureOpenAIApiHost(formatted.openaiApiHost)
+    }
   } else if (isVertexProvider(formatted)) {
     formatted.apiHost = formatVertexApiHost(formatted)
   } else if (isCherryAIProvider(formatted)) {
@@ -207,6 +223,25 @@ export function providerToAiSdkConfig(actualProvider: Provider, model: Model): A
       }
     }
   }
+
+  // azure foundry - unified inference API for all non-OpenAI/Anthropic models
+  if (actualProvider.id === 'azure-foundry-inference') {
+    const inferenceBaseURL = actualProvider.apiHost + '/models'
+    return {
+      providerId: 'openai-compatible',
+      options: {
+        baseURL: inferenceBaseURL,
+        apiKey: baseConfig.apiKey,
+        name: 'azure-foundry',
+        headers: {
+          'api-version': actualProvider.apiVersion || '2024-10-21',
+          ...actualProvider.extra_headers
+        },
+        includeUsage
+      }
+    }
+  }
+
   // azure
   // https://learn.microsoft.com/en-us/azure/ai-foundry/openai/latest
   // https://learn.microsoft.com/en-us/azure/ai-foundry/openai/how-to/responses?tabs=python-key#responses-api

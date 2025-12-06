@@ -2665,6 +2665,7 @@
     "alayanew": "Alaya NeW",
     "anthropic": "Anthropic",
     "aws-bedrock": "AWS Bedrock",
+    "azure-foundry": "[to be translated]:Azure AI Foundry",
     "azure-openai": "Azure OpenAI",
     "baichuan": "Baichuan",
     "baidu-cloud": "Baidu Cloud Qianfan",
@@ -4640,6 +4641,17 @@
         "apiversion": {
           "tip": "Azure OpenAI-API-Version, um Response API zu verwenden, bitte preview-Version eingeben"
         }
+      },
+      "azure-foundry": {
+        "description": "[to be translated]:Universal access to 10+ model providers",
+        "help": "[to be translated]:Supports OpenAI, Anthropic, Meta, Mistral, Cohere, DeepSeek, xAI, Microsoft, AI21, and other models through a single endpoint",
+        "openai_host_help": "[to be translated]:Required for GPT/o/Embedding deployments hosted at https://{resource}.openai.azure.com",
+        "openai_host_label": "[to be translated]:OpenAI deployment endpoint",
+        "openai_host_placeholder": "[to be translated]:https://<resource>.openai.azure.com",
+        "openai_host_preview": "[to be translated]:Current OpenAI endpoint: {{url}}",
+        "openai_host_warning": "[to be translated]:OpenAI endpoint should use https://{resource}.openai.azure.com. You entered a project or legacy Cognitive Services host.",
+        "project_host_help": "[to be translated]:Project base URL must be https://{resource}.services.ai.azure.com/api/projects/<project>",
+        "project_host_warning": "[to be translated]:Project endpoints should use https://{resource}.services.ai.azure.com/api/projects/<project>. You entered an OpenAI/Cognitive Services host."
       },
       "basic_auth": {
         "label": "HTTP-Authentifizierung",

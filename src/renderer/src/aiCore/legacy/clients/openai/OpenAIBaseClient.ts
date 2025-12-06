@@ -191,7 +191,13 @@ export abstract class OpenAIBaseClient<
       }
     }
 
-    if (this.provider.id === 'azure-openai' || this.provider.type === 'azure-openai') {
+    if (
+      this.provider.id === 'azure-openai' ||
+      this.provider.type === 'azure-openai' ||
+      this.provider.id === 'azure-foundry' ||
+      this.provider.type === 'azure-foundry' ||
+      this.provider.id.startsWith('azure-foundry-')
+    ) {
       this.sdkInstance = new AzureOpenAI({
         dangerouslyAllowBrowser: true,
         apiKey: apiKeyForSdkInstance,

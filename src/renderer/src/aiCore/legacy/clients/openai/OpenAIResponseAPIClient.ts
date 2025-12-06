@@ -88,7 +88,13 @@ export class OpenAIResponseAPIClient extends OpenAIBaseClient<
       return this
     }
     if (isOpenAILLMModel(model) && !isOpenAIChatCompletionOnlyModel(model)) {
-      if (this.provider.id === 'azure-openai' || this.provider.type === 'azure-openai') {
+      if (
+        this.provider.id === 'azure-openai' ||
+        this.provider.type === 'azure-openai' ||
+        this.provider.id === 'azure-foundry' ||
+        this.provider.type === 'azure-foundry' ||
+        this.provider.id.startsWith('azure-foundry-')
+      ) {
         this.provider = { ...this.provider, apiHost: this.formatApiHost() }
         if (this.provider.apiVersion === 'preview' || this.provider.apiVersion === 'v1') {
           return this
@@ -123,7 +129,13 @@ export class OpenAIResponseAPIClient extends OpenAIBaseClient<
       return this.sdkInstance
     }
 
-    if (this.provider.id === 'azure-openai' || this.provider.type === 'azure-openai') {
+    if (
+      this.provider.id === 'azure-openai' ||
+      this.provider.type === 'azure-openai' ||
+      this.provider.id === 'azure-foundry' ||
+      this.provider.type === 'azure-foundry' ||
+      this.provider.id.startsWith('azure-foundry-')
+    ) {
       return new AzureOpenAI({
         dangerouslyAllowBrowser: true,
         apiKey: this.apiKey,

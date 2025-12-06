@@ -18,7 +18,7 @@ import type { Chunk } from '@renderer/types/chunk'
 import { ChunkType } from '@renderer/types/chunk'
 import { routeToEndpoint } from '@renderer/utils'
 import type { ExtractResults } from '@renderer/utils/extract'
-import { isAzureOpenAIProvider, isGeminiProvider } from '@renderer/utils/provider'
+import { isAzureFoundryProvider, isAzureOpenAIProvider, isGeminiProvider } from '@renderer/utils/provider'
 import { isEmpty } from 'lodash'
 
 import { getProviderByModel } from './AssistantService'
@@ -46,7 +46,7 @@ export const getKnowledgeBaseParams = (base: KnowledgeBase): KnowledgeBaseParams
 
   if (isGeminiProvider(actualProvider)) {
     baseURL = baseURL + '/openai'
-  } else if (isAzureOpenAIProvider(actualProvider)) {
+  } else if (isAzureOpenAIProvider(actualProvider) || isAzureFoundryProvider(actualProvider)) {
     baseURL = baseURL + '/v1'
   } else if (actualProvider.id === SystemProviderIds.ollama) {
     // LangChain生态不需要/api结尾的URL
