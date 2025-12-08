@@ -1,6 +1,6 @@
 {
   "name": "CherryStudio",
-  "version": "1.7.1",
+  "version": "1.7.2",
   "private": true,
   "description": "The Boss - A powerful AI assistant",
   "main": "./out/main/index.js",
@@ -268,7 +268,6 @@
     "clsx": "^2.1.1",
     "code-inspector-plugin": "^0.20.14",
     "color": "^5.0.0",
-    "concurrently": "^9.2.1",
     "country-flag-emoji-polyfill": "0.1.8",
     "dayjs": "^1.11.11",
     "dexie": "^4.0.8",

@@ -1019,7 +1019,7 @@ describe('Gemini Models', () => {
           provider: '',
           group: ''
         })
-      ).toBe(false)
+      ).toBe(true)
       expect(
         isSupportedThinkingTokenGeminiModel({
           id: 'gemini-3.0-flash-image-preview',
@@ -1227,7 +1227,7 @@ describe('Gemini Models', () => {
           provider: '',
           group: ''
         })
-      ).toBe(false)
+      ).toBe(true)
       expect(
         isGeminiReasoningModel({
           id: 'gemini-3.5-flash-image-preview',
