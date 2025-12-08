@@ -1,7 +1,8 @@
 import { hasProviderConfigByAlias, type ProviderId, resolveProviderConfigId } from '@cherrystudio/ai-core/provider'
 import { createProvider as createProviderCore } from '@cherrystudio/ai-core/provider'
 import { loggerService } from '@logger'
-import type { Provider } from '@renderer/types'
+import { isClaudeReasoningModel } from '@renderer/config/models'
+import type { Model, Provider } from '@renderer/types'
 import { isAzureFoundryProvider, isAzureOpenAIProvider, isAzureResponsesEndpoint } from '@renderer/utils/provider'
 import type { Provider as AiSdkProvider } from 'ai'
 
@@ -102,6 +103,16 @@ export function getAiSdkProviderId(provider: Provider): string {
   }
   // 3. 最后的fallback（使用provider本身的id）
   return provider.id
+}
+
+export function getModelAwareAiSdkProviderId(provider: Provider, model?: Model): string {
+  const resolvedId = getAiSdkProviderId(provider)
+
+  if (model && provider.type === 'vertexai' && resolvedId === 'google-vertex' && isClaudeReasoningModel(model)) {
+    return 'google-vertex-anthropic'
+  }
+
+  return resolvedId
 }
 
 export async function createAiSdkProvider(config: AiSdkConfig): Promise<AiSdkProvider | null> {

@@ -42,7 +42,7 @@ import { t } from 'i18next'
 import type { OllamaCompletionProviderOptions } from 'ollama-ai-provider-v2'
 
 import { addAnthropicHeaders } from '../prepareParams/header'
-import { getAiSdkProviderId } from '../provider/factory'
+import { getModelAwareAiSdkProviderId } from '../provider/factory'
 import { buildGeminiGenerateImageParams } from './image'
 import {
   getAnthropicReasoningParams,
@@ -161,7 +161,7 @@ export function buildProviderOptions(
   providerOptions: Record<string, Record<string, JSONValue>>
   standardParams: Partial<Record<AiSdkParam, any>>
 } {
-  const rawProviderId = getAiSdkProviderId(actualProvider)
+  const rawProviderId = getModelAwareAiSdkProviderId(actualProvider, model)
   logger.debug('buildProviderOptions', { assistant, model, actualProvider, capabilities, rawProviderId })
   // 构建 provider 特定的选项
   let providerSpecificOptions: Record<string, any> = {}

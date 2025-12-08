@@ -39,7 +39,7 @@ import { aihubmixProviderCreator, newApiResolverCreator, vertexAnthropicProvider
 import { azureAnthropicProviderCreator } from './config/azure-anthropic'
 import { azureFoundryProviderCreator } from './config/azure-foundry'
 import { COPILOT_DEFAULT_HEADERS } from './constants'
-import { getAiSdkProviderId } from './factory'
+import { getAiSdkProviderId, getModelAwareAiSdkProviderId } from './factory'
 
 /**
  * 处理特殊provider的转换逻辑
@@ -156,7 +156,7 @@ export function adaptProvider({ provider, model }: { provider: Provider; model?:
  * 简化版：利用新的别名映射系统
  */
 export function providerToAiSdkConfig(actualProvider: Provider, model: Model): AiSdkConfig {
-  const aiSdkProviderId = getAiSdkProviderId(actualProvider)
+  const aiSdkProviderId = getModelAwareAiSdkProviderId(actualProvider, model)
 
   // 构建基础配置
   const { baseURL, endpoint } = routeToEndpoint(actualProvider.apiHost)

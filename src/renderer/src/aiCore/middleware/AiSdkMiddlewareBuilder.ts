@@ -9,7 +9,7 @@ import type { LanguageModelMiddleware } from 'ai'
 import { extractReasoningMiddleware, simulateStreamingMiddleware } from 'ai'
 import { isEmpty } from 'lodash'
 
-import { getAiSdkProviderId } from '../provider/factory'
+import { getModelAwareAiSdkProviderId } from '../provider/factory'
 import { isOpenRouterGeminiGenerateImageModel } from '../utils/image'
 import { noThinkMiddleware } from './noThinkMiddleware'
 import { openrouterGenerateImageMiddleware } from './openrouterGenerateImageMiddleware'
@@ -263,7 +263,7 @@ function addModelSpecificMiddlewares(builder: AiSdkMiddlewareBuilder, config: Ai
   }
 
   if (isGemini3Model(config.model)) {
-    const aiSdkId = getAiSdkProviderId(config.provider)
+    const aiSdkId = getModelAwareAiSdkProviderId(config.provider, config.model)
     builder.add({
       name: 'skip-gemini3-thought-signature',
       middleware: skipGeminiThoughtSignatureMiddleware(aiSdkId)

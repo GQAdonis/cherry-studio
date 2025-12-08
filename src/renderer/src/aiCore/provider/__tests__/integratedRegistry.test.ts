@@ -1,7 +1,7 @@
 import type { Model, Provider } from '@renderer/types'
 import { describe, expect, it, vi } from 'vitest'
 
-import { getAiSdkProviderId } from '../factory'
+import { getAiSdkProviderId, getModelAwareAiSdkProviderId } from '../factory'
 
 // Mock the external dependencies
 vi.mock('@cherrystudio/ai-core', () => ({
@@ -80,6 +80,15 @@ function createAzureProvider(id: string, apiVersion?: string, model?: string): P
   }
 }
 
+function createTestModel(id: string, provider: string = 'vertexai'): Model {
+  return {
+    id,
+    name: id,
+    provider,
+    group: provider
+  } as Model
+}
+
 describe('Integrated Provider Registry', () => {
   describe('Provider ID Resolution', () => {
     it('should resolve openrouter provider correctly', () => {
@@ -148,6 +157,26 @@ describe('Integrated Provider Registry', () => {
       const grokProvider = createTestProvider('grok', 'grok')
       const result = getAiSdkProviderId(grokProvider)
       expect(result).toBe('xai')
+    })
+  })
+
+  describe('Model-aware provider routing', () => {
+    it('routes Vertex Claude models to google-vertex-anthropic', () => {
+      const provider = createTestProvider('vertexai', 'vertexai')
+      const model = createTestModel('claude-sonnet-4-5@20250929')
+
+      const result = getModelAwareAiSdkProviderId(provider, model)
+
+      expect(result).toBe('google-vertex-anthropic')
+    })
+
+    it('keeps non-Claude Vertex models on google-vertex', () => {
+      const provider = createTestProvider('vertexai', 'vertexai')
+      const model = createTestModel('gemini-2.0-flash')
+
+      const result = getModelAwareAiSdkProviderId(provider, model)
+
+      expect(result).toBe('google-vertex')
     })
   })
 })

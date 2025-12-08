@@ -12,7 +12,7 @@ import type { FileMessageBlock } from '@renderer/types/newMessage'
 import { findFileBlocks } from '@renderer/utils/messageUtils/find'
 import type { FilePart, TextPart } from 'ai'
 
-import { getAiSdkProviderId } from '../provider/factory'
+import { getModelAwareAiSdkProviderId } from '../provider/factory'
 import { getFileSizeLimit, supportsImageInput, supportsLargeFileUpload, supportsPdfInput } from './modelCapabilities'
 
 const logger = loggerService.withContext('fileProcessor')
@@ -180,7 +180,7 @@ export async function handleLargeFileUpload(
   model: Model
 ): Promise<(FilePart & { id?: string }) | null> {
   const provider = getProviderByModel(model)
-  const aiSdkId = getAiSdkProviderId(provider)
+  const aiSdkId = getModelAwareAiSdkProviderId(provider, model)
 
   if (['google', 'google-generative-ai', 'google-vertex'].includes(aiSdkId)) {
     return await handleGeminiFileUpload(file, model)
@@ -243,7 +243,7 @@ export async function convertFileBlockToFilePart(fileBlock: FileMessageBlock, mo
       // 处理MIME类型，特别是jpg->jpeg的转换（Anthropic要求）
       let mediaType = base64Data.mime
       const provider = getProviderByModel(model)
-      const aiSdkId = getAiSdkProviderId(provider)
+      const aiSdkId = getModelAwareAiSdkProviderId(provider, model)
 
       if (aiSdkId === 'anthropic' && mediaType === 'image/jpg') {
         mediaType = 'image/jpeg'

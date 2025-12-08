@@ -8,7 +8,7 @@ import { getProviderByModel } from '@renderer/services/AssistantService'
 import type { Model } from '@renderer/types'
 import { FileTypes } from '@renderer/types'
 
-import { getAiSdkProviderId } from '../provider/factory'
+import { getModelAwareAiSdkProviderId } from '../provider/factory'
 
 // 工具函数：基于模型名和提供商判断是否支持某特性
 function modelSupportValidator(
@@ -26,7 +26,7 @@ function modelSupportValidator(
   }
 ): boolean {
   const provider = getProviderByModel(model)
-  const aiSdkId = getAiSdkProviderId(provider)
+  const aiSdkId = getModelAwareAiSdkProviderId(provider, model)
 
   // 黑名单：命中不支持的模型直接拒绝
   if (unsupportedModels.some((name) => model.name.includes(name))) {
@@ -91,7 +91,7 @@ export function supportsLargeFileUpload(model: Model): boolean {
  */
 export function getFileSizeLimit(model: Model, fileType: FileTypes): number {
   const provider = getProviderByModel(model)
-  const aiSdkId = getAiSdkProviderId(provider)
+  const aiSdkId = getModelAwareAiSdkProviderId(provider, model)
 
   // Anthropic PDF限制32MB
   if (aiSdkId === 'anthropic' && fileType === FileTypes.DOCUMENT) {
