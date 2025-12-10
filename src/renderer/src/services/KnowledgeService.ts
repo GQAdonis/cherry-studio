@@ -181,14 +181,20 @@ export const searchKnowledgeBase = async (
     // 如果有rerank模型，执行重排
     let rerankResults = filteredResults
     if (base.rerankModel && filteredResults.length > 0) {
-      rerankResults = await window.api.knowledgeBase.rerank(
-        {
-          search: rewrite || query,
-          base: baseParams,
-          results: filteredResults
-        },
-        currentSpan?.spanContext()
-      )
+      try {
+        rerankResults = await window.api.knowledgeBase.rerank(
+          {
+            search: rewrite || query,
+            base: baseParams,
+            results: filteredResults
+          },
+          currentSpan?.spanContext()
+        )
+      } catch (error: any) {
+        // If rerank fails (e.g., model not supported), fall back to original results
+        logger.warn(`Rerank failed for knowledge base "${base.name}", falling back to original results:`, error.message)
+        rerankResults = filteredResults
+      }
     }
 
     // 限制文档数量

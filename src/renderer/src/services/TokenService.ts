@@ -5,8 +5,9 @@ import {
 } from '@renderer/config/models/contextLimits'
 import type { Assistant, FileMetadata, Model, Usage } from '@renderer/types'
 import { FileTypes } from '@renderer/types'
-import type { Message } from '@renderer/types/newMessage'
-import { findFileBlocks, getMainTextContent, getThinkingContent } from '@renderer/utils/messageUtils/find'
+import type { Message} from '@renderer/types/newMessage';
+import { MessageBlockType } from '@renderer/types/newMessage'
+import { findAllBlocks, findFileBlocks, getMainTextContent, getThinkingContent } from '@renderer/utils/messageUtils/find'
 import { flatten, takeRight } from 'lodash'
 import { approximateTokenSize } from 'tokenx'
 
@@ -209,24 +210,120 @@ export async function estimateHistoryTokens(assistant: Assistant, msgs: Message[
  * @returns Estimated token count
  */
 export function estimateSingleMessageTokens(message: Message): number {
-  const content = getMainTextContent(message)
-  const reasoningContent = getThinkingContent(message)
-  const combinedContent = [content, reasoningContent].filter((s) => s !== undefined).join(' ')
+  if (!message.blocks || message.blocks.length === 0) {
+    // Fallback for messages without blocks (legacy or simple)
+    const content = getMainTextContent(message)
+    const reasoningContent = getThinkingContent(message)
+    const combinedContent = [content, reasoningContent].filter((s) => s !== undefined).join(' ')
+    return estimateTextTokens(combinedContent)
+  }
 
-  let tokens = estimateTextTokens(combinedContent)
+  let totalTokens = 0
+  const blocks = findAllBlocks(message)
 
-  // Add rough estimate for file blocks (we can't read async here, so use heuristic)
-  const fileBlocks = findFileBlocks(message)
-  for (const fileBlock of fileBlocks) {
-    if (fileBlock.file?.type === FileTypes.IMAGE) {
-      tokens += estimateImageTokens(fileBlock.file)
-    } else if (fileBlock.file?.size) {
-      // Rough estimate for text files: ~4 chars per token
-      tokens += Math.floor(fileBlock.file.size / 4)
+  for (const block of blocks) {
+    // Skip blocks that don't contribute to context sent to LLM
+    if (block.type === MessageBlockType.ERROR || block.type === MessageBlockType.UNKNOWN) {
+      continue
+    }
+
+    switch (block.type) {
+      case MessageBlockType.MAIN_TEXT:
+      case MessageBlockType.THINKING:
+      case MessageBlockType.TRANSLATION:
+      case MessageBlockType.CODE:
+      case MessageBlockType.COMPACT:
+        // Text-based blocks
+        if ((block as any).content) {
+          totalTokens += estimateTextTokens((block as any).content)
+        }
+        break
+
+      case MessageBlockType.IMAGE: {
+        const imgBlock = block as any
+        if (imgBlock.file) {
+          totalTokens += estimateImageTokens(imgBlock.file)
+        } else if (imgBlock.url) {
+           // Heuristic for URL images if not downloaded: assume typical size
+           totalTokens += 85 // Roughly small image tokens
+        }
+        break
+      }
+
+      case MessageBlockType.FILE: {
+        const fileBlock = block as any
+        // Rough estimate for text files: ~4 chars per token if we can't read it here
+        if (fileBlock.file?.size) {
+          totalTokens += Math.floor(fileBlock.file.size / 4)
+        }
+        break
+      }
+
+      case MessageBlockType.TOOL: {
+        const toolBlock = block as any
+        // Estimate tokens for tool name, args, and result
+        let toolContent = `Tool: ${toolBlock.toolName || ''} `
+        if (toolBlock.arguments) {
+          toolContent += `Args: ${JSON.stringify(toolBlock.arguments)} `
+        }
+        if (toolBlock.content) {
+          const contentStr = typeof toolBlock.content === 'string' 
+            ? toolBlock.content 
+            : JSON.stringify(toolBlock.content)
+          toolContent += `Result: ${contentStr}`
+        }
+        totalTokens += estimateTextTokens(toolContent)
+        break
+      }
+
+      case MessageBlockType.CITATION: {
+        const citationBlock = block as any
+        let citationContent = ''
+        // Estimate for web search results
+        if (citationBlock.response && citationBlock.response.results) {
+           for (const result of citationBlock.response.results) {
+             citationContent += `${result.title} ${result.url} ${result.content || ''} `
+           }
+        }
+        // Estimate for knowledge base refs
+        if (citationBlock.knowledge) {
+           for (const k of citationBlock.knowledge) {
+             citationContent += `${k.fileName} ${k.content} `
+           }
+        }
+        if (citationContent) {
+          totalTokens += estimateTextTokens(citationContent)
+        }
+        break
+      }
+      
+      case MessageBlockType.VIDEO: {
+         // Treat video similar to image/file metadata for now
+         const videoBlock = block as any
+         if (videoBlock.url) {
+           totalTokens += estimateTextTokens(videoBlock.url)
+         }
+         break
+      }
+      
+      case MessageBlockType.ARTIFACT: {
+         const artifactBlock = block as any
+         if (artifactBlock.content) {
+           totalTokens += estimateTextTokens(artifactBlock.content)
+         }
+         break
+      }
+
+      default:
+        // Try to find content property for unknown blocks
+        if ((block as any).content && typeof (block as any).content === 'string') {
+          totalTokens += estimateTextTokens((block as any).content)
+        }
+        break
     }
   }
 
-  return tokens
+  return totalTokens
 }
 
 /**

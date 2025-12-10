@@ -48,6 +48,7 @@ export enum ChunkType {
   SEARCH_COMPLETE_UNION = 'search_complete_union',
   VIDEO_SEARCHED = 'video.searched',
   IMAGE_SEARCHED = 'image.searched',
+  CONTEXT_ACTION = 'context.action',
   RAW = 'raw'
 }
 
@@ -415,6 +416,13 @@ export interface ImageSearchedChunk {
   metadata: Record<string, any>
 }
 
+export interface ContextActionChunk {
+  type: ChunkType.CONTEXT_ACTION
+  action: 'pruned' | 'summarized' | 'cleared'
+  summary?: string
+  removedCount?: number
+}
+
 export interface RawChunk {
   /**
    * The type of the chunk
@@ -462,4 +470,5 @@ export type Chunk =
   | SearchCompleteUnionChunk // 搜索(知识库/互联网)完成
   | VideoSearchedChunk // 知识库检索视频
   | ImageSearchedChunk // 知识库检索图片
+  | ContextActionChunk // 上下文管理动作
   | RawChunk

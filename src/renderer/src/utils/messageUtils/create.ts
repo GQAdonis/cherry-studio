@@ -7,6 +7,7 @@ import type {
   CitationMessageBlock,
   CodeMessageBlock,
   CompactMessageBlock,
+  ContextActionMessageBlock,
   ErrorMessageBlock,
   FileMessageBlock,
   ImageMessageBlock,
@@ -311,6 +312,28 @@ export function createCompactBlock(
     ...baseBlock,
     content,
     compactedContent
+  }
+}
+
+/**
+ * Creates a Context Action Message Block.
+ * @param messageId - The ID of the parent message.
+ * @param overrides - Optional properties to override the defaults.
+ * @returns A ContextActionMessageBlock object.
+ */
+export function createContextActionBlock(
+  messageId: string,
+  overrides: Partial<Omit<ContextActionMessageBlock, 'id' | 'messageId' | 'type'>> = {}
+): ContextActionMessageBlock {
+  const baseBlock = createBaseMessageBlock(messageId, MessageBlockType.CONTEXT_ACTION, {
+    status: MessageBlockStatus.SUCCESS,
+    ...overrides
+  })
+  return {
+    ...baseBlock,
+    action: overrides.action || 'pruned',
+    summary: overrides.summary,
+    removedCount: overrides.removedCount
   }
 }
 

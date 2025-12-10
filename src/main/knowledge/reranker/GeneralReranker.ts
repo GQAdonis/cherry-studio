@@ -1,13 +1,26 @@
 import type { KnowledgeBaseParams, KnowledgeSearchResult } from '@types'
+import { loggerService } from '@logger'
 import { net } from 'electron'
 
 import BaseReranker from './BaseReranker'
+
+const logger = loggerService.withContext('GeneralReranker')
 
 interface RerankError extends Error {
   response?: {
     status: number
     statusText: string
     body?: unknown
+  }
+}
+
+export class RerankModelNotSupportedError extends Error {
+  constructor(
+    message: string,
+    public model: string
+  ) {
+    super(message)
+    this.name = 'RerankModelNotSupportedError'
   }
 }
 
@@ -42,6 +55,22 @@ export default class GeneralReranker extends BaseReranker {
           }
         }
 
+        // Check if the error is about model not being supported for rerank
+        if (
+          errorBody &&
+          typeof errorBody === 'object' &&
+          'error' in errorBody &&
+          errorBody.error &&
+          typeof errorBody.error === 'object' &&
+          'message' in errorBody.error &&
+          typeof errorBody.error.message === 'string' &&
+          errorBody.error.message.toLowerCase().includes('model not supported for rerank')
+        ) {
+          const model = requestBody.model || 'unknown'
+          logger.warn(`Rerank model "${model}" is not supported for reranking. Falling back to original results.`)
+          throw new RerankModelNotSupportedError(`Model "${model}" is not supported for reranking`, model)
+        }
+
         const error = new Error(`HTTP ${response.status}: ${response.statusText}`) as RerankError
         // Attach response details to the error object for formatErrorMessage
         error.response = {
@@ -57,6 +86,10 @@ export default class GeneralReranker extends BaseReranker {
       const rerankResults = this.extractRerankResult(data)
       return this.getRerankResult(searchResults, rerankResults)
     } catch (error: any) {
+      // If it's a model not supported error, re-throw it so caller can handle gracefully
+      if (error instanceof RerankModelNotSupportedError) {
+        throw error
+      }
       const errorDetails = this.formatErrorMessage(url, error, requestBody)
       throw new Error(`重排序请求失败: ${error.message}\n请求详情: ${errorDetails}`)
     }

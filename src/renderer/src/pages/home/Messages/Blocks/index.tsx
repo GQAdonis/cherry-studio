@@ -1,7 +1,7 @@
 import { loggerService } from '@logger'
 import type { RootState } from '@renderer/store'
 import { messageBlocksSelectors } from '@renderer/store/messageBlock'
-import type { ArtifactMessageBlock, ImageMessageBlock, Message, MessageBlock } from '@renderer/types/newMessage'
+import type { ArtifactMessageBlock, ContextActionMessageBlock, ImageMessageBlock, Message, MessageBlock } from '@renderer/types/newMessage'
 import { MessageBlockStatus, MessageBlockType } from '@renderer/types/newMessage'
 import { isArtifactBlock, isMainTextBlock, isMessageProcessing, isVideoBlock } from '@renderer/utils/messageUtils/is'
 import { AnimatePresence, motion, type Variants } from 'motion/react'
@@ -12,6 +12,7 @@ import styled from 'styled-components'
 import ArtifactBlock from './ArtifactBlock'
 import CitationBlock from './CitationBlock'
 import CompactBlock from './CompactBlock'
+import ContextActionBlock from './ContextActionBlock'
 import ErrorBlock from './ErrorBlock'
 import FileBlock from './FileBlock'
 import ImageBlock from './ImageBlock'
@@ -211,6 +212,9 @@ const MessageBlockRenderer: React.FC<Props> = ({ blocks, message }) => {
               break
             }
             blockComponent = <ArtifactBlock key={block.id} block={block as ArtifactMessageBlock} />
+            break
+          case MessageBlockType.CONTEXT_ACTION:
+            blockComponent = <ContextActionBlock key={block.id} block={block as ContextActionMessageBlock} />
             break
           default:
             logger.warn('Unsupported block type in MessageBlockRenderer:', (block as any).type, block)

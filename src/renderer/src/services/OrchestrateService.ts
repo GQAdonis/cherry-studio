@@ -72,7 +72,16 @@ export async function transformMessagesAndFetch(
   const { messages, assistant } = request
 
   try {
-    const { modelMessages, uiMessages } = await ConversationService.prepareMessagesForModel(messages, assistant)
+    const { modelMessages, uiMessages, contextManagementApplied, contextSummary } = await ConversationService.prepareMessagesForModel(messages, assistant)
+
+    // Emit context action chunk if strategy was applied
+    if (contextManagementApplied) {
+      onChunkReceived({
+        type: ChunkType.CONTEXT_ACTION,
+        action: 'pruned', // Currently the only action we have
+        summary: contextSummary
+      })
+    }
 
     // replace prompt variables
     assistant.prompt = await replacePromptVariables(assistant.prompt, assistant.model?.name)

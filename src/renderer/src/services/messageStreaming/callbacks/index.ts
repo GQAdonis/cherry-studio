@@ -4,6 +4,7 @@ import type { BlockManager } from '../BlockManager'
 import { createBaseCallbacks } from './baseCallbacks'
 import { createCitationCallbacks } from './citationCallbacks'
 import { createCompactCallbacks } from './compactCallbacks'
+import { createContextActionCallbacks } from './contextActionCallbacks'
 import { createImageCallbacks } from './imageCallbacks'
 import { createTextCallbacks } from './textCallbacks'
 import { createThinkingCallbacks } from './thinkingCallbacks'
@@ -58,6 +59,11 @@ export const createCallbacks = (deps: CallbacksDependencies) => {
   })
 
   const videoCallbacks = createVideoCallbacks({ blockManager, assistantMsgId })
+  
+  const contextActionCallbacks = createContextActionCallbacks({
+    blockManager,
+    assistantMsgId
+  })
 
   const compactCallbacks = createCompactCallbacks({
     blockManager,
@@ -88,6 +94,7 @@ export const createCallbacks = (deps: CallbacksDependencies) => {
     ...citationCallbacks,
     ...videoCallbacks,
     ...compactCallbacks,
+    ...contextActionCallbacks,
     // 清理资源的方法
     cleanup: () => {
       // 清理由 messageThunk 中的节流函数管理，这里不需要特别处理

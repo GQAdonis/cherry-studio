@@ -33,7 +33,8 @@ export enum MessageBlockType {
   CITATION = 'citation', // 引用类型 (Now includes web search, grounding, etc.)
   VIDEO = 'video', // 视频内容
   COMPACT = 'compact', // Compact command response
-  ARTIFACT = 'artifact' // AI-generated artifact (HTMX, HTML, React, etc.)
+  ARTIFACT = 'artifact', // AI-generated artifact (HTMX, HTML, React, etc.)
+  CONTEXT_ACTION = 'context_action' // Context management action (pruning, etc.)
 }
 
 // 块状态定义
@@ -164,6 +165,14 @@ export interface ArtifactMessageBlock extends BaseMessageBlock {
   conversationId: string // 所属会话ID
 }
 
+// Context Action Block - Context management events
+export interface ContextActionMessageBlock extends BaseMessageBlock {
+  type: MessageBlockType.CONTEXT_ACTION
+  action: 'pruned' | 'summarized' | 'cleared'
+  summary?: string
+  removedCount?: number
+}
+
 // MessageBlock 联合类型
 export type MessageBlock =
   | PlaceholderMessageBlock
@@ -179,6 +188,7 @@ export type MessageBlock =
   | VideoMessageBlock
   | CompactMessageBlock
   | ArtifactMessageBlock
+  | ContextActionMessageBlock
 
 export enum UserMessageStatus {
   SUCCESS = 'success'
