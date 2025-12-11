@@ -35,6 +35,11 @@ export default defineConfig({
           'bufferutil',
           'utf-8-validate',
           'electron',
+          // Explicitly externalize modules with dynamic require() issues
+          'chalk',
+          'dockerfile-ast',
+          '@e2b/code-interpreter',
+          'e2b',
           // Bundle packages with problematic transitive dependencies
           ...Object.keys(pkg.dependencies).filter(
             (dep) =>
@@ -42,7 +47,12 @@ export default defineConfig({
               dep !== 'swagger-ui-express' &&
               dep !== 'decompress-tar' &&
               dep !== 'officeparser' &&
-              dep !== 'tar'
+              dep !== 'tar' &&
+              // Don't double-add e2b packages
+              !dep.startsWith('@e2b') &&
+              dep !== 'e2b' &&
+              dep !== 'chalk' &&
+              dep !== 'dockerfile-ast'
           )
         ],
         output: {
@@ -114,7 +124,14 @@ export default defineConfig({
       }
     },
     optimizeDeps: {
-      exclude: ['pyodide'],
+      exclude: [
+        'pyodide',
+        // Exclude main process dependencies from renderer
+        'chalk',
+        'dockerfile-ast',
+        '@e2b/code-interpreter',
+        'e2b'
+      ],
       esbuildOptions: {
         target: 'esnext' // for dev
       }

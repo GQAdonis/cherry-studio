@@ -20,7 +20,9 @@ export const CodeBlockShiki = CodeBlock.extend<CodeBlockShikiOptions>({
       theme: 'one-light',
       HTMLAttributes: {
         class: 'code-block-shiki'
-      }
+      },
+      enableTabIndentation: true,
+      tabSize: 2
     }
   },
 

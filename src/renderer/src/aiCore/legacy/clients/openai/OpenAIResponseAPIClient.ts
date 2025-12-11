@@ -128,6 +128,7 @@ export class OpenAIResponseAPIClient extends OpenAIBaseClient<
     if (this.sdkInstance) {
       return this.sdkInstance
     }
+    const baseUrl = this.getBaseURL()
 
     if (
       this.provider.id === 'azure-openai' ||
@@ -146,7 +147,7 @@ export class OpenAIResponseAPIClient extends OpenAIBaseClient<
       return new OpenAI({
         dangerouslyAllowBrowser: true,
         apiKey: this.apiKey,
-        baseURL: this.getBaseURL(),
+        baseURL: baseUrl,
         defaultHeaders: {
           ...this.defaultHeaders(),
           ...this.provider.extra_headers

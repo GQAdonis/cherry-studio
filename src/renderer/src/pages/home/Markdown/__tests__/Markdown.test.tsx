@@ -107,7 +107,6 @@ vi.mock('remark-gfm', () => ({ __esModule: true, default: vi.fn() }))
 vi.mock('remark-cjk-friendly', () => ({ __esModule: true, default: vi.fn() }))
 vi.mock('remark-math', () => ({ __esModule: true, default: vi.fn() }))
 vi.mock('rehype-katex', () => ({ __esModule: true, default: vi.fn() }))
-vi.mock('rehype-mathjax', () => ({ __esModule: true, default: vi.fn() }))
 vi.mock('rehype-raw', () => ({ __esModule: true, default: vi.fn() }))
 
 // Mock custom plugins

@@ -1,5 +1,16 @@
 appId: com.kangfenmao.CherryStudio
 productName: The Boss
+asar: true
+asarUnpack:
+  # Unpack Node.js modules that use require() or have native bindings
+  - "node_modules/chalk/**/*"
+  - "node_modules/dockerfile-ast/**/*"
+  - "node_modules/e2b/**/*"
+  - "node_modules/@e2b/**/*"
+  - "node_modules/mathjax-full/**/*"
+  - "node_modules/@protobufjs/**/*"
+  - "node_modules/sharp/**/*"
+  - "node_modules/@img/**/*"
 electronLanguages:
   - zh-CN
   - zh-TW
@@ -18,6 +29,18 @@ protocols:
     schemes:
       - boss
 files:
+  # Explicitly include critical e2b dependencies FIRST (takes priority)
+  - "node_modules/chalk/**/*"
+  - "node_modules/dockerfile-ast/**/*"
+  - "node_modules/e2b/**/*"
+  - "node_modules/@e2b/**/*"
+  # Also need to explicitly include dependencies of these modules
+  - "node_modules/ansi-styles/**/*"
+  - "node_modules/supports-color/**/*"
+  - "node_modules/has-flag/**/*"
+  - "node_modules/color-convert/**/*"
+  - "node_modules/color-name/**/*"
+  - "node_modules/vscode-languageserver-types/**/*"
   - "**/*"
   - "!**/{.vscode,.yarn,.yarn-lock,.github,.cursorrules,.prettierrc}"
   - "!electron.vite.config.{js,ts,mjs,cjs}}"
@@ -37,7 +60,12 @@ files:
   - "!._*"
   - "!*.log"
   - "!stats.html"
+  # Don't exclude .md files from our critical modules
   - "!*.md"
+  - "node_modules/chalk/**/*.md"
+  - "node_modules/dockerfile-ast/**/*.md"
+  - "node_modules/e2b/**/*.md"
+  - "node_modules/@e2b/**/*.md"
   - "!**/*.{iml,o,hprof,orig,pyc,pyo,rbc,swp,csproj,sln,xproj}"
   - "!**/*.{map,ts,tsx,jsx,less,scss,sass,css.d.ts,d.cts,d.mts,md,markdown,yaml,yml}"
   - "!**/{test,tests,__tests__,powered-test,coverage}/**"
@@ -62,21 +90,7 @@ files:
   - "!node_modules/tesseract.js-core/{tesseract-core-lstm.js,tesseract-core-lstm.wasm,tesseract-core-lstm.wasm.js}" # we don't need source files
   - "!node_modules/tesseract.js-core/{tesseract-core-simd-lstm.js,tesseract-core-simd-lstm.wasm,tesseract-core-simd-lstm.wasm.js}" # we don't need source files
   - "!**/*.{h,iobj,ipdb,tlog,recipe,vcxproj,vcxproj.filters,Makefile,*.Makefile}" # filter .node build files
-asarUnpack:
-  - resources/**
-  - "**/*.{metal,exp,lib}"
-  - "node_modules/@img/sharp-libvips-*/**"
-  - "node_modules/@e2b/**"
-  - "node_modules/e2b/**"
-  - "node_modules/jsdom/**"
-  - "node_modules/vary/**"
-  - "node_modules/iconv-lite/**"
-  - "node_modules/safer-buffer/**"
-  - "node_modules/whatwg-encoding/**"
-  - "node_modules/html-encoding-sniffer/**"
-  - "node_modules/unstructured-client/**"
-
-# copy from node_modules/claude-code-plugins/plugins to resources/data/claude-code-pluginso
+# copy from node_modules/claude-code-plugins/plugins to resources/data/claude-code-plugins
 extraResources:
   - from: "./node_modules/claude-code-plugins/plugins/"
     to: "claude-code-plugins"

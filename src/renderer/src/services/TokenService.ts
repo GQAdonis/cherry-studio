@@ -280,13 +280,13 @@ export function estimateSingleMessageTokens(message: Message): number {
         const citationBlock = block as any
         let citationContent = ''
         // Estimate for web search results
-        if (citationBlock.response && citationBlock.response.results) {
+        if (citationBlock.response && Array.isArray(citationBlock.response.results)) {
            for (const result of citationBlock.response.results) {
              citationContent += `${result.title} ${result.url} ${result.content || ''} `
            }
         }
         // Estimate for knowledge base refs
-        if (citationBlock.knowledge) {
+        if (Array.isArray(citationBlock.knowledge)) {
            for (const k of citationBlock.knowledge) {
              citationContent += `${k.fileName} ${k.content} `
            }
