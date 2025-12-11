@@ -5,7 +5,9 @@ import type { MCPToolResponse } from '@renderer/types'
 import { WebSearchSource } from '@renderer/types'
 import type { ToolMessageBlock } from '@renderer/types/newMessage'
 import { MessageBlockStatus, MessageBlockType } from '@renderer/types/newMessage'
-import { createCitationBlock, createToolBlock } from '@renderer/utils/messageUtils/create'
+import { createCitationBlock, createContextActionBlock, createToolBlock } from '@renderer/utils/messageUtils/create'
+
+import { condenseToolResult } from '../../ToolResultCondenser'
 
 import type { BlockManager } from '../BlockManager'
 
@@ -75,10 +77,32 @@ export const createToolCallbacks = (deps: ToolCallbacksDependencies) => {
             ? MessageBlockStatus.SUCCESS
             : MessageBlockStatus.ERROR
 
+        let content = toolResponse.response
+        let wasCondensed = false
+
+        if (finalStatus === MessageBlockStatus.SUCCESS && content) {
+          const result = condenseToolResult(content, toolResponse.tool.name)
+
+          if (result.wasCondensed) {
+            content = result.condensed
+            wasCondensed = true
+
+            const contextActionBlock = createContextActionBlock(assistantMsgId, {
+              action: 'summarized',
+              summary: result.summary,
+              removedCount: result.originalTokens - result.condensedTokens
+            })
+            blockManager.handleBlockTransition(contextActionBlock, MessageBlockType.CONTEXT_ACTION)
+          }
+        }
+
         const changes: Partial<ToolMessageBlock> = {
-          content: toolResponse.response,
+          content: content,
           status: finalStatus,
-          metadata: { rawMcpToolResponse: toolResponse }
+          metadata: {
+            rawMcpToolResponse: toolResponse,
+            fullContent: wasCondensed ? toolResponse.response : undefined
+          }
         }
 
         if (finalStatus === MessageBlockStatus.ERROR) {
