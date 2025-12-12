@@ -1,18 +1,22 @@
+import EmojiIcon from '@renderer/components/EmojiIcon'
 import HorizontalScrollContainer from '@renderer/components/HorizontalScrollContainer'
 import { useActiveAgent } from '@renderer/hooks/agents/useActiveAgent'
 import { useActiveSession } from '@renderer/hooks/agents/useActiveSession'
 import { useUpdateSession } from '@renderer/hooks/agents/useUpdateSession'
 import { useRuntime } from '@renderer/hooks/useRuntime'
-import type { AgentEntity, AgentSessionEntity, ApiModel, Assistant } from '@renderer/types'
+import AssistantSettingsPopup from '@renderer/pages/settings/AssistantSettings'
+import type { AgentEntity, AgentSessionEntity, ApiModel, Assistant, Topic } from '@renderer/types'
+import { getLeadingEmoji } from '@renderer/utils'
 import { formatErrorMessageWithPrefix } from '@renderer/utils/error'
 import { t } from 'i18next'
 import { ChevronRight, Folder } from 'lucide-react'
 import type { FC, ReactNode } from 'react'
-import { useCallback } from 'react'
+import { useCallback, useMemo } from 'react'
 import { twMerge } from 'tailwind-merge'
 
 import { AgentSettingsPopup, SessionSettingsPopup } from '../../settings/AgentSettings'
 import { AgentLabel, SessionLabel } from '../../settings/AgentSettings/shared'
+import ConversationContextButton from './ConversationContextButton'
 import SelectAgentBaseModelButton from './SelectAgentBaseModelButton'
 import SelectModelButton from './SelectModelButton'
 
@@ -20,14 +24,17 @@ const cn = (...inputs: any[]) => twMerge(inputs)
 
 interface Props {
   assistant: Assistant
+  topic: Topic
 }
 
-const ChatNavbarContent: FC<Props> = ({ assistant }) => {
+const ChatNavbarContent: FC<Props> = ({ assistant, topic }) => {
   const { chat } = useRuntime()
   const { activeTopicOrSession } = chat
   const { agent: activeAgent } = useActiveAgent()
   const { session: activeSession } = useActiveSession()
   const { updateModel } = useUpdateSession(activeAgent?.id ?? null)
+
+  const assistantName = useMemo(() => assistant.name || t('chat.default.name'), [assistant.name])
 
   const handleUpdateModel = useCallback(
     async (model: ApiModel) => {
@@ -39,7 +46,31 @@ const ChatNavbarContent: FC<Props> = ({ assistant }) => {
 
   return (
     <>
-      {activeTopicOrSession === 'topic' && <SelectModelButton assistant={assistant} />}
+      {activeTopicOrSession === 'topic' && (
+        <HorizontalScrollContainer className="ml-2 flex-initial">
+          <div className="flex flex-nowrap items-center gap-2">
+            {/* Assistant Label */}
+            <div
+              className="flex h-full cursor-pointer items-center gap-1.5"
+              onClick={() => AssistantSettingsPopup.show({ assistant })}>
+              <EmojiIcon emoji={assistant.emoji || getLeadingEmoji(assistantName)} size={24} />
+              <span className="max-w-40 truncate text-xs">{assistantName}</span>
+            </div>
+
+            {/* Separator */}
+            <ChevronRight className="h-4 w-4 text-gray-400" />
+
+            {/* Model Button */}
+            <SelectModelButton assistant={assistant} />
+
+            {/* Separator */}
+            <ChevronRight className="h-4 w-4 text-gray-400" />
+
+            {/* Context Management Button */}
+            <ConversationContextButton assistant={assistant} topic={topic} />
+          </div>
+        </HorizontalScrollContainer>
+      )}
       {activeTopicOrSession === 'session' && activeAgent && (
         <HorizontalScrollContainer className="ml-2 flex-initial">
           <div className="flex flex-nowrap items-center gap-2">

@@ -8,7 +8,6 @@ import { MessageBlockStatus, MessageBlockType } from '@renderer/types/newMessage
 import { createCitationBlock, createContextActionBlock, createToolBlock } from '@renderer/utils/messageUtils/create'
 
 import { condenseToolResult } from '../../ToolResultCondenser'
-
 import type { BlockManager } from '../BlockManager'
 
 const logger = loggerService.withContext('ToolCallbacks')

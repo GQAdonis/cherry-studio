@@ -5,9 +5,14 @@ import {
 } from '@renderer/config/models/contextLimits'
 import type { Assistant, FileMetadata, Model, Usage } from '@renderer/types'
 import { FileTypes } from '@renderer/types'
-import type { Message} from '@renderer/types/newMessage';
+import type { Message } from '@renderer/types/newMessage'
 import { MessageBlockType } from '@renderer/types/newMessage'
-import { findAllBlocks, findFileBlocks, getMainTextContent, getThinkingContent } from '@renderer/utils/messageUtils/find'
+import {
+  findAllBlocks,
+  findFileBlocks,
+  getMainTextContent,
+  getThinkingContent
+} from '@renderer/utils/messageUtils/find'
 import { flatten, takeRight } from 'lodash'
 import { approximateTokenSize } from 'tokenx'
 
@@ -244,8 +249,8 @@ export function estimateSingleMessageTokens(message: Message): number {
         if (imgBlock.file) {
           totalTokens += estimateImageTokens(imgBlock.file)
         } else if (imgBlock.url) {
-           // Heuristic for URL images if not downloaded: assume typical size
-           totalTokens += 85 // Roughly small image tokens
+          // Heuristic for URL images if not downloaded: assume typical size
+          totalTokens += 85 // Roughly small image tokens
         }
         break
       }
@@ -267,9 +272,8 @@ export function estimateSingleMessageTokens(message: Message): number {
           toolContent += `Args: ${JSON.stringify(toolBlock.arguments)} `
         }
         if (toolBlock.content) {
-          const contentStr = typeof toolBlock.content === 'string' 
-            ? toolBlock.content 
-            : JSON.stringify(toolBlock.content)
+          const contentStr =
+            typeof toolBlock.content === 'string' ? toolBlock.content : JSON.stringify(toolBlock.content)
           toolContent += `Result: ${contentStr}`
         }
         totalTokens += estimateTextTokens(toolContent)
@@ -281,37 +285,37 @@ export function estimateSingleMessageTokens(message: Message): number {
         let citationContent = ''
         // Estimate for web search results
         if (citationBlock.response && Array.isArray(citationBlock.response.results)) {
-           for (const result of citationBlock.response.results) {
-             citationContent += `${result.title} ${result.url} ${result.content || ''} `
-           }
+          for (const result of citationBlock.response.results) {
+            citationContent += `${result.title} ${result.url} ${result.content || ''} `
+          }
         }
         // Estimate for knowledge base refs
         if (Array.isArray(citationBlock.knowledge)) {
-           for (const k of citationBlock.knowledge) {
-             citationContent += `${k.fileName} ${k.content} `
-           }
+          for (const k of citationBlock.knowledge) {
+            citationContent += `${k.fileName} ${k.content} `
+          }
         }
         if (citationContent) {
           totalTokens += estimateTextTokens(citationContent)
         }
         break
       }
-      
+
       case MessageBlockType.VIDEO: {
-         // Treat video similar to image/file metadata for now
-         const videoBlock = block as any
-         if (videoBlock.url) {
-           totalTokens += estimateTextTokens(videoBlock.url)
-         }
-         break
+        // Treat video similar to image/file metadata for now
+        const videoBlock = block as any
+        if (videoBlock.url) {
+          totalTokens += estimateTextTokens(videoBlock.url)
+        }
+        break
       }
-      
+
       case MessageBlockType.ARTIFACT: {
-         const artifactBlock = block as any
-         if (artifactBlock.content) {
-           totalTokens += estimateTextTokens(artifactBlock.content)
-         }
-         break
+        const artifactBlock = block as any
+        if (artifactBlock.content) {
+          totalTokens += estimateTextTokens(artifactBlock.content)
+        }
+        break
       }
 
       default:

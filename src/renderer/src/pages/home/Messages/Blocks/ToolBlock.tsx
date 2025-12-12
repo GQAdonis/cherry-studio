@@ -33,9 +33,8 @@ const ToolBlock: React.FC<Props> = ({ block }) => {
       <MessageTools block={displayBlock as ToolMessageBlock} />
       {fullContent && (
         <div
-          className="text-xs text-secondary hover:text-primary cursor-pointer transition-colors px-1"
-          onClick={() => setShowFull(!showFull)}
-        >
+          className="cursor-pointer px-1 text-secondary text-xs transition-colors hover:text-primary"
+          onClick={() => setShowFull(!showFull)}>
           {showFull ? 'Show summarized result' : 'View full result (original)'}
         </div>
       )}

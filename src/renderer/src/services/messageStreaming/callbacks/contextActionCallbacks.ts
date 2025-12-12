@@ -18,10 +18,10 @@ export const createContextActionCallbacks = (deps: ContextActionCallbacksDepende
   return {
     onContextAction: async (chunk: ContextActionChunk) => {
       logger.info('onContextAction', chunk)
-      
-      // Prevent duplicate blocks if one already exists for this action? 
+
+      // Prevent duplicate blocks if one already exists for this action?
       // For now, we assume one context action per message generation flow if triggered.
-      
+
       const newBlock = createContextActionBlock(assistantMsgId, {
         action: chunk.action,
         summary: chunk.summary,

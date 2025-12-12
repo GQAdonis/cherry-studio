@@ -1,7 +1,13 @@
 import { loggerService } from '@logger'
 import type { RootState } from '@renderer/store'
 import { messageBlocksSelectors } from '@renderer/store/messageBlock'
-import type { ArtifactMessageBlock, ContextActionMessageBlock, ImageMessageBlock, Message, MessageBlock } from '@renderer/types/newMessage'
+import type {
+  ArtifactMessageBlock,
+  ContextActionMessageBlock,
+  ImageMessageBlock,
+  Message,
+  MessageBlock
+} from '@renderer/types/newMessage'
 import { MessageBlockStatus, MessageBlockType } from '@renderer/types/newMessage'
 import { isArtifactBlock, isMainTextBlock, isMessageProcessing, isVideoBlock } from '@renderer/utils/messageUtils/is'
 import { AnimatePresence, motion, type Variants } from 'motion/react'

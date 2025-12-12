@@ -31,12 +31,26 @@
       }
     },
     "gitBash": {
+      "autoDetected": "Using auto-detected Git Bash",
+      "clear": {
+        "button": "Clear custom path"
+      },
+      "customPath": "Using custom path: {{path}}",
       "error": {
         "description": "Git Bash is required to run agents on Windows. The agent cannot function without it. Please install Git for Windows from",
         "recheck": "Recheck Git Bash Installation",
         "title": "Git Bash Required"
       },
+      "found": {
+        "title": "Git Bash configured"
+      },
       "notFound": "Git Bash not found. Please install it first.",
+      "pick": {
+        "button": "Select Git Bash Path",
+        "failed": "Failed to set Git Bash path",
+        "invalidPath": "Selected file is not a valid Git Bash executable (bash.exe).",
+        "title": "Select Git Bash executable"
+      },
       "success": "Git Bash detected successfully!"
     },
     "input": {
@@ -1076,6 +1090,17 @@
       "warning": {
         "openai": "The GPT-5 model's minimal reasoning effort does not support web search."
       }
+    }
+  },
+  "conversation": {
+    "contextStrategy": {
+      "button": "Context",
+      "customActive": "Custom context strategy active",
+      "customInfo": "Custom context strategy will override the assistant's setting for this conversation only.",
+      "description": "Configure how this conversation manages context. You can use the assistant's default or customize for this conversation.",
+      "title": "Conversation Context Strategy",
+      "useAssistantDefault": "Use Assistant Default",
+      "usingDefault": "Using assistant default"
     }
   },
   "code": {
@@ -4127,6 +4152,7 @@
       "jsonSaveError": "Failed to save JSON configuration.",
       "jsonSaveSuccess": "JSON configuration has been saved.",
       "logoUrl": "Logo URL",
+      "logs": "Logs",
       "longRunning": "Long Running Mode",
       "longRunningTooltip": "When enabled, the server supports long-running tasks. When receiving progress notifications, the timeout will be reset and the maximum execution time will be extended to 10 minutes.",
       "marketplaces": "Marketplaces",
@@ -4146,6 +4172,7 @@
       "name": "Name",
       "newServer": "MCP Server",
       "noDescriptionAvailable": "No description available",
+      "noLogs": "No logs yet",
       "noServers": "No servers configured",
       "not_support": "Model not supported",
       "npx_list": {

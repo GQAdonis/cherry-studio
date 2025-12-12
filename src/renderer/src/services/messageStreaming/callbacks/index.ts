@@ -59,7 +59,7 @@ export const createCallbacks = (deps: CallbacksDependencies) => {
   })
 
   const videoCallbacks = createVideoCallbacks({ blockManager, assistantMsgId })
-  
+
   const contextActionCallbacks = createContextActionCallbacks({
     blockManager,
     assistantMsgId

@@ -15,6 +15,7 @@ import { useCodeStyle } from '@renderer/context/CodeStyleProvider'
 import { useTheme } from '@renderer/context/ThemeProvider'
 import { useAssistant } from '@renderer/hooks/useAssistant'
 import { useProvider } from '@renderer/hooks/useProvider'
+import { useRuntime } from '@renderer/hooks/useRuntime'
 import { useSettings } from '@renderer/hooks/useSettings'
 import useTranslate from '@renderer/hooks/useTranslate'
 import { SettingDivider, SettingRow, SettingRowTitle } from '@renderer/pages/settings'
@@ -52,7 +53,7 @@ import {
   setShowTranslateConfirm,
   setThoughtAutoCollapse
 } from '@renderer/store/settings'
-import type { Assistant, AssistantSettings, CodeStyleVarious, MathEngine } from '@renderer/types'
+import type { Assistant, CodeStyleVarious, MathEngine } from '@renderer/types'
 import { isGroqSystemProvider, ThemeMode } from '@renderer/types'
 import type { ContextStrategyType } from '@renderer/types/contextStrategy'
 import { CONTEXT_STRATEGY_LABELS } from '@renderer/types/contextStrategy'
@@ -78,18 +79,14 @@ interface Props {
 }
 
 const SettingsTab: FC<Props> = (props) => {
-  const { assistant, updateAssistantSettings } = useAssistant(props.assistant.id)
+  const { chat } = useRuntime()
+  const { assistant } = useAssistant(props.assistant.id)
   const { provider } = useProvider(assistant.model.provider)
 
   const { messageStyle, fontSize, language } = useSettings()
   const { theme } = useTheme()
   const { themeNames } = useCodeStyle()
 
-  const [temperature, setTemperature] = useState(assistant?.settings?.temperature ?? DEFAULT_TEMPERATURE)
-  const [enableTemperature, setEnableTemperature] = useState(assistant?.settings?.enableTemperature ?? true)
-  const [contextCount, setContextCount] = useState(assistant?.settings?.contextCount ?? DEFAULT_CONTEXTCOUNT)
-  const [enableMaxTokens, setEnableMaxTokens] = useState(assistant?.settings?.enableMaxTokens ?? false)
-  const [maxTokens, setMaxTokens] = useState(assistant?.settings?.maxTokens ?? 0)
   const [fontSizeValue, setFontSizeValue] = useState(fontSize)
   const [streamOutput, setStreamOutput] = useState(assistant?.settings?.streamOutput)
   const [contextStrategy, setContextStrategy] = useState<ContextStrategyType | undefined>(
@@ -133,28 +130,6 @@ const SettingsTab: FC<Props> = (props) => {
     confirmRegenerateMessage
   } = useSettings()
 
-  const onUpdateAssistantSettings = (settings: Partial<AssistantSettings>) => {
-    updateAssistantSettings(settings)
-  }
-
-  const onTemperatureChange = (value) => {
-    if (!isNaN(value as number)) {
-      onUpdateAssistantSettings({ temperature: value })
-    }
-  }
-
-  const onContextCountChange = (value) => {
-    if (!isNaN(value as number)) {
-      onUpdateAssistantSettings({ contextCount: value })
-    }
-  }
-
-  const onMaxTokensChange = (value) => {
-    if (!isNaN(value as number)) {
-      onUpdateAssistantSettings({ maxTokens: value })
-    }
-  }
-
   const codeStyle = useMemo(() => {
     return codeEditor.enabled
       ? theme === ThemeMode.light
@@ -181,6 +156,13 @@ const SettingsTab: FC<Props> = (props) => {
     [dispatch, theme, codeEditor.enabled]
   )
 
+  // State for assistant settings
+  const [temperature, setTemperature] = useState(assistant?.settings?.temperature ?? DEFAULT_TEMPERATURE)
+  const [enableTemperature, setEnableTemperature] = useState(assistant?.settings?.enableTemperature ?? true)
+  const [contextCount, setContextCount] = useState(assistant?.settings?.contextCount ?? DEFAULT_CONTEXTCOUNT)
+  const [enableMaxTokens, setEnableMaxTokens] = useState(assistant?.settings?.enableMaxTokens ?? false)
+  const [maxTokens, setMaxTokens] = useState(assistant?.settings?.maxTokens ?? DEFAULT_MAX_TOKENS)
+
   useEffect(() => {
     setTemperature(assistant?.settings?.temperature ?? DEFAULT_TEMPERATURE)
     setEnableTemperature(assistant?.settings?.enableTemperature ?? true)
@@ -190,6 +172,20 @@ const SettingsTab: FC<Props> = (props) => {
     setStreamOutput(assistant?.settings?.streamOutput ?? true)
     setContextStrategy(assistant?.settings?.contextStrategy?.type)
   }, [assistant])
+
+  const { updateAssistantSettings: onUpdateAssistantSettings } = useAssistant(props.assistant.id)
+
+  const onTemperatureChange = (value: number) => {
+    onUpdateAssistantSettings({ temperature: value })
+  }
+
+  const onContextCountChange = (value: number) => {
+    onUpdateAssistantSettings({ contextCount: value })
+  }
+
+  const onMaxTokensChange = (value: number) => {
+    onUpdateAssistantSettings({ maxTokens: value })
+  }
 
   const onContextStrategyChange = (value: ContextStrategyType | 'inherit') => {
     if (value === 'inherit') {
@@ -208,6 +204,8 @@ const SettingsTab: FC<Props> = (props) => {
     isOpenAIModel(model) ||
     isSupportServiceTierProvider(provider) ||
     (isSupportVerbosityModel(model) && isSupportVerbosityProvider(provider))
+
+  const isTopicSettings = chat.activeTopicOrSession === 'topic'
 
   return (
     <Container className="settings-tab">
@@ -398,11 +396,15 @@ const SettingsTab: FC<Props> = (props) => {
       )}
       <CollapsibleSettingGroup title={t('settings.messages.title')} defaultExpanded={true}>
         <SettingGroup>
-          <SettingRow>
-            <SettingRowTitleSmall>{t('settings.messages.prompt')}</SettingRowTitleSmall>
-            <Switch size="small" checked={showPrompt} onChange={(checked) => dispatch(setShowPrompt(checked))} />
-          </SettingRow>
-          <SettingDivider />
+          {isTopicSettings && (
+            <>
+              <SettingRow>
+                <SettingRowTitleSmall>{t('settings.messages.prompt')}</SettingRowTitleSmall>
+                <Switch size="small" checked={showPrompt} onChange={(checked) => dispatch(setShowPrompt(checked))} />
+              </SettingRow>
+              <SettingDivider />
+            </>
+          )}
           <SettingRow>
             <SettingRowTitleSmall>{t('settings.messages.use_serif_font')}</SettingRowTitleSmall>
             <Switch
@@ -424,15 +426,19 @@ const SettingsTab: FC<Props> = (props) => {
             />
           </SettingRow>
           <SettingDivider />
-          <SettingRow>
-            <SettingRowTitleSmall>{t('settings.messages.show_message_outline')}</SettingRowTitleSmall>
-            <Switch
-              size="small"
-              checked={showMessageOutline}
-              onChange={(checked) => dispatch(setShowMessageOutline(checked))}
-            />
-          </SettingRow>
-          <SettingDivider />
+          {isTopicSettings && (
+            <>
+              <SettingRow>
+                <SettingRowTitleSmall>{t('settings.messages.show_message_outline')}</SettingRowTitleSmall>
+                <Switch
+                  size="small"
+                  checked={showMessageOutline}
+                  onChange={(checked) => dispatch(setShowMessageOutline(checked))}
+                />
+              </SettingRow>
+              <SettingDivider />
+            </>
+          )}
           <SettingRow>
             <SettingRowTitleSmall>{t('message.message.style.label')}</SettingRowTitleSmall>
             <Selector
@@ -445,20 +451,24 @@ const SettingsTab: FC<Props> = (props) => {
             />
           </SettingRow>
           <SettingDivider />
-          <SettingRow>
-            <SettingRowTitleSmall>{t('message.message.multi_model_style.label')}</SettingRowTitleSmall>
-            <Selector
-              value={multiModelMessageStyle}
-              onChange={(value) => dispatch(setMultiModelMessageStyle(value))}
-              options={[
-                { value: 'fold', label: t('message.message.multi_model_style.fold.label') },
-                { value: 'vertical', label: t('message.message.multi_model_style.vertical') },
-                { value: 'horizontal', label: t('message.message.multi_model_style.horizontal') },
-                { value: 'grid', label: t('message.message.multi_model_style.grid') }
-              ]}
-            />
-          </SettingRow>
-          <SettingDivider />
+          {isTopicSettings && (
+            <>
+              <SettingRow>
+                <SettingRowTitleSmall>{t('message.message.multi_model_style.label')}</SettingRowTitleSmall>
+                <Selector
+                  value={multiModelMessageStyle}
+                  onChange={(value) => dispatch(setMultiModelMessageStyle(value))}
+                  options={[
+                    { value: 'fold', label: t('message.message.multi_model_style.fold.label') },
+                    { value: 'vertical', label: t('message.message.multi_model_style.vertical') },
+                    { value: 'horizontal', label: t('message.message.multi_model_style.horizontal') },
+                    { value: 'grid', label: t('message.message.multi_model_style.grid') }
+                  ]}
+                />
+              </SettingRow>
+              <SettingDivider />
+            </>
+          )}
           <SettingRow>
             <SettingRowTitleSmall>{t('settings.messages.navigation.label')}</SettingRowTitleSmall>
             <Selector
@@ -670,15 +680,19 @@ const SettingsTab: FC<Props> = (props) => {
       </CollapsibleSettingGroup>
       <CollapsibleSettingGroup title={t('settings.messages.input.title')} defaultExpanded={false}>
         <SettingGroup>
-          <SettingRow>
-            <SettingRowTitleSmall>{t('settings.messages.input.show_estimated_tokens')}</SettingRowTitleSmall>
-            <Switch
-              size="small"
-              checked={showInputEstimatedTokens}
-              onChange={(checked) => dispatch(setShowInputEstimatedTokens(checked))}
-            />
-          </SettingRow>
-          <SettingDivider />
+          {isTopicSettings && (
+            <>
+              <SettingRow>
+                <SettingRowTitleSmall>{t('settings.messages.input.show_estimated_tokens')}</SettingRowTitleSmall>
+                <Switch
+                  size="small"
+                  checked={showInputEstimatedTokens}
+                  onChange={(checked) => dispatch(setShowInputEstimatedTokens(checked))}
+                />
+              </SettingRow>
+              <SettingDivider />
+            </>
+          )}
           <SettingRow>
             <SettingRowTitleSmall>{t('settings.messages.input.paste_long_text_as_file')}</SettingRowTitleSmall>
             <Switch

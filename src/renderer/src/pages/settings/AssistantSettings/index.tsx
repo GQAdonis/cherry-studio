@@ -39,7 +39,7 @@ interface Props extends AssistantSettingPopupShowParams {
 const AssistantSettingPopupContainer: React.FC<Props> = ({ resolve, tab, ...props }) => {
   const [open, setOpen] = useState(true)
   const { t } = useTranslation()
-  const [menu, setMenu] = useState<AssistantSettingPopupTab>(tab || 'prompt')
+  const [menu, setMenu] = useState<AssistantSettingPopupTab>(tab || 'model')
 
   const _useAssistant = useAssistant(props.assistant.id)
   const isAgent = props.assistant.type === 'agent'
@@ -67,16 +67,16 @@ const AssistantSettingPopupContainer: React.FC<Props> = ({ resolve, tab, ...prop
 
   const items = [
     {
-      key: 'prompt',
-      label: t('assistants.settings.prompt')
-    },
-    {
       key: 'model',
       label: t('assistants.settings.model')
     },
     {
       key: 'context',
       label: t('assistants.settings.context.label', { defaultValue: 'Context' })
+    },
+    {
+      key: 'prompt',
+      label: t('assistants.settings.prompt')
     },
     showKnowledgeIcon && {
       key: 'knowledge_base',
@@ -102,7 +102,7 @@ const AssistantSettingPopupContainer: React.FC<Props> = ({ resolve, tab, ...prop
       onOk={onOk}
       onCancel={onCancel}
       afterClose={afterClose}
-      maskClosable={false}
+      maskClosable={menu !== 'prompt'}
       footer={null}
       title={assistant.name}
       transitionName="animation-move-down"
@@ -122,22 +122,22 @@ const AssistantSettingPopupContainer: React.FC<Props> = ({ resolve, tab, ...prop
       <HStack>
         <LeftMenu>
           <StyledMenu
-            defaultSelectedKeys={[tab || 'prompt']}
+            defaultSelectedKeys={[tab || 'model']}
             mode="vertical"
             items={items}
             onSelect={({ key }) => setMenu(key as AssistantSettingPopupTab)}
           />
         </LeftMenu>
         <Settings>
-          {menu === 'prompt' && (
-            <AssistantPromptSettings
+          {menu === 'model' && (
+            <AssistantModelSettings
               assistant={assistant}
               updateAssistant={updateAssistant}
               updateAssistantSettings={updateAssistantSettings}
             />
           )}
-          {menu === 'model' && (
-            <AssistantModelSettings
+          {menu === 'prompt' && (
+            <AssistantPromptSettings
               assistant={assistant}
               updateAssistant={updateAssistant}
               updateAssistantSettings={updateAssistantSettings}

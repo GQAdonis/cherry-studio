@@ -72,7 +72,8 @@ export async function transformMessagesAndFetch(
   const { messages, assistant } = request
 
   try {
-    const { modelMessages, uiMessages, contextManagementApplied, contextSummary } = await ConversationService.prepareMessagesForModel(messages, assistant)
+    const { modelMessages, uiMessages, contextManagementApplied, contextSummary } =
+      await ConversationService.prepareMessagesForModel(messages, assistant)
 
     // Emit context action chunk if strategy was applied
     if (contextManagementApplied) {
