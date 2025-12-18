@@ -528,6 +528,14 @@
         "url_placeholder": "輸入 JSON URL"
       },
       "manage": {
+        "batch_delete": {
+          "button": "批次刪除",
+          "confirm": "您確定要刪除所選的 {{count}} 個助理嗎？"
+        },
+        "mode": {
+          "delete": "刪除",
+          "sort": "排序"
+        },
         "title": "管理助手"
       },
       "my_agents": "我的助手",
@@ -588,7 +596,8 @@
         "low": "稍微思考",
         "medium": "正常思考",
         "minimal": "最少思考",
-        "off": "關閉"
+        "off": "關閉",
+        "xhigh": "極力思考"
       },
       "regular_phrases": {
         "add": "添加短语",
@@ -1255,6 +1264,7 @@
     "saved": "已儲存",
     "search": "搜尋",
     "select": "選擇",
+    "select_all": "全選",
     "selected": "已選擇",
     "selectedItems": "已選擇 {{count}} 項",
     "selectedMessages": "選中 {{count}} 條訊息",
@@ -1278,6 +1288,17 @@
     "upload_files": "上傳檔案",
     "warning": "警告",
     "you": "您"
+  },
+  "conversation": {
+    "contextStrategy": {
+      "button": "[to be translated]:Context",
+      "customActive": "[to be translated]:Custom context strategy active",
+      "customInfo": "[to be translated]:Custom context strategy will override the assistant's setting for this conversation only.",
+      "description": "[to be translated]:Configure how this conversation manages context. You can use the assistant's default or customize for this conversation.",
+      "title": "[to be translated]:Conversation Context Strategy",
+      "useAssistantDefault": "[to be translated]:Use Assistant Default",
+      "usingDefault": "[to be translated]:Using assistant default"
+    }
   },
   "docs": {
     "title": "說明文件"
@@ -2210,6 +2231,17 @@
       "number": "數字",
       "string": "文字"
     },
+    "parameters": {
+      "default_temperature": "預設溫度",
+      "default_temperature.tooltip": "控制隨機性：降低該值會使輸出更加確定",
+      "default_top_p": "預設 Top P",
+      "default_top_p.tooltip": "通過核心採樣控制多樣性",
+      "label": "參數",
+      "max_context_tokens": "最大上下文 Token 數",
+      "max_context_tokens.tooltip": "模型可處理的最大 Token 數，點擊編輯",
+      "max_output_tokens": "最大輸出 Token 數",
+      "max_output_tokens.tooltip": "模型可生成的最大 Token 數"
+    },
     "pinned": "已固定",
     "price": {
       "cost": "花費",
@@ -2444,7 +2476,7 @@
     "failed": {
       "install": "安裝 OVMS 失敗:",
       "install_code_100": "未知錯誤",
-      "install_code_101": "僅支援 Intel(R) Core(TM) Ultra CPU",
+      "install_code_101": "僅支援 Intel(R) CPU",
       "install_code_102": "僅支援 Windows",
       "install_code_103": "下載 OVMS runtime 失敗",
       "install_code_104": "安裝 OVMS runtime 失敗",

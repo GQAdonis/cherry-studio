@@ -91,7 +91,10 @@ const ThinkModelTypes = [
   'gpt5_1',
   'gpt5_codex',
   'gpt5_1_codex',
+  'gpt5_1_codex_max',
+  'gpt5_2',
   'gpt5pro',
+  'gpt52pro',
   'grok',
   'grok4_fast',
   'gemini',
@@ -125,6 +128,7 @@ export const EFFORT_RATIO: EffortRatio = {
   low: 0.05,
   medium: 0.5,
   high: 0.8,
+  xhigh: 0.9,
   auto: 2
 }
 
@@ -305,6 +309,24 @@ export type Model = {
    * If set, this takes precedence over the default context limit for the model.
    */
   maxContextTokens?: number
+
+  /**
+   * User-defined override for the model's maximum output tokens.
+   * If set, this value will be used when the assistant's maxTokens setting is not explicitly enabled.
+   */
+  maxOutputTokens?: number
+
+  /**
+   * Default temperature for this model.
+   * Applied to assistant settings when this model is selected.
+   */
+  defaultTemperature?: number
+
+  /**
+   * Default top_p for this model.
+   * Applied to assistant settings when this model is selected.
+   */
+  defaultTopP?: number
 }
 
 export type Suggestion = {

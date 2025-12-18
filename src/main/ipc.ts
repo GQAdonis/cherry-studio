@@ -876,86 +876,16 @@ export function registerIpc(mainWindow: BrowserWindow, app: Electron.App) {
     webview.session.setSpellCheckerEnabled(isEnable)
   })
 
-  // mini-app webview automation
-  ipcMain.handle(IpcChannel.MinApp_RegisterWebview, (_, webContentsId: number, appId: string, url: string) => {
-    const { webViewRegistryService } = require('./services/WebViewRegistryService')
-    return webViewRegistryService.register(webContentsId, appId, url)
+  // Webview print and save handlers
+  ipcMain.handle(IpcChannel.Webview_PrintToPDF, async (_, webviewId: number) => {
+    const { printWebviewToPDF } = await import('./services/WebviewService')
+    return await printWebviewToPDF(webviewId)
   })
 
-  ipcMain.handle(IpcChannel.MinApp_ListWebviews, () => {
-    const { webViewRegistryService } = require('./services/WebViewRegistryService')
-    return webViewRegistryService.listAll()
+  ipcMain.handle(IpcChannel.Webview_SaveAsHTML, async (_, webviewId: number) => {
+    const { saveWebviewAsHTML } = await import('./services/WebviewService')
+    return await saveWebviewAsHTML(webviewId)
   })
-
-  ipcMain.handle(IpcChannel.MinApp_ExecuteScript, async (_, appId: string, script: string) => {
-    const { webViewRegistryService } = require('./services/WebViewRegistryService')
-    const { cdpBridgeService } = require('./services/CDPBridgeService')
-    const info = webViewRegistryService.getByAppId(appId)
-    if (!info) return { success: false, error: 'Mini-app not found' }
-    return cdpBridgeService.evaluate(info.webContentsId, script)
-  })
-
-  ipcMain.handle(
-    IpcChannel.MinApp_Screenshot,
-    async (_, appId: string, options?: { fullPage?: boolean; format?: string }) => {
-      const { webViewRegistryService } = require('./services/WebViewRegistryService')
-      const { cdpBridgeService } = require('./services/CDPBridgeService')
-      const info = webViewRegistryService.getByAppId(appId)
-      if (!info) return { success: false, error: 'Mini-app not found' }
-      return cdpBridgeService.screenshot(info.webContentsId, options)
-    }
-  )
-
-  ipcMain.handle(IpcChannel.MinApp_Navigate, async (_, appId: string, url: string) => {
-    const { webViewRegistryService } = require('./services/WebViewRegistryService')
-    const { cdpBridgeService } = require('./services/CDPBridgeService')
-    const info = webViewRegistryService.getByAppId(appId)
-    if (!info) return { success: false, error: 'Mini-app not found' }
-    return cdpBridgeService.navigate(info.webContentsId, url)
-  })
-
-  ipcMain.handle(IpcChannel.MinApp_Click, async (_, appId: string, x: number, y: number) => {
-    const { webViewRegistryService } = require('./services/WebViewRegistryService')
-    const { cdpBridgeService } = require('./services/CDPBridgeService')
-    const info = webViewRegistryService.getByAppId(appId)
-    if (!info) return { success: false, error: 'Mini-app not found' }
-    return cdpBridgeService.click(info.webContentsId, x, y)
-  })
-
-  ipcMain.handle(IpcChannel.MinApp_Type, async (_, appId: string, text: string) => {
-    const { webViewRegistryService } = require('./services/WebViewRegistryService')
-    const { cdpBridgeService } = require('./services/CDPBridgeService')
-    const info = webViewRegistryService.getByAppId(appId)
-    if (!info) return { success: false, error: 'Mini-app not found' }
-    return cdpBridgeService.insertText(info.webContentsId, text)
-  })
-
-  ipcMain.handle(IpcChannel.MinApp_Scroll, async (_, appId: string, deltaX: number, deltaY: number) => {
-    const { webViewRegistryService } = require('./services/WebViewRegistryService')
-    const { cdpBridgeService } = require('./services/CDPBridgeService')
-    const info = webViewRegistryService.getByAppId(appId)
-    if (!info) return { success: false, error: 'Mini-app not found' }
-    return cdpBridgeService.scroll(info.webContentsId, { deltaX, deltaY })
-  })
-
-  ipcMain.handle(IpcChannel.MinApp_GetPageContent, async (_, appId: string, format?: string) => {
-    const { webViewRegistryService } = require('./services/WebViewRegistryService')
-    const { extractPageContent } = require('./mcpServers/adapters')
-    const info = webViewRegistryService.getByAppId(appId)
-    if (!info) return { success: false, error: 'Mini-app not found' }
-    return extractPageContent(info.webContentsId, format || 'text')
-  })
-
-  ipcMain.handle(
-    IpcChannel.MinApp_ExtractConversations,
-    async (_, appId: string, options?: { limit?: number; currentOnly?: boolean }) => {
-      const { webViewRegistryService } = require('./services/WebViewRegistryService')
-      const { extractConversations } = require('./mcpServers/adapters')
-      const info = webViewRegistryService.getByAppId(appId)
-      if (!info) return { success: false, error: 'Mini-app not found' }
-      return extractConversations(info.webContentsId, info.url, options)
-    }
-  )
 
   // store sync
   storeSyncService.registerIpcHandler()

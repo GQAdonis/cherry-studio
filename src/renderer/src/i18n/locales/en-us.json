@@ -528,6 +528,14 @@
         "url_placeholder": "Enter JSON URL"
       },
       "manage": {
+        "batch_delete": {
+          "button": "Batch Delete",
+          "confirm": "Are you sure you want to delete the selected {{count}} assistants?"
+        },
+        "mode": {
+          "delete": "Delete",
+          "sort": "Sort"
+        },
         "title": "Manage Assistants"
       },
       "my_agents": "My Assistants",
@@ -588,7 +596,8 @@
         "low": "Low",
         "medium": "Medium",
         "minimal": "Minimal",
-        "off": "Off"
+        "off": "Off",
+        "xhigh": "Extra High"
       },
       "regular_phrases": {
         "add": "Add Phrase",
@@ -1092,17 +1101,6 @@
       }
     }
   },
-  "conversation": {
-    "contextStrategy": {
-      "button": "Context",
-      "customActive": "Custom context strategy active",
-      "customInfo": "Custom context strategy will override the assistant's setting for this conversation only.",
-      "description": "Configure how this conversation manages context. You can use the assistant's default or customize for this conversation.",
-      "title": "Conversation Context Strategy",
-      "useAssistantDefault": "Use Assistant Default",
-      "usingDefault": "Using assistant default"
-    }
-  },
   "code": {
     "auto_update_to_latest": "Automatically update to latest version",
     "bun_required_message": "Bun environment is required to run CLI tools",
@@ -1266,6 +1264,7 @@
     "saved": "Saved",
     "search": "Search",
     "select": "Select",
+    "select_all": "Select All",
     "selected": "Selected",
     "selectedItems": "Selected {{count}} items",
     "selectedMessages": "Selected {{count}} messages",
@@ -1289,6 +1288,17 @@
     "upload_files": "Upload file",
     "warning": "Warning",
     "you": "You"
+  },
+  "conversation": {
+    "contextStrategy": {
+      "button": "Context",
+      "customActive": "Custom context strategy active",
+      "customInfo": "Custom context strategy will override the assistant's setting for this conversation only.",
+      "description": "Configure how this conversation manages context. You can use the assistant's default or customize for this conversation.",
+      "title": "Conversation Context Strategy",
+      "useAssistantDefault": "Use Assistant Default",
+      "usingDefault": "Using assistant default"
+    }
   },
   "docs": {
     "title": "Docs"
@@ -2221,6 +2231,17 @@
       "number": "Number",
       "string": "Text"
     },
+    "parameters": {
+      "default_temperature": "Default Temperature",
+      "default_temperature.tooltip": "Controls randomness: Lowering results in less random completions",
+      "default_top_p": "Default Top P",
+      "default_top_p.tooltip": "Controls diversity via nucleus sampling",
+      "label": "Parameters",
+      "max_context_tokens": "Max Context Tokens",
+      "max_context_tokens.tooltip": "The maximum number of tokens the model can process, click to edit",
+      "max_output_tokens": "Max Output Tokens",
+      "max_output_tokens.tooltip": "The maximum number of tokens the model can generate"
+    },
     "pinned": "Pinned",
     "price": {
       "cost": "Cost",
@@ -2455,7 +2476,7 @@
     "failed": {
       "install": "Install OVMS failed:",
       "install_code_100": "Unknown Error",
-      "install_code_101": "Only supports Intel(R) Core(TM) Ultra CPU",
+      "install_code_101": "Only supports Intel(R) CPU",
       "install_code_102": "Only supports Windows",
       "install_code_103": "Download OVMS runtime failed",
       "install_code_104": "Failed to install OVMS runtime",

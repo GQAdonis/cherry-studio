@@ -191,13 +191,29 @@ const AssistantModelSettings: FC<Props> = ({ assistant, updateAssistant, updateA
         model: selectedModel,
         defaultModel: selectedModel
       })
-      // TODO: 需要根据配置来设置默认值
-      if (selectedModel.name.includes('kimi-k2')) {
+      // Use model-specific default settings if available
+      if (selectedModel.defaultTemperature !== undefined) {
+        setTemperature(selectedModel.defaultTemperature)
+        setTimeoutTimer(
+          'onSelectModel_temp',
+          () => updateAssistantSettings({ temperature: selectedModel.defaultTemperature }),
+          500
+        )
+      } else if (selectedModel.name.includes('kimi-k2')) {
         setTemperature(0.6)
         setTimeoutTimer('onSelectModel_1', () => updateAssistantSettings({ temperature: 0.6 }), 500)
       } else if (selectedModel.name.includes('moonshot')) {
         setTemperature(0.3)
         setTimeoutTimer('onSelectModel_2', () => updateAssistantSettings({ temperature: 0.3 }), 500)
+      }
+
+      if (selectedModel.defaultTopP !== undefined) {
+        setTopP(selectedModel.defaultTopP)
+        setTimeoutTimer(
+          'onSelectModel_topP',
+          () => updateAssistantSettings({ topP: selectedModel.defaultTopP }),
+          500
+        )
       }
     }
   }, [assistant, defaultModel, setTimeoutTimer, updateAssistant, updateAssistantSettings])

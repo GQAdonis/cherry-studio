@@ -528,6 +528,14 @@
         "url_placeholder": "输入 JSON URL"
       },
       "manage": {
+        "batch_delete": {
+          "button": "批量删除",
+          "confirm": "确定要删除选中的 {{count}} 个助手吗？"
+        },
+        "mode": {
+          "delete": "删除",
+          "sort": "排序"
+        },
         "title": "管理助手"
       },
       "my_agents": "我的助手",
@@ -588,7 +596,8 @@
         "low": "浮想",
         "medium": "斟酌",
         "minimal": "微念",
-        "off": "关闭"
+        "off": "关闭",
+        "xhigh": "穷究"
       },
       "regular_phrases": {
         "add": "添加短语",
@@ -1092,17 +1101,6 @@
       }
     }
   },
-  "conversation": {
-    "contextStrategy": {
-      "button": "上下文",
-      "customActive": "自定义上下文策略已启用",
-      "customInfo": "自定义上下文策略将仅对此对话覆盖助手的设置。",
-      "description": "配置此对话如何管理上下文。您可以使用助手的默认设置或为此对话自定义。",
-      "title": "对话上下文策略",
-      "useAssistantDefault": "使用助手默认",
-      "usingDefault": "使用助手默认"
-    }
-  },
   "code": {
     "auto_update_to_latest": "检查更新并安装最新版本",
     "bun_required_message": "运行 CLI 工具需要安装 Bun 环境",
@@ -1266,6 +1264,7 @@
     "saved": "已保存",
     "search": "搜索",
     "select": "选择",
+    "select_all": "全选",
     "selected": "已选择",
     "selectedItems": "已选择 {{count}} 项",
     "selectedMessages": "选中 {{count}} 条消息",
@@ -1289,6 +1288,17 @@
     "upload_files": "上传文件",
     "warning": "警告",
     "you": "用户"
+  },
+  "conversation": {
+    "contextStrategy": {
+      "button": "上下文",
+      "customActive": "自定义上下文策略已启用",
+      "customInfo": "自定义上下文策略将仅对此对话覆盖助手的设置。",
+      "description": "配置此对话如何管理上下文。您可以使用助手的默认设置或为此对话自定义。",
+      "title": "对话上下文策略",
+      "useAssistantDefault": "使用助手默认",
+      "usingDefault": "使用助手默认"
+    }
   },
   "docs": {
     "title": "帮助文档"
@@ -2221,6 +2231,17 @@
       "number": "数字",
       "string": "文本"
     },
+    "parameters": {
+      "default_temperature": "默认温度",
+      "default_temperature.tooltip": "控制随机性：降低该值会使输出更加确定",
+      "default_top_p": "默认 Top P",
+      "default_top_p.tooltip": "通过核心采样控制多样性",
+      "label": "参数",
+      "max_context_tokens": "最大上下文 Token 数",
+      "max_context_tokens.tooltip": "模型可处理的最大 Token 数，点击编辑",
+      "max_output_tokens": "最大输出 Token 数",
+      "max_output_tokens.tooltip": "模型可生成的最大 Token 数"
+    },
     "pinned": "已固定",
     "price": {
       "cost": "花费",
@@ -2455,7 +2476,7 @@
     "failed": {
       "install": "安装 OVMS 失败:",
       "install_code_100": "未知错误",
-      "install_code_101": "仅支持 Intel(R) Core(TM) Ultra CPU",
+      "install_code_101": "仅支持 Intel(R) CPU",
       "install_code_102": "仅支持 Windows",
       "install_code_103": "下载 OVMS runtime 失败",
       "install_code_104": "安装 OVMS runtime 失败",

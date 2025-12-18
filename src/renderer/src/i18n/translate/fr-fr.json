@@ -528,6 +528,14 @@
         "url_placeholder": "Saisir l'URL JSON"
       },
       "manage": {
+        "batch_delete": {
+          "button": "Suppression par lot",
+          "confirm": "Êtes-vous sûr de vouloir supprimer les {{count}} assistants sélectionnés ?"
+        },
+        "mode": {
+          "delete": "Supprimer",
+          "sort": "Trier"
+        },
         "title": "Gérer les assistants"
       },
       "my_agents": "Mes assistants",
@@ -588,7 +596,8 @@
         "low": "Court",
         "medium": "Moyen",
         "minimal": "minimal",
-        "off": "Off"
+        "off": "Off",
+        "xhigh": "[to be translated]:Extra High"
       },
       "regular_phrases": {
         "add": "Добавить фразу",
@@ -1255,6 +1264,7 @@
     "saved": "enregistré",
     "search": "Rechercher",
     "select": "Sélectionner",
+    "select_all": "Tout sélectionner",
     "selected": "Sélectionné",
     "selectedItems": "{{count}} éléments sélectionnés",
     "selectedMessages": "{{count}} messages sélectionnés",
@@ -1278,6 +1288,17 @@
     "upload_files": "Uploader des fichiers",
     "warning": "Avertissement",
     "you": "Vous"
+  },
+  "conversation": {
+    "contextStrategy": {
+      "button": "[to be translated]:Context",
+      "customActive": "[to be translated]:Custom context strategy active",
+      "customInfo": "[to be translated]:Custom context strategy will override the assistant's setting for this conversation only.",
+      "description": "[to be translated]:Configure how this conversation manages context. You can use the assistant's default or customize for this conversation.",
+      "title": "[to be translated]:Conversation Context Strategy",
+      "useAssistantDefault": "[to be translated]:Use Assistant Default",
+      "usingDefault": "[to be translated]:Using assistant default"
+    }
   },
   "docs": {
     "title": "Documentation d'aide"
@@ -2209,6 +2230,17 @@
       "json": "JSON",
       "number": "Chiffre",
       "string": "Texte"
+    },
+    "parameters": {
+      "default_temperature": "[to be translated]:Default Temperature",
+      "default_temperature.tooltip": "[to be translated]:Controls randomness: Lowering results in less random completions",
+      "default_top_p": "[to be translated]:Default Top P",
+      "default_top_p.tooltip": "[to be translated]:Controls diversity via nucleus sampling",
+      "label": "[to be translated]:Parameters",
+      "max_context_tokens": "[to be translated]:Max Context Tokens",
+      "max_context_tokens.tooltip": "[to be translated]:The maximum number of tokens the model can process, click to edit",
+      "max_output_tokens": "[to be translated]:Max Output Tokens",
+      "max_output_tokens.tooltip": "[to be translated]:The maximum number of tokens the model can generate"
     },
     "pinned": "Épinglé",
     "price": {

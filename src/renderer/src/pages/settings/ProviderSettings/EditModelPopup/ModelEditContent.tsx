@@ -22,7 +22,7 @@ import type { Model, ModelCapability, ModelType, Provider } from '@renderer/type
 import { getDefaultGroupName, getDifference, getUnion, uniqueObjectArray } from '@renderer/utils'
 import { isNewApiProvider } from '@renderer/utils/provider'
 import type { ModalProps } from 'antd'
-import { Button, Divider, Flex, Form, Input, InputNumber, message, Modal, Select, Switch, Tooltip } from 'antd'
+import { Button, Col, Divider, Flex, Form, Input, InputNumber, message, Modal, Row, Select, Switch, Tooltip } from 'antd'
 import { cloneDeep } from 'lodash'
 import { ChevronDown, ChevronUp, RotateCcw, SaveIcon } from 'lucide-react'
 import type { FC } from 'react'
@@ -75,7 +75,11 @@ const ModelEditContent: FC<ModelEditContentProps & ModalProps> = ({ provider, mo
         input_per_million_tokens: Number(formValues.input_per_million_tokens) || 0,
         output_per_million_tokens: Number(formValues.output_per_million_tokens) || 0,
         currencySymbol: finalCurrencySymbol
-      }
+      },
+      maxContextTokens: formValues.maxContextTokens,
+      maxOutputTokens: formValues.maxOutputTokens,
+      defaultTemperature: formValues.defaultTemperature,
+      defaultTopP: formValues.defaultTopP
     }
     onUpdateModel(updatedModel)
   }
@@ -94,7 +98,11 @@ const ModelEditContent: FC<ModelEditContentProps & ModalProps> = ({ provider, mo
         input_per_million_tokens: Number(values.input_per_million_tokens) || 0,
         output_per_million_tokens: Number(values.output_per_million_tokens) || 0,
         currencySymbol: finalCurrencySymbol || '$'
-      }
+      },
+      maxContextTokens: values.maxContextTokens,
+      maxOutputTokens: values.maxOutputTokens,
+      defaultTemperature: values.defaultTemperature,
+      defaultTopP: values.defaultTopP
     }
     onUpdateModel(updatedModel)
     setShowMoreSettings(false)
@@ -253,7 +261,11 @@ const ModelEditContent: FC<ModelEditContentProps & ModalProps> = ({ provider, mo
             : 'custom',
           customCurrencySymbol: symbols.includes(model.pricing?.currencySymbol || '$')
             ? ''
-            : model.pricing?.currencySymbol || ''
+            : model.pricing?.currencySymbol || '',
+          maxContextTokens: model.maxContextTokens,
+          maxOutputTokens: model.maxOutputTokens,
+          defaultTemperature: model.defaultTemperature,
+          defaultTopP: model.defaultTopP
         }}
         onFinish={onFinish}>
         <Form.Item
@@ -352,6 +364,70 @@ const ModelEditContent: FC<ModelEditContentProps & ModalProps> = ({ provider, mo
                 }}
               />
             </Form.Item>
+            <Divider style={{ margin: '12px 0 16px 0' }} />
+            <div style={{ marginBottom: 8 }}>
+              <div style={{ fontSize: 14, fontWeight: 500, marginBottom: 8 }}>{t('models.parameters.label')}</div>
+              <Row gutter={10}>
+                <Col span={12}>
+                  <Form.Item
+                    name="maxContextTokens"
+                    label={t('models.parameters.max_context_tokens')}
+                    tooltip={t('models.parameters.max_context_tokens.tooltip')}>
+                    <InputNumber
+                      placeholder="128000"
+                      min={0}
+                      step={1000}
+                      style={{ width: '100%' }}
+                      onChange={() => autoSave()}
+                    />
+                  </Form.Item>
+                </Col>
+                <Col span={12}>
+                  <Form.Item
+                    name="maxOutputTokens"
+                    label={t('models.parameters.max_output_tokens')}
+                    tooltip={t('models.parameters.max_output_tokens.tooltip')}>
+                    <InputNumber
+                      placeholder="4096"
+                      min={0}
+                      step={100}
+                      style={{ width: '100%' }}
+                      onChange={() => autoSave()}
+                    />
+                  </Form.Item>
+                </Col>
+                <Col span={12}>
+                  <Form.Item
+                    name="defaultTemperature"
+                    label={t('models.parameters.default_temperature')}
+                    tooltip={t('models.parameters.default_temperature.tooltip')}>
+                    <InputNumber
+                      placeholder="0.5"
+                      min={0}
+                      max={2}
+                      step={0.1}
+                      style={{ width: '100%' }}
+                      onChange={() => autoSave()}
+                    />
+                  </Form.Item>
+                </Col>
+                <Col span={12}>
+                  <Form.Item
+                    name="defaultTopP"
+                    label={t('models.parameters.default_top_p')}
+                    tooltip={t('models.parameters.default_top_p.tooltip')}>
+                    <InputNumber
+                      placeholder="1.0"
+                      min={0}
+                      max={1}
+                      step={0.1}
+                      style={{ width: '100%' }}
+                      onChange={() => autoSave()}
+                    />
+                  </Form.Item>
+                </Col>
+              </Row>
+            </div>
             <Divider style={{ margin: '12px 0 16px 0' }} />
             <Form.Item name="currencySymbol" label={t('models.price.currency')} style={{ marginBottom: 10 }}>
               <Select
