@@ -157,38 +157,38 @@ artifactBuildCompleted: scripts/artifact-build-completed.js
 releaseInfo:
   releaseNotes: |
     <!--LANG:en-->
-    Cherry Studio 1.7.5 - Filesystem MCP Overhaul & Topic Management
+    Cherry Studio 1.7.6 - New Models & MCP Enhancements
 
-    This release features a completely rewritten filesystem MCP server, new batch topic management, and improved assistant management.
+    This release adds support for new AI models and includes a new MCP server for memory management.
 
     ✨ New Features
-    - [MCP] Rewrite filesystem MCP server with improved tool set (glob, ls, grep, read, write, edit, delete)
-    - [Topics] Add topic manage mode for batch delete and move operations with search functionality
-    - [Assistants] Merge import/subscribe popups and add export to assistant management
-    - [Knowledge] Use prompt injection for forced knowledge base search (faster response times)
-    - [Settings] Add tool use mode setting (prompt/function) to default assistant settings
+    - [Models] Add support for Xiaomi MiMo model
+    - [Models] Add support for Gemini 3 Flash and Pro model detection
+    - [Models] Add support for Volcengine Doubao-Seed-1.8 model
+    - [MCP] Add Nowledge Mem builtin MCP server for memory management
+    - [Settings] Add default reasoning effort option to resolve confusion between undefined and none
 
     🐛 Bug Fixes
-    - [Model] Correct typo in Gemini 3 Pro Image Preview model name
-    - [Installer] Auto-install VC++ Redistributable without user prompt
-    - [Notes] Fix notes directory validation and default path reset for cross-platform restore
-    - [OAuth] Bind OAuth callback server to localhost (127.0.0.1) for security
+    - [Azure] Restore deployment-based URLs for non-v1 apiVersion
+    - [Translation] Disable reasoning mode for translation to improve efficiency
+    - [Image] Update API path for image generation requests in OpenAIBaseClient
+    - [Windows] Auto-discover and persist Git Bash path on Windows for scoop users
 
     <!--LANG:zh-CN-->
-    Cherry Studio 1.7.5 - 文件系统 MCP 重构与话题管理
+    Cherry Studio 1.7.6 - 新模型与 MCP 增强
 
-    本次更新完全重写了文件系统 MCP 服务器，新增批量话题管理功能，并改进了助手管理。
+    本次更新添加了多个新 AI 模型支持，并新增记忆管理 MCP 服务器。
 
     ✨ 新功能
-    - [MCP] 重写文件系统 MCP 服务器，提供改进的工具集（glob、ls、grep、read、write、edit、delete）
-    - [话题] 新增话题管理模式，支持批量删除和移动操作，带搜索功能
-    - [助手] 合并导入/订阅弹窗，并在助手管理中添加导出功能
-    - [知识库] 使用提示词注入进行强制知识库搜索（响应更快）
-    - [设置] 在默认助手设置中添加工具使用模式设置（prompt/function）
+    - [模型] 添加小米 MiMo 模型支持
+    - [模型] 添加 Gemini 3 Flash 和 Pro 模型检测支持
+    - [模型] 添加火山引擎 Doubao-Seed-1.8 模型支持
+    - [MCP] 新增 Nowledge Mem 内置 MCP 服务器，用于记忆管理
+    - [设置] 添加默认推理强度选项，解决 undefined 和 none 之间的混淆
 
     🐛 问题修复
-    - [模型] 修正 Gemini 3 Pro Image Preview 模型名称的拼写错误
-    - [安装程序] 自动安装 VC++ 运行库，无需用户确认
-    - [笔记] 修复跨平台恢复场景下的笔记目录验证和默认路径重置逻辑
-    - [OAuth] 将 OAuth 回调服务器绑定到 localhost (127.0.0.1) 以提高安全性
+    - [Azure] 修复非 v1 apiVersion 的部署 URL 问题
+    - [翻译] 禁用翻译时的推理模式以提高效率
+    - [图像] 更新 OpenAIBaseClient 中图像生成请求的 API 路径
+    - [Windows] 自动发现并保存 Windows scoop 用户的 Git Bash 路径
     <!--LANG:END-->
