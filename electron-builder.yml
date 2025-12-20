@@ -157,60 +157,38 @@ artifactBuildCompleted: scripts/artifact-build-completed.js
 releaseInfo:
   releaseNotes: |
     <!--LANG:en-->
-    Cherry Studio 1.7.3 - Feature & Stability Update
+    Cherry Studio 1.7.5 - Filesystem MCP Overhaul & Topic Management
 
-    This release brings new features, UI improvements, and important bug fixes.
+    This release features a completely rewritten filesystem MCP server, new batch topic management, and improved assistant management.
 
     ✨ New Features
-    - Add MCP server log viewer for better debugging
-    - Support custom Git Bash path configuration
-    - Add print to PDF and save as HTML for mini program webviews
-    - Add CherryIN API host selection settings
-    - Enhance assistant presets with sort and batch delete modes
-    - Open URL directly for SelectionAssistant search action
-    - Enhance web search tool switching with provider-specific context
-
-    🔧 Improvements
-    - Remove Intel Ultra limit for OVMS
-    - Improve settings tab and assistant item UI
+    - [MCP] Rewrite filesystem MCP server with improved tool set (glob, ls, grep, read, write, edit, delete)
+    - [Topics] Add topic manage mode for batch delete and move operations with search functionality
+    - [Assistants] Merge import/subscribe popups and add export to assistant management
+    - [Knowledge] Use prompt injection for forced knowledge base search (faster response times)
+    - [Settings] Add tool use mode setting (prompt/function) to default assistant settings
 
     🐛 Bug Fixes
-    - Fix stack overflow with base64 images
-    - Fix infinite loop in knowledge queue processing
-    - Fix quick panel closing in multiple selection mode
-    - Fix thinking timer not stopping when reply is aborted
-    - Fix ThinkingButton icon display for fixed reasoning mode
-    - Fix knowledge query prioritization and intent prompt
-    - Fix OpenRouter embeddings support
-    - Fix SelectionAction window resize on Windows
-    - Add gpustack provider support for qwen3 thinking mode
+    - [Model] Correct typo in Gemini 3 Pro Image Preview model name
+    - [Installer] Auto-install VC++ Redistributable without user prompt
+    - [Notes] Fix notes directory validation and default path reset for cross-platform restore
+    - [OAuth] Bind OAuth callback server to localhost (127.0.0.1) for security
 
     <!--LANG:zh-CN-->
-    Cherry Studio 1.7.3 - 功能与稳定性更新
+    Cherry Studio 1.7.5 - 文件系统 MCP 重构与话题管理
 
-    本次更新带来新功能、界面改进和重要的问题修复。
+    本次更新完全重写了文件系统 MCP 服务器，新增批量话题管理功能，并改进了助手管理。
 
     ✨ 新功能
-    - 新增 MCP 服务器日志查看器，便于调试
-    - 支持自定义 Git Bash 路径配置
-    - 小程序 webview 支持打印 PDF 和保存为 HTML
-    - 新增 CherryIN API 主机选择设置
-    - 助手预设增强：支持排序和批量删除模式
-    - 划词助手搜索操作直接打开 URL
-    - 增强网页搜索工具切换逻辑，支持服务商特定上下文
-
-    🔧 功能改进
-    - 移除 OVMS 的 Intel Ultra 限制
-    - 优化设置标签页和助手项目 UI
+    - [MCP] 重写文件系统 MCP 服务器，提供改进的工具集（glob、ls、grep、read、write、edit、delete）
+    - [话题] 新增话题管理模式，支持批量删除和移动操作，带搜索功能
+    - [助手] 合并导入/订阅弹窗，并在助手管理中添加导出功能
+    - [知识库] 使用提示词注入进行强制知识库搜索（响应更快）
+    - [设置] 在默认助手设置中添加工具使用模式设置（prompt/function）
 
     🐛 问题修复
-    - 修复 base64 图片导致的栈溢出问题
-    - 修复知识库队列处理的无限循环问题
-    - 修复多选模式下快捷面板意外关闭的问题
-    - 修复回复中止时思考计时器未停止的问题
-    - 修复固定推理模式下思考按钮图标显示问题
-    - 修复知识库查询优先级和意图提示
-    - 修复 OpenRouter 嵌入模型支持
-    - 修复 Windows 上划词助手窗口大小调整问题
-    - 为 gpustack 服务商添加 qwen3 思考模式支持
+    - [模型] 修正 Gemini 3 Pro Image Preview 模型名称的拼写错误
+    - [安装程序] 自动安装 VC++ 运行库，无需用户确认
+    - [笔记] 修复跨平台恢复场景下的笔记目录验证和默认路径重置逻辑
+    - [OAuth] 将 OAuth 回调服务器绑定到 localhost (127.0.0.1) 以提高安全性
     <!--LANG:END-->

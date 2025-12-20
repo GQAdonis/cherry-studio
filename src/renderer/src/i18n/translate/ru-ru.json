@@ -32,6 +32,7 @@
     },
     "gitBash": {
       "autoDetected": "Используется автоматически обнаруженный Git Bash",
+      "autoDiscoveredHint": "[to be translated]:Auto-discovered",
       "clear": {
         "button": "Очистить пользовательский путь"
       },
@@ -39,6 +40,7 @@
       "error": {
         "description": "Для запуска агентов в Windows требуется Git Bash. Без него агент не может работать. Пожалуйста, установите Git для Windows с",
         "recheck": "Повторная проверка установки Git Bash",
+        "required": "[to be translated]:Git Bash path is required on Windows",
         "title": "Требуется Git Bash"
       },
       "found": {
@@ -51,7 +53,9 @@
         "invalidPath": "Выбранный файл не является допустимым исполняемым файлом Git Bash (bash.exe).",
         "title": "Выберите исполняемый файл Git Bash"
       },
-      "success": "Git Bash успешно обнаружен!"
+      "placeholder": "[to be translated]:Select bash.exe path",
+      "success": "Git Bash успешно обнаружен!",
+      "tooltip": "[to be translated]:Git Bash is required to run agents on Windows. Install from git-scm.com if not available."
     },
     "input": {
       "placeholder": "Введите ваше сообщение здесь, отправьте с помощью {{key}} — @ выбрать путь, / выбрать команду"
@@ -515,6 +519,7 @@
         "button": "Импортировать",
         "error": {
           "fetch_failed": "Ошибка получения данных с URL",
+          "file_required": "Сначала выберите файл",
           "invalid_format": "Неверный формат помощника: отсутствуют обязательные поля",
           "url_required": "Пожалуйста, введите URL"
         },
@@ -532,8 +537,11 @@
           "button": "Массовое удаление",
           "confirm": "Вы уверены, что хотите удалить выбранных {{count}} ассистентов?"
         },
+        "batch_export": {
+          "button": "Экспорт"
+        },
         "mode": {
-          "delete": "Удалить",
+          "manage": "Управлять",
           "sort": "Сортировать"
         },
         "title": "Управление помощниками"
@@ -597,7 +605,7 @@
         "medium": "Среднее",
         "minimal": "минимальный",
         "off": "Выключить",
-        "xhigh": "[to be translated]:Extra High"
+        "xhigh": "Сверхвысокое"
       },
       "regular_phrases": {
         "add": "Добавить подсказку",
@@ -1081,6 +1089,29 @@
         "yuque": "Экспорт в Yuque"
       },
       "list": "Список топиков",
+      "manage": {
+        "clear_selection": "Очистить выбор",
+        "delete": {
+          "confirm": {
+            "content": "Вы уверены, что хотите удалить выбранные темы ({{count}})? Это действие нельзя отменить.",
+            "title": "Удалить темы"
+          },
+          "success": "Удалено {{count}} тем(ы)"
+        },
+        "deselect_all": "Снять выделение со всех",
+        "error": {
+          "at_least_one": "Должна быть сохранена хотя бы одна тема"
+        },
+        "move": {
+          "button": "Переместить",
+          "placeholder": "Выберите цель",
+          "success": "Перемещено {{count}} тем(ы)"
+        },
+        "pinned": "Закреплённые темы",
+        "selected_count": "{{count}} выбрано",
+        "title": "Управление темами",
+        "unpinned": "Откреплённые темы"
+      },
       "move_to": "Переместить в",
       "new": "Новый топик",
       "pin": "Закрепленные темы",
@@ -1090,6 +1121,10 @@
         },
         "label": "Тематические подсказки",
         "tips": "Тематические подсказки: Дополнительные подсказки, предоставленные для текущей темы"
+      },
+      "search": {
+        "placeholder": "Искать темы...",
+        "title": "Поиск"
       },
       "title": "Топики",
       "unpin": "Открепленные темы"
@@ -1277,6 +1312,7 @@
       }
     },
     "stop": "остановить",
+    "subscribe": "Подписаться",
     "success": "Успешно",
     "swap": "Поменять местами",
     "tags": "[to be translated]:Tags",
@@ -1284,6 +1320,7 @@
     "topics": "Топики",
     "unknown": "Неизвестно",
     "unnamed": "Без имени",
+    "unsubscribe": "Отписаться",
     "update_success": "Обновление выполнено успешно",
     "upload_files": "Загрузить файл",
     "warning": "Предупреждение",
@@ -2232,15 +2269,23 @@
       "string": "Текст"
     },
     "parameters": {
-      "default_temperature": "[to be translated]:Default Temperature",
-      "default_temperature.tooltip": "[to be translated]:Controls randomness: Lowering results in less random completions",
-      "default_top_p": "[to be translated]:Default Top P",
-      "default_top_p.tooltip": "[to be translated]:Controls diversity via nucleus sampling",
+      "default_temperature": {
+        "label": "[to be translated]:Default Temperature",
+        "tooltip": "[to be translated]:Controls randomness: Lowering results in less random completions"
+      },
+      "default_top_p": {
+        "label": "[to be translated]:Default Top P",
+        "tooltip": "[to be translated]:Controls diversity via nucleus sampling"
+      },
       "label": "[to be translated]:Parameters",
-      "max_context_tokens": "[to be translated]:Max Context Tokens",
-      "max_context_tokens.tooltip": "[to be translated]:The maximum number of tokens the model can process, click to edit",
-      "max_output_tokens": "[to be translated]:Max Output Tokens",
-      "max_output_tokens.tooltip": "[to be translated]:The maximum number of tokens the model can generate"
+      "max_context_tokens": {
+        "label": "[to be translated]:Max Context Tokens",
+        "tooltip": "[to be translated]:The maximum number of tokens the model can process, click to edit"
+      },
+      "max_output_tokens": {
+        "label": "[to be translated]:Max Output Tokens",
+        "tooltip": "[to be translated]:The maximum number of tokens the model can generate"
+      }
     },
     "pinned": "Закреплено",
     "price": {
@@ -2301,6 +2346,7 @@
     "collapse": "Свернуть",
     "content_placeholder": "Введите содержимое заметки...",
     "copyContent": "Копировать контент",
+    "crossPlatformRestoreWarning": "[to be translated]:Cross-platform configuration restored, but notes directory is empty. Please copy your note files to: {{path}}",
     "delete": "удалить",
     "delete_confirm": "Вы уверены, что хотите удалить этот объект {{type}}?",
     "delete_folder_confirm": "Вы уверены, что хотите удалить папку \"{{name}}\" со всем ее содержимым?",
@@ -4116,6 +4162,7 @@
       "builtinServers": "Встроенные серверы",
       "builtinServersDescriptions": {
         "brave_search": "реализация сервера MCP с интеграцией API поиска Brave, обеспечивающая функции веб-поиска и локального поиска. Требуется настройка переменной среды BRAVE_API_KEY",
+        "browser": "Управление headless-окном Electron через Chrome DevTools Protocol. Инструменты: открытие URL, выполнение однострочного JS, сброс сессии.",
         "browser_automation": "[to be translated]:Vision-optimized browser automation for embedded mini-apps. Provides high-level tools for AI models to interact with web content using screenshots and element detection.",
         "didi_mcp": "Сервер DiDi MCP, предоставляющий услуги такси, включая поиск на карте, оценку стоимости, управление заказами и отслеживание водителей. Доступен только в материковом Китае. Требует настройки переменной окружения DIDI_API_KEY",
         "dify_knowledge": "Реализация сервера MCP Dify, предоставляющая простой API для взаимодействия с Dify. Требуется настройка ключа Dify",

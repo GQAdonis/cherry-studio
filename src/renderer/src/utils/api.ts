@@ -1,4 +1,3 @@
-import store from '@renderer/store'
 import type { VertexProvider } from '@renderer/types'
 import { trim } from 'lodash'
 
@@ -165,9 +164,21 @@ export function formatAzureFoundryApiHost(host: string): string {
 
 export function formatVertexApiHost(provider: VertexProvider): string {
   const { apiHost } = provider
-  const { projectId: project, location } = store.getState().llm.settings.vertexai
+  // Avoid importing the Redux store at module scope:
+  // `@renderer/utils` is a barrel that re-exports this file, and the store imports settings which
+  // depends on `uuid` from `@renderer/utils`. Importing the store here creates a circular dependency
+  // that breaks in tests (and can be fragile at runtime).
+  //
+  // Prefer reading from a global store reference if available, otherwise fall back to returning the
+  // trimmed host (users can provide a fully-qualified Vertex endpoint).
+  const vertexSettings = (globalThis as any)?.store?.getState?.()?.llm?.settings?.vertexai
+  const project = vertexSettings?.projectId
+  const location = vertexSettings?.location
   const trimmedHost = withoutTrailingSlash(trim(apiHost))
   if (!trimmedHost || trimmedHost.endsWith('aiplatform.googleapis.com')) {
+    if (!project || !location) {
+      return formatApiHost(trimmedHost || 'https://aiplatform.googleapis.com')
+    }
     const host =
       location == 'global' ? 'https://aiplatform.googleapis.com' : `https://${location}-aiplatform.googleapis.com`
     return `${formatApiHost(host)}/projects/${project}/locations/${location}`

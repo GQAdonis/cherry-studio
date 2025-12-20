@@ -22,7 +22,21 @@ import type { Model, ModelCapability, ModelType, Provider } from '@renderer/type
 import { getDefaultGroupName, getDifference, getUnion, uniqueObjectArray } from '@renderer/utils'
 import { isNewApiProvider } from '@renderer/utils/provider'
 import type { ModalProps } from 'antd'
-import { Button, Col, Divider, Flex, Form, Input, InputNumber, message, Modal, Row, Select, Switch, Tooltip } from 'antd'
+import {
+  Button,
+  Col,
+  Divider,
+  Flex,
+  Form,
+  Input,
+  InputNumber,
+  message,
+  Modal,
+  Row,
+  Select,
+  Switch,
+  Tooltip
+} from 'antd'
 import { cloneDeep } from 'lodash'
 import { ChevronDown, ChevronUp, RotateCcw, SaveIcon } from 'lucide-react'
 import type { FC } from 'react'
@@ -371,7 +385,7 @@ const ModelEditContent: FC<ModelEditContentProps & ModalProps> = ({ provider, mo
                 <Col span={12}>
                   <Form.Item
                     name="maxContextTokens"
-                    label={t('models.parameters.max_context_tokens')}
+                    label={t('models.parameters.max_context_tokens.label')}
                     tooltip={t('models.parameters.max_context_tokens.tooltip')}>
                     <InputNumber
                       placeholder="128000"
@@ -385,7 +399,7 @@ const ModelEditContent: FC<ModelEditContentProps & ModalProps> = ({ provider, mo
                 <Col span={12}>
                   <Form.Item
                     name="maxOutputTokens"
-                    label={t('models.parameters.max_output_tokens')}
+                    label={t('models.parameters.max_output_tokens.label')}
                     tooltip={t('models.parameters.max_output_tokens.tooltip')}>
                     <InputNumber
                       placeholder="4096"
@@ -399,7 +413,7 @@ const ModelEditContent: FC<ModelEditContentProps & ModalProps> = ({ provider, mo
                 <Col span={12}>
                   <Form.Item
                     name="defaultTemperature"
-                    label={t('models.parameters.default_temperature')}
+                    label={t('models.parameters.default_temperature.label')}
                     tooltip={t('models.parameters.default_temperature.tooltip')}>
                     <InputNumber
                       placeholder="0.5"
@@ -414,7 +428,7 @@ const ModelEditContent: FC<ModelEditContentProps & ModalProps> = ({ provider, mo
                 <Col span={12}>
                   <Form.Item
                     name="defaultTopP"
-                    label={t('models.parameters.default_top_p')}
+                    label={t('models.parameters.default_top_p.label')}
                     tooltip={t('models.parameters.default_top_p.tooltip')}>
                     <InputNumber
                       placeholder="1.0"

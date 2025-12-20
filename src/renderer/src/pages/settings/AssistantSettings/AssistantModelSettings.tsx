@@ -209,11 +209,7 @@ const AssistantModelSettings: FC<Props> = ({ assistant, updateAssistant, updateA
 
       if (selectedModel.defaultTopP !== undefined) {
         setTopP(selectedModel.defaultTopP)
-        setTimeoutTimer(
-          'onSelectModel_topP',
-          () => updateAssistantSettings({ topP: selectedModel.defaultTopP }),
-          500
-        )
+        setTimeoutTimer('onSelectModel_topP', () => updateAssistantSettings({ topP: selectedModel.defaultTopP }), 500)
       }
     }
   }, [assistant, defaultModel, setTimeoutTimer, updateAssistant, updateAssistantSettings])

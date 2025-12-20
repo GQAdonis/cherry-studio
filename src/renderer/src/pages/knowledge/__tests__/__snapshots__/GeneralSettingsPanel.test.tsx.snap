@@ -19,20 +19,16 @@ exports[`GeneralSettingsPanel > basic rendering > should match snapshot 1`] = `
 
 <div
   class="c0"
-  data-insp-path="src/renderer/src/pages/knowledge/components/KnowledgeSettings/GeneralSettingsPanel.tsx:29:5:SettingsPanel"
 >
   <div
     class="c1"
-    data-insp-path="src/renderer/src/pages/knowledge/components/KnowledgeSettings/GeneralSettingsPanel.tsx:30:7:SettingsItem"
   >
     <div
       class="settings-label"
-      data-insp-path="src/renderer/src/pages/knowledge/components/KnowledgeSettings/GeneralSettingsPanel.tsx:31:9:div"
     >
       common.name
     </div>
     <input
-      data-insp-path="src/renderer/src/pages/knowledge/__tests__/GeneralSettingsPanel.test.tsx:104:5:input"
       data-testid="name-input"
       placeholder="common.name"
       value="Test Knowledge Base"
@@ -40,15 +36,12 @@ exports[`GeneralSettingsPanel > basic rendering > should match snapshot 1`] = `
   </div>
   <div
     class="c1"
-    data-insp-path="src/renderer/src/pages/knowledge/components/KnowledgeSettings/GeneralSettingsPanel.tsx:39:7:SettingsItem"
   >
     <div
       class="settings-label"
-      data-insp-path="src/renderer/src/pages/knowledge/components/KnowledgeSettings/GeneralSettingsPanel.tsx:40:9:div"
     >
       models.embedding_model
       <span
-        data-insp-path="src/renderer/src/pages/knowledge/__tests__/GeneralSettingsPanel.test.tsx:34:5:span"
         data-placement="right"
         data-testid="info-tooltip"
         title="models.embedding_model_tooltip"
@@ -58,24 +51,20 @@ exports[`GeneralSettingsPanel > basic rendering > should match snapshot 1`] = `
     </div>
     <select
       data-has-providers="true"
-      data-insp-path="src/renderer/src/pages/knowledge/__tests__/GeneralSettingsPanel.test.tsx:47:7:select"
       data-placeholder="settings.models.empty"
       data-testid="model-selector"
     >
       <option
-        data-insp-path="src/renderer/src/pages/knowledge/__tests__/GeneralSettingsPanel.test.tsx:54:9:option"
         value=""
       >
         Select model
       </option>
       <option
-        data-insp-path="src/renderer/src/pages/knowledge/__tests__/GeneralSettingsPanel.test.tsx:55:9:option"
         value="openai/text-embedding-3-small"
       >
         text-embedding-3-small
       </option>
       <option
-        data-insp-path="src/renderer/src/pages/knowledge/__tests__/GeneralSettingsPanel.test.tsx:56:9:option"
         value="openai/text-embedding-ada-002"
       >
         text-embedding-ada-002
@@ -84,15 +73,12 @@ exports[`GeneralSettingsPanel > basic rendering > should match snapshot 1`] = `
   </div>
   <div
     class="c1"
-    data-insp-path="src/renderer/src/pages/knowledge/components/KnowledgeSettings/GeneralSettingsPanel.tsx:54:7:SettingsItem"
   >
     <div
       class="settings-label"
-      data-insp-path="src/renderer/src/pages/knowledge/components/KnowledgeSettings/GeneralSettingsPanel.tsx:55:9:div"
     >
       knowledge.dimensions
       <span
-        data-insp-path="src/renderer/src/pages/knowledge/__tests__/GeneralSettingsPanel.test.tsx:34:5:span"
         data-placement="right"
         data-testid="info-tooltip"
         title="knowledge.dimensions_size_tooltip"
@@ -101,7 +87,6 @@ exports[`GeneralSettingsPanel > basic rendering > should match snapshot 1`] = `
       </span>
     </div>
     <input
-      data-insp-path="src/renderer/src/pages/knowledge/__tests__/GeneralSettingsPanel.test.tsx:65:5:input"
       data-model="text-embedding-3-small"
       data-testid="embedding-dimension-input"
       type="number"
@@ -110,15 +95,12 @@ exports[`GeneralSettingsPanel > basic rendering > should match snapshot 1`] = `
   </div>
   <div
     class="c1"
-    data-insp-path="src/renderer/src/pages/knowledge/components/KnowledgeSettings/GeneralSettingsPanel.tsx:67:7:SettingsItem"
   >
     <div
       class="settings-label"
-      data-insp-path="src/renderer/src/pages/knowledge/components/KnowledgeSettings/GeneralSettingsPanel.tsx:68:9:div"
     >
       knowledge.document_count
       <span
-        data-insp-path="src/renderer/src/pages/knowledge/__tests__/GeneralSettingsPanel.test.tsx:34:5:span"
         data-placement="right"
         data-testid="info-tooltip"
         title="knowledge.document_count_help"
@@ -127,7 +109,6 @@ exports[`GeneralSettingsPanel > basic rendering > should match snapshot 1`] = `
       </span>
     </div>
     <input
-      data-insp-path="src/renderer/src/pages/knowledge/__tests__/GeneralSettingsPanel.test.tsx:112:7:input"
       data-marks="{"1":"1","6":"knowledge.document_count_default","30":"30","50":"50"}"
       data-testid="document-count-slider"
       max="50"

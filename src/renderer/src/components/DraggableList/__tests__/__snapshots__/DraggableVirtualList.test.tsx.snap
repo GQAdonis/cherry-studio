@@ -4,102 +4,79 @@ exports[`DraggableVirtualList > snapshot > should match snapshot with custom sty
 <div>
   <div
     class="custom-class draggable-virtual-list"
-    data-insp-path="src/renderer/src/components/DraggableList/virtual-list.tsx:128:5:div"
     style="height: 100%; display: flex; flex-direction: column; border: 1px solid red;"
   >
     <div
-      data-insp-path="src/renderer/src/components/DraggableList/__tests__/DraggableVirtualList.test.tsx:27:12:div"
       data-testid="drag-drop-context"
     >
       <div
-        data-insp-path="src/renderer/src/components/DraggableList/__tests__/DraggableVirtualList.test.tsx:30:5:div"
         data-testid="droppable"
       >
         <div
-          data-insp-path="src/renderer/src/components/DraggableList/virtual-list.tsx:139:15:div"
           style="background: blue;"
         >
-          <div
-            data-insp-path="src/renderer/src/components/DraggableList/__tests__/DraggableVirtualList.test.tsx:167:22:div"
-          >
+          <div>
             Item A
           </div>
         </div>
         <div
           class="virtual-scroller"
-          data-insp-path="src/renderer/src/components/DraggableList/__tests__/DraggableVirtualList.test.tsx:67:5:div"
           data-testid="scrollbar"
           style="height: 100%; width: 100%; overflow-y: auto; position: relative;"
         >
           <div
             class="virtual-list"
-            data-insp-path="src/renderer/src/components/DraggableList/virtual-list.tsx:171:17:div"
             style="height: 150px; width: 100%; position: relative;"
           >
             <div
-              data-insp-path="src/renderer/src/components/DraggableList/__tests__/DraggableVirtualList.test.tsx:38:5:div"
               data-testid="draggable-0-0"
             >
               <div
                 class="draggable-item"
                 data-index="0"
-                data-insp-path="src/renderer/src/components/DraggableList/virtual-list.tsx:230:13:div"
                 style="position: absolute; top: 0px; left: 0px; width: 100%; transform: translateY(0px);"
               >
                 <div
                   class="draggable-content"
-                  data-insp-path="src/renderer/src/components/DraggableList/virtual-list.tsx:244:15:div"
                   style="background: blue;"
                 >
-                  <div
-                    data-insp-path="src/renderer/src/components/DraggableList/__tests__/DraggableVirtualList.test.tsx:167:22:div"
-                  >
+                  <div>
                     Item A
                   </div>
                 </div>
               </div>
             </div>
             <div
-              data-insp-path="src/renderer/src/components/DraggableList/__tests__/DraggableVirtualList.test.tsx:38:5:div"
               data-testid="draggable-1-1"
             >
               <div
                 class="draggable-item"
                 data-index="1"
-                data-insp-path="src/renderer/src/components/DraggableList/virtual-list.tsx:230:13:div"
                 style="position: absolute; top: 0px; left: 0px; width: 100%; transform: translateY(50px);"
               >
                 <div
                   class="draggable-content"
-                  data-insp-path="src/renderer/src/components/DraggableList/virtual-list.tsx:244:15:div"
                   style="background: blue;"
                 >
-                  <div
-                    data-insp-path="src/renderer/src/components/DraggableList/__tests__/DraggableVirtualList.test.tsx:167:22:div"
-                  >
+                  <div>
                     Item B
                   </div>
                 </div>
               </div>
             </div>
             <div
-              data-insp-path="src/renderer/src/components/DraggableList/__tests__/DraggableVirtualList.test.tsx:38:5:div"
               data-testid="draggable-2-2"
             >
               <div
                 class="draggable-item"
                 data-index="2"
-                data-insp-path="src/renderer/src/components/DraggableList/virtual-list.tsx:230:13:div"
                 style="position: absolute; top: 0px; left: 0px; width: 100%; transform: translateY(100px);"
               >
                 <div
                   class="draggable-content"
-                  data-insp-path="src/renderer/src/components/DraggableList/virtual-list.tsx:244:15:div"
                   style="background: blue;"
                 >
-                  <div
-                    data-insp-path="src/renderer/src/components/DraggableList/__tests__/DraggableVirtualList.test.tsx:167:22:div"
-                  >
+                  <div>
                     Item C
                   </div>
                 </div>

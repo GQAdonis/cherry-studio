@@ -4,33 +4,27 @@ exports[`Hyperlink > should match snapshot for normal url 1`] = `
 <div>
   <div
     data-arrow="false"
-    data-insp-path="src/renderer/src/pages/home/Markdown/__tests__/Hyperlink.test.tsx:9:5:div"
     data-placement="top"
     data-styles="{"body":{"padding":0,"borderRadius":"8px","overflow":"hidden"}}"
     data-testid="popover"
   >
     <div
-      data-insp-path="src/renderer/src/pages/home/Markdown/__tests__/Hyperlink.test.tsx:15:7:div"
       data-testid="popover-content"
     >
       <div
-        data-insp-path="src/renderer/src/pages/home/Markdown/__tests__/Hyperlink.test.tsx:61:7:div"
         data-testid="og-card"
       >
         <img
           alt="https://example.com/path with space"
           data-hostname="example.com"
-          data-insp-path="src/renderer/src/pages/home/Markdown/__tests__/Hyperlink.test.tsx:20:5:img"
           data-testid="favicon"
         />
         <div
-          data-insp-path="src/renderer/src/pages/home/Markdown/__tests__/Hyperlink.test.tsx:23:61:div"
           data-testid="title"
         >
           example.com
         </div>
         <div
-          data-insp-path="src/renderer/src/pages/home/Markdown/__tests__/Hyperlink.test.tsx:24:60:div"
           data-testid="text"
         >
           https://example.com/path with space
@@ -38,12 +32,9 @@ exports[`Hyperlink > should match snapshot for normal url 1`] = `
       </div>
     </div>
     <div
-      data-insp-path="src/renderer/src/pages/home/Markdown/__tests__/Hyperlink.test.tsx:16:7:div"
       data-testid="popover-children"
     >
-      <span
-        data-insp-path="src/renderer/src/pages/home/Markdown/__tests__/Hyperlink.test.tsx:78:9:span"
-      >
+      <span>
         Child
       </span>
     </div>

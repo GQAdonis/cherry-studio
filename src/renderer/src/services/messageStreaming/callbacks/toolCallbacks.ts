@@ -26,9 +26,14 @@ export const createToolCallbacks = (deps: ToolCallbacksDependencies) => {
   let toolBlockId: string | null = null
   let citationBlockId: string | null = null
 
+  const getToolCallKey = (toolResponse: MCPToolResponse): string => {
+    return toolResponse.toolCallId || toolResponse.id
+  }
+
   return {
     onToolCallPending: (toolResponse: MCPToolResponse) => {
       logger.debug('onToolCallPending', toolResponse)
+      const toolCallKey = getToolCallKey(toolResponse)
 
       if (blockManager.hasInitialPlaceholder) {
         const changes = {
@@ -39,16 +44,16 @@ export const createToolCallbacks = (deps: ToolCallbacksDependencies) => {
         }
         toolBlockId = blockManager.initialPlaceholderBlockId!
         blockManager.smartBlockUpdate(toolBlockId, changes, MessageBlockType.TOOL)
-        toolCallIdToBlockIdMap.set(toolResponse.id, toolBlockId)
+        toolCallIdToBlockIdMap.set(toolCallKey, toolBlockId)
       } else if (toolResponse.status === 'pending') {
-        const toolBlock = createToolBlock(assistantMsgId, toolResponse.id, {
+        const toolBlock = createToolBlock(assistantMsgId, toolCallKey, {
           toolName: toolResponse.tool.name,
           status: MessageBlockStatus.PENDING,
           metadata: { rawMcpToolResponse: toolResponse }
         })
         toolBlockId = toolBlock.id
         blockManager.handleBlockTransition(toolBlock, MessageBlockType.TOOL)
-        toolCallIdToBlockIdMap.set(toolResponse.id, toolBlock.id)
+        toolCallIdToBlockIdMap.set(toolCallKey, toolBlock.id)
       } else {
         logger.warn(
           `[onToolCallPending] Received unhandled tool status: ${toolResponse.status} for ID: ${toolResponse.id}`
@@ -57,20 +62,14 @@ export const createToolCallbacks = (deps: ToolCallbacksDependencies) => {
     },
 
     onToolCallComplete: (toolResponse: MCPToolResponse) => {
-      if (toolResponse?.id) {
-        dispatch(toolPermissionsActions.removeByToolCallId({ toolCallId: toolResponse.id }))
+      const toolCallKey = getToolCallKey(toolResponse)
+      if (toolCallKey) {
+        dispatch(toolPermissionsActions.removeByToolCallId({ toolCallId: toolCallKey }))
       }
-      const existingBlockId = toolCallIdToBlockIdMap.get(toolResponse.id)
-      toolCallIdToBlockIdMap.delete(toolResponse.id)
+      const existingBlockId = toolCallIdToBlockIdMap.get(toolCallKey)
+      toolCallIdToBlockIdMap.delete(toolCallKey)
 
       if (toolResponse.status === 'done' || toolResponse.status === 'error' || toolResponse.status === 'cancelled') {
-        if (!existingBlockId) {
-          logger.error(
-            `[onToolCallComplete] No existing block found for completed/error tool call ID: ${toolResponse.id}. Cannot update.`
-          )
-          return
-        }
-
         const finalStatus =
           toolResponse.status === 'done' || toolResponse.status === 'cancelled'
             ? MessageBlockStatus.SUCCESS
@@ -112,7 +111,25 @@ export const createToolCallbacks = (deps: ToolCallbacksDependencies) => {
             stack: null
           }
         }
-        blockManager.smartBlockUpdate(existingBlockId, changes, MessageBlockType.TOOL, true)
+
+        // Be resilient to out-of-order chunk processing:
+        // If we can't find the existing block (e.g. pending chunk was skipped / mapping lost),
+        // create a new tool block so we still surface the final tool output.
+        if (!existingBlockId) {
+          logger.warn(
+            `[onToolCallComplete] No existing block found for completed/error tool call ID: ${toolCallKey}. Creating a new tool block.`
+          )
+          const toolBlock = createToolBlock(assistantMsgId, toolCallKey, {
+            toolName: toolResponse.tool.name,
+            status: finalStatus,
+            content: changes.content,
+            metadata: changes.metadata,
+            error: changes.error
+          })
+          blockManager.handleBlockTransition(toolBlock, MessageBlockType.TOOL)
+        } else {
+          blockManager.smartBlockUpdate(existingBlockId, changes, MessageBlockType.TOOL, true)
+        }
         // Handle citation block creation for web search results
         if (toolResponse.tool.name === 'builtin_web_search' && toolResponse.response) {
           const citationBlock = createCitationBlock(

@@ -5,6 +5,22 @@ import { expect, vi } from 'vitest'
 
 expect.addSnapshotSerializer(styleSheetSerializer)
 
+// JSDOM/CSSOM compatibility:
+// Some libraries (e.g. @stitches/core via Sandpack) attempt to insert CSS rules that
+// older CSSOM parsers can't handle, causing tests to crash.
+// We defensively ignore insertRule parse errors in the test environment.
+if (typeof CSSStyleSheet !== 'undefined' && CSSStyleSheet.prototype?.insertRule) {
+  const originalInsertRule = CSSStyleSheet.prototype.insertRule
+  // biome-ignore lint/suspicious/noExplicitAny: monkeypatching a DOM API for tests
+  CSSStyleSheet.prototype.insertRule = function (rule: string, index?: number): any {
+    try {
+      return originalInsertRule.call(this, rule, index)
+    } catch {
+      return 0
+    }
+  }
+}
+
 // Mock LoggerService globally for renderer tests
 vi.mock('@logger', async () => {
   const { MockRendererLoggerService, mockRendererLoggerService } = await import('./__mocks__/RendererLoggerService')
@@ -48,3 +64,13 @@ vi.stubGlobal('api', {
     writeWithId: vi.fn().mockResolvedValue(undefined)
   }
 })
+
+// Sandpack (and its styling stack) isn't compatible with JSDOM in a few cases.
+// Mock it globally to avoid CSSOM/runtime issues in unit tests.
+vi.mock('@codesandbox/sandpack-react', () => ({
+  SandpackCodeEditor: () => null,
+  SandpackConsole: () => null,
+  SandpackLayout: ({ children }: any) => children ?? null,
+  SandpackPreview: () => null,
+  SandpackProvider: ({ children }: any) => children ?? null
+}))

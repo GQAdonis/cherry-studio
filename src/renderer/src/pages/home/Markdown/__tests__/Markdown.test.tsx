@@ -16,6 +16,18 @@ vi.mock('@renderer/hooks/useSettings', () => ({
   useSettings: () => mockUseSettings()
 }))
 
+vi.mock('@renderer/hooks/useSmoothStream', () => ({
+  useSmoothStream: ({ onUpdate, initialText }: any) => ({
+    addChunk: (delta: string) => onUpdate(`${initialText ?? ''}${delta}`),
+    reset: (text: string) => onUpdate(text)
+  })
+}))
+
+vi.mock('@renderer/components/MarkdownShadowDOMRenderer', () => ({
+  __esModule: true,
+  default: ({ children }: any) => <div data-testid="markdown-shadow-dom">{children}</div>
+}))
+
 vi.mock('react-i18next', () => ({
   useTranslation: () => mockUseTranslation(),
   initReactI18next: {
@@ -27,26 +39,22 @@ vi.mock('react-i18next', () => ({
 // Mock services
 vi.mock('@renderer/services/EventService', () => ({
   EVENT_NAMES: {
+    SEND_MESSAGE: 'SEND_MESSAGE',
+    CLEAR_MESSAGES: 'CLEAR_MESSAGES',
     EDIT_CODE_BLOCK: 'EDIT_CODE_BLOCK'
   },
   EventEmitter: {
+    on: vi.fn(),
     emit: vi.fn()
   }
 }))
 
-// Mock utilities
-vi.mock('@renderer/utils', () => ({
-  parseJSON: vi.fn((str) => {
-    try {
-      return JSON.parse(str || '{}')
-    } catch {
-      return {}
-    }
-  })
-}))
-
 vi.mock('@renderer/utils/formats', () => ({
   removeSvgEmptyLines: vi.fn((str) => str)
+}))
+
+vi.mock('@renderer/utils/image', () => ({
+  makeSvgSizeAdaptive: vi.fn((svg: string) => svg)
 }))
 
 vi.mock('@renderer/utils/markdown', () => ({

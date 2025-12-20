@@ -264,7 +264,7 @@ describe('Azure Foundry Universal Provider Support', () => {
       const model = createTestModel('GPT-4O')
       const routed = azureFoundryProviderCreator(model, provider)
 
-      expect(routed.type).toBe('openai')
+      expect(routed.type).toBe('azure-openai')
       expect(routed.id).toBe('azure-foundry-openai')
     })
 

@@ -9,23 +9,19 @@ exports[`GraphvizPreview > basic rendering > should match snapshot 1`] = `
 
 <div>
   <div
-    data-insp-path="src/renderer/src/components/Preview/__tests__/GraphvizPreview.test.tsx:14:5:div"
     data-source="graphviz"
     data-testid="image-preview-layout"
   >
     <div
-      data-insp-path="src/renderer/src/components/Preview/__tests__/GraphvizPreview.test.tsx:15:25:div"
       data-testid="toolbar"
     >
       Toolbar
     </div>
     <div
-      data-insp-path="src/renderer/src/components/Preview/__tests__/GraphvizPreview.test.tsx:18:7:div"
       data-testid="preview-content"
     >
       <div
         class="c0 graphviz special-preview"
-        data-insp-path="src/renderer/src/components/Preview/GraphvizPreview.tsx:46:7:ShadowWhiteContainer"
       />
     </div>
   </div>

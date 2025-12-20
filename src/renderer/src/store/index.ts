@@ -71,7 +71,7 @@ const persistedReducer = persistReducer(
   {
     key: 'cherry-studio',
     storage,
-    version: 185,
+    version: 186,
     blacklist: ['runtime', 'messages', 'messageBlocks', 'tabs', 'toolPermissions', 'artifacts'],
     migrate
   },
@@ -130,6 +130,7 @@ export const useAppDispatch = useDispatch.withTypes<AppDispatch>()
 export const useAppSelector = useSelector.withTypes<RootState>()
 export const useAppStore = useStore.withTypes<typeof store>()
 window.store = store
+;(globalThis as any).store = store
 
 export async function handleSaveData() {
   logger.info('Flushing redux persistor data')

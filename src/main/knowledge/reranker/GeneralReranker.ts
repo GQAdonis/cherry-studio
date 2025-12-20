@@ -1,5 +1,5 @@
-import type { KnowledgeBaseParams, KnowledgeSearchResult } from '@types'
 import { loggerService } from '@logger'
+import type { KnowledgeBaseParams, KnowledgeSearchResult } from '@types'
 import { net } from 'electron'
 
 import BaseReranker from './BaseReranker'

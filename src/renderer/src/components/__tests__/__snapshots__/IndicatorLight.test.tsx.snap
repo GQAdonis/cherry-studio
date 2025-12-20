@@ -13,7 +13,6 @@ exports[`IndicatorLight > should match snapshot 1`] = `
 <div
   class="c0"
   color="#22c55e"
-  data-insp-path="src/renderer/src/components/IndicatorLight.tsx:42:10:Light"
   size="8"
 />
 `;

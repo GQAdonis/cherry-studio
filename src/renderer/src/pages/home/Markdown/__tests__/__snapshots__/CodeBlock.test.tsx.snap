@@ -2,16 +2,11 @@
 
 exports[`CodeBlock > rendering > should render a snapshot 1`] = `
 <div>
-  <div
-    data-insp-path="src/renderer/src/pages/home/Markdown/__tests__/CodeBlock.test.tsx:17:5:div"
-  >
-    <code
-      data-insp-path="src/renderer/src/pages/home/Markdown/__tests__/CodeBlock.test.tsx:18:7:code"
-    >
+  <div>
+    <code>
       console.log("hello world")
     </code>
     <button
-      data-insp-path="src/renderer/src/pages/home/Markdown/__tests__/CodeBlock.test.tsx:19:7:button"
       type="button"
     >
       Save

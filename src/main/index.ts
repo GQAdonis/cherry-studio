@@ -8,8 +8,9 @@ import '@main/config'
 import { loggerService } from '@logger'
 import { electronApp, optimizer } from '@electron-toolkit/utils'
 import { replaceDevtoolsFont } from '@main/utils/windowUtil'
-import { app, crashReporter } from 'electron'
-import installExtension, { REACT_DEVELOPER_TOOLS, REDUX_DEVTOOLS } from 'electron-devtools-installer'
+import { app, crashReporter, session } from 'electron'
+import { existsSync } from 'node:fs'
+import { join } from 'node:path'
 import { isDev, isLinux, isWin } from './constant'
 
 import process from 'node:process'
@@ -37,6 +38,36 @@ import { initWebviewHotkeys } from './services/WebviewService'
 import { runAsyncFunction } from './utils'
 
 const logger = loggerService.withContext('MainEntry')
+
+function redactApiKey(apiKey?: string) {
+  if (!apiKey) return apiKey
+  // Keep a tiny prefix so it's useful for debugging which key is in use
+  return `${apiKey.slice(0, 10)}…(redacted)`
+}
+
+async function loadDevtoolsExtensions(): Promise<void> {
+  // In newer Electron versions, `session.loadExtension` is deprecated.
+  // Use `session.extensions.loadExtension` and load from the local cached directory.
+  // We do not download extensions here; this only loads if already present.
+  const extensionsDir = join(app.getPath('userData'), 'extensions')
+
+  const extensions = [
+    // Chrome Web Store extension IDs (used by Electron's extension loader)
+    { id: 'lmhkpmbekcpmknklioeibfkpmmfibljd', name: 'Redux DevTools' },
+    { id: 'fmkadmapgofadopljbjfkapdkoienihi', name: 'React Developer Tools' }
+  ]
+
+  for (const ext of extensions) {
+    const extPath = join(extensionsDir, ext.id)
+    if (!existsSync(extPath)) continue
+    try {
+      await session.defaultSession.extensions.loadExtension(extPath, { allowFileAccess: true })
+      logger.info(`Added Extension:  ${ext.name}`)
+    } catch (error) {
+      logger.warn(`Failed to load extension: ${ext.name}`, error as Error)
+    }
+  }
+}
 
 // enable local crash reports
 crashReporter.start({
@@ -163,9 +194,9 @@ if (!app.requestSingleInstanceLock()) {
     await setupAppImageDeepLink()
 
     if (isDev) {
-      installExtension([REDUX_DEVTOOLS, REACT_DEVELOPER_TOOLS])
-        .then((name) => logger.info(`Added Extension:  ${name}`))
-        .catch((err) => logger.error('An error occurred: ', err))
+      // Avoid deprecated `session.loadExtension` warnings by loading via the modern API.
+      // Extensions will be loaded only if they already exist in userData.
+      await loadDevtoolsExtensions()
     }
 
     //start selection assistant service
@@ -175,7 +206,10 @@ if (!app.requestSingleInstanceLock()) {
       // Start API server if enabled or if agents exist
       try {
         const config = await apiServerService.getCurrentConfig()
-        logger.info('API server config:', config)
+        logger.info('API server config:', {
+          ...config,
+          apiKey: redactApiKey(config.apiKey)
+        })
 
         // Check if there are any agents
         let shouldStart = config.enabled

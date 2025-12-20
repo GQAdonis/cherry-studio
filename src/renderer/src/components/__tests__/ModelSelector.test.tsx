@@ -15,9 +15,13 @@ vi.mock('@renderer/services/ModelService', () => ({
   getModelUniqId: (model: any) => `${model.provider}-${model.id}`
 }))
 
-vi.mock('@renderer/utils', () => ({
-  matchKeywordsInString: (input: string, target: string) => target.toLowerCase().includes(input.toLowerCase())
-}))
+vi.mock('@renderer/utils', async (importOriginal) => {
+  const actual = (await importOriginal()) as any
+  return {
+    ...actual,
+    matchKeywordsInString: (input: string, target: string) => target.toLowerCase().includes(input.toLowerCase())
+  }
+})
 
 vi.mock('@renderer/utils/naming', () => ({
   getFancyProviderName: (provider: any) => provider.name

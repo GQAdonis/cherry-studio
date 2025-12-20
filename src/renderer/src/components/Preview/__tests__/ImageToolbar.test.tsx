@@ -7,7 +7,11 @@ import ImageToolbar from '../ImageToolbar'
 vi.mock('react-i18next', () => ({
   useTranslation: () => ({
     t: (key: string) => key
-  })
+  }),
+  initReactI18next: {
+    type: '3rdParty',
+    init: vi.fn()
+  }
 }))
 
 // Mock ImageToolButton
@@ -35,9 +39,13 @@ vi.mock('@renderer/components/Icons', () => ({
 }))
 
 // Mock utils
-vi.mock('@renderer/utils', () => ({
-  classNames: (...args: any[]) => args.filter(Boolean).join(' ')
-}))
+vi.mock('@renderer/utils', async (importOriginal) => {
+  const actual = (await importOriginal()) as any
+  return {
+    ...actual,
+    classNames: (...args: any[]) => args.filter(Boolean).join(' ')
+  }
+})
 
 describe('ImageToolbar', () => {
   const mockPan = vi.fn()

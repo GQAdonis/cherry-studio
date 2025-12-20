@@ -25,25 +25,19 @@ exports[`KnowledgeBaseFormModal > basic rendering > should match snapshot 1`] = 
 
 <div
   class="c0"
-  data-insp-path="src/renderer/src/pages/knowledge/__tests__/KnowledgeBaseFormModal.test.tsx:32:7:div"
   data-testid="modal"
   styles="[object Object]"
   transitionname="animation-move-down"
   width="min(500px, 60vw)"
 >
   <div
-    data-insp-path="src/renderer/src/pages/knowledge/__tests__/KnowledgeBaseFormModal.test.tsx:33:9:div"
     data-testid="modal-body"
   >
     <div
       class="c1"
-      data-insp-path="src/renderer/src/pages/knowledge/components/KnowledgeSettings/KnowledgeBaseFormModal.tsx:86:7:ContentContainer"
     >
-      <div
-        data-insp-path="src/renderer/src/pages/knowledge/components/KnowledgeSettings/KnowledgeBaseFormModal.tsx:88:26:div"
-      >
+      <div>
         <div
-          data-insp-path="src/renderer/src/pages/knowledge/__tests__/KnowledgeBaseFormModal.test.tsx:49:12:div"
           data-testid="general-panel"
         >
           General Settings Content
@@ -52,24 +46,19 @@ exports[`KnowledgeBaseFormModal > basic rendering > should match snapshot 1`] = 
     </div>
   </div>
   <div
-    data-insp-path="src/renderer/src/pages/knowledge/__tests__/KnowledgeBaseFormModal.test.tsx:34:20:div"
     data-testid="modal-footer"
   >
     <div
       class="c2"
-      data-insp-path="src/renderer/src/pages/knowledge/components/KnowledgeSettings/KnowledgeBaseFormModal.tsx:36:5:FooterContainer"
     >
       <div
-        data-insp-path="src/renderer/src/pages/knowledge/components/KnowledgeSettings/KnowledgeBaseFormModal.tsx:37:7:div"
         style="display: flex; gap: 8px;"
       >
         <button
-          data-insp-path="src/renderer/src/pages/knowledge/__tests__/KnowledgeBaseFormModal.test.tsx:38:5:button"
           data-testid="button"
           type="button"
         >
           <span
-            data-insp-path="src/renderer/src/pages/knowledge/__tests__/KnowledgeBaseFormModal.test.tsx:24:22:span"
             data-testid="chevron-down"
           >
             ▼
@@ -78,18 +67,15 @@ exports[`KnowledgeBaseFormModal > basic rendering > should match snapshot 1`] = 
         </button>
       </div>
       <div
-        data-insp-path="src/renderer/src/pages/knowledge/components/KnowledgeSettings/KnowledgeBaseFormModal.tsx:47:7:div"
         style="display: flex; gap: 8px;"
       >
         <button
-          data-insp-path="src/renderer/src/pages/knowledge/__tests__/KnowledgeBaseFormModal.test.tsx:38:5:button"
           data-testid="button"
           type="button"
         >
           common.cancel
         </button>
         <button
-          data-insp-path="src/renderer/src/pages/knowledge/__tests__/KnowledgeBaseFormModal.test.tsx:38:5:button"
           data-testid="button"
           data-type="primary"
           type="button"

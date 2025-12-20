@@ -31,25 +31,20 @@ exports[`ImageToolbar > should match snapshot 1`] = `
 <div
     aria-label="preview.label"
     class="c0 preview-toolbar"
-    data-insp-path="src/renderer/src/components/Preview/ImageToolbar.tsx:32:5:ToolbarWrapper"
     role="toolbar"
   >
     <div
       class="c1"
-      data-insp-path="src/renderer/src/components/Preview/ImageToolbar.tsx:34:7:ActionButtonRow"
     >
       <div
         class="c2"
-        data-insp-path="src/renderer/src/components/Preview/ImageToolbar.tsx:35:9:Spacer"
       />
       <button
         aria-label="preview.pan_up"
-        data-insp-path="src/renderer/src/components/Preview/__tests__/ImageToolbar.test.tsx:16:5:button"
         role="button"
         type="button"
       >
         <span
-          data-insp-path="src/renderer/src/components/Preview/__tests__/ImageToolbar.test.tsx:24:20:span"
           data-testid="chevron-up"
         >
           ↑
@@ -57,12 +52,10 @@ exports[`ImageToolbar > should match snapshot 1`] = `
       </button>
       <button
         aria-label="preview.dialog"
-        data-insp-path="src/renderer/src/components/Preview/__tests__/ImageToolbar.test.tsx:16:5:button"
         role="button"
         type="button"
       >
         <span
-          data-insp-path="src/renderer/src/components/Preview/__tests__/ImageToolbar.test.tsx:30:15:span"
           data-testid="scan"
         >
           ⊞
@@ -71,16 +64,13 @@ exports[`ImageToolbar > should match snapshot 1`] = `
     </div>
     <div
       class="c1"
-      data-insp-path="src/renderer/src/components/Preview/ImageToolbar.tsx:45:7:ActionButtonRow"
     >
       <button
         aria-label="preview.pan_left"
-        data-insp-path="src/renderer/src/components/Preview/__tests__/ImageToolbar.test.tsx:16:5:button"
         role="button"
         type="button"
       >
         <span
-          data-insp-path="src/renderer/src/components/Preview/__tests__/ImageToolbar.test.tsx:26:22:span"
           data-testid="chevron-left"
         >
           ←
@@ -88,12 +78,10 @@ exports[`ImageToolbar > should match snapshot 1`] = `
       </button>
       <button
         aria-label="preview.reset"
-        data-insp-path="src/renderer/src/components/Preview/__tests__/ImageToolbar.test.tsx:16:5:button"
         role="button"
         type="button"
       >
         <span
-          data-insp-path="src/renderer/src/components/Preview/__tests__/ImageToolbar.test.tsx:34:20:span"
           data-testid="reset"
         >
           ↻
@@ -101,12 +89,10 @@ exports[`ImageToolbar > should match snapshot 1`] = `
       </button>
       <button
         aria-label="preview.pan_right"
-        data-insp-path="src/renderer/src/components/Preview/__tests__/ImageToolbar.test.tsx:16:5:button"
         role="button"
         type="button"
       >
         <span
-          data-insp-path="src/renderer/src/components/Preview/__tests__/ImageToolbar.test.tsx:27:23:span"
           data-testid="chevron-right"
         >
           →
@@ -115,16 +101,13 @@ exports[`ImageToolbar > should match snapshot 1`] = `
     </div>
     <div
       class="c1"
-      data-insp-path="src/renderer/src/components/Preview/ImageToolbar.tsx:60:7:ActionButtonRow"
     >
       <button
         aria-label="preview.zoom_out"
-        data-insp-path="src/renderer/src/components/Preview/__tests__/ImageToolbar.test.tsx:16:5:button"
         role="button"
         type="button"
       >
         <span
-          data-insp-path="src/renderer/src/components/Preview/__tests__/ImageToolbar.test.tsx:29:18:span"
           data-testid="zoom-out"
         >
           -
@@ -132,12 +115,10 @@ exports[`ImageToolbar > should match snapshot 1`] = `
       </button>
       <button
         aria-label="preview.pan_down"
-        data-insp-path="src/renderer/src/components/Preview/__tests__/ImageToolbar.test.tsx:16:5:button"
         role="button"
         type="button"
       >
         <span
-          data-insp-path="src/renderer/src/components/Preview/__tests__/ImageToolbar.test.tsx:25:22:span"
           data-testid="chevron-down"
         >
           ↓
@@ -145,12 +126,10 @@ exports[`ImageToolbar > should match snapshot 1`] = `
       </button>
       <button
         aria-label="preview.zoom_in"
-        data-insp-path="src/renderer/src/components/Preview/__tests__/ImageToolbar.test.tsx:16:5:button"
         role="button"
         type="button"
       >
         <span
-          data-insp-path="src/renderer/src/components/Preview/__tests__/ImageToolbar.test.tsx:28:17:span"
           data-testid="zoom-in"
         >
           +

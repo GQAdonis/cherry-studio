@@ -641,6 +641,7 @@ export const WebSearchProviderIds = {
   tavily: 'tavily',
   searxng: 'searxng',
   exa: 'exa',
+  'exa-mcp': 'exa-mcp',
   bocha: 'bocha',
   'local-google': 'local-google',
   'local-bing': 'local-bing',
@@ -792,6 +793,7 @@ export const BuiltinMCPServerNames = {
   didiMCP: '@cherry/didi-mcp',
   minappController: '@cherry/minapp-controller',
   browserAutomation: '@cherry/browser-automation',
+  browser: '@cherry/browser',
   sdkBridge: '@cherry/sdk-bridge',
   e2b: '@cherry/e2b',
   unstructured: '@cherry/unstructured'

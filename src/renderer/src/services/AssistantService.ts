@@ -6,12 +6,11 @@ import {
   MAX_CONTEXT_COUNT,
   UNLIMITED_CONTEXT_COUNT
 } from '@renderer/config/constant'
+import { getModelSupportedReasoningEffortOptions } from '@renderer/config/models'
 import { isQwenMTModel } from '@renderer/config/models/qwen'
+import { CHERRYAI_PROVIDER } from '@renderer/config/providers'
 import { UNKNOWN } from '@renderer/config/translate'
-import { getStoreProviders } from '@renderer/hooks/useStore'
 import i18n from '@renderer/i18n'
-import store from '@renderer/store'
-import { addAssistant } from '@renderer/store/assistants'
 import type {
   Assistant,
   AssistantPreset,
@@ -25,6 +24,25 @@ import type {
 import { uuid } from '@renderer/utils'
 
 const logger = loggerService.withContext('AssistantService')
+
+const safeT = (key: string) => {
+  try {
+    return i18n.t(key)
+  } catch {
+    return key
+  }
+}
+
+const getReduxStore = () => {
+  return (globalThis as any).store as {
+    getState: () => any
+    dispatch: (action: any) => any
+  }
+}
+
+const getStoreProviders = () => {
+  return getReduxStore().getState().llm.providers.concat([CHERRYAI_PROVIDER])
+}
 
 export const DEFAULT_ASSISTANT_SETTINGS = {
   temperature: DEFAULT_TEMPERATURE,
@@ -43,7 +61,7 @@ export const DEFAULT_ASSISTANT_SETTINGS = {
 export function getDefaultAssistant(): Assistant {
   return {
     id: 'default',
-    name: i18n.t('chat.default.name'),
+    name: safeT('chat.default.name'),
     emoji: '😀',
     prompt: '',
     topics: [getDefaultTopic('default')],
@@ -54,13 +72,17 @@ export function getDefaultAssistant(): Assistant {
   }
 }
 
-export function getDefaultTranslateAssistant(targetLanguage: TranslateLanguage, text: string): TranslateAssistant {
+export function getDefaultTranslateAssistant(
+  targetLanguage: TranslateLanguage,
+  text: string,
+  _settings?: Partial<AssistantSettings>
+): TranslateAssistant {
   const model = getTranslateModel()
   const assistant: Assistant = getDefaultAssistant()
 
   if (!model) {
     logger.error('No translate model')
-    throw new Error(i18n.t('translate.error.not_configured'))
+    throw new Error(safeT('translate.error.not_configured'))
   }
 
   if (targetLanguage.langCode === UNKNOWN.langCode) {
@@ -68,16 +90,19 @@ export function getDefaultTranslateAssistant(targetLanguage: TranslateLanguage, 
     throw new Error('Unknown target language')
   }
 
+  const reasoningEffort = getModelSupportedReasoningEffortOptions(model)?.[0]
   const settings = {
-    temperature: 0.7
-  }
+    temperature: 0.7,
+    reasoning_effort: reasoningEffort,
+    ..._settings
+  } satisfies Partial<AssistantSettings>
 
   const getTranslateContent = (model: Model, text: string, targetLanguage: TranslateLanguage): string => {
     if (isQwenMTModel(model)) {
       return text // QwenMT models handle raw text directly
     }
 
-    return store
+    return getReduxStore()
       .getState()
       .settings.translateModelPrompt.replaceAll('{{target_language}}', targetLanguage.value)
       .replaceAll('{{text}}', text)
@@ -96,7 +121,7 @@ export function getDefaultTranslateAssistant(targetLanguage: TranslateLanguage, 
 }
 
 export function getDefaultAssistantSettings() {
-  return store.getState().assistants.defaultAssistant.settings
+  return getReduxStore().getState().assistants.defaultAssistant.settings
 }
 
 export function getDefaultTopic(assistantId: string): Topic {
@@ -105,7 +130,7 @@ export function getDefaultTopic(assistantId: string): Topic {
     assistantId,
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
-    name: i18n.t('chat.default.topic.name'),
+    name: safeT('chat.default.topic.name'),
     messages: [],
     isNameManuallyEdited: false
   }
@@ -116,15 +141,15 @@ export function getDefaultProvider() {
 }
 
 export function getDefaultModel() {
-  return store.getState().llm.defaultModel
+  return getReduxStore().getState().llm.defaultModel
 }
 
 export function getQuickModel() {
-  return store.getState().llm.quickModel
+  return getReduxStore().getState().llm.quickModel
 }
 
 export function getTranslateModel() {
-  return store.getState().llm.translateModel
+  return getReduxStore().getState().llm.translateModel
 }
 
 export function getAssistantProvider(assistant: Assistant): Provider {
@@ -184,7 +209,7 @@ export const getAssistantSettings = (assistant: Assistant): AssistantSettings =>
 }
 
 export function getAssistantById(id: string) {
-  const assistants = store.getState().assistants.assistants
+  const assistants = getReduxStore().getState().assistants.assistants
   return assistants.find((a) => a.id === id)
 }
 
@@ -204,9 +229,10 @@ export async function createAssistantFromAgent(agent: AssistantPreset) {
     settings: agent.settings || DEFAULT_ASSISTANT_SETTINGS
   }
 
-  store.dispatch(addAssistant(assistant))
+  const { addAssistant } = await import('@renderer/store/assistants')
+  getReduxStore().dispatch(addAssistant(assistant))
 
-  window.toast.success(i18n.t('message.assistant.added.content'))
+  window.toast.success(safeT('message.assistant.added.content'))
 
   return assistant
 }

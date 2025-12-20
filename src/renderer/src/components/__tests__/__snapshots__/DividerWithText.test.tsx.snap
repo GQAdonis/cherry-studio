@@ -21,17 +21,14 @@ exports[`DividerWithText > should match snapshot 1`] = `
 
 <div
   class="c0"
-  data-insp-path="src/renderer/src/components/DividerWithText.tsx:12:5:DividerContainer"
 >
   <span
     class="c1"
-    data-insp-path="src/renderer/src/components/DividerWithText.tsx:13:7:DividerText"
   >
     Test Divider
   </span>
   <div
     class="c2"
-    data-insp-path="src/renderer/src/components/DividerWithText.tsx:14:7:DividerLine"
   />
 </div>
 `;

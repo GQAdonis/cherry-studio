@@ -21,13 +21,23 @@ const logger = loggerService.withContext('SelectionService')
 const isSupportedOS = isWin || isMac
 
 let SelectionHook: SelectionHookConstructor | null = null
+let selectionHookLoadError: Error | null = null
 try {
   //since selection-hook v1.0.0, it supports macOS
   if (isSupportedOS) {
     SelectionHook = require('selection-hook')
   }
 } catch (error) {
-  logger.error('Failed to load selection-hook:', error as Error)
+  selectionHookLoadError = error as Error
+  // Treat this as an optional capability:
+  // - On Apple Silicon, users can end up with an x86_64 native binary installed under node_modules,
+  //   which cannot be loaded by an arm64 Electron runtime.
+  // - The app should still start; only SelectionAssistant should be disabled.
+  logger.warn('selection-hook not available; SelectionAssistant will be disabled', {
+    platform: process.platform,
+    arch: process.arch,
+    error: selectionHookLoadError
+  })
 }
 
 // Type definitions
@@ -108,7 +118,9 @@ export class SelectionService {
   private constructor() {
     try {
       if (!SelectionHook) {
-        throw new Error('module selection-hook not exists')
+        // This should not happen because getInstance() guards on SelectionHook availability,
+        // but keep it defensive to avoid crashing the app startup.
+        throw new Error('selection-hook is not available')
       }
 
       this.selectionHook = new SelectionHook()
@@ -118,12 +130,19 @@ export class SelectionService {
         this.initStatus = true
       }
     } catch (error) {
-      this.logError('Failed to initialize SelectionService:', error as Error)
+      // Don't fail app startup: SelectionAssistant is optional.
+      logger.warn('SelectionService disabled: failed to initialize selection-hook', {
+        platform: process.platform,
+        arch: process.arch,
+        error: error as Error,
+        selectionHookLoadError
+      })
     }
   }
 
   public static getInstance(): SelectionService | null {
-    if (!isSupportedOS) return null
+    // SelectionAssistant is only supported on Windows/macOS AND requires the native selection-hook module.
+    if (!isSupportedOS || !SelectionHook) return null
 
     if (!SelectionService.instance) {
       SelectionService.instance = new SelectionService()
@@ -1586,13 +1605,17 @@ export class SelectionService {
  * @returns {boolean} Success status of initialization
  */
 export function initSelectionService(): boolean {
-  if (!isSupportedOS) return false
+  if (!isSupportedOS || !SelectionHook) return false
 
   configManager.subscribe(ConfigKeys.SelectionAssistantEnabled, (enabled: boolean): void => {
     //avoid closure
     const ss = SelectionService.getInstance()
     if (!ss) {
-      logger.error('SelectionService not initialized: instance is null')
+      logger.warn('SelectionService not initialized: selection-hook unavailable', {
+        platform: process.platform,
+        arch: process.arch,
+        selectionHookLoadError
+      })
       return
     }
 
@@ -1607,7 +1630,11 @@ export function initSelectionService(): boolean {
 
   const ss = SelectionService.getInstance()
   if (!ss) {
-    logger.error('SelectionService not initialized: instance is null')
+    logger.warn('SelectionService not initialized: selection-hook unavailable', {
+      platform: process.platform,
+      arch: process.arch,
+      selectionHookLoadError
+    })
     return false
   }
 

@@ -3,12 +3,10 @@
 exports[`ImageToolButton > should match snapshot 1`] = `
 <DocumentFragment>
   <div
-    data-insp-path="src/renderer/src/components/Preview/__tests__/ImageToolButton.test.tsx:13:43:div"
     title="Test tooltip"
   >
     <button
       aria-label="Test tooltip"
-      data-insp-path="src/renderer/src/components/Preview/__tests__/ImageToolButton.test.tsx:9:5:button"
       data-testid="custom-button"
       icon="[object Object]"
       role="button"

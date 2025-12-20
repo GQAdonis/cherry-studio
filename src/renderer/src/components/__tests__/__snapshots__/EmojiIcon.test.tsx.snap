@@ -31,11 +31,9 @@ exports[`EmojiIcon > should match snapshot 1`] = `
 
 <div
   class="c0"
-  data-insp-path="src/renderer/src/components/EmojiIcon.tsx:13:5:Container"
 >
   <div
     class="c1"
-    data-insp-path="src/renderer/src/components/EmojiIcon.tsx:14:7:EmojiBackground"
   >
     🎉
   </div>

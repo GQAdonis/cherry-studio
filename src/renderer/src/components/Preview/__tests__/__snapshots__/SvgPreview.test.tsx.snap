@@ -9,23 +9,19 @@ exports[`SvgPreview > basic rendering > should match snapshot 1`] = `
 
 <div>
   <div
-    data-insp-path="src/renderer/src/components/Preview/__tests__/SvgPreview.test.tsx:8:5:div"
     data-source="svg"
     data-testid="image-preview-layout"
   >
     <div
-      data-insp-path="src/renderer/src/components/Preview/__tests__/SvgPreview.test.tsx:9:25:div"
       data-testid="toolbar"
     >
       Toolbar
     </div>
     <div
-      data-insp-path="src/renderer/src/components/Preview/__tests__/SvgPreview.test.tsx:12:7:div"
       data-testid="preview-content"
     >
       <div
         class="c0 svg-preview special-preview"
-        data-insp-path="src/renderer/src/components/Preview/SvgPreview.tsx:39:7:ShadowTransparentContainer"
       />
     </div>
   </div>

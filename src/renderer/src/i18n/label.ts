@@ -349,6 +349,7 @@ const builtInMcpDescriptionKeyMap: Record<BuiltinMCPServerName, string> = {
   [BuiltinMCPServerNames.didiMCP]: 'settings.mcp.builtinServersDescriptions.didi_mcp',
   [BuiltinMCPServerNames.minappController]: 'settings.mcp.builtinServersDescriptions.minapp_controller',
   [BuiltinMCPServerNames.browserAutomation]: 'settings.mcp.builtinServersDescriptions.browser_automation',
+  [BuiltinMCPServerNames.browser]: 'settings.mcp.builtinServersDescriptions.browser',
   [BuiltinMCPServerNames.sdkBridge]: 'settings.mcp.builtinServersDescriptions.sdk_bridge',
   [BuiltinMCPServerNames.e2b]: 'settings.mcp.builtinServersDescriptions.e2b',
   [BuiltinMCPServerNames.unstructured]: 'settings.mcp.builtinServersDescriptions.unstructured'

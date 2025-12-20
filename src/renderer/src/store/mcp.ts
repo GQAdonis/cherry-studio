@@ -177,6 +177,15 @@ export const builtinMCPServers: BuiltinMCPServer[] = [
   },
   {
     id: nanoid(),
+    name: BuiltinMCPServerNames.browser,
+    type: 'inMemory',
+    isActive: false,
+    provider: 'CherryAI',
+    installSource: 'builtin',
+    isTrusted: true
+  },
+  {
+    id: nanoid(),
     name: BuiltinMCPServerNames.e2b,
     reference: 'https://e2b.dev/docs',
     type: 'inMemory',

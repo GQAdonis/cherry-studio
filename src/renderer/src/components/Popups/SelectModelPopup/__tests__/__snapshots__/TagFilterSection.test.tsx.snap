@@ -14,11 +14,9 @@ exports[`TagFilterSection > rendering > should match snapshot 1`] = `
 <div>
   <div
     class="c0"
-    data-insp-path="src/renderer/src/components/Popups/SelectModelPopup/TagFilterSection.tsx:50:5:FilterContainer"
   >
     <span
       class="c1"
-      data-insp-path="src/renderer/src/components/Popups/SelectModelPopup/TagFilterSection.tsx:52:9:FilterText"
     >
       models.filter.by_tag
     </span>
