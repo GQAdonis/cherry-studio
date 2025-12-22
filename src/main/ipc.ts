@@ -18,6 +18,7 @@ import { handleZoomFactor } from '@main/utils/zoom'
 import type { SpanEntity, TokenUsage } from '@mcp-trace/trace-core'
 import type { UpgradeChannel } from '@shared/config/constant'
 import { MIN_WINDOW_HEIGHT, MIN_WINDOW_WIDTH } from '@shared/config/constant'
+import type { LocalTransferConnectPayload } from '@shared/config/types'
 import { IpcChannel } from '@shared/IpcChannel'
 import type { PluginError } from '@types'
 import type {
@@ -50,6 +51,8 @@ import { ExportService } from './services/ExportService'
 import { fileStorage as fileManager } from './services/FileStorage'
 import FileService from './services/FileSystemService'
 import KnowledgeService from './services/KnowledgeService'
+import { lanTransferClientService } from './services/lanTransfer'
+import { localTransferService } from './services/LocalTransferService'
 import mcpService from './services/MCPService'
 import MemoryService from './services/memory/MemoryService'
 import { openTraceWindow, setTraceWindowTitle } from './services/NodeTraceService'
@@ -82,7 +85,6 @@ import storeSyncService from './services/StoreSyncService'
 import { themeService } from './services/ThemeService'
 import { unstructuredService } from './services/UnstructuredService'
 import VertexAIService from './services/VertexAIService'
-import WebSocketService from './services/WebSocketService'
 import { setOpenLinkExternal } from './services/WebviewService'
 import { windowService } from './services/WindowService'
 import { calculateDirectorySize, getResourcePath } from './utils'
@@ -585,6 +587,8 @@ export function registerIpc(mainWindow: BrowserWindow, app: Electron.App) {
   ipcMain.handle(IpcChannel.Backup_ListS3Files, backupManager.listS3Files.bind(backupManager))
   ipcMain.handle(IpcChannel.Backup_DeleteS3File, backupManager.deleteS3File.bind(backupManager))
   ipcMain.handle(IpcChannel.Backup_CheckS3Connection, backupManager.checkS3Connection.bind(backupManager))
+  ipcMain.handle(IpcChannel.Backup_CreateLanTransferBackup, backupManager.createLanTransferBackup.bind(backupManager))
+  ipcMain.handle(IpcChannel.Backup_DeleteTempBackup, backupManager.deleteTempBackup.bind(backupManager))
 
   // file
   ipcMain.handle(IpcChannel.File_Open, fileManager.open.bind(fileManager))
@@ -1152,12 +1156,17 @@ export function registerIpc(mainWindow: BrowserWindow, app: Electron.App) {
     }
   })
 
-  // WebSocket
-  ipcMain.handle(IpcChannel.WebSocket_Start, WebSocketService.start)
-  ipcMain.handle(IpcChannel.WebSocket_Stop, WebSocketService.stop)
-  ipcMain.handle(IpcChannel.WebSocket_Status, WebSocketService.getStatus)
-  ipcMain.handle(IpcChannel.WebSocket_SendFile, WebSocketService.sendFile)
-  ipcMain.handle(IpcChannel.WebSocket_GetAllCandidates, WebSocketService.getAllCandidates)
+  ipcMain.handle(IpcChannel.LocalTransfer_ListServices, () => localTransferService.getState())
+  ipcMain.handle(IpcChannel.LocalTransfer_StartScan, () => localTransferService.startDiscovery({ resetList: true }))
+  ipcMain.handle(IpcChannel.LocalTransfer_StopScan, () => localTransferService.stopDiscovery())
+  ipcMain.handle(IpcChannel.LocalTransfer_Connect, (_, payload: LocalTransferConnectPayload) =>
+    lanTransferClientService.connectAndHandshake(payload)
+  )
+  ipcMain.handle(IpcChannel.LocalTransfer_Disconnect, () => lanTransferClientService.disconnect())
+  ipcMain.handle(IpcChannel.LocalTransfer_SendFile, (_, payload: { filePath: string }) =>
+    lanTransferClientService.sendFile(payload.filePath)
+  )
+  ipcMain.handle(IpcChannel.LocalTransfer_CancelTransfer, () => lanTransferClientService.cancelTransfer())
 
   ipcMain.handle(IpcChannel.APP_CrashRenderProcess, () => {
     mainWindow.webContents.forcefullyCrashRenderer()

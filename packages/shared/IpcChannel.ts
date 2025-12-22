@@ -233,6 +233,8 @@ export enum IpcChannel {
   Backup_ListS3Files = 'backup:listS3Files',
   Backup_DeleteS3File = 'backup:deleteS3File',
   Backup_CheckS3Connection = 'backup:checkS3Connection',
+  Backup_CreateLanTransferBackup = 'backup:createLanTransferBackup',
+  Backup_DeleteTempBackup = 'backup:deleteTempBackup',
 
   // zip
   Zip_Compress = 'zip:compress',
@@ -452,5 +454,16 @@ export enum IpcChannel {
   E2B_GetSandboxInfo = 'e2b:get-sandbox-info',
   E2B_TestConnection = 'e2b:test-connection',
   E2B_CloseSandbox = 'e2b:close-sandbox',
-  E2B_ExecuteForTool = 'e2b:execute-for-tool'
+  E2B_ExecuteForTool = 'e2b:execute-for-tool',
+
+  // Local Transfer
+  LocalTransfer_ListServices = 'local-transfer:list',
+  LocalTransfer_StartScan = 'local-transfer:start-scan',
+  LocalTransfer_StopScan = 'local-transfer:stop-scan',
+  LocalTransfer_ServicesUpdated = 'local-transfer:services-updated',
+  LocalTransfer_Connect = 'local-transfer:connect',
+  LocalTransfer_Disconnect = 'local-transfer:disconnect',
+  LocalTransfer_ClientEvent = 'local-transfer:client-event',
+  LocalTransfer_SendFile = 'local-transfer:send-file',
+  LocalTransfer_CancelTransfer = 'local-transfer:cancel-transfer'
 }
