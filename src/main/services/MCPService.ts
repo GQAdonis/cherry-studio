@@ -629,13 +629,13 @@ class McpService {
       // Set up logging message notification handler
       client.setNotificationHandler(LoggingMessageNotificationSchema, async (notification) => {
         logger.debug(`Message from server ${server.name}:`, notification.params)
-        const msg = notification.params?.message
-        if (msg) {
+        const data = notification.params?.data
+        if (data !== undefined && data !== null) {
           this.emitServerLog(server, {
             timestamp: Date.now(),
             level: (notification.params?.level as MCPServerLogEntry['level']) || 'info',
-            message: typeof msg === 'string' ? msg : JSON.stringify(msg),
-            data: redactSensitive(notification.params?.data),
+            message: typeof data === 'string' ? data : JSON.stringify(data),
+            data: redactSensitive(data),
             source: notification.params?.logger || 'server'
           })
         }
