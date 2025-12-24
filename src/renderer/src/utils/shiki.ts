@@ -171,7 +171,7 @@ export async function getMarkdownIt(theme: string, markdown: string) {
   }
 
   md.use(
-    fromHighlighter(highlighter, {
+    fromHighlighter(highlighter as any, {
       themes,
       defaultColor: actualTheme,
       defaultLanguage: 'json',

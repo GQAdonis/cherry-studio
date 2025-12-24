@@ -9,7 +9,7 @@ import { google } from '@ai-sdk/google'
 import { vertexAnthropic } from '@ai-sdk/google-vertex/anthropic/edge'
 import { vertex } from '@ai-sdk/google-vertex/edge'
 import { combineHeaders } from '@ai-sdk/provider-utils'
-import type { AnthropicSearchConfig, WebSearchPluginConfig } from '@cherrystudio/ai-core/built-in/plugins'
+import type { WebSearchPluginConfig } from '@cherrystudio/ai-core/built-in/plugins'
 import { isBaseProvider } from '@cherrystudio/ai-core/core/providers/schemas'
 import type { BaseProviderId } from '@cherrystudio/ai-core/provider'
 import { loggerService } from '@logger'
@@ -171,7 +171,7 @@ export async function buildStreamTextParams(
       }) as ProviderDefinedTool
     } else if (aiSdkProviderId === 'azure-anthropic') {
       const blockedDomains = mapRegexToPatterns(webSearchConfig.excludeDomains)
-      const anthropicSearchOptions: AnthropicSearchConfig = {
+      const anthropicSearchOptions = {
         maxUses: webSearchConfig.maxResults,
         blockedDomains: blockedDomains.length > 0 ? blockedDomains : undefined
       }
