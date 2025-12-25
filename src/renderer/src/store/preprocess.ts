@@ -1,6 +1,7 @@
 import type { PayloadAction } from '@reduxjs/toolkit'
 import { createSlice } from '@reduxjs/toolkit'
 import { getDefaultEnabledMimeTypes } from '@renderer/config/unstructuredMimeTypes'
+
 import type { PreprocessProvider } from '@renderer/types'
 
 export interface PreprocessState {
@@ -48,6 +49,7 @@ const initialState: PreprocessState = {
         enableChatTool: false,
         enabledMimeTypes: getDefaultEnabledMimeTypes()
       }
+
     }
   ],
   defaultProvider: 'mineru'

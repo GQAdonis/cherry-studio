@@ -24,6 +24,7 @@ import TranslateSettingsPopup from '../TranslateSettingsPopup/TranslateSettingsP
 import ContextManagementSettings from './ContextManagementSettings'
 import DefaultAssistantSettings from './DefaultAssistantSettings'
 import McpContentSettings from './McpContentSettings'
+
 import TopicNamingModalPopup from './QuickModelPopup'
 
 const ModelSettings: FC = () => {
@@ -135,6 +136,7 @@ const ModelSettings: FC = () => {
       </SettingGroup>
       <ContextManagementSettings />
       <McpContentSettings />
+
     </SettingContainer>
   )
 }

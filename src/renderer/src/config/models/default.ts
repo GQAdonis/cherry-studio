@@ -426,6 +426,7 @@ export const SYSTEM_MODELS: Record<SystemProviderId | 'defaultModel', Model[]> =
     // AI21 Labs Models
     { id: 'jamba-1.5-large', name: 'Jamba 1.5 Large', provider: 'azure-foundry', group: 'AI21 Labs' }
   ],
+
   gemini: [
     {
       id: 'gemini-2.5-flash',
@@ -704,6 +705,13 @@ export const SYSTEM_MODELS: Record<SystemProviderId | 'defaultModel', Model[]> =
       group: 'GLM-4.6'
     },
     {
+      id: 'glm-4.7',
+      provider: 'zhipu',
+      name: 'GLM-4.7',
+      group: 'GLM-4.7'
+    },
+    {
+
       id: 'glm-4.5',
       provider: 'zhipu',
       name: 'GLM-4.5',
@@ -1007,6 +1015,13 @@ export const SYSTEM_MODELS: Record<SystemProviderId | 'defaultModel', Model[]> =
       provider: 'minimax',
       name: 'MiniMax M2 Stable',
       group: 'minimax-m2'
+    },
+    {
+      id: 'MiniMax-M2.1',
+      provider: 'minimax',
+      name: 'MiniMax M2.1',
+      group: 'minimax-m2'
+
     }
   ],
   hyperbolic: [

@@ -68,6 +68,7 @@ export const TOOL_SPECS: Record<string, ActionToolSpec> = {
     type: 'quick',
     order: 15
   },
+
   'zoom-in': {
     id: 'zoom-in',
     type: 'quick',

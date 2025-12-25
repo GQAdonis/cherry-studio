@@ -7,6 +7,7 @@ import MineruPreprocessProvider from './MineruPreprocessProvider'
 import MistralPreprocessProvider from './MistralPreprocessProvider'
 import OpenMineruPreprocessProvider from './OpenMineruPreprocessProvider'
 import UnstructuredPreprocessProvider from './UnstructuredPreprocessProvider'
+
 export default class PreprocessProviderFactory {
   static create(provider: PreprocessProvider, userId?: string): BasePreprocessProvider {
     switch (provider.id) {
@@ -20,6 +21,7 @@ export default class PreprocessProviderFactory {
         return new OpenMineruPreprocessProvider(provider, userId)
       case 'unstructured':
         return new UnstructuredPreprocessProvider(provider, userId)
+
       default:
         return new DefaultPreprocessProvider(provider)
     }

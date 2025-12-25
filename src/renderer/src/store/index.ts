@@ -38,25 +38,11 @@ import websearch from './websearch'
 const logger = loggerService.withContext('Store')
 
 const rootReducer = combineReducers({
-  artifacts,
   assistants,
+  artifacts,
   backup,
   codeTools,
-  nutstore,
-  paintings,
-  llm,
-  settings,
-  runtime,
-  shortcuts,
-  knowledge,
-  minapps,
-  websearch,
-  mcp,
-  memory,
   copilot,
-  selectionStore,
-  tabs,
-  preprocess,
   e2b,
   messages: newMessagesReducer,
   messageBlocks: messageBlocksReducer,
@@ -64,7 +50,21 @@ const rootReducer = combineReducers({
   translate,
   ocr,
   note,
-  toolPermissions
+  nutstore,
+  toolPermissions,
+  knowledge,
+  llm,
+  mcp,
+  memory,
+  minapps,
+  paintings,
+  preprocess,
+  runtime,
+  selectionStore,
+  settings,
+  shortcuts,
+  tabs,
+  websearch
 })
 
 const persistedReducer = persistReducer(

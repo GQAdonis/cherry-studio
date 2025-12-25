@@ -363,6 +363,7 @@ export const SYSTEM_PROVIDERS_CONFIG: Record<SystemProviderId, SystemProvider> =
     notes:
       'Unified access to 10+ model providers: OpenAI, Anthropic, Meta, Mistral, Cohere, DeepSeek, xAI, Microsoft, and more.'
   },
+
   gemini: {
     id: 'gemini',
     name: 'Gemini',
@@ -762,6 +763,7 @@ export const PROVIDER_LOGO_MAP: AtLeast<SystemProviderId, string> = {
   nvidia: NvidiaProviderLogo,
   'azure-openai': AzureProviderLogo,
   'azure-foundry': AzureProviderLogo,
+
   hunyuan: HunyuanProviderLogo,
   grok: GrokProviderLogo,
   hyperbolic: HyperbolicProviderLogo,
@@ -1290,6 +1292,7 @@ export const PROVIDER_URLS: Record<SystemProviderId, ProviderUrls> = {
       models: 'https://ai.azure.com/explore/models'
     }
   },
+
   'baidu-cloud': {
     api: {
       url: 'https://qianfan.baidubce.com/v2/'

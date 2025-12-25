@@ -7,6 +7,7 @@ import type { BasicPreviewHandles } from './types'
 import { renderSvgInShadowHost } from './utils'
 
 export interface SvgPreviewProps {
+
   children: string
   enableToolbar?: boolean
   className?: string

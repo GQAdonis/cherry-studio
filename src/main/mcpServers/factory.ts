@@ -18,6 +18,7 @@ import SDKBridgeServer from './sdk-bridge'
 import ThinkingServer from './sequentialthinking'
 import UnstructuredServer from './unstructured'
 
+
 const logger = loggerService.withContext('MCPFactory')
 
 export function createInMemoryMCPServer(
@@ -73,6 +74,7 @@ export function createInMemoryMCPServer(
       const apiHost = envs.UNSTRUCTURED_API_URL
       return new UnstructuredServer(apiKey, apiHost).server
     }
+
     case BuiltinMCPServerNames.browser: {
       return new BrowserServer().server
     }

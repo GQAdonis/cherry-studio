@@ -20,6 +20,7 @@ export const EnhancedImage = Image.extend({
       allowBase64: true,
       inline: false,
       resize: false,
+
       HTMLAttributes: {
         class: 'rich-editor-image'
       }

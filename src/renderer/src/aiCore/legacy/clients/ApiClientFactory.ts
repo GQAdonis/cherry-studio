@@ -77,6 +77,7 @@ export class ApiClientFactory {
         break
       case 'azure-openai':
       case 'azure-foundry':
+
       case 'openai-response':
         instance = new OpenAIResponseAPIClient(provider) as BaseApiClient
         break

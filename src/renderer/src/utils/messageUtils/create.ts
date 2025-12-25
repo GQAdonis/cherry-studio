@@ -8,6 +8,7 @@ import type {
   CodeMessageBlock,
   CompactMessageBlock,
   ContextActionMessageBlock,
+
   ErrorMessageBlock,
   FileMessageBlock,
   ImageMessageBlock,
@@ -338,6 +339,7 @@ export function createContextActionBlock(
 }
 
 /**
+
  * Creates a new Message object
  * @param role - The role of the message sender ('user' or 'assistant').
  * @param topicId - The ID of the topic this message belongs to.

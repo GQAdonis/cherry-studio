@@ -318,6 +318,8 @@ export enum IpcChannel {
   Memory_DeleteUser = 'memory:delete-user',
   Memory_DeleteAllMemoriesForUser = 'memory:delete-all-memories-for-user',
   Memory_GetUsersList = 'memory:get-users-list',
+  Memory_MigrateMemoryDb = 'memory:migrate-memory-db',
+
 
   // TRACE
   TRACE_SAVE_DATA = 'trace:saveData',
@@ -455,6 +457,7 @@ export enum IpcChannel {
   E2B_TestConnection = 'e2b:test-connection',
   E2B_CloseSandbox = 'e2b:close-sandbox',
   E2B_ExecuteForTool = 'e2b:execute-for-tool',
+
 
   // Local Transfer
   LocalTransfer_ListServices = 'local-transfer:list',

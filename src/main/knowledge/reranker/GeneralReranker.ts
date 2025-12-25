@@ -1,10 +1,12 @@
 import { loggerService } from '@logger'
+
 import type { KnowledgeBaseParams, KnowledgeSearchResult } from '@types'
 import { net } from 'electron'
 
 import BaseReranker from './BaseReranker'
 
 const logger = loggerService.withContext('GeneralReranker')
+
 
 interface RerankError extends Error {
   response?: {
@@ -23,6 +25,7 @@ export class RerankModelNotSupportedError extends Error {
     this.name = 'RerankModelNotSupportedError'
   }
 }
+
 
 export default class GeneralReranker extends BaseReranker {
   constructor(base: KnowledgeBaseParams) {
@@ -71,6 +74,7 @@ export default class GeneralReranker extends BaseReranker {
           throw new RerankModelNotSupportedError(`Model "${model}" is not supported for reranking`, model)
         }
 
+
         const error = new Error(`HTTP ${response.status}: ${response.statusText}`) as RerankError
         // Attach response details to the error object for formatErrorMessage
         error.response = {
@@ -90,6 +94,7 @@ export default class GeneralReranker extends BaseReranker {
       if (error instanceof RerankModelNotSupportedError) {
         throw error
       }
+
       const errorDetails = this.formatErrorMessage(url, error, requestBody)
       throw new Error(`重排序请求失败: ${error.message}\n请求详情: ${errorDetails}`)
     }

@@ -12,6 +12,7 @@ export const ProviderTypeSchema = z.enum([
   'gemini',
   'azure-openai',
   'azure-foundry',
+
   'vertexai',
   'mistral',
   'aws-bedrock',
@@ -103,6 +104,7 @@ export type Provider = {
   apiKey: string
   apiHost: string
   openaiApiHost?: string
+
   anthropicApiHost?: string
   isAnthropicModel?: (m: Model) => boolean
   apiVersion?: string
@@ -157,6 +159,7 @@ export const SystemProviderIdSchema = z.enum([
   'openai',
   'azure-openai',
   'azure-foundry',
+
   'gemini',
   'vertexai',
   'github',
@@ -229,6 +232,7 @@ export const SystemProviderIds = {
   openai: 'openai',
   'azure-openai': 'azure-openai',
   'azure-foundry': 'azure-foundry',
+
   gemini: 'gemini',
   vertexai: 'vertexai',
   github: 'github',
@@ -295,6 +299,7 @@ export type AzureFoundryProvider = Provider & {
   apiVersion: string
   openaiApiHost?: string
 }
+
 
 /**
  * 判断是否为系统内置的提供商。比直接使用`provider.isSystem`更好，因为该数据字段不会随着版本更新而变化。

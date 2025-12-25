@@ -32,6 +32,7 @@ const providerKeyMap = {
   'aws-bedrock': 'provider.aws-bedrock',
   'azure-openai': 'provider.azure-openai',
   'azure-foundry': 'provider.azure-foundry',
+
   baichuan: 'provider.baichuan',
   'baidu-cloud': 'provider.baidu-cloud',
   burncloud: 'provider.burncloud',
@@ -139,6 +140,7 @@ const titleKeyMap = {
   store: 'title.store',
   apps: 'title.apps',
   artifacts: 'artifacts.title',
+
   code: 'title.code',
   files: 'title.files',
   home: 'title.home',
@@ -340,6 +342,7 @@ const builtInMcpDescriptionKeyMap: Record<BuiltinMCPServerName, string> = {
   [BuiltinMCPServerNames.sdkBridge]: 'settings.mcp.builtinServersDescriptions.sdk_bridge',
   [BuiltinMCPServerNames.e2b]: 'settings.mcp.builtinServersDescriptions.e2b',
   [BuiltinMCPServerNames.unstructured]: 'settings.mcp.builtinServersDescriptions.unstructured',
+
   [BuiltinMCPServerNames.nowledgeMem]: 'settings.mcp.builtinServersDescriptions.nowledge_mem'
 } as const
 

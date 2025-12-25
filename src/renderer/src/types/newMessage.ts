@@ -35,6 +35,7 @@ export enum MessageBlockType {
   COMPACT = 'compact', // Compact command response
   ARTIFACT = 'artifact', // AI-generated artifact (HTMX, HTML, React, etc.)
   CONTEXT_ACTION = 'context_action' // Context management action (pruning, etc.)
+
 }
 
 // 块状态定义
@@ -173,6 +174,7 @@ export interface ContextActionMessageBlock extends BaseMessageBlock {
   removedCount?: number
 }
 
+
 // MessageBlock 联合类型
 export type MessageBlock =
   | PlaceholderMessageBlock
@@ -189,6 +191,7 @@ export type MessageBlock =
   | CompactMessageBlock
   | ArtifactMessageBlock
   | ContextActionMessageBlock
+
 
 export enum UserMessageStatus {
   SUCCESS = 'success'

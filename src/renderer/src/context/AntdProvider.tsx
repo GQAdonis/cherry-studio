@@ -124,6 +124,7 @@ const AntdProvider: FC<PropsWithChildren> = ({ children }) => {
           // Border colors
           colorBorder: 'var(--color-border)',
           colorBorderSecondary: 'var(--color-border-soft)'
+
         }
       }}>
       {children}

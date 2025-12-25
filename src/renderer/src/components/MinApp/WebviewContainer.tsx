@@ -1,6 +1,7 @@
 import { loggerService } from '@logger'
 import { useSettings } from '@renderer/hooks/useSettings'
 import { getMinAppContentScript } from '@renderer/utils/minAppContentScript'
+
 import type { WebviewTag } from 'electron'
 import { memo, useEffect, useRef } from 'react'
 
@@ -93,6 +94,7 @@ const WebviewContainer = memo(
           webviewRef.current.executeJavaScript(contentScript).catch((err) => {
             logger.debug(`Failed to inject content script for ${appid}:`, err)
           })
+
         }
       }
 

@@ -1,4 +1,5 @@
 import { GlobalOutlined } from '@ant-design/icons'
+
 import { Navbar, NavbarCenter } from '@renderer/components/app/Navbar'
 import { McpLogo } from '@renderer/components/Icons'
 import Scrollbar from '@renderer/components/Scrollbar'
@@ -9,6 +10,7 @@ import {
   Brain,
   Cloud,
   Code2,
+
   Command,
   FileCode,
   HardDrive,
@@ -41,6 +43,7 @@ import MCPSettings from './MCPSettings'
 import MemorySettings from './MemorySettings'
 import MinAppSettings from './MinAppSettings'
 import NotesSettings from './NotesSettings'
+
 import { ProviderList } from './ProviderSettings'
 import QuickAssistantSettings from './QuickAssistantSettings'
 import QuickPhraseSettings from './QuickPhraseSettings'
@@ -136,6 +139,7 @@ const SettingsPage: FC = () => {
               {t('settings.contextStrategy.nav_title', { defaultValue: 'Context Management' })}
             </MenuItem>
           </MenuItemLink>
+
           <MenuItemLink to="/settings/api-server">
             <MenuItem className={isRoute('/settings/api-server')}>
               <Server size={18} />
@@ -154,6 +158,7 @@ const SettingsPage: FC = () => {
               E2B Code Interpreter
             </MenuItem>
           </MenuItemLink>
+
           <MenuItemLink to="/settings/quickphrase">
             <MenuItem className={isRoute('/settings/quickphrase')}>
               <Zap size={18} />
@@ -200,6 +205,7 @@ const SettingsPage: FC = () => {
             <Route path="minapp" element={<MinAppSettings />} />
             <Route path="memory" element={<MemorySettings />} />
             <Route path="context" element={<ContextManagementSettings />} />
+
             <Route path="general/*" element={<GeneralSettings />} />
             <Route path="display" element={<DisplaySettings />} />
             <Route path="shortcut" element={<ShortcutSettings />} />
@@ -208,6 +214,7 @@ const SettingsPage: FC = () => {
             <Route path="data" element={<DataSettings />} />
             <Route path="notes" element={<NotesSettings />} />
             <Route path="artifacts" element={<ArtifactSettings />} />
+
             <Route path="about" element={<AboutSettings />} />
           </Routes>
         </SettingContent>

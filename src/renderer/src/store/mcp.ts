@@ -216,6 +216,7 @@ export const builtinMCPServers: BuiltinMCPServer[] = [
   },
   {
     id: nanoid(),
+
     name: BuiltinMCPServerNames.nowledgeMem,
     reference: 'https://mem.nowledge.co/',
     type: 'inMemory',

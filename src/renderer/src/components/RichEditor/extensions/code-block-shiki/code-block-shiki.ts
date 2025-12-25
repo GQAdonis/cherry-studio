@@ -23,6 +23,7 @@ export const CodeBlockShiki = CodeBlock.extend<CodeBlockShikiOptions>({
       },
       enableTabIndentation: true,
       tabSize: 2
+
     }
   },
 

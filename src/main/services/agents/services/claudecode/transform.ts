@@ -59,6 +59,7 @@ const finishReasonMapping: Record<BetaStopReason, FinishReason> = {
   pause_turn: 'unknown',
   refusal: 'content-filter',
   model_context_window_exceeded: 'length'
+
 }
 
 const emptyUsage: LanguageModelUsage = {

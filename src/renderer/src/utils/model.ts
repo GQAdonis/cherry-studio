@@ -213,3 +213,4 @@ export function isXAIModelId(modelId: string): boolean {
 export function isAI21ModelId(modelId: string): boolean {
   return /jamba/i.test(modelId)
 }
+
