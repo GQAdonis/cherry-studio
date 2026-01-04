@@ -5,7 +5,6 @@ import { createBaseCallbacks } from './baseCallbacks'
 import { createCitationCallbacks } from './citationCallbacks'
 import { createCompactCallbacks } from './compactCallbacks'
 import { createContextActionCallbacks } from './contextActionCallbacks'
-
 import { createImageCallbacks } from './imageCallbacks'
 import { createTextCallbacks } from './textCallbacks'
 import { createThinkingCallbacks } from './thinkingCallbacks'
@@ -25,6 +24,12 @@ interface CallbacksDependencies {
 export const createCallbacks = (deps: CallbacksDependencies) => {
   const { blockManager, dispatch, getState, topicId, assistantMsgId, saveUpdatesToDB, assistant } = deps
 
+  // 首先创建 thinkingCallbacks ，以便传递 getCurrentThinkingInfo 给 baseCallbacks
+  const thinkingCallbacks = createThinkingCallbacks({
+    blockManager,
+    assistantMsgId
+  })
+
   // 创建基础回调
   const baseCallbacks = createBaseCallbacks({
     blockManager,
@@ -33,13 +38,8 @@ export const createCallbacks = (deps: CallbacksDependencies) => {
     topicId,
     assistantMsgId,
     saveUpdatesToDB,
-    assistant
-  })
-
-  // 创建各类回调
-  const thinkingCallbacks = createThinkingCallbacks({
-    blockManager,
-    assistantMsgId
+    assistant,
+    getCurrentThinkingInfo: thinkingCallbacks.getCurrentThinkingInfo
   })
 
   const toolCallbacks = createToolCallbacks({
@@ -65,7 +65,6 @@ export const createCallbacks = (deps: CallbacksDependencies) => {
     blockManager,
     assistantMsgId
   })
-
 
   const compactCallbacks = createCompactCallbacks({
     blockManager,

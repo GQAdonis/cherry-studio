@@ -1,6 +1,6 @@
 {
   "name": "CherryStudio",
-  "version": "1.7.8",
+  "version": "1.7.9",
   "private": true,
   "description": "The Boss - A powerful AI assistant",
   "main": "./out/main/index.js",
