@@ -1,7 +1,13 @@
+import crypto from 'node:crypto'
+import fs from 'node:fs'
+import path from 'node:path'
+
 import type { Client } from '@libsql/client'
 import { createClient } from '@libsql/client'
 import { loggerService } from '@logger'
+import { DATA_PATH } from '@main/config'
 import Embeddings from '@main/knowledge/embedjs/embeddings/Embeddings'
+import { makeSureDirExists } from '@main/utils'
 import type {
   AddMemoryOptions,
   AssistantMessage,
@@ -11,9 +17,7 @@ import type {
   MemoryListOptions,
   MemorySearchOptions
 } from '@types'
-import crypto from 'crypto'
 import { app } from 'electron'
-import path from 'path'
 
 import { MemoryQueries } from './queries'
 
@@ -72,6 +76,21 @@ export class MemoryService {
   }
 
   /**
+   * Migrate the memory database from the old path to the new path
+   * If the old memory database exists, rename it to the new path
+   */
+  public migrateMemoryDb(): void {
+    const oldMemoryDbPath = path.join(app.getPath('userData'), 'memories.db')
+    const memoryDbPath = path.join(DATA_PATH, 'Memory', 'memories.db')
+
+    makeSureDirExists(path.dirname(memoryDbPath))
+
+    if (fs.existsSync(oldMemoryDbPath)) {
+      fs.renameSync(oldMemoryDbPath, memoryDbPath)
+    }
+  }
+
+  /**
    * Initialize the database connection and create tables
    */
   private async init(): Promise<void> {
@@ -80,11 +99,12 @@ export class MemoryService {
     }
 
     try {
-      const userDataPath = app.getPath('userData')
-      const dbPath = path.join(userDataPath, 'memories.db')
+      const memoryDbPath = path.join(DATA_PATH, 'Memory', 'memories.db')
+
+      makeSureDirExists(path.dirname(memoryDbPath))
 
       this.db = createClient({
-        url: `file:${dbPath}`,
+        url: `file:${memoryDbPath}`,
         intMode: 'number'
       })
 

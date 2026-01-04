@@ -718,6 +718,9 @@ export function registerIpc(mainWindow: BrowserWindow, app: Electron.App) {
   ipcMain.handle(IpcChannel.Memory_GetUsersList, async () => {
     return await memoryService.getUsersList()
   })
+  ipcMain.handle(IpcChannel.Memory_MigrateMemoryDb, () => {
+    memoryService.migrateMemoryDb()
+  })
 
   // window
   ipcMain.handle(IpcChannel.Windows_SetMinimumSize, (_, width: number, height: number) => {

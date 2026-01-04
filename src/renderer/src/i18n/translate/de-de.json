@@ -463,6 +463,9 @@
     },
     "delete": {
       "content": "Das Löschen des Assistenten löscht alle Themen und Dateien unter diesem Assistenten. Möchten Sie fortfahren?",
+      "error": {
+        "remain_one": "Man darf den letzten Assistenten nicht löschen."
+      },
       "title": "Assistent löschen"
     },
     "edit": {
@@ -5165,6 +5168,13 @@
         "content_limit": "Inhaltslängenbegrenzung",
         "content_limit_tooltip": "Begrenzen Sie die Länge der Suchergebnisse, überschreitende Inhalte werden abgeschnitten",
         "free": "Kostenlos",
+        "is_default": "Standard",
+        "local_provider": {
+          "hint": "Melden Sie sich auf der Website an, um bessere Suchergebnisse zu erhalten und Ihre Sucheinstellungen zu personalisieren.",
+          "open_settings": "{{provider}}-Einstellungen öffnen",
+          "settings": "Lokale Sucheinstellungen"
+        },
+        "local_providers": "Lokale Anbieter",
         "no_provider_selected": "Wählen Sie einen Suchanbieter aus, bevor Sie suchen",
         "overwrite": "Suchanbieter statt LLM für Suche erzwingen",
         "overwrite_tooltip": "Suchanbieter statt LLM für Suche erzwingen",
@@ -5175,6 +5185,7 @@
         "search_provider": "Suchanbieter",
         "search_provider_placeholder": "Einen Suchanbieter auswählen",
         "search_with_time": "Suche mit Datum",
+        "set_as_default": "Als Standard festlegen",
         "subscribe": "Schwarze Liste-Abonnement",
         "subscribe_add": "Abonnement hinzufügen",
         "subscribe_add_failed": "Abonnement-Quelle hinzufügen fehlgeschlagen",
