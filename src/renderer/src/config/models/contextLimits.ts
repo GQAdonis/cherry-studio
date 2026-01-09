@@ -186,7 +186,7 @@ export const DEFAULT_CONTEXT_LIMIT = 128_000
  * Safety margin to apply when calculating available context
  * We use 90% of the limit to leave room for response tokens and overhead
  */
-export const CONTEXT_SAFETY_MARGIN = 0.9
+export const CONTEXT_SAFETY_MARGIN = 0.85
 
 /**
  * Minimum context budget to reserve for response generation

@@ -42,7 +42,6 @@ import {
   FolderOpen,
   HelpCircle,
   Layers,
-
   ListChecks,
   MenuIcon,
   NotebookPen,
@@ -349,7 +348,6 @@ export const Topics: React.FC<Props> = ({ assistant: _assistant, activeTopic, se
         ]
       },
       {
-
         label: topic.pinned ? t('chat.topics.unpin') : t('chat.topics.pin'),
         key: 'pin',
         icon: topic.pinned ? <PinOffIcon size={14} /> : <PinIcon size={14} />,

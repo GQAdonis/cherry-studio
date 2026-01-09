@@ -40,7 +40,6 @@ import { useLocation, useNavigate } from 'react-router-dom'
 import styled from 'styled-components'
 
 import { McpLogo } from '../Icons'
-
 import MinAppIcon from '../Icons/MinAppIcon'
 import MinAppTabsPool from '../MinApp/MinAppTabsPool'
 import WindowControls from '../WindowControls'

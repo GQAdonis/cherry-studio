@@ -421,26 +421,23 @@ describe('Qwen & Gemini thinking coverage', () => {
     expect(isSupportedThinkingTokenQwenModel(createModel({ id }))).toBe(true)
   })
 
-  it.each([
-    'qwen3-thinking',
-    'qwen3-instruct',
-    'qwen3-max',
-    'qwen3-vl-thinking'
-  ])('blocks thinking tokens for %s', (id) => {
-    expect(isSupportedThinkingTokenQwenModel(createModel({ id }))).toBe(false)
-  })
+  it.each(['qwen3-thinking', 'qwen3-instruct', 'qwen3-max', 'qwen3-vl-thinking'])(
+    'blocks thinking tokens for %s',
+    (id) => {
+      expect(isSupportedThinkingTokenQwenModel(createModel({ id }))).toBe(false)
+    }
+  )
 
   it.each(['qwen3-thinking', 'qwen3-vl-235b-thinking'])('always thinks for %s', (id) => {
     expect(isQwenAlwaysThinkModel(createModel({ id }))).toBe(true)
   })
 
-  it.each([
-    'gemini-2.5-flash-latest',
-    'gemini-pro-latest',
-    'gemini-flash-lite-latest'
-  ])('Gemini supports thinking tokens for %s', (id) => {
-    expect(isSupportedThinkingTokenGeminiModel(createModel({ id }))).toBe(true)
-  })
+  it.each(['gemini-2.5-flash-latest', 'gemini-pro-latest', 'gemini-flash-lite-latest'])(
+    'Gemini supports thinking tokens for %s',
+    (id) => {
+      expect(isSupportedThinkingTokenGeminiModel(createModel({ id }))).toBe(true)
+    }
+  )
 
   it.each(['gemini-2.5-flash-image', 'gemini-2.0-tts', 'custom-model'])('Gemini excludes %s', (id) => {
     expect(isSupportedThinkingTokenGeminiModel(createModel({ id }))).toBe(false)
@@ -747,7 +744,7 @@ describe('getThinkModelType - Comprehensive Coverage', () => {
     })
 
     it('should return doubao_after_251015 for Doubao-Seed-1.8 models', () => {
-      expect(getThinkModelType(createModel({ id: 'doubao-seed-1-8-251215' }))).toBe('doubao_after_251015')
+      expect(getThinkModelType(createModel({ id: 'doubao-seed-1-8-251228' }))).toBe('doubao_after_251015')
       expect(getThinkModelType(createModel({ id: 'doubao-seed-1.8' }))).toBe('doubao_after_251015')
     })
 
@@ -881,7 +878,7 @@ describe('getThinkModelType - Comprehensive Coverage', () => {
       // auto > after_251015 > no_auto
       expect(getThinkModelType(createModel({ id: 'doubao-seed-1.6' }))).toBe('doubao')
       expect(getThinkModelType(createModel({ id: 'doubao-seed-1-6-251015' }))).toBe('doubao_after_251015')
-      expect(getThinkModelType(createModel({ id: 'doubao-seed-1-8-251215' }))).toBe('doubao_after_251015')
+      expect(getThinkModelType(createModel({ id: 'doubao-seed-1-8-251228' }))).toBe('doubao_after_251015')
       expect(getThinkModelType(createModel({ id: 'doubao-1.5-thinking-vision-pro' }))).toBe('doubao_no_auto')
     })
 
@@ -1524,13 +1521,12 @@ describe('findTokenLimit', () => {
         expect(findTokenLimit(modelId)).toEqual({ min: 1024, max: 64_000 })
       })
 
-      it.each([
-        'CLAUDE-HAIKU-4.5',
-        'Claude-Sonnet-4-5-Preview',
-        'CLAUDE-OPUS-4.5-20250929'
-      ])('should be case insensitive for %s', (modelId) => {
-        expect(findTokenLimit(modelId)).toEqual({ min: 1024, max: 64_000 })
-      })
+      it.each(['CLAUDE-HAIKU-4.5', 'Claude-Sonnet-4-5-Preview', 'CLAUDE-OPUS-4.5-20250929'])(
+        'should be case insensitive for %s',
+        (modelId) => {
+          expect(findTokenLimit(modelId)).toEqual({ min: 1024, max: 64_000 })
+        }
+      )
     })
 
     describe('Claude models that should NOT match', () => {

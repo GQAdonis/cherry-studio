@@ -175,6 +175,18 @@ export interface ContextStrategyContext {
   currentTokens: number
 
   /**
+   * Token overhead from tool definitions (MCP tools, etc.)
+   * These are subtracted from the available budget before strategy application.
+   */
+  toolTokens?: number
+
+  /**
+   * Token overhead from knowledge base (RAG) content
+   * These are subtracted from the available budget before strategy application.
+   */
+  knowledgeTokens?: number
+
+  /**
    * System prompt to include in calculations
    */
   systemPrompt?: string

@@ -1,7 +1,6 @@
 import type { Message } from '@renderer/types/newMessage'
 import {
   type ArtifactMessageBlock,
-
   AssistantMessageStatus,
   type CitationMessageBlock,
   type CodeMessageBlock,
@@ -172,7 +171,6 @@ export function isCompactBlock(block: MessageBlock): block is CompactMessageBloc
 export function isArtifactBlock(block: MessageBlock): block is ArtifactMessageBlock {
   return block.type === MessageBlockType.ARTIFACT
 }
-
 
 export function isMessageProcessing(message: Message): boolean {
   return (

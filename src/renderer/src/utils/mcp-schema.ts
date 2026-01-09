@@ -33,6 +33,13 @@ export function filterProperties(schema: any): any {
     filtered.properties = newProperties
   }
 
+  // GEMINI FIX: Enforce 'items' for array schemas.
+  // Gemini API requires 'items' to be defined for all array types.
+  // Default to { type: 'string' } if not specified.
+  if (filtered.type === 'array' && !filtered.items) {
+    filtered.items = { type: 'string' }
+  }
+
   // Process other schema fields that might contain nested schemas
   if (filtered.items) {
     filtered.items = filterProperties(filtered.items)

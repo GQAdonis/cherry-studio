@@ -43,6 +43,8 @@ export class ConversationService {
       topic?: Topic
       systemPrompt?: string
       maxOutputTokens?: number
+      toolTokens?: number
+      knowledgeTokens?: number
     } = {}
   ): Promise<{
     modelMessages: ModelMessage[]
@@ -50,7 +52,7 @@ export class ConversationService {
     contextSummary?: string
     contextManagementApplied: boolean
   }> {
-    const { topic, systemPrompt, maxOutputTokens } = options
+    const { topic, systemPrompt, maxOutputTokens, toolTokens, knowledgeTokens } = options
     const { contextCount } = getAssistantSettings(assistant)
     const model = assistant.model || getDefaultModel()
 
@@ -82,7 +84,9 @@ export class ConversationService {
     if (isContextStrategyEnabled(strategyConfig)) {
       logger.debug('Applying context management strategy', {
         strategyType: strategyConfig.type,
-        messageCount: uiMessagesFromPipeline.length
+        messageCount: uiMessagesFromPipeline.length,
+        modelName: model.name,
+        topicId: topic?.id
       })
 
       const strategyResult = await applyContextStrategy(uiMessagesFromPipeline, model, {
@@ -90,6 +94,8 @@ export class ConversationService {
         assistant,
         systemPrompt,
         maxOutputTokens,
+        toolTokens,
+        knowledgeTokens,
         existingSummary: topic?.contextMetadata?.conversationSummary,
         existingFacts: topic?.contextMetadata?.longTermFacts
       })
@@ -106,7 +112,17 @@ export class ConversationService {
           messagesRemoved: strategyResult.messagesRemoved,
           tokensSaved: strategyResult.tokensSaved
         })
+      } else {
+        logger.debug('Context strategy executed but no changes needed', {
+          strategy: strategyConfig.type,
+          originalCount: uiMessagesFromPipeline.length
+        })
       }
+    } else {
+      logger.debug('Context strategy disabled', {
+        type: strategyConfig.type,
+        modelName: model.name
+      })
     }
 
     return {

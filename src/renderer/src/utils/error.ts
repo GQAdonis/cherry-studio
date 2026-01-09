@@ -1,5 +1,4 @@
 import { loggerService } from '@logger'
-
 import type { McpError } from '@modelcontextprotocol/sdk/types.js'
 import type { AgentServerError } from '@renderer/types'
 import { AgentServerErrorSchema } from '@renderer/types'

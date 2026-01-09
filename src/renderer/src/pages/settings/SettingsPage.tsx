@@ -1,5 +1,4 @@
 import { GlobalOutlined } from '@ant-design/icons'
-
 import { Navbar, NavbarCenter } from '@renderer/components/app/Navbar'
 import { McpLogo } from '@renderer/components/Icons'
 import Scrollbar from '@renderer/components/Scrollbar'
@@ -10,7 +9,6 @@ import {
   Brain,
   Cloud,
   Code2,
-
   Command,
   FileCode,
   HardDrive,
@@ -43,7 +41,6 @@ import MCPSettings from './MCPSettings'
 import MemorySettings from './MemorySettings'
 import MinAppSettings from './MinAppSettings'
 import NotesSettings from './NotesSettings'
-
 import { ProviderList } from './ProviderSettings'
 import QuickAssistantSettings from './QuickAssistantSettings'
 import QuickPhraseSettings from './QuickPhraseSettings'

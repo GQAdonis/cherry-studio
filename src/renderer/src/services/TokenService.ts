@@ -84,6 +84,64 @@ export function estimateImageTokens(file: FileMetadata) {
 }
 
 /**
+ * Estimate token usage for MCP tool definitions
+ *
+ * Tool definitions are sent to the LLM and consume context tokens.
+ * Each tool includes: name, description, and full JSON schema.
+ * This can be substantial with many tools enabled.
+ *
+ * @param tools - Array of MCP tool definitions
+ * @returns Estimated token count for all tool definitions
+ */
+export function estimateToolTokens(
+  tools: Array<{ name: string; description?: string; inputSchema?: unknown }>
+): number {
+  if (!tools || tools.length === 0) {
+    return 0
+  }
+
+  return tools.reduce((total, tool) => {
+    // Tool name and description
+    let tokens = approximateTokenSize(tool.name + ' ' + (tool.description || ''))
+    // Input schema (JSON stringified) - this is often the bulk of the tokens
+    if (tool.inputSchema) {
+      tokens += approximateTokenSize(JSON.stringify(tool.inputSchema))
+    }
+    // Add overhead for JSON structure (function_call wrapper, etc.)
+    tokens += 20
+    return total + tokens
+  }, 0)
+}
+
+/**
+ * Estimate token usage for knowledge base (RAG) references
+ *
+ * Knowledge base content is injected into the user message and can be very large.
+ * This function estimates the token overhead before injection so context strategy
+ * can account for it.
+ *
+ * @param references - Array of knowledge references with content
+ * @returns Estimated token count for all knowledge references
+ */
+export function estimateKnowledgeTokens(references: Array<{ content: string; sourceUrl?: string }>): number {
+  if (!references || references.length === 0) {
+    return 0
+  }
+
+  return references.reduce((total, ref) => {
+    // Reference content is the main token consumer
+    let tokens = approximateTokenSize(ref.content || '')
+    // Source URL and formatting overhead
+    if (ref.sourceUrl) {
+      tokens += approximateTokenSize(ref.sourceUrl)
+    }
+    // Add overhead for reference structure and REFERENCE_PROMPT template
+    tokens += 50
+    return total + tokens
+  }, 0)
+}
+
+/**
  * 估算用户输入内容（文本和文件）的 token 用量。
  *
  * 该函数只根据传入的 content（文本内容）和 files（文件列表）估算，

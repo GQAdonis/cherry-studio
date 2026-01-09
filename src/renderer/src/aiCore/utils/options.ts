@@ -579,7 +579,7 @@ function buildOllamaProviderOptions(
     if (isOpenAIOpenWeightModel(model)) {
       // For gpt-oss models, Ollama accepts: 'low' | 'medium' | 'high'
       if (reasoningEffort === 'low' || reasoningEffort === 'medium' || reasoningEffort === 'high') {
-        providerOptions.think = reasoningEffort
+        providerOptions.think = true
       }
     } else {
       providerOptions.think = !['none', undefined].includes(reasoningEffort)

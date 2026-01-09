@@ -35,7 +35,6 @@ import {
   getQuickModel
 } from './AssistantService'
 import { ConversationService } from './ConversationService'
-import { injectUserMessageWithKnowledgeSearchPrompt } from './KnowledgeService'
 import type { BlockManager } from './messageStreaming'
 import type { StreamProcessorCallbacks } from './StreamProcessingService'
 // import { processKnowledgeSearch } from './KnowledgeService'
@@ -108,20 +107,43 @@ export async function transformMessagesAndFetch(
   const { messages, assistant } = request
 
   try {
-    const { modelMessages, uiMessages } = await ConversationService.prepareMessagesForModel(messages, assistant)
+    // Fetch MCP tools early to estimate token overhead for context management
+    let toolTokens = 0
+    if (isPromptToolUse(assistant) || isSupportedToolUse(assistant)) {
+      const mcpTools = await fetchMcpTools(assistant)
+      if (mcpTools.length > 0) {
+        // Estimate tool tokens: name + description + schema for each tool
+        const { estimateToolTokens } = await import('./TokenService')
+        toolTokens = estimateToolTokens(mcpTools)
+        logger.debug('Estimated MCP tool tokens for context budget', { toolCount: mcpTools.length, toolTokens })
+      }
+    }
+
+    // CRITICAL FIX: Inject knowledge base content BEFORE context strategy is applied
+    // This ensures the actual content (not just an estimate) is accounted for in token budgets
+    if (assistant.knowledge_bases?.length && messages.length > 0) {
+      // Inject knowledge into the original Message[] array
+      // We'll need to do this before converting to ModelMessage[]
+      const { injectKnowledgeIntoMessages } = await import('./KnowledgeService')
+      await injectKnowledgeIntoMessages({
+        messages, // Inject into original Message[] array
+        assistant,
+        assistantMsgId: request.assistantMsgId,
+        topicId: request.topicId,
+        blockManager: request.blockManager,
+        setCitationBlockId: request.callbacks.setCitationBlockId!
+      })
+      logger.debug('Knowledge base content injected before context strategy')
+    }
+
+    // Apply context strategy to messages (now containing actual knowledge content)
+    const { modelMessages, uiMessages } = await ConversationService.prepareMessagesForModel(messages, assistant, {
+      toolTokens
+      // No need for knowledgeTokens estimate - actual content is now in messages
+    })
 
     // replace prompt variables
     assistant.prompt = await replacePromptVariables(assistant.prompt, assistant.model?.name)
-
-    // inject knowledge search prompt into model messages
-    await injectUserMessageWithKnowledgeSearchPrompt({
-      modelMessages,
-      assistant,
-      assistantMsgId: request.assistantMsgId,
-      topicId: request.topicId,
-      blockManager: request.blockManager,
-      setCitationBlockId: request.callbacks.setCitationBlockId!
-    })
 
     await fetchChatCompletion({
       messages: modelMessages,

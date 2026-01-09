@@ -2,7 +2,6 @@ import Doc2xLogo from '@renderer/assets/images/ocr/doc2x.png'
 import MinerULogo from '@renderer/assets/images/ocr/mineru.jpg'
 import MistralLogo from '@renderer/assets/images/providers/mistral.png'
 import UnstructuredLogo from '@renderer/assets/images/providers/unstructured_logo.png'
-
 import type { PreprocessProviderId } from '@renderer/types'
 
 export function getPreprocessProviderLogo(providerId: PreprocessProviderId) {
@@ -55,6 +54,5 @@ export const PREPROCESS_PROVIDER_CONFIG: Record<PreprocessProviderId, Preprocess
       official: 'https://unstructured.io',
       apiKey: 'https://unstructured.io/api-key-hosted'
     }
-
   }
 }

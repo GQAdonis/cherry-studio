@@ -10,6 +10,7 @@ import { extractReasoningMiddleware, simulateStreamingMiddleware } from 'ai'
 
 import { getModelAwareAiSdkProviderId } from '../provider/factory'
 import { isOpenRouterGeminiGenerateImageModel } from '../utils/image'
+import { createTokenValidationMiddleware } from './core/TokenValidationMiddleware'
 import { noThinkMiddleware } from './noThinkMiddleware'
 import { openrouterGenerateImageMiddleware } from './openrouterGenerateImageMiddleware'
 import { openrouterReasoningMiddleware } from './openrouterReasoningMiddleware'
@@ -133,6 +134,16 @@ export class AiSdkMiddlewareBuilder {
  */
 export function buildAiSdkMiddlewares(config: AiSdkMiddlewareConfig): LanguageModelMiddleware[] {
   const builder = new AiSdkMiddlewareBuilder()
+
+  // 0. CRITICAL: Add token validation middleware FIRST
+  // This runs LAST in the middleware chain (right before LLM call)
+  // to validate final payload size and apply emergency context reduction if needed
+  if (config.model) {
+    builder.add({
+      name: 'token-validation',
+      middleware: createTokenValidationMiddleware(config)
+    })
+  }
 
   // 1. 根据provider添加特定中间件
   if (config.provider) {

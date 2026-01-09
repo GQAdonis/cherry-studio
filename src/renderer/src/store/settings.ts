@@ -24,7 +24,6 @@ import type {
   AssistantsSortType,
   CodeStyleVarious,
   ContextStrategyConfig,
-
   LanguageVarious,
   MathEngine,
   OpenAIServiceTier,
@@ -40,7 +39,6 @@ import type {
   OpenAIVerbosity
 } from '@renderer/types/aiCoreTypes'
 import { DEFAULT_CONTEXT_STRATEGY_CONFIG } from '@renderer/types/contextStrategy'
-
 import { uuid } from '@renderer/utils'
 import { API_SERVER_DEFAULTS, UpgradeChannel } from '@shared/config/constant'
 
@@ -310,7 +308,6 @@ export interface SettingsState {
       dependencies: Record<string, string>
     }
   }
-
 }
 
 export type MultiModelMessageStyle = 'horizontal' | 'vertical' | 'fold' | 'grid'
@@ -571,7 +568,6 @@ export const initialState: SettingsState = {
       }
     }
   }
-
 }
 
 const settingsSlice = createSlice({
@@ -1083,7 +1079,6 @@ const settingsSlice = createSlice({
     },
     removeArtifactReactDependency: (state, action: PayloadAction<string>) => {
       delete state.artifacts.react.dependencies[action.payload]
-
     }
   }
 })
@@ -1248,4 +1243,3 @@ export default settingsSlice.reducer
 // Selectors
 export const selectArtifactSettings = (state: { settings: SettingsState }) => state.settings.artifacts
 export const selectArtifactReactSettings = (state: { settings: SettingsState }) => state.settings.artifacts?.react
-

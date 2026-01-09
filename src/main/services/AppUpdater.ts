@@ -289,8 +289,6 @@ export default class AppUpdater {
         // 如果 autoDownload 为 false，则需要再调用下面的函数触发下
         // do not use await, because it will block the return of this function
         logger.info('downloadUpdate manual by check for updates', this.cancellationToken)
-        // @ts-expect-error CancellationToken types from different package versions
-
         this.autoUpdater.downloadUpdate(this.cancellationToken)
       }
 

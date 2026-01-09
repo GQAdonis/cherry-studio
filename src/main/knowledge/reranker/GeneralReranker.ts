@@ -1,12 +1,10 @@
 import { loggerService } from '@logger'
-
 import type { KnowledgeBaseParams, KnowledgeSearchResult } from '@types'
 import { net } from 'electron'
 
 import BaseReranker from './BaseReranker'
 
 const logger = loggerService.withContext('GeneralReranker')
-
 
 interface RerankError extends Error {
   response?: {
@@ -25,7 +23,6 @@ export class RerankModelNotSupportedError extends Error {
     this.name = 'RerankModelNotSupportedError'
   }
 }
-
 
 export default class GeneralReranker extends BaseReranker {
   constructor(base: KnowledgeBaseParams) {
@@ -73,7 +70,6 @@ export default class GeneralReranker extends BaseReranker {
           logger.warn(`Rerank model "${model}" is not supported for reranking. Falling back to original results.`)
           throw new RerankModelNotSupportedError(`Model "${model}" is not supported for reranking`, model)
         }
-
 
         const error = new Error(`HTTP ${response.status}: ${response.statusText}`) as RerankError
         // Attach response details to the error object for formatErrorMessage

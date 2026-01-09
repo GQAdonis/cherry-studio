@@ -729,7 +729,6 @@ export const SYSTEM_MODELS: Record<SystemProviderId | 'defaultModel', Model[]> =
       group: 'GLM-4.7'
     },
     {
-
       id: 'glm-4.5',
       provider: 'zhipu',
       name: 'GLM-4.5',
@@ -859,7 +858,7 @@ export const SYSTEM_MODELS: Record<SystemProviderId | 'defaultModel', Model[]> =
   ],
   doubao: [
     {
-      id: 'doubao-seed-1-8-251215',
+      id: 'doubao-seed-1-8-251228',
       provider: 'doubao',
       name: 'Doubao-Seed-1.8',
       group: 'Doubao-Seed-1.8'
@@ -1039,7 +1038,6 @@ export const SYSTEM_MODELS: Record<SystemProviderId | 'defaultModel', Model[]> =
       provider: 'minimax',
       name: 'MiniMax M2.1',
       group: 'minimax-m2'
-
     }
   ],
   hyperbolic: [

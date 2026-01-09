@@ -32,7 +32,8 @@ import {
   isSupportedThinkingTokenMiMoModel,
   isSupportedThinkingTokenModel,
   isSupportedThinkingTokenQwenModel,
-  isSupportedThinkingTokenZhipuModel
+  isSupportedThinkingTokenZhipuModel,
+  isSupportNoneReasoningEffortModel
 } from '@renderer/config/models'
 import { getStoreSetting } from '@renderer/hooks/useSettings'
 import { getAssistantSettings, getProviderByModel } from '@renderer/services/AssistantService'
@@ -120,8 +121,13 @@ export function getReasoningEffort(assistant: Assistant, model: Model): Reasonin
       return { thinking: { type: 'disabled' } }
     }
 
-    // Specially for GPT-5.1. Suppose this is a OpenAI Compatible provider
-    if (isGPT51SeriesModel(model)) {
+    // Deepseek, default behavior is non-thinking
+    if (isDeepSeekHybridInferenceModel(model)) {
+      return {}
+    }
+
+    // GPT 5.1, GPT 5.2, or newer
+    if (isSupportNoneReasoningEffortModel(model)) {
       return {
         reasoningEffort: 'none'
       }

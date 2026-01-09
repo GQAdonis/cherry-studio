@@ -100,9 +100,20 @@ export async function applyContextStrategy(
     maxOutputTokens?: number
     existingSummary?: string
     existingFacts?: string[]
+    toolTokens?: number
+    knowledgeTokens?: number
   } = {}
 ): Promise<ContextStrategyResult> {
-  const { topic, assistant, systemPrompt, maxOutputTokens, existingSummary, existingFacts } = options
+  const {
+    topic,
+    assistant,
+    systemPrompt,
+    maxOutputTokens,
+    existingSummary,
+    existingFacts,
+    toolTokens = 0,
+    knowledgeTokens = 0
+  } = options
 
   // Get effective configuration
   const config = getEffectiveStrategyConfig(topic, assistant)
@@ -131,14 +142,29 @@ export async function applyContextStrategy(
   }
 
   // Calculate token budget and current usage
-  const tokenBudget = getAvailableInputBudget(model, maxOutputTokens)
+  // IMPORTANT: Subtract tool AND knowledge tokens from available budget since they consume context space
+  const rawTokenBudget = getAvailableInputBudget(model, maxOutputTokens)
+  const overheadTokens = toolTokens + knowledgeTokens
+  const tokenBudget = Math.max(0, rawTokenBudget - overheadTokens)
   const currentTokens = estimateConversationTokens(messages, systemPrompt)
+
+  if (overheadTokens > 0) {
+    logger.debug('Token overhead applied to budget', {
+      rawBudget: rawTokenBudget,
+      toolTokens,
+      knowledgeTokens,
+      totalOverhead: overheadTokens,
+      effectiveBudget: tokenBudget
+    })
+  }
 
   // Build context for strategy
   const context: ContextStrategyContext = {
     model,
     tokenBudget,
     currentTokens,
+    toolTokens,
+    knowledgeTokens,
     systemPrompt,
     topicId: topic?.id,
     existingSummary,
