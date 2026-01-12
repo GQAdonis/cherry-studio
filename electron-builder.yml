@@ -119,6 +119,7 @@ nsis:
   oneClick: false
   include: build/nsis-installer.nsh
   buildUniversalInstaller: false
+  differentialPackage: false
 portable:
   artifactName: ${productName}-${version}-${arch}-portable.${ext}
   buildUniversalInstaller: false
@@ -134,6 +135,8 @@ mac:
   target:
     - target: dmg
     - target: zip
+dmg:
+  writeUpdateInfo: false
 linux:
   artifactName: ${productName}-${version}-${arch}.${ext}
   target:
@@ -163,44 +166,30 @@ artifactBuildCompleted: scripts/artifact-build-completed.js
 releaseInfo:
   releaseNotes: |
     <!--LANG:en-->
-    Cherry Studio 1.7.9 - New Features & Bug Fixes
+    Cherry Studio 1.7.13 - Security & Bug Fixes
 
-    ✨ New Features
-    - [Agent] Add 302.AI provider support
-    - [Browser] Browser data now persists and supports multiple tabs
-    - [Language] Add Romanian language support
-    - [Search] Add fuzzy search for file list
-    - [Models] Add latest Zhipu models
-    - [Image] Improve text-to-image functionality
+    🔒 Security
+    - [Plugin] Fix security vulnerability in DXT plugin system on Windows
 
     🐛 Bug Fixes
-    - [Mac] Fix mini window unexpected closing issue
-    - [Preview] Fix HTML preview controls not working in fullscreen
-    - [Translate] Fix translation duplicate execution issue
-    - [Zoom] Fix page zoom reset issue during navigation
-    - [Agent] Fix crash when switching between agent and assistant
-    - [Agent] Fix navigation in agent mode
-    - [Copy] Fix markdown copy button issue
-    - [Windows] Fix compatibility issues on non-Windows systems
+    - [Agent] Fix Agent not working when Node.js is not installed on system
+    - [Chat] Fix app crash when opening certain agents
+    - [Chat] Fix reasoning process not displaying correctly for some providers
+    - [Chat] Fix memory leak issue during streaming conversations
+    - [MCP] Fix timeout field not accepting string format in MCP configuration
+    - [Settings] Add careers section in About page
 
     <!--LANG:zh-CN-->
-    Cherry Studio 1.7.9 - 新功能与问题修复
+    Cherry Studio 1.7.13 - 安全与问题修复
 
-    ✨ 新功能
-    - [Agent] 新增 302.AI 服务商支持
-    - [浏览器] 浏览器数据现在可以保存，支持多标签页
-    - [语言] 新增罗马尼亚语支持
-    - [搜索] 文件列表新增模糊搜索功能
-    - [模型] 新增最新智谱模型
-    - [图片] 优化文生图功能
+    🔒 安全修复
+    - [插件] 修复 Windows 系统 DXT 插件的安全漏洞
 
     🐛 问题修复
-    - [Mac] 修复迷你窗口意外关闭的问题
-    - [预览] 修复全屏模式下 HTML 预览控件无法使用的问题
-    - [翻译] 修复翻译重复执行的问题
-    - [缩放] 修复页面导航时缩放被重置的问题
-    - [智能体] 修复在智能体和助手间切换时崩溃的问题
-    - [智能体] 修复智能体模式下的导航问题
-    - [复制] 修复 Markdown 复制按钮问题
-    - [兼容性] 修复非 Windows 系统的兼容性问题
+    - [Agent] 修复系统未安装 Node.js 时 Agent 功能无法使用的问题
+    - [对话] 修复打开某些智能体时应用崩溃的问题
+    - [对话] 修复部分服务商推理过程无法正确显示的问题
+    - [对话] 修复流式对话时的内存泄漏问题
+    - [MCP] 修复 MCP 配置的 timeout 字段不支持字符串格式的问题
+    - [设置] 关于页面新增招聘入口
     <!--LANG:END-->

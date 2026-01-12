@@ -11,13 +11,13 @@ import DifyKnowledgeServer from './dify-knowledge'
 import E2BServer from './e2b'
 import FetchServer from './fetch'
 import FileSystemServer from './filesystem'
+import HubServer from './hub'
 import MemoryServer from './memory'
 import MinAppControllerServer from './minapp-controller'
 import PythonServer from './python'
 import SDKBridgeServer from './sdk-bridge'
 import ThinkingServer from './sequentialthinking'
 import UnstructuredServer from './unstructured'
-
 
 const logger = loggerService.withContext('MCPFactory')
 
@@ -77,6 +77,9 @@ export function createInMemoryMCPServer(
 
     case BuiltinMCPServerNames.browser: {
       return new BrowserServer().server
+    }
+    case BuiltinMCPServerNames.hub: {
+      return new HubServer().server
     }
     default:
       throw new Error(`Unknown in-memory MCP server: ${name}`)

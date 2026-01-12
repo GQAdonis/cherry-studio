@@ -1042,7 +1042,7 @@ export const PROVIDER_URLS: Record<SystemProviderId, ProviderUrls> = {
       official: 'https://www.baichuan-ai.com/',
       apiKey: 'https://platform.baichuan-ai.com/console/apikey',
       docs: 'https://platform.baichuan-ai.com/docs',
-      models: 'https://platform.baichuan-ai.com/price'
+      models: 'https://platform.baichuan-ai.com/prices'
     }
   },
   modelscope: {
