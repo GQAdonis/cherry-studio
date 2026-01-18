@@ -37,7 +37,7 @@ import type { StreamTextParams } from '@renderer/types/aiCoreTypes'
 import { mapRegexToPatterns } from '@renderer/utils/blacklistMatchPattern'
 import { replacePromptVariables } from '@renderer/utils/prompt'
 import { isAIGatewayProvider, isAwsBedrockProvider, isSupportUrlContextProvider } from '@renderer/utils/provider'
-import type { ModelMessage, Tool } from 'ai'
+import type { ModelMessage } from 'ai'
 import { stepCountIs } from 'ai'
 
 import { getModelAwareAiSdkProviderId } from '../provider/factory'
@@ -48,8 +48,6 @@ import { addAnthropicHeaders } from './header'
 import { getMaxTokens, getTemperature, getTopP } from './modelParameters'
 
 const logger = loggerService.withContext('parameterBuilder')
-
-type ProviderDefinedTool = Extract<Tool<any, any>, { type: 'provider-defined' }>
 
 function mapVertexAIGatewayModelToProviderId(model: Model): BaseProviderId | undefined {
   if (isAnthropicModel(model)) {
@@ -160,24 +158,24 @@ export async function buildStreamTextParams(
       tools = {}
     }
     if (aiSdkProviderId === 'google-vertex') {
-      tools.google_search = vertex.tools.googleSearch({}) as ProviderDefinedTool
+      tools.google_search = vertex.tools.googleSearch({}) as any
     } else if (aiSdkProviderId === 'google-vertex-anthropic') {
       const blockedDomains = mapRegexToPatterns(webSearchConfig.excludeDomains)
       tools.web_search = vertexAnthropic.tools.webSearch_20250305({
         maxUses: webSearchConfig.maxResults,
         blockedDomains: blockedDomains.length > 0 ? blockedDomains : undefined
-      }) as ProviderDefinedTool
+      }) as any
     } else if (aiSdkProviderId === 'azure-responses') {
       tools.web_search_preview = azure.tools.webSearchPreview({
         searchContextSize: webSearchPluginConfig?.openai!.searchContextSize
-      }) as ProviderDefinedTool
+      }) as any
     } else if (aiSdkProviderId === 'azure-anthropic') {
       const blockedDomains = mapRegexToPatterns(webSearchConfig.excludeDomains)
       const anthropicSearchOptions = {
         maxUses: webSearchConfig.maxResults,
         blockedDomains: blockedDomains.length > 0 ? blockedDomains : undefined
       }
-      tools.web_search = anthropic.tools.webSearch_20250305(anthropicSearchOptions) as ProviderDefinedTool
+      tools.web_search = anthropic.tools.webSearch_20250305(anthropicSearchOptions) as any
     }
   }
 
@@ -189,10 +187,10 @@ export async function buildStreamTextParams(
 
     switch (aiSdkProviderId) {
       case 'google-vertex':
-        tools.url_context = vertex.tools.urlContext({}) as ProviderDefinedTool
+        tools.url_context = vertex.tools.urlContext({}) as any
         break
       case 'google':
-        tools.url_context = google.tools.urlContext({}) as ProviderDefinedTool
+        tools.url_context = google.tools.urlContext({}) as any
         break
       case 'anthropic':
       case 'azure-anthropic':
@@ -207,7 +205,7 @@ export async function buildStreamTextParams(
                 maxUses: webSearchConfig.maxResults,
                 blockedDomains: blockedDomains.length > 0 ? blockedDomains : undefined
               })
-        ) as ProviderDefinedTool
+        ) as any
         break
     }
   }

@@ -486,8 +486,9 @@ export default class ModernAiProvider {
   // 代理其他方法到原有实现
   public async models() {
     if (this.actualProvider.id === SystemProviderIds.gateway) {
-      const gatewayModels = (await gateway.getAvailableModels()).models
-      return normalizeGatewayModels(this.actualProvider, gatewayModels)
+      const availableModels = await gateway.getAvailableModels()
+      // Accept models as-is, the adapter will handle version differences
+      return normalizeGatewayModels(this.actualProvider, availableModels.models as any)
     }
     const sdkModels = await this.legacyProvider.models()
     return normalizeSdkModels(this.actualProvider, sdkModels)

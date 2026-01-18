@@ -190,7 +190,8 @@ async function convertMessageToAssistantModelMessage(
 
   return {
     role: 'assistant',
-    content: parts
+    // Cast to any to avoid version conflicts between @ai-sdk/provider-utils v3 and v4
+    content: parts as any
   }
 }
 

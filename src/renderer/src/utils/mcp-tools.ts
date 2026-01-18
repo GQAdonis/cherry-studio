@@ -267,6 +267,13 @@ function cleanSchemaForGemini(schema: any): any {
   const cleaned: any = {}
 
   for (const [key, value] of Object.entries(schema)) {
+    // GEMINI FIX: Normalize type string to uppercase (string -> STRING, array -> ARRAY)
+    // Gemini API requires strict enum matching for types in Schema objects
+    if (key === 'type' && typeof value === 'string') {
+      cleaned[key] = value.toUpperCase()
+      continue
+    }
+
     // Handle undefined values and "[undefined]" strings
     if (value === undefined || value === '[undefined]') {
       // Special handling for array items - Gemini requires this field if present
@@ -287,6 +294,27 @@ function cleanSchemaForGemini(schema: any): any {
       }
     } else {
       cleaned[key] = value
+    }
+  }
+
+  // GEMINI FIX: Enforce 'items' for array schemas if it ends up missing
+  // This MUST happen AFTER all recursive processing to catch arrays at any nesting level
+  // Note: we check for both 'ARRAY' (normalized) and 'array' (lowercase from original)
+  if ((cleaned.type === 'ARRAY' || cleaned.type === 'array') && !cleaned.items) {
+    cleaned.items = { type: GeminiSchemaType.STRING }
+  }
+
+  // GEMINI FIX: Recursively ensure all nested properties that are arrays have items
+  // This catches cases where properties contain array schemas
+  if (cleaned.properties && typeof cleaned.properties === 'object') {
+    for (const [propKey, propValue] of Object.entries(cleaned.properties)) {
+      if (propValue && typeof propValue === 'object') {
+        const prop = propValue as any
+        // Check if this property is an array type and missing items
+        if ((prop.type === 'ARRAY' || prop.type === 'array') && !prop.items) {
+          prop.items = { type: GeminiSchemaType.STRING }
+        }
+      }
     }
   }
 
