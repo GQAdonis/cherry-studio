@@ -225,6 +225,8 @@ export interface SettingsState {
   enableQuickPanelTriggers: boolean
   // 硬件加速设置
   disableHardwareAcceleration: boolean
+  // 使用系统标题栏 (仅Linux)
+  useSystemTitleBar: boolean
   exportMenuOptions: {
     image: boolean
     markdown: boolean
@@ -464,6 +466,8 @@ export const initialState: SettingsState = {
   confirmRegenerateMessage: true,
   // 硬件加速设置
   disableHardwareAcceleration: false,
+  // 使用系统标题栏 (仅Linux)
+  useSystemTitleBar: false,
   exportMenuOptions: {
     image: true,
     markdown: true,
@@ -951,6 +955,9 @@ const settingsSlice = createSlice({
     setDisableHardwareAcceleration: (state, action: PayloadAction<boolean>) => {
       state.disableHardwareAcceleration = action.payload
     },
+    setUseSystemTitleBar: (state, action: PayloadAction<boolean>) => {
+      state.useSystemTitleBar = action.payload
+    },
     setOpenAISummaryText: (state, action: PayloadAction<OpenAIReasoningSummary>) => {
       state.openAI.summaryText = action.payload
     },
@@ -1195,6 +1202,7 @@ export const {
   setConfirmDeleteMessage,
   setConfirmRegenerateMessage,
   setDisableHardwareAcceleration,
+  setUseSystemTitleBar,
   setOpenAISummaryText,
   setOpenAIVerbosity,
   setOpenAIStreamOptionsIncludeUsage,

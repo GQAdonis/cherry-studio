@@ -1,8 +1,13 @@
 {
   "name": "CherryStudio",
-  "version": "1.7.13",
+  "version": "1.7.15",
   "private": true,
+<<<<<<< HEAD
   "description": "The Boss - A powerful AI assistant",
+=======
+  "description": "A powerful AI assistant for producer.",
+  "desktopName": "CherryStudio.desktop",
+>>>>>>> upstream/main
   "main": "./out/main/index.js",
   "author": "support@cherry-ai.com",
   "homepage": "https://github.com/CherryHQ/cherry-studio",
@@ -39,6 +44,8 @@
     "typecheck:node": "GOMAXPROCS=1 tsgo --noEmit -p tsconfig.node.json --composite false",
     "typecheck:web": "GOMAXPROCS=1 tsgo --noEmit -p tsconfig.web.json --composite false",
     "i18n:check": "dotenv -e .env -- tsx scripts/check-i18n.ts",
+    "i18n:hardcoded": "tsx scripts/check-hardcoded-strings.ts",
+    "i18n:hardcoded:strict": "I18N_STRICT=true tsx scripts/check-hardcoded-strings.ts",
     "i18n:sync": "dotenv -e .env -- tsx scripts/sync-i18n.ts",
     "i18n:update": "dotenv -e .env -- tsx scripts/update-i18n.ts",
     "i18n:translate": "dotenv -e .env -- tsx scripts/auto-translate-i18n.ts",
@@ -398,6 +405,7 @@
     "tar": "^7.4.3",
     "tiny-pinyin": "^1.3.2",
     "tokenx": "^1.1.0",
+    "ts-morph": "^27.0.2",
     "tsx": "^4.20.3",
     "turndown-plugin-gfm": "^1.0.2",
     "tw-animate-css": "^1.3.8",
@@ -504,6 +512,7 @@
       "zipfile"
     ]
   },
+<<<<<<< HEAD
   "packageManager": "pnpm@10.28.0+sha512.05df71d1421f21399e053fde567cea34d446fa02c76571441bfc1c7956e98e363088982d940465fd34480d4d90a0668bc12362f8aa88000a64e83d0b0e47be48",
   "lint-staged": {
     "*.{js,jsx,ts,tsx,cjs,mjs,cts,mts}": [
@@ -513,5 +522,35 @@
     "*.{json,yml,yaml,css,html}": [
       "biome format --write --no-errors-on-unmatched"
     ]
+=======
+  "packageManager": "pnpm@10.27.0",
+  "optionalDependencies": {
+    "@img/sharp-darwin-arm64": "0.34.3",
+    "@img/sharp-darwin-x64": "0.34.3",
+    "@img/sharp-libvips-darwin-arm64": "1.2.0",
+    "@img/sharp-libvips-darwin-x64": "1.2.0",
+    "@img/sharp-libvips-linux-arm64": "1.2.0",
+    "@img/sharp-libvips-linux-x64": "1.2.0",
+    "@img/sharp-libvips-linuxmusl-arm64": "1.2.0",
+    "@img/sharp-libvips-linuxmusl-x64": "1.2.0",
+    "@img/sharp-linux-arm64": "0.34.3",
+    "@img/sharp-linux-x64": "0.34.3",
+    "@img/sharp-linuxmusl-arm64": "0.34.3",
+    "@img/sharp-linuxmusl-x64": "0.34.3",
+    "@img/sharp-win32-arm64": "0.34.3",
+    "@img/sharp-win32-x64": "0.34.3",
+    "@libsql/darwin-arm64": "0.4.7",
+    "@libsql/darwin-x64": "0.4.7",
+    "@libsql/linux-arm64-gnu": "0.4.7",
+    "@libsql/linux-arm64-musl": "0.4.7",
+    "@libsql/linux-x64-gnu": "0.4.7",
+    "@libsql/linux-x64-musl": "0.4.7",
+    "@libsql/win32-x64-msvc": "0.4.7",
+    "@napi-rs/system-ocr-darwin-arm64": "1.0.2",
+    "@napi-rs/system-ocr-darwin-x64": "1.0.2",
+    "@napi-rs/system-ocr-win32-arm64-msvc": "1.0.2",
+    "@napi-rs/system-ocr-win32-x64-msvc": "1.0.2",
+    "@strongtz/win32-arm64-msvc": "0.4.7"
+>>>>>>> upstream/main
   }
 }
