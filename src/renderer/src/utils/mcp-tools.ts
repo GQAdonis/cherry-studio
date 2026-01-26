@@ -32,7 +32,7 @@ import { nanoid } from 'nanoid'
 
 import { isToolUseModeFunction } from './assistant'
 import { convertBase64ImageToAwsBedrockFormat } from './aws-bedrock-utils'
-import { filterProperties, processSchemaForO3 } from './mcp-schema'
+import { filterProperties, isUndefinedVariant, processSchemaForO3 } from './mcp-schema'
 
 const logger = loggerService.withContext('Utils:MCPTools')
 
@@ -274,8 +274,9 @@ function cleanSchemaForGemini(schema: any): any {
       continue
     }
 
-    // Handle undefined values and "[undefined]" strings
-    if (value === undefined || value === '[undefined]') {
+    // Handle undefined values, "[undefined]" strings, and other invalid variants
+    // This uses the shared isUndefinedVariant helper to catch all serialization artifacts
+    if (isUndefinedVariant(value)) {
       // Special handling for array items - Gemini requires this field if present
       if (key === 'items') {
         // Provide a default schema that accepts any type
@@ -297,25 +298,18 @@ function cleanSchemaForGemini(schema: any): any {
     }
   }
 
-  // GEMINI FIX: Enforce 'items' for array schemas if it ends up missing
-  // This MUST happen AFTER all recursive processing to catch arrays at any nesting level
-  // Note: we check for both 'ARRAY' (normalized) and 'array' (lowercase from original)
-  if ((cleaned.type === 'ARRAY' || cleaned.type === 'array') && !cleaned.items) {
+  // GEMINI FIX: Enforce 'items' for array schemas at ALL nesting levels
+  // This must be done recursively to catch arrays anywhere in the schema tree
+  // We apply this fix AFTER recursive processing to ensure all nested objects are cleaned first
+  if ((cleaned.type === 'ARRAY' || cleaned.type === 'array') && (!cleaned.items || isUndefinedVariant(cleaned.items))) {
+    logger.warn('Fixed missing items for array schema', { schema: cleaned })
     cleaned.items = { type: GeminiSchemaType.STRING }
   }
 
-  // GEMINI FIX: Recursively ensure all nested properties that are arrays have items
-  // This catches cases where properties contain array schemas
+  // GEMINI FIX: Recursively ensure ALL nested properties (at any depth) have valid items
+  // This is critical - we must recursively check the entire properties tree, not just one level
   if (cleaned.properties && typeof cleaned.properties === 'object') {
-    for (const [propKey, propValue] of Object.entries(cleaned.properties)) {
-      if (propValue && typeof propValue === 'object') {
-        const prop = propValue as any
-        // Check if this property is an array type and missing items
-        if ((prop.type === 'ARRAY' || prop.type === 'array') && !prop.items) {
-          prop.items = { type: GeminiSchemaType.STRING }
-        }
-      }
-    }
+    cleaned.properties = ensureArrayItemsInProperties(cleaned.properties)
   }
 
   // CRITICAL: Validate 'required' array against actual properties
@@ -333,6 +327,47 @@ function cleanSchemaForGemini(schema: any): any {
   }
 
   return cleaned
+}
+
+/**
+ * Recursively ensures all array properties at any nesting level have valid items.
+ * This is a helper for cleanSchemaForGemini to handle deeply nested property structures.
+ */
+function ensureArrayItemsInProperties(properties: any): any {
+  if (!properties || typeof properties !== 'object') {
+    return properties
+  }
+
+  const fixed: any = {}
+
+  for (const [propKey, propValue] of Object.entries(properties)) {
+    if (!propValue || typeof propValue !== 'object') {
+      fixed[propKey] = propValue
+      continue
+    }
+
+    const prop = propValue as any
+
+    // Fix array type missing items
+    if ((prop.type === 'ARRAY' || prop.type === 'array') && (!prop.items || isUndefinedVariant(prop.items))) {
+      logger.warn(`Fixed missing items for nested array property: ${propKey}`, { prop })
+      prop.items = { type: GeminiSchemaType.STRING }
+    }
+
+    // Recursively process nested properties (for objects that contain objects)
+    if (prop.properties && typeof prop.properties === 'object') {
+      prop.properties = ensureArrayItemsInProperties(prop.properties)
+    }
+
+    // Recursively process array items that might be objects with properties
+    if (prop.items && typeof prop.items === 'object' && prop.items.properties) {
+      prop.items.properties = ensureArrayItemsInProperties(prop.items.properties)
+    }
+
+    fixed[propKey] = prop
+  }
+
+  return fixed
 }
 
 /**

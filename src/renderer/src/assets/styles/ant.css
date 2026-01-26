@@ -147,7 +147,6 @@
   color: var(--color-text-1) !important;
 }
 
-
 .ant-dropdown-menu-submenu {
   background-color: var(--ant-color-bg-elevated);
   overflow: hidden;

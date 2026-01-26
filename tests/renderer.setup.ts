@@ -28,7 +28,6 @@ if (typeof CSSStyleSheet !== 'undefined' && CSSStyleSheet.prototype?.insertRule)
   }
 }
 
-
 // Mock LoggerService globally for renderer tests
 vi.mock('@logger', async () => {
   const { MockRendererLoggerService, mockRendererLoggerService } = await import('./__mocks__/RendererLoggerService')
@@ -82,7 +81,6 @@ vi.mock('@codesandbox/sandpack-react', () => ({
   SandpackPreview: () => null,
   SandpackProvider: ({ children }: any) => children ?? null
 }))
-
 
 if (typeof globalThis.localStorage === 'undefined' || typeof (globalThis.localStorage as any).getItem !== 'function') {
   let store = new Map<string, string>()

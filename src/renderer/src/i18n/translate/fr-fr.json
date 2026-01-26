@@ -4479,9 +4479,6 @@
       "title": "Paramètres des messages",
       "use_serif_font": "Utiliser une police serif"
     },
-    "mineru": {
-      "api_key": "MinerU propose désormais un quota gratuit de 500 pages par jour, vous n'avez donc pas besoin de saisir de clé."
-    },
     "miniapps": {
       "cache_change_notice": "Les modifications prendront effet après l'ajout ou la suppression d'applications ouvertes jusqu'à atteindre la valeur définie",
       "cache_description": "Définir le nombre maximum d'applications pouvant rester actives simultanément",
@@ -5198,13 +5195,6 @@
         "content_limit": "Limite de longueur du contenu",
         "content_limit_tooltip": "Limiter la longueur du contenu des résultats de recherche ; le contenu dépassant cette limite sera tronqué",
         "free": "Gratuit",
-        "is_default": "Défaut",
-        "local_provider": {
-          "hint": "Connectez-vous au site Web pour obtenir de meilleurs résultats de recherche et personnaliser vos paramètres de recherche.",
-          "open_settings": "Ouvrir les paramètres de {{provider}}",
-          "settings": "Paramètres de recherche locale"
-        },
-        "local_providers": "Fournisseurs locaux",
         "no_provider_selected": "Veuillez sélectionner un fournisseur de recherche avant de vérifier",
         "overwrite": "Remplacer la recherche du fournisseur",
         "overwrite_tooltip": "Forcer l'utilisation du fournisseur de recherche au lieu du grand modèle linguistique",
@@ -5215,7 +5205,6 @@
         "search_provider": "Fournisseur de recherche",
         "search_provider_placeholder": "Sélectionnez un fournisseur de recherche",
         "search_with_time": "Rechercher avec date",
-        "set_as_default": "Définir par défaut",
         "subscribe": "Abonnement à la liste noire",
         "subscribe_add": "Ajouter un abonnement",
         "subscribe_add_failed": "Échec de l'ajout de la source d'abonnement",

@@ -284,14 +284,19 @@ describe('filterProperties', () => {
   })
 
   describe('non-object type schemas', () => {
-    it('should not modify non-object type schemas', () => {
+    it('should not modify string and number schemas but should add items to array schemas', () => {
       const stringSchema = { type: 'string', minLength: 1 }
       const numberSchema = { type: 'number', minimum: 0 }
       const arraySchema = { type: 'array', minItems: 1 }
 
       expect(filterProperties(stringSchema)).toEqual(stringSchema)
       expect(filterProperties(numberSchema)).toEqual(numberSchema)
-      expect(filterProperties(arraySchema)).toEqual(arraySchema)
+      // Array schemas should get default items for Gemini API compatibility
+      expect(filterProperties(arraySchema)).toEqual({
+        type: 'array',
+        minItems: 1,
+        items: { type: 'string' }
+      })
     })
   })
 

@@ -105,7 +105,6 @@ export function isSupportNoneReasoningEffortModel(model: Model): boolean {
   )
 }
 
-
 export function isOpenAIChatCompletionOnlyModel(model: Model): boolean {
   if (!model) {
     return false

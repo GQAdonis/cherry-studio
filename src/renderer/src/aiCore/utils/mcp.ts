@@ -1,7 +1,7 @@
 import { loggerService } from '@logger'
 import { processMcpToolResult, shouldProcessMcpContent } from '@renderer/services/McpContentManager'
 import type { MCPTool, MCPToolResponse } from '@renderer/types'
-import { filterProperties } from '@renderer/utils/mcp-schema'
+import { filterProperties, isUndefinedVariant } from '@renderer/utils/mcp-schema'
 import { callMCPTool, getMcpServerByTool, isToolAutoApproved } from '@renderer/utils/mcp-tools'
 import { requestToolConfirmation } from '@renderer/utils/userConfirmation'
 import { type Tool, type ToolSet } from 'ai'
@@ -11,9 +11,54 @@ import type { JSONSchema7 } from 'json-schema'
 const logger = loggerService.withContext('MCP-utils')
 
 /**
+ * Recursively ensures all array schemas have valid 'items' fields.
+ * This is a defensive post-processing step to catch any edge cases that
+ * might slip through the main filterProperties function.
+ *
+ * Gemini API requires all array types to have a valid 'items' schema object.
+ */
+function ensureArrayItemsValid(schema: any): any {
+  if (!schema || typeof schema !== 'object') {
+    return schema
+  }
+
+  if (Array.isArray(schema)) {
+    return schema.map(ensureArrayItemsValid)
+  }
+
+  const fixed = { ...schema }
+
+  // Fix array items at current level
+  if (fixed.type === 'array' && (!fixed.items || isUndefinedVariant(fixed.items))) {
+    fixed.items = { type: 'string' }
+  }
+
+  // Recursively process items
+  if (fixed.items && typeof fixed.items === 'object') {
+    fixed.items = ensureArrayItemsValid(fixed.items)
+  }
+
+  // Recursively process properties
+  if (fixed.properties && typeof fixed.properties === 'object') {
+    const newProperties: any = {}
+    for (const [key, value] of Object.entries(fixed.properties)) {
+      if (isUndefinedVariant(value)) {
+        continue
+      }
+      newProperties[key] = ensureArrayItemsValid(value)
+    }
+    fixed.properties = newProperties
+  }
+
+  return fixed
+}
+
+/**
  * Pre-process MCP tool input schema to ensure OpenAI API compatibility.
  * OpenAI requires object schemas to have a 'properties' field, even if empty.
  * This is especially important for tools like 'get_stats' that have no parameters.
+ *
+ * Also applies Gemini-specific fixes to ensure array schemas have valid items.
  */
 function preprocessSchemaForOpenAI(schema: any): JSONSchema7 {
   if (!schema || typeof schema !== 'object') {
@@ -24,9 +69,14 @@ function preprocessSchemaForOpenAI(schema: any): JSONSchema7 {
   // 1. Adding properties: {} for object schemas without properties
   // 2. Setting required array with all property keys
   // 3. Setting additionalProperties: false
+  // 4. Fixing array items (now using isUndefinedVariant helper)
   const processed = filterProperties(schema)
 
-  return processed as JSONSchema7
+  // Post-processing: ensure all array items are valid across all nested levels
+  // This is a defensive measure to catch any edge cases, especially for Gemini API
+  const validated = ensureArrayItemsValid(processed)
+
+  return validated as JSONSchema7
 }
 
 // Setup tools configuration based on provided parameters

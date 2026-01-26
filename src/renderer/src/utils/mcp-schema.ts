@@ -1,4 +1,25 @@
 /**
+ * Helper function to detect all forms of invalid/undefined values that may appear
+ * in serialized schemas. This catches:
+ * - undefined and null values
+ * - String literals '[undefined]' and 'undefined' (from serialization)
+ * - Empty strings
+ * - Empty objects (which are invalid as schema items)
+ *
+ * This is critical for Gemini API compatibility where array 'items' must be valid schema objects.
+ */
+export function isUndefinedVariant(value: any): boolean {
+  if (value === undefined || value === null) return true
+  if (typeof value === 'string' && (value === '[undefined]' || value === 'undefined' || value.trim() === '')) {
+    return true
+  }
+  if (typeof value === 'object' && !Array.isArray(value) && Object.keys(value).length === 0) {
+    return true
+  }
+  return false
+}
+
+/**
  * Recursively filters and validates properties for OpenAI o3 strict schema validation
  *
  * o3 strict mode requirements:
@@ -24,8 +45,8 @@ export function filterProperties(schema: any): any {
   if (filtered.properties && typeof filtered.properties === 'object') {
     const newProperties: any = {}
     for (const [key, value] of Object.entries(filtered.properties)) {
-      // Skip undefined or null property values - Gemini requires all properties in 'required' to be defined
-      if (value === undefined || value === null) {
+      // Skip undefined, null, or '[undefined]' string literals - Gemini requires all properties in 'required' to be defined
+      if (isUndefinedVariant(value)) {
         continue
       }
       newProperties[key] = filterProperties(value)
@@ -35,8 +56,9 @@ export function filterProperties(schema: any): any {
 
   // GEMINI FIX: Enforce 'items' for array schemas.
   // Gemini API requires 'items' to be defined for all array types.
-  // Default to { type: 'string' } if not specified.
-  if (filtered.type === 'array' && !filtered.items) {
+  // This also catches '[undefined]' string literals that may come from serialization.
+  // Default to { type: 'string' } if not specified or invalid.
+  if (filtered.type === 'array' && (!filtered.items || isUndefinedVariant(filtered.items))) {
     filtered.items = { type: 'string' }
   }
 

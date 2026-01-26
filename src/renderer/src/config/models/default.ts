@@ -250,7 +250,6 @@ export const SYSTEM_MODELS: Record<SystemProviderId | 'defaultModel', Model[]> =
     { id: 'gemini-2.5-flash', provider: 'burncloud', name: 'Gemini 2.5 Flash', group: 'Gemini 2.5' },
     { id: 'gemini-2.5-flash-image', provider: 'burncloud', name: 'Gemini 2.5 Flash Image', group: 'Gemini 2.5' },
     { id: 'gemini-2.5-pro', provider: 'burncloud', name: 'Gemini 2.5 Pro', group: 'Gemini 2.5' },
-    { id: 'gemini-3-pro-preview', provider: 'burncloud', name: 'Gemini 3 Pro Preview', group: 'Gemini 3' },
 
     { id: 'deepseek-reasoner', name: 'DeepSeek Reasoner', provider: 'burncloud', group: 'deepseek-ai' },
     { id: 'deepseek-chat', name: 'DeepSeek Chat', provider: 'burncloud', group: 'deepseek-ai' }
@@ -453,10 +452,10 @@ export const SYSTEM_MODELS: Record<SystemProviderId | 'defaultModel', Model[]> =
       group: 'Gemini 3'
     },
     {
-      id: 'gemini-3-pro-preview',
+      id: 'gemini-2.5-pro-preview',
       provider: 'gemini',
-      name: 'Gemini 3 Pro Preview',
-      group: 'Gemini 3'
+      name: 'Gemini 2.5 Pro Preview',
+      group: 'Gemini 2.5'
     }
   ],
   anthropic: [
@@ -824,6 +823,12 @@ export const SYSTEM_MODELS: Record<SystemProviderId | 'defaultModel', Model[]> =
       provider: 'baichuan',
       name: 'Baichuan M2 Plus',
       group: 'Baichuan-M2'
+    },
+    {
+      id: 'Baichuan-M3',
+      provider: 'baichuan',
+      name: 'Baichuan M3',
+      group: 'Baichuan-M3'
     }
   ],
   modelscope: [
@@ -1884,8 +1889,8 @@ export const SYSTEM_MODELS: Record<SystemProviderId | 'defaultModel', Model[]> =
       group: 'OpenAI'
     },
     {
-      id: 'gemini-3-pro-preview',
-      name: 'Gemini 3 Pro Preview',
+      id: 'gemini-2.5-pro-preview',
+      name: 'Gemini 2.5 Pro Preview',
       provider: 'aionly',
       group: 'Google'
     },

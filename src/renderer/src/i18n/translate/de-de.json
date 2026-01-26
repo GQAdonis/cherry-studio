@@ -4479,9 +4479,6 @@
       "title": "Nachrichteneinstellungen",
       "use_serif_font": "Serifenschrift verwenden"
     },
-    "mineru": {
-      "api_key": "MinerU bietet täglich 500 Seiten kostenlos an, Sie müssen keinen Schlüssel eingeben."
-    },
     "miniapps": {
       "cache_change_notice": "Änderung wird wirksam wenn Anzahl geöffneter Mini-Apps auf festgelegten Wert angepasst wird",
       "cache_description": "Maximale Anzahl gleichzeitig aktiver Mini-Apps festlegen",
@@ -5198,13 +5195,6 @@
         "content_limit": "Inhaltslängenbegrenzung",
         "content_limit_tooltip": "Begrenzen Sie die Länge der Suchergebnisse, überschreitende Inhalte werden abgeschnitten",
         "free": "Kostenlos",
-        "is_default": "Standard",
-        "local_provider": {
-          "hint": "Melden Sie sich auf der Website an, um bessere Suchergebnisse zu erhalten und Ihre Sucheinstellungen zu personalisieren.",
-          "open_settings": "{{provider}}-Einstellungen öffnen",
-          "settings": "Lokale Sucheinstellungen"
-        },
-        "local_providers": "Lokale Anbieter",
         "no_provider_selected": "Wählen Sie einen Suchanbieter aus, bevor Sie suchen",
         "overwrite": "Suchanbieter statt LLM für Suche erzwingen",
         "overwrite_tooltip": "Suchanbieter statt LLM für Suche erzwingen",
@@ -5215,7 +5205,6 @@
         "search_provider": "Suchanbieter",
         "search_provider_placeholder": "Einen Suchanbieter auswählen",
         "search_with_time": "Suche mit Datum",
-        "set_as_default": "Als Standard festlegen",
         "subscribe": "Schwarze Liste-Abonnement",
         "subscribe_add": "Abonnement hinzufügen",
         "subscribe_add_failed": "Abonnement-Quelle hinzufügen fehlgeschlagen",

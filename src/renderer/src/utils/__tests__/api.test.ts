@@ -60,7 +60,6 @@ beforeEach(() => {
   // `formatVertexApiHost` reads Vertex settings via a global store reference to avoid
   // a circular import between `@renderer/utils` and the Redux store.
   ;(globalThis as any).store = store
-
 })
 
 describe('api', () => {

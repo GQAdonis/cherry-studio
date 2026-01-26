@@ -8,7 +8,6 @@ import path from 'node:path'
 const electron = require('electron')
 const app = electron.app
 
-
 export function getResourcePath() {
   return path.join(app.getAppPath(), 'resources')
 }

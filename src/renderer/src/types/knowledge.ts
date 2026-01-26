@@ -110,7 +110,6 @@ export const PreprocessProviderIds = {
   mineru: 'mineru',
   'open-mineru': 'open-mineru',
   unstructured: 'unstructured'
-
 } as const
 
 export type PreprocessProviderId = keyof typeof PreprocessProviderIds
@@ -129,7 +128,6 @@ export interface UnstructuredOptions {
   enabledMimeTypes?: string[]
   enableChatTool?: boolean
 }
-
 
 export interface PreprocessProvider {
   id: PreprocessProviderId

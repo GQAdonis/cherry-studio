@@ -275,7 +275,7 @@
         "denyRequest": "Refuză cererea instrumentului",
         "hideDetails": "Ascunde detaliile instrumentului",
         "runWithOptions": "Rulează cu opțiuni suplimentare",
-        "showDetails": "Arată detaliile instrumentului"
+        "showDetails": "Afișează detaliile instrumentului"
       },
       "button": {
         "cancel": "Anulează",
@@ -401,13 +401,56 @@
     "toggleDevTools": "Comută instrumentele pentru dezvoltatori",
     "toggleFullscreen": "Comută ecranul complet",
     "undo": "Anulează",
-    "unhide": "Arată toate",
+    "unhide": "Afișează toate",
     "view": "Vizualizare",
     "website": "Site web",
     "window": "Fereastră",
     "zoom": "Zoom",
     "zoomIn": "Mărește",
     "zoomOut": "Micșorează"
+  },
+  "artifacts": {
+    "attach_image": "[to be translated]:Attach image",
+    "change_model": "[to be translated]:Click to change model",
+    "click_to_open": "[to be translated]:Click to open artifact",
+    "code": "[to be translated]:Code",
+    "console": "[to be translated]:Console",
+    "description_help": "[to be translated]:Used for searching artifacts in your library",
+    "description_placeholder": "[to be translated]:What does this artifact do?",
+    "generating": "[to be translated]:Generating artifact...",
+    "library": "[to be translated]:Artifact Library",
+    "model_locked": "[to be translated]:Model selection is locked",
+    "new_artifact": "[to be translated]:New Artifact",
+    "no_artifacts": "[to be translated]:No artifacts found",
+    "open_artifact": "[to be translated]:Open Artifact",
+    "preview": "[to be translated]:Preview",
+    "preview_type": "[to be translated]:Type",
+    "refinement": "[to be translated]:Refinement Chat",
+    "refinement_empty": "[to be translated]:No messages yet",
+    "refinement_hint": "[to be translated]:Ask the AI to modify this artifact",
+    "refinement_placeholder": "[to be translated]:Describe changes...",
+    "save_from_modal": "[to be translated]:Open the artifact to save it",
+    "save_to_library": "[to be translated]:Save to Library",
+    "saved": "[to be translated]:Artifact saved to library",
+    "split": "[to be translated]:Split",
+    "tags_placeholder": "[to be translated]:Add tags...",
+    "title": "[to be translated]:Artifacts",
+    "title_placeholder": "[to be translated]:Enter artifact title",
+    "type": {
+      "code": "[to be translated]:Code",
+      "html": "[to be translated]:HTML",
+      "htmx": "[to be translated]:HTMX",
+      "markdown": "[to be translated]:Markdown",
+      "mermaid": "[to be translated]:Mermaid",
+      "react": "[to be translated]:React",
+      "svg": "[to be translated]:SVG"
+    },
+    "version": "[to be translated]:Version",
+    "view": {
+      "code": "[to be translated]:Code",
+      "preview": "[to be translated]:Preview",
+      "split": "[to be translated]:Split"
+    }
   },
   "assistants": {
     "abbr": "Asistenți",
@@ -530,6 +573,13 @@
     },
     "search": "Caută asistenți...",
     "settings": {
+      "context": {
+        "custom_info": "[to be translated]:Custom context strategy will override the global setting for all conversations with this assistant.",
+        "description": "[to be translated]:Configure how this assistant manages conversation context when approaching model limits. You can use the global default or customize settings for this assistant.",
+        "label": "[to be translated]:Context",
+        "title": "[to be translated]:Context Management",
+        "use_global": "[to be translated]:Use Global Default"
+      },
       "default_model": "Model implicit",
       "knowledge_base": {
         "label": "Setări bază de cunoștințe",
@@ -649,7 +699,7 @@
     "manage": "Gestionează",
     "select_model": "Selectează modelul",
     "show": {
-      "all": "Arată tot"
+      "all": "Afișează tot"
     },
     "update_available": "Actualizare disponibilă",
     "whole_word": "Cuvânt întreg"
@@ -975,7 +1025,7 @@
       },
       "reset": "Resetează",
       "set_as_default": "Aplică la asistentul implicit",
-      "show_line_numbers": "Arată numerele de linie în cod",
+      "show_line_numbers": "Afișează numerele liniilor de cod",
       "temperature": {
         "label": "Temperatură",
         "tip": "Valorile mai mari fac modelul mai creativ și imprevizibil, în timp ce valorile mai mici îl fac mai determinist și precis."
@@ -997,6 +1047,10 @@
       "auto_rename": "Redenumire automată",
       "clear": {
         "title": "Șterge mesajele"
+      },
+      "context_strategy": {
+        "label": "[to be translated]:Context Strategy",
+        "use_assistant": "[to be translated]:Use Assistant Default"
       },
       "copy": {
         "image": "Copiază ca imagine",
@@ -1209,6 +1263,7 @@
     "copy_failed": "Copiere eșuată",
     "current": "Curent",
     "cut": "Decupează",
+    "dark_mode": "[to be translated]:Dark Mode",
     "default": "Implicit",
     "delete": "Șterge",
     "delete_confirm": "Ești sigur că vrei să ștergi?",
@@ -1241,6 +1296,7 @@
     "invalid_value": "Valoare invalidă",
     "knowledge_base": "Bază de cunoștințe",
     "language": "Limbă",
+    "light_mode": "[to be translated]:Light Mode",
     "loading": "Se încarcă...",
     "model": "Model",
     "models": "Modele",
@@ -1285,6 +1341,8 @@
     "subscribe": "Abonează-te",
     "success": "Succes",
     "swap": "Schimbă",
+    "tags": "[to be translated]:Tags",
+    "title": "[to be translated]:Title",
     "topics": "Subiecte",
     "unknown": "Necunoscut",
     "unnamed": "Fără nume",
@@ -1293,6 +1351,17 @@
     "upload_files": "Încarcă fișier",
     "warning": "Avertisment",
     "you": "Tu"
+  },
+  "conversation": {
+    "contextStrategy": {
+      "button": "[to be translated]:Context",
+      "customActive": "[to be translated]:Custom context strategy active",
+      "customInfo": "[to be translated]:Custom context strategy will override the assistant's setting for this conversation only.",
+      "description": "[to be translated]:Configure how this conversation manages context. You can use the assistant's default or customize for this conversation.",
+      "title": "[to be translated]:Conversation Context Strategy",
+      "useAssistantDefault": "[to be translated]:Use Assistant Default",
+      "usingDefault": "[to be translated]:Using assistant default"
+    }
   },
   "docs": {
     "title": "Documentație"
@@ -2051,6 +2120,31 @@
   "minapp": {
     "add_to_launchpad": "Adaugă în Launchpad",
     "add_to_sidebar": "Adaugă în bara laterală",
+    "automation": {
+      "contentScript": "[to be translated]:Content script injection",
+      "contentScriptDescription": "[to be translated]:Enable communication bridge with mini-apps",
+      "contextMenu": "[to be translated]:Enhanced context menu",
+      "contextMenuDescription": "[to be translated]:Add 'Send to Chat' and 'Send to KB' options to right-click menu",
+      "conversationExtraction": "[to be translated]:Conversation extraction",
+      "conversationExtractionDescription": "[to be translated]:Extract conversations from AI chat apps (ChatGPT, Claude, etc.)",
+      "description": "[to be translated]:Control and extract data from embedded mini-apps",
+      "enabled": "[to be translated]:Enable automation features",
+      "enabledDescription": "[to be translated]:Allow AI assistants to control mini-apps via MCP tools",
+      "title": "[to be translated]:Mini-App Automation"
+    },
+    "context": {
+      "allConversations": "[to be translated]:All Recent Conversations",
+      "askAbout": "[to be translated]:Ask about this...",
+      "contentPreview": "[to be translated]:Content Preview",
+      "currentConversation": "[to be translated]:Current Conversation",
+      "extractConversations": "[to be translated]:Extract Conversations",
+      "extractPage": "[to be translated]:Extract Page Content",
+      "noKnowledgeBases": "[to be translated]:No knowledge bases yet",
+      "saveAsNote": "[to be translated]:Save as Note",
+      "selectKnowledgeBase": "[to be translated]:Select Knowledge Base",
+      "sendToChat": "[to be translated]:Send to Chat",
+      "sendToKB": "[to be translated]:Send to Knowledge Base..."
+    },
     "popup": {
       "close": "Închide MinApp",
       "devtools": "Instrumente dezvoltator",
@@ -2065,6 +2159,18 @@
     },
     "remove_from_launchpad": "Elimină din Launchpad",
     "remove_from_sidebar": "Elimină din bara laterală",
+    "sdk": {
+      "autoStart": "[to be translated]:Auto-start server",
+      "autoStartDescription": "[to be translated]:Start SDK server when Cherry Studio launches",
+      "description": "[to be translated]:Allow external apps to integrate with Cherry Studio",
+      "enableServer": "[to be translated]:Enable SDK server",
+      "enableServerDescription": "[to be translated]:Start WebSocket server for external app connections",
+      "port": "[to be translated]:Server port",
+      "portDescription": "[to be translated]:Port for the SDK WebSocket server",
+      "requireApproval": "[to be translated]:Require approval",
+      "requireApprovalDescription": "[to be translated]:Ask for permission when new apps connect",
+      "title": "[to be translated]:Developer SDK"
+    },
     "sidebar": {
       "close": {
         "title": "Închide"
@@ -2079,7 +2185,39 @@
         "title": "Șterge aplicația personalizată"
       }
     },
-    "title": "MinApp"
+    "title": "MinApp",
+    "trust": {
+      "approve": "[to be translated]:Allow",
+      "capabilities": {
+        "ai": "[to be translated]:AI Completion",
+        "aiDescription": "[to be translated]:Access AI chat completion services",
+        "clipboard": "[to be translated]:Clipboard",
+        "clipboardDescription": "[to be translated]:Read and write clipboard",
+        "files": "[to be translated]:File Access",
+        "filesDescription": "[to be translated]:Sandboxed file system access",
+        "knowledge": "[to be translated]:Knowledge Bases",
+        "knowledgeDescription": "[to be translated]:Search and add to knowledge bases",
+        "mcp": "[to be translated]:MCP Tools",
+        "mcpDescription": "[to be translated]:Call available MCP tools",
+        "memory": "[to be translated]:Memory Storage",
+        "memoryDescription": "[to be translated]:Store and retrieve persistent data",
+        "notifications": "[to be translated]:Notifications",
+        "notificationsDescription": "[to be translated]:Show system notifications",
+        "settings": "[to be translated]:Settings",
+        "settingsDescription": "[to be translated]:Read app settings",
+        "tools": "[to be translated]:Tool Registration",
+        "toolsDescription": "[to be translated]:Register as an MCP tool"
+      },
+      "deny": "[to be translated]:Deny",
+      "description": "[to be translated]:{{appName}} wants to connect to Cherry Studio",
+      "noTrustedApps": "[to be translated]:No trusted apps",
+      "remember": "[to be translated]:Remember this choice",
+      "requestedCapabilities": "[to be translated]:Requested permissions:",
+      "revoke": "[to be translated]:Revoke",
+      "revokeConfirm": "[to be translated]:Are you sure you want to revoke trust for {{appName}}?",
+      "title": "[to be translated]:App Trust Request",
+      "trustedApps": "[to be translated]:Trusted Apps"
+    }
   },
   "minapps": {
     "ant-ling": "Ant Ling",
@@ -2158,6 +2296,25 @@
       "json": "JSON",
       "number": "Număr",
       "string": "Text"
+    },
+    "parameters": {
+      "default_temperature": {
+        "label": "[to be translated]:Default Temperature",
+        "tooltip": "[to be translated]:Controls randomness: Lowering results in less random completions"
+      },
+      "default_top_p": {
+        "label": "[to be translated]:Default Top P",
+        "tooltip": "[to be translated]:Controls diversity via nucleus sampling"
+      },
+      "label": "[to be translated]:Parameters",
+      "max_context_tokens": {
+        "label": "[to be translated]:Max Context Tokens",
+        "tooltip": "[to be translated]:The maximum number of tokens the model can process, click to edit"
+      },
+      "max_output_tokens": {
+        "label": "[to be translated]:Max Output Tokens",
+        "tooltip": "[to be translated]:The maximum number of tokens the model can generate"
+      }
     },
     "pinned": "Fixat",
     "price": {
@@ -2246,7 +2403,7 @@
       "found_results": "S-au găsit {{count}} rezultate (Nume: {{nameCount}}, Conținut: {{contentCount}})",
       "more_matches": "mai multe potriviri",
       "searching": "Se caută...",
-      "show_less": "Arată mai puțin"
+      "show_less": "Afișează mai puțin"
     },
     "settings": {
       "data": {
@@ -2297,7 +2454,7 @@
       },
       "title": "Notițe"
     },
-    "show_starred": "Arată notițele favorite",
+    "show_starred": "Afișează notițele favorite",
     "sort_a2z": "Nume fișier (A-Z)",
     "sort_created_asc": "Ora creării (cele mai vechi întâi)",
     "sort_created_desc": "Ora creării (cele mai noi întâi)",
@@ -2636,6 +2793,7 @@
     "alayanew": "Alaya NeW",
     "anthropic": "Anthropic",
     "aws-bedrock": "AWS Bedrock",
+    "azure-foundry": "[to be translated]:Azure AI Foundry",
     "azure-openai": "Azure OpenAI",
     "baichuan": "Baichuan",
     "baidu-cloud": "Baidu Cloud",
@@ -2948,7 +3106,7 @@
         "opacity": "Opacitate fereastră",
         "original_copy": "Copiază originalul",
         "original_hide": "Ascunde originalul",
-        "original_show": "Arată originalul",
+        "original_show": "Afișează originalul",
         "pin": "Fixează",
         "pinned": "Fixat",
         "r_regenerate": "R: Regenerează"
@@ -3046,7 +3204,7 @@
             "windows": "Unele aplicații nu acceptă selectarea textului cu tasta Ctrl. Dacă ai remapat tasta Ctrl folosind instrumente precum AHK, acest lucru poate cauza eșecul selecției textului în unele aplicații."
           },
           "selected": "Selecție",
-          "selected_note": "Arată bara de instrumente imediat ce textul este selectat",
+          "selected_note": "Afișează bara de instrumente la selectarea textului",
           "shortcut": "Comandă rapidă",
           "shortcut_link": "Mergi la Setările comenzilor rapide",
           "shortcut_note": "După selecție, folosește comanda rapidă pentru a afișa bara de instrumente. Te rugăm să setezi comanda rapidă în pagina de setări și să o activezi. ",
@@ -3162,6 +3320,40 @@
       "auto_switch_to_topics": "Comutare automată la subiect",
       "title": "Setări avansate"
     },
+    "artifacts": {
+      "auto_open": "[to be translated]:Auto-open Artifacts",
+      "auto_open_help": "[to be translated]:Automatically open the artifact viewer when a new artifact is created.",
+      "enable": "[to be translated]:Enable Artifact Support",
+      "enable_help": "[to be translated]:When enabled, AI-generated interactive content will be detected and rendered as artifacts.",
+      "enabled_types": "[to be translated]:Enabled Artifact Types",
+      "items": "[to be translated]:items",
+      "react": {
+        "add_dep": "[to be translated]:Add",
+        "custom_bundler_url": "[to be translated]:Custom Bundler URL",
+        "custom_bundler_url_help": "[to be translated]:Optional: URL for a self-hosted Sandpack bundler. Leave empty to use the default CodeSandbox bundler.",
+        "dep_actions": "[to be translated]:Actions",
+        "dep_name": "[to be translated]:Package",
+        "dep_name_placeholder": "[to be translated]:Package name (e.g., framer-motion)",
+        "dep_version": "[to be translated]:Version",
+        "dependencies_help": "[to be translated]:These packages will be available in Sandpack React artifacts. Add commonly used packages here.",
+        "dependencies_title": "[to be translated]:Available Dependencies",
+        "no_deps": "[to be translated]:No dependencies configured",
+        "show_console": "[to be translated]:Show Console",
+        "show_console_help": "[to be translated]:Show the console output panel for debugging React artifacts.",
+        "show_editor": "[to be translated]:Show Code Editor",
+        "show_editor_help": "[to be translated]:Show the code editor panel alongside the preview in Sandpack mode.",
+        "title": "[to be translated]:React Artifact Settings",
+        "use_sandpack": "[to be translated]:Use Sandpack Runtime",
+        "use_sandpack_help": "[to be translated]:Use CodeSandbox Sandpack for React artifacts. Enables NPM dependencies, hot reload, and better error handling. Disable for simple Babel-only transpilation."
+      },
+      "required": "[to be translated]:Required",
+      "storage_limit": "[to be translated]:Storage Limit",
+      "storage_limit_help": "[to be translated]:Maximum number of artifacts to store. Older artifacts will be automatically removed.",
+      "storage_title": "[to be translated]:Storage",
+      "title": "[to be translated]:Artifacts",
+      "types_help": "[to be translated]:Select which types of artifacts should be generated. HTMX is always enabled.",
+      "types_title": "[to be translated]:Artifact Types"
+    },
     "assistant": {
       "icon": {
         "type": {
@@ -3174,6 +3366,54 @@
       "label": "Asistent implicit",
       "model_params": "Parametri model",
       "title": "Asistent implicit"
+    },
+    "contextStrategy": {
+      "configuration": "[to be translated]:Strategy Configuration",
+      "configurationHelp": "[to be translated]:Configure how context is managed when conversations approach model limits. Different strategies offer different tradeoffs between context preservation and token efficiency.",
+      "description": "[to be translated]:Choose how to manage conversation context when it approaches model limits. This prevents \"Prompt is too long\" errors while preserving important context.",
+      "descriptions": {
+        "hierarchical": "[to be translated]:Three-tier memory system: recent messages verbatim, older messages summarized, key facts extracted.",
+        "none": "[to be translated]:No context management. May exceed model limits on long conversations.",
+        "sliding_window": "[to be translated]:Keeps only the most recent messages within the token budget. Simple and predictable.",
+        "summarize": "[to be translated]:Progressively summarizes older messages to preserve key information while reducing tokens.",
+        "truncate_middle": "[to be translated]:Preserves initial instructions and recent context, removes middle messages."
+      },
+      "globalDescription": "[to be translated]:Automatically manages conversation context to prevent exceeding model limits. This setting applies globally and can be overridden per assistant or conversation.",
+      "howItWorks": "[to be translated]:How It Works",
+      "inheritedStrategy": "[to be translated]:Currently using:",
+      "keepFirst": "[to be translated]:Keep First Messages",
+      "keepFirstHelp": "[to be translated]:Number of initial messages to preserve (system context, instructions).",
+      "keepLast": "[to be translated]:Keep Last Messages",
+      "keepLastHelp": "[to be translated]:Number of recent messages to preserve.",
+      "longTermBudget": "[to be translated]:Long-term Budget",
+      "longTermBudgetHelp": "[to be translated]:Token budget for extracted long-term facts and preferences.",
+      "maxMessages": "[to be translated]:Max Messages",
+      "maxMessagesHelp": "[to be translated]:Maximum number of messages to keep. Leave empty for automatic (token-based) management.",
+      "midTermBudget": "[to be translated]:Mid-term Budget",
+      "midTermBudgetHelp": "[to be translated]:Token budget for mid-term memory summaries.",
+      "nav_title": "[to be translated]:Context Management",
+      "selectModel": "[to be translated]:Model",
+      "selectModelPlaceholder": "[to be translated]:Select summarization model",
+      "shortTermTurns": "[to be translated]:Short-term Turns",
+      "shortTermTurnsHelp": "[to be translated]:Number of recent conversation turns to keep verbatim.",
+      "strategy": "[to be translated]:Strategy",
+      "summarizationModel": "[to be translated]:Summarization Model",
+      "summarizationModelDescription": "[to be translated]:This model will be used to generate conversation summaries. Choose a fast model to minimize latency. If not set, the current conversation model will be used.",
+      "summarizationModelHelp": "[to be translated]:Select a fast, lightweight model for generating summaries. Recommended: Claude Haiku, GPT-3.5 Turbo, or similar quick models.",
+      "summarizeThreshold": "[to be translated]:Min Messages Before Summarizing",
+      "summarizeThresholdHelp": "[to be translated]:Minimum number of messages before summarization kicks in.",
+      "summaryMaxTokens": "[to be translated]:Summary Budget",
+      "summaryMaxTokensHelp": "[to be translated]:Maximum tokens allocated for the conversation summary.",
+      "title": "[to be translated]:Context Management",
+      "tooltip": "[to be translated]:Automatically manages conversation context to prevent exceeding model limits. Applies to all conversations unless overridden.",
+      "types": {
+        "hierarchical": "[to be translated]:Hierarchical Memory",
+        "none": "[to be translated]:None (No Management)",
+        "sliding_window": "[to be translated]:Sliding Window",
+        "summarize": "[to be translated]:Progressive Summarization",
+        "truncate_middle": "[to be translated]:Keep First & Last"
+      },
+      "useInherited": "[to be translated]:Use Default"
     },
     "data": {
       "app_data": {
@@ -3441,7 +3681,7 @@
         },
         "show_model_provider": {
           "help": "Afișează furnizorul modelului (de ex., OpenAI, Gemini) la exportul în Markdown",
-          "title": "Arată furnizorul modelului"
+          "title": "Afișează furnizorul modelului"
         },
         "standardize_citations": {
           "help": "Când este activat, marcatorii de citare vor fi convertiți în format standard de notă de subsol Markdown [^1], iar listele de citare vor fi formatate.",
@@ -3826,22 +4066,22 @@
         "disabled": "Ascunde pictograme",
         "empty": "Trage funcția ascunsă din partea stângă aici",
         "files": {
-          "icon": "Arată pictograma Fișiere"
+          "icon": "Afișează pictograma Fișiere"
         },
         "knowledge": {
-          "icon": "Arată pictograma Cunoștințe"
+          "icon": "Afișează pictograma Cunoștințe"
         },
         "minapp": {
-          "icon": "Arată pictograma MinApp"
+          "icon": "Afișează pictograma MinApp"
         },
         "painting": {
-          "icon": "Arată pictograma Pictură"
+          "icon": "Afișează pictograma Imagini"
         },
         "title": "Setări bară laterală",
         "translate": {
-          "icon": "Arată pictograma Traducere"
+          "icon": "Afișează pictograma Traducere"
         },
-        "visible": "Arată pictograme"
+        "visible": "Afișează pictograme"
       },
       "title": "Setări afișare",
       "topic": {
@@ -3917,7 +4157,7 @@
         "knowledge_base": "Golește bazele de cunoștințe selectate",
         "models": "Golește toate modelele"
       },
-      "show_translate_confirm": "Arată dialogul de confirmare a traducerii",
+      "show_translate_confirm": "Afișează fereastra de confirmare a traducerii",
       "target_language": {
         "chinese": "Chineză simplificată",
         "chinese-traditional": "Chineză tradițională",
@@ -3979,16 +4219,21 @@
       "builtinServersDescriptions": {
         "brave_search": "O implementare de server MCP care integrează API-ul Brave Search, oferind funcționalități de căutare web și locală. Necesită configurarea variabilei de mediu BRAVE_API_KEY",
         "browser": "Controlează o fereastră Electron headless prin Protocolul Chrome DevTools. Instrumente: deschide URL, execută JS pe o singură linie, resetează sesiunea.",
+        "browser_automation": "[to be translated]:Vision-optimized browser automation for embedded mini-apps. Provides high-level tools for AI models to interact with web content using screenshots and element detection.",
         "didi_mcp": "Server DiDi MCP care oferă servicii de ride-hailing, inclusiv căutare pe hartă, estimare preț, gestionare comenzi și urmărire șofer. Disponibil doar în China continentală. Necesită configurarea variabilei de mediu DIDI_API_KEY",
         "dify_knowledge": "Implementarea serverului MCP Dify oferă un API simplu pentru a interacționa cu Dify. Necesită configurarea cheii Dify",
+        "e2b": "[to be translated]:Execute Python code in secure E2B cloud sandboxes with full file operations support. Provides persistent Jupyter-like environments with common data science libraries pre-installed. Requires configuring the E2B_API_KEY environment variable. Supports both hosted and self-hosted deployments via E2B_API_URL.",
         "fetch": "Server MCP pentru preluarea conținutului web de la URL",
         "filesystem": "Un server Node.js care implementează Protocolul de Context Model (MCP) pentru operațiuni în sistemul de fișiere. Necesită configurarea directoarelor permise pentru acces.",
         "mcp_auto_install": "Instalează automat serviciul MCP (beta)",
         "memory": "Implementare de memorie persistentă bazată pe un graf de cunoștințe local. Aceasta permite modelului să rețină informații legate de utilizator între conversații diferite. Necesită configurarea variabilei de mediu MEMORY_FILE_PATH.",
+        "minapp_controller": "[to be translated]:Control and extract data from embedded mini-apps. Provides tools for conversation extraction, page content scraping, and automated interaction with ChatGPT, Claude, Perplexity, and other web apps.",
         "no": "Fără descriere",
         "nowledge_mem": "Necesită aplicația Nowledge Mem rulând local. Păstrează chat-urile AI, instrumentele, notițele, agenții și fișierele în memoria privată de pe computerul tău. Descarcă de la https://mem.nowledge.co/",
         "python": "Execută cod Python într-un mediu sandbox securizat. Rulează Python cu Pyodide, suportând majoritatea bibliotecilor standard și pachetelor de calcul științific",
-        "sequentialthinking": "O implementare de server MCP care oferă instrumente pentru rezolvarea dinamică și reflexivă a problemelor prin procese de gândire structurată"
+        "sdk_bridge": "[to be translated]:Bridge for dynamically registered tools from mini-apps using the @theboss/sdk. Enables third-party apps to register custom MCP tools at runtime.",
+        "sequentialthinking": "O implementare de server MCP care oferă instrumente pentru rezolvarea dinamică și reflexivă a problemelor prin procese de gândire structurată",
+        "unstructured": "[to be translated]:Process and extract content from 50+ document formats including PDF, Word, Excel, PowerPoint, images (with OCR), HTML, and more. Returns structured text that can be analyzed or summarized. Requires configuring the UNSTRUCTURED_API_KEY environment variable. Supports both hosted and self-hosted deployments via UNSTRUCTURED_API_URL."
       },
       "command": "Comandă",
       "config_description": "Configurează serverele Protocolului de Context Model",
@@ -4182,9 +4427,24 @@
       "url": "URL",
       "user": "Utilizator"
     },
+    "mcpContent": {
+      "autoSummarization": "[to be translated]:Auto-Summarization",
+      "autoSummarizationHelp": "[to be translated]:When enabled, large MCP tool results will be automatically summarized using the quick model. When disabled, large results will be truncated instead.",
+      "description": "[to be translated]:These settings help prevent \"Prompt is too long\" errors when MCP tools return large content (e.g., web search results, extracted pages). Large content is automatically summarized or truncated before being sent to the model.",
+      "maxCharactersForTruncation": "[to be translated]:Truncation Limit (chars)",
+      "maxCharactersForTruncationHelp": "[to be translated]:Maximum characters to keep when truncating (fallback when summarization fails or is disabled). Content beyond this is removed.",
+      "maxToolResultTokens": "[to be translated]:Max Result Tokens",
+      "maxToolResultTokensHelp": "[to be translated]:Absolute maximum tokens allowed for a single MCP tool result. Results exceeding this will always be processed regardless of other settings.",
+      "summarizationThreshold": "[to be translated]:Summarization Threshold",
+      "summarizationThresholdHelp": "[to be translated]:Token count that triggers automatic summarization. Content exceeding this will be processed. Lower values mean more aggressive summarization.",
+      "targetSummarizedTokens": "[to be translated]:Target Summary Size",
+      "targetSummarizedTokensHelp": "[to be translated]:Target token count after summarization. Larger values preserve more detail but use more context. Recommended: 4000-12000 tokens.",
+      "title": "[to be translated]:MCP Tool Content Management",
+      "tooltip": "[to be translated]:Automatically manages large content from MCP tools (like web search) to prevent \"Prompt is too long\" errors. Large results are summarized or truncated before being sent to the model."
+    },
     "messages": {
       "divider": {
-        "label": "Arată divizor între mesaje",
+        "label": "Afișează divizor între mesaje",
         "tooltip": "Nu se aplică mesajelor stil bulă"
       },
       "grid_columns": "Coloane afișare grilă mesaje",
@@ -4200,7 +4460,7 @@
         "paste_long_text_as_file": "Lipește text lung ca fișier",
         "paste_long_text_threshold": "Lungime lipire text lung",
         "send_shortcuts": "Comenzi rapide trimitere",
-        "show_estimated_tokens": "Arată tokeni estimați",
+        "show_estimated_tokens": "Afișează numărul estimat de tokeni",
         "title": "Setări intrare"
       },
       "markdown_rendering_input_message": "Randare Markdown mesaj intrare",
@@ -4214,13 +4474,10 @@
         "label": "Bară navigare",
         "none": "Niciunul"
       },
-      "prompt": "Arată prompt",
-      "show_message_outline": "Arată contur mesaj",
+      "prompt": "Afișează prompt",
+      "show_message_outline": "Afișează conturul mesajului",
       "title": "Setări mesaje",
       "use_serif_font": "Folosește font serif"
-    },
-    "mineru": {
-      "api_key": "Mineru oferă acum o cotă zilnică gratuită de 500 de pagini și nu este nevoie să introduci o cheie."
     },
     "miniapps": {
       "cache_change_notice": "Modificările vor intra în vigoare când numărul de mini-aplicații deschise atinge valoarea setată",
@@ -4265,7 +4522,7 @@
         "title": "Deschide în browser linkurile care deschid ferestre noi"
       },
       "reset_tooltip": "Resetează la implicit",
-      "sidebar_description": "Arată mini-aplicațiile active în bara laterală",
+      "sidebar_description": "Afișează mini-aplicațiile active în bara laterală",
       "sidebar_title": "Afișare mini-aplicații active în bara laterală",
       "title": "Setări mini-aplicații",
       "visible": "Mini-aplicații vizibile"
@@ -4549,6 +4806,17 @@
           "tip": "Versiunea API a Azure OpenAI, dacă dorești să folosești API-ul de Răspuns, te rugăm să introduci versiunea v1"
         }
       },
+      "azure-foundry": {
+        "description": "[to be translated]:Universal access to 10+ model providers",
+        "help": "[to be translated]:Supports OpenAI, Anthropic, Meta, Mistral, Cohere, DeepSeek, xAI, Microsoft, AI21, and other models through a single endpoint",
+        "openai_host_help": "[to be translated]:Required for GPT/o/Embedding deployments hosted at https://{resource}.openai.azure.com",
+        "openai_host_label": "[to be translated]:OpenAI deployment endpoint",
+        "openai_host_placeholder": "[to be translated]:https://<resource>.openai.azure.com",
+        "openai_host_preview": "[to be translated]:Current OpenAI endpoint: {{url}}",
+        "openai_host_warning": "[to be translated]:OpenAI endpoint should use https://{resource}.openai.azure.com. You entered a project or legacy Cognitive Services host.",
+        "project_host_help": "[to be translated]:Project base URL must be https://{resource}.services.ai.azure.com/api/projects/<project>",
+        "project_host_warning": "[to be translated]:Project endpoints should use https://{resource}.services.ai.azure.com/api/projects/<project>. You entered an OpenAI/Cognitive Services host."
+      },
       "basic_auth": {
         "label": "Autentificare HTTP",
         "password": {
@@ -4721,7 +4989,7 @@
       "search_message_in_chat": "Caută mesaj în chat-ul curent",
       "selection_assistant_select_text": "Asistent de selecție: Selectează text",
       "selection_assistant_toggle": "Comută Asistentul de selecție",
-      "show_app": "Arată/Ascunde aplicația",
+      "show_app": "Afișează/Ascunde aplicația",
       "show_settings": "Deschide setările",
       "title": "Comenzi rapide de la tastatură",
       "toggle_new_context": "Șterge contextul",
@@ -4782,19 +5050,109 @@
         "title": "Serviciu OCR"
       },
       "preprocess": {
+        "e2b": {
+          "api_key": "[to be translated]:API Key",
+          "api_key_placeholder": "[to be translated]:Enter your E2B API key",
+          "api_url": "[to be translated]:API URL",
+          "api_url_placeholder": "[to be translated]:https://api.e2b.dev or self-hosted URL",
+          "chat_tool": {
+            "description": "[to be translated]:When enabled, AI can run Python code in E2B sandboxes",
+            "label": "[to be translated]:Enable Chat Tool",
+            "requires_api_key": "[to be translated]:Requires valid API key to enable",
+            "tool_name": "[to be translated]:Tool name: execute_code_in_e2b",
+            "tooltip": "[to be translated]:Allow AI to execute code during conversations"
+          },
+          "description": "[to be translated]:Run AI-generated code in secure cloud sandboxes",
+          "health_check": {
+            "button": "[to be translated]:Test Connection",
+            "failed": "[to be translated]:E2B connection failed. Check your API key and URL.",
+            "success": "[to be translated]:E2B connection successful!"
+          },
+          "options": {
+            "sandbox_mode": {
+              "label": "[to be translated]:Sandbox Mode",
+              "per_session": "[to be translated]:Per Session - New sandbox each chat",
+              "persistent": "[to be translated]:Persistent - Reuse sandbox",
+              "tooltip": "[to be translated]:Per-session creates fresh sandboxes; persistent reuses them for better performance"
+            },
+            "template": {
+              "label": "[to be translated]:Custom Template ID",
+              "placeholder": "[to be translated]:Optional: custom E2B template",
+              "tooltip": "[to be translated]:Use a custom E2B template for specialized environments"
+            },
+            "timeout": {
+              "label": "[to be translated]:Execution Timeout",
+              "tooltip": "[to be translated]:Maximum time for code execution (seconds)"
+            }
+          },
+          "title": "[to be translated]:E2B Code Interpreter"
+        },
         "provider": "Furnizor procesare documente",
         "provider_placeholder": "Alege un furnizor de procesare documente",
         "title": "Procesare documente",
-        "tooltip": "În Setări -> Instrumente, setează un furnizor de servicii de procesare a documentelor. Procesarea documentelor poate îmbunătăți eficient performanța de recuperare a documentelor cu format complex și a documentelor scanate."
+        "tooltip": "În Setări -> Instrumente, setează un furnizor de servicii de procesare a documentelor. Procesarea documentelor poate îmbunătăți eficient performanța de recuperare a documentelor cu format complex și a documentelor scanate.",
+        "unstructured": {
+          "api_host": "[to be translated]:API Host",
+          "api_host_placeholder": "[to be translated]:https://api.unstructured.io or self-hosted URL",
+          "api_key": "[to be translated]:API Key",
+          "api_key_placeholder": "[to be translated]:Enter your Unstructured API key",
+          "chat_tool": {
+            "description": "[to be translated]:Allow AI to process documents during conversations",
+            "label": "[to be translated]:Enable Chat Tool",
+            "requires_api_key": "[to be translated]:Requires valid API key to enable",
+            "tool_name": "[to be translated]:Tool name: process_document_with_unstructured",
+            "tooltip": "[to be translated]:When enabled, the AI can use the 'process_document_with_unstructured' tool to extract content from documents"
+          },
+          "description": "[to be translated]:Enterprise-grade document processing supporting 50+ file types",
+          "health_check": {
+            "button": "[to be translated]:Test Connection",
+            "failed": "[to be translated]:Connection failed",
+            "success": "[to be translated]:Connection successful"
+          },
+          "options": {
+            "chunking_strategy": {
+              "basic": "[to be translated]:Basic - Simple chunking",
+              "by_title": "[to be translated]:By Title - Semantic chunking",
+              "label": "[to be translated]:Chunking Strategy"
+            },
+            "concurrency": {
+              "label": "[to be translated]:Concurrency Level",
+              "tooltip": "[to be translated]:Number of parallel requests (1-15)"
+            },
+            "mime_types": {
+              "categories": {
+                "document": "[to be translated]:Documents",
+                "image": "[to be translated]:Images (OCR)",
+                "other": "[to be translated]:Other Formats",
+                "presentation": "[to be translated]:Presentations",
+                "spreadsheet": "[to be translated]:Spreadsheets",
+                "text": "[to be translated]:Text Files",
+                "web": "[to be translated]:Web Pages"
+              },
+              "description": "[to be translated]:Select which file types should be processed by Unstructured.io",
+              "deselect_all": "[to be translated]:Deselect All",
+              "label": "[to be translated]:Supported File Types",
+              "search_placeholder": "[to be translated]:Search file types...",
+              "select_all": "[to be translated]:Select All",
+              "selected_count": "[to be translated]:{{count}} file type(s) selected"
+            },
+            "split_pdf": {
+              "label": "[to be translated]:Split PDF Pages",
+              "tooltip": "[to be translated]:Process PDF pages in parallel for faster processing"
+            },
+            "strategy": {
+              "auto": "[to be translated]:Auto - Automatic detection",
+              "fast": "[to be translated]:Fast - Quick processing",
+              "hi_res": "[to be translated]:High Resolution - Best quality",
+              "label": "[to be translated]:Processing Strategy",
+              "ocr_only": "[to be translated]:OCR Only - Text extraction"
+            }
+          },
+          "title": "[to be translated]:Unstructured.io"
+        }
       },
       "title": "Alte setări",
       "websearch": {
-        "api_key_required": {
-          "content": "{{provider}} necesită o cheie API pentru a funcționa. Dorești să o configurezi acum?",
-          "ok": "Configurează",
-          "title": "Cheie API necesară"
-        },
-        "api_providers": "Furnizori API",
         "apikey": "Cheie API",
         "blacklist": "Listă neagră",
         "blacklist_description": "Rezultatele de pe următoarele site-uri web nu vor apărea în rezultatele căutării",
@@ -4836,15 +5194,7 @@
         },
         "content_limit": "Limită lungime conținut",
         "content_limit_tooltip": "Limitează lungimea conținutului rezultatelor căutării; conținutul care depășește limita va fi trunchiat.",
-        "default_provider": "Furnizor implicit",
         "free": "Gratuit",
-        "is_default": "Implicit",
-        "local_provider": {
-          "hint": "Conectează-te la site pentru a obține rezultate mai bune ale căutării și pentru a personaliza setările de căutare.",
-          "open_settings": "Deschide setările {{provider}}",
-          "settings": "Setări căutare locală"
-        },
-        "local_providers": "Furnizori locali",
         "no_provider_selected": "Te rugăm să selectezi un furnizor de servicii de căutare înainte de a verifica.",
         "overwrite": "Suprascrie serviciul de căutare",
         "overwrite_tooltip": "Forțează utilizarea serviciului de căutare în loc de LLM",
@@ -4855,7 +5205,6 @@
         "search_provider": "Furnizor serviciu căutare",
         "search_provider_placeholder": "Alege un furnizor de servicii de căutare.",
         "search_with_time": "Caută cu date incluse",
-        "set_as_default": "Setează ca implicit",
         "subscribe": "Abonare listă neagră",
         "subscribe_add": "Adaugă abonament",
         "subscribe_add_failed": "Adăugarea sursei fluxului a eșuat",
@@ -4890,7 +5239,7 @@
         "right": "Dreapta"
       },
       "show": {
-        "time": "Arată ora subiectului"
+        "time": "Afișează ora subiectului"
       }
     },
     "translate": {
@@ -4940,7 +5289,7 @@
     },
     "tray": {
       "onclose": "Minimizează în zona de notificare la închidere",
-      "show": "Arată pictograma în zona de notificare",
+      "show": "Afișează pictograma în zona de notificare",
       "title": "Zonă de notificare"
     },
     "zoom": {

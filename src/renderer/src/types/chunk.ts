@@ -424,7 +424,6 @@ export interface ContextActionChunk {
   removedCount?: number
 }
 
-
 export interface RawChunk {
   /**
    * The type of the chunk
@@ -473,5 +472,4 @@ export type Chunk =
   | VideoSearchedChunk // 知识库检索视频
   | ImageSearchedChunk // 知识库检索图片
   | ContextActionChunk // 上下文管理动作
-
   | RawChunk

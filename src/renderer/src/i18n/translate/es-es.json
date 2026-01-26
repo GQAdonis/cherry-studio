@@ -4479,9 +4479,6 @@
       "title": "Configuración de mensajes",
       "use_serif_font": "Usar fuente serif"
     },
-    "mineru": {
-      "api_key": "MinerU ahora ofrece un cupo gratuito de 500 páginas diarias, no es necesario que ingrese una clave."
-    },
     "miniapps": {
       "cache_change_notice": "Los cambios surtirán efecto cuando el número de miniaplicaciones abiertas aumente o disminuya hasta alcanzar el valor configurado",
       "cache_description": "Establece el número máximo de miniaplicaciones que pueden permanecer activas simultáneamente",
@@ -5198,13 +5195,6 @@
         "content_limit": "Límite de longitud del contenido",
         "content_limit_tooltip": "Limita la longitud del contenido en los resultados de búsqueda; el contenido que exceda el límite será truncado",
         "free": "Gratis",
-        "is_default": "Por defecto",
-        "local_provider": {
-          "hint": "Inicia sesión en el sitio web para obtener mejores resultados de búsqueda y personalizar tu configuración de búsqueda.",
-          "open_settings": "Abrir configuración de {{provider}}",
-          "settings": "Configuración de búsqueda local"
-        },
-        "local_providers": "Proveedores locales",
         "no_provider_selected": "Seleccione un proveedor de búsqueda antes de comprobar",
         "overwrite": "Sobrescribir búsqueda del proveedor",
         "overwrite_tooltip": "Forzar el uso del proveedor de búsqueda en lugar del modelo de lenguaje grande",
@@ -5215,7 +5205,6 @@
         "search_provider": "Proveedor de búsqueda",
         "search_provider_placeholder": "Seleccione un proveedor de búsqueda",
         "search_with_time": "Buscar con fecha",
-        "set_as_default": "Establecer como predeterminado",
         "subscribe": "Suscripción a lista negra",
         "subscribe_add": "Añadir suscripción",
         "subscribe_add_failed": "Error al agregar la fuente de suscripción",

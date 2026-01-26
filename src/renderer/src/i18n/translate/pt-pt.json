@@ -4479,9 +4479,6 @@
       "title": "Configurações de mensagem",
       "use_serif_font": "Usar fonte serif"
     },
-    "mineru": {
-      "api_key": "O MinerU agora oferece uma cota diária gratuita de 500 páginas; você não precisa preencher uma chave."
-    },
     "miniapps": {
       "cache_change_notice": "As alterações entrarão em vigor após a abertura ou remoção dos mini aplicativos até atingir o número definido",
       "cache_description": "Defina o número máximo de mini aplicativos que permanecerão ativos simultaneamente",
@@ -5198,13 +5195,6 @@
         "content_limit": "Limite de comprimento do conteúdo",
         "content_limit_tooltip": "Limita o comprimento do conteúdo dos resultados de pesquisa; o conteúdo excedente será truncado",
         "free": "Grátis",
-        "is_default": "Padrão",
-        "local_provider": {
-          "hint": "Faça login no site para obter melhores resultados de pesquisa e personalizar suas configurações de busca.",
-          "open_settings": "Abrir Configurações do {{provider}}",
-          "settings": "Configurações de Pesquisa Local"
-        },
-        "local_providers": "Fornecedores Locais",
         "no_provider_selected": "Por favor, selecione um provedor de pesquisa antes de verificar",
         "overwrite": "Substituir busca do provedor",
         "overwrite_tooltip": "Força o uso do provedor de pesquisa em vez do modelo de linguagem grande",
@@ -5215,7 +5205,6 @@
         "search_provider": "Provedor de pesquisa",
         "search_provider_placeholder": "Selecione um provedor de pesquisa",
         "search_with_time": "Pesquisar com data",
-        "set_as_default": "Definir como Padrão",
         "subscribe": "Assinatura de lista negra",
         "subscribe_add": "Adicionar assinatura",
         "subscribe_add_failed": "Falha ao adicionar a fonte de subscrição",
