@@ -1374,7 +1374,6 @@
     "warning": "Advertencia",
     "you": "Usuario"
   },
-<<<<<<< HEAD
   "conversation": {
     "contextStrategy": {
       "button": "[to be translated]:Context",
@@ -1385,7 +1384,7 @@
       "useAssistantDefault": "[to be translated]:Use Assistant Default",
       "usingDefault": "[to be translated]:Using assistant default"
     }
-=======
+  },
   "dialog": {
     "all_files": "Todos los archivos",
     "html_files": "Archivos HTML",
@@ -1397,7 +1396,6 @@
     "save_file": "Guardar archivo",
     "select_folder": "Seleccionar carpeta",
     "word_document": "Documento de Word"
->>>>>>> upstream/main
   },
   "docs": {
     "title": "Documentación de Ayuda"
@@ -5200,6 +5198,21 @@
       }
     },
     "title": "Configuración",
+    "title": {
+      "apps": "Aplicaciones",
+      "code": "Código",
+      "files": "Archivos",
+      "home": "Inicio",
+      "knowledge": "Base de conocimiento",
+      "launchpad": "Centro de lanzamiento",
+      "mcp-servers": "Servidores MCP",
+      "memories": "Memorias",
+      "notes": "notas",
+      "paintings": "Pinturas",
+      "settings": "Configuración",
+      "store": "Biblioteca de asistentes",
+      "translate": "Traducir"
+    },
     "tool": {
       "ocr": {
         "common": {
@@ -5234,7 +5247,6 @@
         "title": "Servicio OCR"
       },
       "preprocess": {
-<<<<<<< HEAD
         "e2b": {
           "api_key": "[to be translated]:API Key",
           "api_key_placeholder": "[to be translated]:Enter your E2B API key",
@@ -5271,13 +5283,12 @@
             }
           },
           "title": "[to be translated]:E2B Code Interpreter"
-=======
+        },
         "paddleocr": {
           "aistudio_access_token": "Token de acceso de la Comunidad AI Studio",
           "api_url": "URL de la API",
           "api_url_label": "Obtener el token de acceso y la URL de la API",
           "paddleocr_url_label": "Sitio web oficial de PaddleOCR"
->>>>>>> upstream/main
         },
         "provider": "Proveedor de servicios de preprocesamiento de documentos",
         "provider_placeholder": "Seleccionar un proveedor de servicios de preprocesamiento de documentos",
@@ -5495,21 +5506,6 @@
       "reset": "Restablecer",
       "title": "Escala"
     }
-  },
-  "title": {
-    "apps": "Aplicaciones",
-    "code": "Código",
-    "files": "Archivos",
-    "home": "Inicio",
-    "knowledge": "Base de conocimiento",
-    "launchpad": "Centro de lanzamiento",
-    "mcp-servers": "Servidores MCP",
-    "memories": "Memorias",
-    "notes": "notas",
-    "paintings": "Pinturas",
-    "settings": "Configuración",
-    "store": "Biblioteca de asistentes",
-    "translate": "Traducir"
   },
   "trace": {
     "backList": "Volver a la lista",

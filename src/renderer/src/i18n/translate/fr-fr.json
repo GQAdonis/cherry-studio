@@ -1374,7 +1374,6 @@
     "warning": "Avertissement",
     "you": "Vous"
   },
-<<<<<<< HEAD
   "conversation": {
     "contextStrategy": {
       "button": "[to be translated]:Context",
@@ -1385,7 +1384,7 @@
       "useAssistantDefault": "[to be translated]:Use Assistant Default",
       "usingDefault": "[to be translated]:Using assistant default"
     }
-=======
+  },
   "dialog": {
     "all_files": "Tous les fichiers",
     "html_files": "Fichiers HTML",
@@ -1397,7 +1396,6 @@
     "save_file": "Enregistrer le fichier",
     "select_folder": "Sélectionner un dossier",
     "word_document": "Document Word"
->>>>>>> upstream/main
   },
   "docs": {
     "title": "Documentation d'aide"
@@ -5234,7 +5232,6 @@
         "title": "Service OCR"
       },
       "preprocess": {
-<<<<<<< HEAD
         "e2b": {
           "api_key": "[to be translated]:API Key",
           "api_key_placeholder": "[to be translated]:Enter your E2B API key",
@@ -5271,13 +5268,12 @@
             }
           },
           "title": "[to be translated]:E2B Code Interpreter"
-=======
+        },
         "paddleocr": {
           "aistudio_access_token": "Jeton d’accès à la communauté AI Studio",
           "api_url": "URL de l’API",
           "api_url_label": "Obtenir le jeton d’accès et l’URL de l’API",
           "paddleocr_url_label": "Site officiel de PaddleOCR"
->>>>>>> upstream/main
         },
         "provider": "fournisseur de services de prétraitement de documents",
         "provider_placeholder": "Choisissez un prestataire de traitement de documents",

@@ -137,9 +137,10 @@ mac:
     - target: zip
 dmg:
   writeUpdateInfo: false
+  artifactName: The-Boss-${version}-${arch}.${ext}
 linux:
   artifactName: ${productName}-${version}-${arch}.${ext}
-  executableName: CherryStudio
+  executableName: The Boss
   target:
     - target: AppImage
     - target: deb
@@ -148,12 +149,9 @@ linux:
   category: Utility
   desktop:
     entry:
-<<<<<<< HEAD
-      StartupWMClass: TheBoss
-=======
-      Name: Cherry Studio
       StartupWMClass: CherryStudio
->>>>>>> upstream/main
+      Name: The Boss
+
   mimeTypes:
     - x-scheme-handler/boss
 rpm:

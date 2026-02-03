@@ -1374,7 +1374,6 @@
     "warning": "警告",
     "you": "用户"
   },
-<<<<<<< HEAD
   "conversation": {
     "contextStrategy": {
       "button": "上下文",
@@ -1385,7 +1384,7 @@
       "useAssistantDefault": "使用助手默认",
       "usingDefault": "使用助手默认"
     }
-=======
+  },
   "dialog": {
     "all_files": "所有文件",
     "html_files": "HTML 文件",
@@ -1397,7 +1396,6 @@
     "save_file": "保存文件",
     "select_folder": "选择文件夹",
     "word_document": "Word 文档"
->>>>>>> upstream/main
   },
   "docs": {
     "title": "帮助文档"
@@ -5234,7 +5232,6 @@
         "title": "OCR 服务"
       },
       "preprocess": {
-<<<<<<< HEAD
         "e2b": {
           "api_key": "[to be translated]:API Key",
           "api_key_placeholder": "[to be translated]:Enter your E2B API key",
@@ -5271,13 +5268,12 @@
             }
           },
           "title": "[to be translated]:E2B Code Interpreter"
-=======
+        },
         "paddleocr": {
           "aistudio_access_token": "星河社区访问令牌",
           "api_url": "API URL",
           "api_url_label": "获取访问令牌及API URL",
           "paddleocr_url_label": "PaddleOCR 官网"
->>>>>>> upstream/main
         },
         "provider": "文档处理服务商",
         "provider_placeholder": "选择一个文档处理服务商",

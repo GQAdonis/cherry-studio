@@ -1,6 +1,7 @@
 import { loggerService } from '@logger'
 import { NavbarCenter, NavbarHeader, NavbarRight } from '@renderer/components/app/Navbar'
 import { HStack } from '@renderer/components/Layout'
+import GeneralPopup from '@renderer/components/Popups/GeneralPopup'
 import { useActiveNode } from '@renderer/hooks/useNotesQuery'
 import { useNotesSettings } from '@renderer/hooks/useNotesSettings'
 import { useShowWorkspace } from '@renderer/hooks/useShowWorkspace'
@@ -12,6 +13,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import styled from 'styled-components'
 
 import { menuItems } from './MenuConfig'
+import NotesSettings from './NotesSettings'
 
 const logger = loggerService.withContext('HeaderNavbar')
 
@@ -51,8 +53,6 @@ const HeaderNavbar = ({ notesTree, getCurrentNoteContent, onToggleStar, onExpand
     }
   }, [getCurrentNoteContent])
 
-<<<<<<< HEAD
-=======
   const handleExportToWord = useCallback(async () => {
     try {
       const content = getCurrentNoteContent?.()
@@ -82,7 +82,6 @@ const HeaderNavbar = ({ notesTree, getCurrentNoteContent, onToggleStar, onExpand
     })
   }, [])
 
->>>>>>> upstream/main
   const handleBreadcrumbClick = useCallback(
     (item: { treePath: string; isFolder: boolean }) => {
       if (item.isFolder && onExpandPath) {
@@ -162,13 +161,10 @@ const HeaderNavbar = ({ notesTree, getCurrentNoteContent, onToggleStar, onExpand
       onClick: () => {
         if (item.copyAction) {
           handleCopyContent()
-<<<<<<< HEAD
-=======
         } else if (item.exportToWordAction) {
           handleExportToWord()
         } else if (item.showSettingsPopup) {
           handleShowSettings()
->>>>>>> upstream/main
         } else if (item.action) {
           item.action(settings, updateSettings)
         }

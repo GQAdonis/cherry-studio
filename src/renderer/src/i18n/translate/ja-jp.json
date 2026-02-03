@@ -1374,7 +1374,6 @@
     "warning": "警告",
     "you": "あなた"
   },
-<<<<<<< HEAD
   "conversation": {
     "contextStrategy": {
       "button": "[to be translated]:Context",
@@ -1385,7 +1384,7 @@
       "useAssistantDefault": "[to be translated]:Use Assistant Default",
       "usingDefault": "[to be translated]:Using assistant default"
     }
-=======
+  },
   "dialog": {
     "all_files": "すべてのファイル",
     "html_files": "HTMLファイル",
@@ -1397,7 +1396,6 @@
     "save_file": "ファイルを保存",
     "select_folder": "フォルダを選択",
     "word_document": "ワード文書"
->>>>>>> upstream/main
   },
   "docs": {
     "title": "ドキュメント"
@@ -5234,7 +5232,6 @@
         "title": "OCRサービス"
       },
       "preprocess": {
-<<<<<<< HEAD
         "e2b": {
           "api_key": "[to be translated]:API Key",
           "api_key_placeholder": "[to be translated]:Enter your E2B API key",
@@ -5271,13 +5268,12 @@
             }
           },
           "title": "[to be translated]:E2B Code Interpreter"
-=======
+        },
         "paddleocr": {
           "aistudio_access_token": "AI Studioコミュニティのアクセストークン",
           "api_url": "API URL",
           "api_url_label": "アクセストークンとAPI URLを取得する",
           "paddleocr_url_label": "PaddleOCR 公式ウェブサイト"
->>>>>>> upstream/main
         },
         "provider": "プレプロセスプロバイダー",
         "provider_placeholder": "前処理プロバイダーを選択してください",

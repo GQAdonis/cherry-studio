@@ -1,4 +1,4 @@
-import { CodeOutlined } from '@ant-design/icons'
+import { CodeOutlined, CopyOutlined } from '@ant-design/icons'
 import { useTheme } from '@renderer/context/ThemeProvider'
 import type { ThemeMode } from '@renderer/types'
 import { Button } from 'antd'
@@ -25,6 +25,15 @@ const ReactArtifactsCard: FC<Props> = ({ code, language, onSave, isStreaming = f
 
   const codeContent = code || ''
   const hasContent = codeContent.trim().length > 0
+
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(codeContent)
+      window.toast.success(t('common.copied'))
+    } catch (err) {
+      window.toast.error(t('common.copy_failed'))
+    }
+  }
 
   const handleDownload = async () => {
     const fileName = `react-component.${language}`
@@ -76,6 +85,9 @@ const ReactArtifactsCard: FC<Props> = ({ code, language, onSave, isStreaming = f
             <ButtonContainer>
               <Button icon={<CodeOutlined />} onClick={() => setIsPopupOpen(true)} type="text" disabled={!hasContent}>
                 {t('chat.artifacts.button.preview')}
+              </Button>
+              <Button icon={<CopyOutlined />} onClick={handleCopy} type="text" disabled={!hasContent}>
+                {t('common.copy')}
               </Button>
               <Button icon={<DownloadIcon size={14} />} onClick={handleDownload} type="text" disabled={!hasContent}>
                 {t('code_block.download.label')}

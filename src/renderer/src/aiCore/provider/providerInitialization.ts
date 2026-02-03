@@ -97,6 +97,14 @@ export const NEW_PROVIDER_CONFIGS: ProviderConfig[] = [
     supportsImageGeneration: false
   },
   {
+    id: 'fireworks',
+    name: 'Fireworks',
+    import: () => import('@ai-sdk/fireworks'),
+    creatorFunctionName: 'createFireworks',
+    supportsImageGeneration: true,
+    aliases: ['fireworks']
+  },
+  {
     id: 'ollama',
     name: 'Ollama',
     import: () => import('ollama-ai-provider-v2'),

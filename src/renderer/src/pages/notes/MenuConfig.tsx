@@ -1,9 +1,5 @@
 import type { NotesSettings } from '@renderer/store/note'
-<<<<<<< HEAD
-import { Copy, MonitorSpeaker, Type } from 'lucide-react'
-=======
-import { Copy, FileText, MonitorSpeaker, Settings, Type } from 'lucide-react'
->>>>>>> upstream/main
+import { Copy, FileText, MonitorSpeaker, Type } from 'lucide-react'
 import type { ReactNode } from 'react'
 
 export interface MenuItem {
@@ -16,11 +12,8 @@ export interface MenuItem {
   isActive?: (settings: NotesSettings) => boolean
   component?: (settings: NotesSettings, updateSettings: (newSettings: Partial<NotesSettings>) => void) => ReactNode
   copyAction?: boolean
-<<<<<<< HEAD
-=======
   exportToWordAction?: boolean
   showSettingsPopup?: boolean
->>>>>>> upstream/main
 }
 
 export const menuItems: MenuItem[] = [

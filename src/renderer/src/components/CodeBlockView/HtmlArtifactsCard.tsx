@@ -1,4 +1,4 @@
-import { CodeOutlined } from '@ant-design/icons'
+import { CodeOutlined, CopyOutlined } from '@ant-design/icons'
 import { loggerService } from '@logger'
 import { useTheme } from '@renderer/context/ThemeProvider'
 import type { ThemeMode } from '@renderer/types'
@@ -45,6 +45,15 @@ const HtmlArtifactsCard: FC<Props> = ({ html, onSave, isStreaming = false }) => 
       window.api.shell.openExternal(filePath)
     } else {
       logger.error(t('chat.artifacts.preview.openExternal.error.content'))
+    }
+  }
+
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(htmlContent)
+      window.toast.success(t('common.copied'))
+    } catch (err) {
+      window.toast.error(t('common.copy_failed'))
     }
   }
 
@@ -101,6 +110,9 @@ const HtmlArtifactsCard: FC<Props> = ({ html, onSave, isStreaming = false }) => 
               </Button>
               <Button icon={<LinkIcon size={14} />} onClick={handleOpenExternal} type="text" disabled={!hasContent}>
                 {t('chat.artifacts.button.openExternal')}
+              </Button>
+              <Button icon={<CopyOutlined />} onClick={handleCopy} type="text" disabled={!hasContent}>
+                {t('common.copy')}
               </Button>
               <Button icon={<DownloadIcon size={14} />} onClick={handleDownload} type="text" disabled={!hasContent}>
                 {t('code_block.download.label')}

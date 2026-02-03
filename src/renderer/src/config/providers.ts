@@ -517,7 +517,7 @@ export const SYSTEM_PROVIDERS_CONFIG: Record<SystemProviderId, SystemProvider> =
     name: 'Fireworks',
     type: 'openai',
     apiKey: '',
-    apiHost: 'https://api.fireworks.ai/inference',
+    apiHost: 'https://api.fireworks.ai/inference/v1',
     models: SYSTEM_MODELS.fireworks,
     isSystem: true,
     enabled: false
@@ -1241,7 +1241,7 @@ export const PROVIDER_URLS: Record<SystemProviderId, ProviderUrls> = {
   },
   fireworks: {
     api: {
-      url: 'https://api.fireworks.ai/inference'
+      url: 'https://api.fireworks.ai/inference/v1'
     },
     websites: {
       official: 'https://fireworks.ai/',

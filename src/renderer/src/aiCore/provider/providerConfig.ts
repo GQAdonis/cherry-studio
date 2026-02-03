@@ -278,47 +278,8 @@ export function providerToAiSdkConfig(actualProvider: Provider, model: Model): A
     ...actualProvider.extra_headers
   }
   if (aiSdkProviderId === 'openai') {
-<<<<<<< HEAD
-    extraOptions.headers['X-Api-Key'] = baseConfig.apiKey
-  }
-
-  // azure foundry - unified inference API for all non-OpenAI/Anthropic models
-  if (actualProvider.id === 'azure-foundry-inference') {
-    const inferenceBaseURL = actualProvider.apiHost + '/models'
-    return {
-      providerId: 'openai-compatible',
-      options: {
-        baseURL: inferenceBaseURL,
-        apiKey: baseConfig.apiKey,
-        name: 'azure-foundry',
-        headers: {
-          'api-version': actualProvider.apiVersion || '2024-10-21',
-          ...actualProvider.extra_headers
-        },
-        includeUsage
-      }
-    }
-  }
-
-  // azure
-  // https://learn.microsoft.com/en-us/azure/ai-foundry/openai/latest
-  // https://learn.microsoft.com/en-us/azure/ai-foundry/openai/how-to/responses?tabs=python-key#responses-api
-  if (aiSdkProviderId === 'azure-responses') {
-    extraOptions.mode = 'responses'
-  } else if (aiSdkProviderId === 'azure') {
-    extraOptions.mode = 'chat'
-  }
-  if (isAzureOpenAIProvider(actualProvider)) {
-    const apiVersion = actualProvider.apiVersion?.trim()
-    if (apiVersion) {
-      extraOptions.apiVersion = apiVersion
-      if (!['preview', 'v1'].includes(apiVersion)) {
-        extraOptions.useDeploymentBasedUrls = true
-      }
-=======
     if (actualProvider.extra_headers?.['X-Api-Key'] === undefined) {
       headers['X-Api-Key'] = baseConfig.apiKey
->>>>>>> upstream/main
     }
   }
 

@@ -109,7 +109,8 @@ export const PreprocessProviderIds = {
   mistral: 'mistral',
   mineru: 'mineru',
   'open-mineru': 'open-mineru',
-  unstructured: 'unstructured'
+  unstructured: 'unstructured',
+  paddleocr: 'paddleocr'
 } as const
 
 export type PreprocessProviderId = keyof typeof PreprocessProviderIds
