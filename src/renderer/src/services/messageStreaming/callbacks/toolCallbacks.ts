@@ -1,7 +1,7 @@
 import { loggerService } from '@logger'
 import type { AppDispatch } from '@renderer/store'
 import { toolPermissionsActions } from '@renderer/store/toolPermissions'
-import type { MCPToolResponse } from '@renderer/types'
+import type { MCPToolResponse, NormalToolResponse } from '@renderer/types'
 import { WebSearchSource } from '@renderer/types'
 import type { ToolMessageBlock } from '@renderer/types/newMessage'
 import { MessageBlockStatus, MessageBlockType } from '@renderer/types/newMessage'
@@ -11,6 +11,8 @@ import { condenseToolResult } from '../../ToolResultCondenser'
 import type { BlockManager } from '../BlockManager'
 
 const logger = loggerService.withContext('ToolCallbacks')
+
+type ToolResponse = MCPToolResponse | NormalToolResponse
 
 interface ToolCallbacksDependencies {
   blockManager: BlockManager
@@ -26,12 +28,12 @@ export const createToolCallbacks = (deps: ToolCallbacksDependencies) => {
   let toolBlockId: string | null = null
   let citationBlockId: string | null = null
 
-  const getToolCallKey = (toolResponse: MCPToolResponse): string => {
+  const getToolCallKey = (toolResponse: ToolResponse): string => {
     return toolResponse.toolCallId || toolResponse.id
   }
 
   return {
-    onToolCallPending: (toolResponse: MCPToolResponse) => {
+    onToolCallPending: (toolResponse: ToolResponse) => {
       logger.debug('onToolCallPending', toolResponse)
       const toolCallKey = getToolCallKey(toolResponse)
 
@@ -61,10 +63,50 @@ export const createToolCallbacks = (deps: ToolCallbacksDependencies) => {
       }
     },
 
-    onToolCallComplete: (toolResponse: MCPToolResponse) => {
+    onToolArgumentStreaming: (toolResponse: ToolResponse) => {
+      // Find or create the tool block for streaming updates
+      let existingBlockId = toolCallIdToBlockIdMap.get(toolResponse.id)
+
+      if (!existingBlockId) {
+        // Create a new tool block if one doesn't exist yet
+        if (blockManager.hasInitialPlaceholder) {
+          const changes = {
+            type: MessageBlockType.TOOL,
+            status: MessageBlockStatus.PENDING,
+            toolName: toolResponse.tool.name,
+            metadata: { rawMcpToolResponse: toolResponse }
+          }
+          toolBlockId = blockManager.initialPlaceholderBlockId!
+          blockManager.smartBlockUpdate(toolBlockId, changes, MessageBlockType.TOOL)
+          toolCallIdToBlockIdMap.set(toolResponse.id, toolBlockId)
+          existingBlockId = toolBlockId
+        } else {
+          const toolBlock = createToolBlock(assistantMsgId, toolResponse.id, {
+            toolName: toolResponse.tool.name,
+            status: MessageBlockStatus.PENDING,
+            metadata: { rawMcpToolResponse: toolResponse }
+          })
+          toolBlockId = toolBlock.id
+          blockManager.handleBlockTransition(toolBlock, MessageBlockType.TOOL)
+          toolCallIdToBlockIdMap.set(toolResponse.id, toolBlock.id)
+          existingBlockId = toolBlock.id
+        }
+      }
+
+      // Update the tool block with streaming arguments
+      const changes: Partial<ToolMessageBlock> = {
+        status: MessageBlockStatus.PENDING,
+        metadata: { rawMcpToolResponse: toolResponse }
+      }
+
+      blockManager.smartBlockUpdate(existingBlockId, changes, MessageBlockType.TOOL)
+    },
+
+    onToolCallComplete: (toolResponse: ToolResponse) => {
       const toolCallKey = getToolCallKey(toolResponse)
-      if (toolCallKey) {
-        dispatch(toolPermissionsActions.removeByToolCallId({ toolCallId: toolCallKey }))
+
+      if (toolResponse?.id) {
+        dispatch(toolPermissionsActions.removeByToolCallId({ toolCallId: toolResponse.id }))
       }
       const existingBlockId = toolCallIdToBlockIdMap.get(toolCallKey)
       toolCallIdToBlockIdMap.delete(toolCallKey)

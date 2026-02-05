@@ -354,6 +354,7 @@
     "oxlint-tsgolint": "^0.2.0",
     "p-queue": "^8.1.0",
     "pako": "1.0.11",
+    "partial-json": "0.1.7",
     "pdf-lib": "^1.17.1",
     "pdf-parse": "^1.1.1",
     "prosemirror-model": "1.25.2",
@@ -487,7 +488,7 @@
       "zipfile"
     ]
   },
-  "packageManager": "pnpm@10.27.0",
+  "packageManager": "pnpm@10.28.2+sha512.41872f037ad22f7348e3b1debbaf7e867cfd448f2726d9cf74c08f19507c31d2c8e7a11525b983febc2df640b5438dee6023ebb1f84ed43cc2d654d2bc326264",
   "optionalDependencies": {
     "@img/sharp-darwin-arm64": "0.34.3",
     "@img/sharp-darwin-x64": "0.34.3",
