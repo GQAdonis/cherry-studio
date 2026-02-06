@@ -23,6 +23,7 @@ import { configManager } from './services/ConfigManager'
 import { lanTransferClientService } from './services/lanTransfer'
 import mcpService from './services/MCPService'
 import { localTransferService } from './services/LocalTransferService'
+import { openClawService } from './services/OpenClawService'
 import { nodeTraceService } from './services/NodeTraceService'
 import powerMonitorService from './services/PowerMonitorService'
 import {
@@ -301,10 +302,11 @@ if (!app.requestSingleInstanceLock()) {
     }
 
     try {
+      await openClawService.stopGateway()
       await mcpService.cleanup()
       await apiServerService.stop()
     } catch (error) {
-      logger.warn('Error cleaning up MCP service:', error as Error)
+      logger.warn('Error cleaning up services:', error as Error)
     }
     // finish the logger
     logger.finish()

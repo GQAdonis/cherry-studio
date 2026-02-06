@@ -151,7 +151,8 @@ const titleKeyMap = {
   notes: 'title.notes',
   paintings: 'title.paintings',
   settings: 'title.settings',
-  translate: 'title.translate'
+  translate: 'title.translate',
+  openclaw: 'openclaw.title'
 } as const
 
 export const getTitleLabel = (key: string): string => {
@@ -190,7 +191,8 @@ const sidebarIconKeyMap = {
   files: 'files.title',
   code_tools: 'code.title',
   notes: 'notes.title',
-  artifacts: 'artifacts.title'
+  artifacts: 'artifacts.title',
+  openclaw: 'openclaw.title'
 } as const
 
 export const getSidebarIconLabel = (key: string): string => {
