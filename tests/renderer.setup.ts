@@ -62,7 +62,8 @@ vi.mock('axios', () => {
 vi.stubGlobal('electron', {
   ipcRenderer: {
     on: vi.fn(),
-    send: vi.fn()
+    send: vi.fn(),
+    invoke: vi.fn().mockResolvedValue(undefined)
   }
 })
 vi.stubGlobal('api', {

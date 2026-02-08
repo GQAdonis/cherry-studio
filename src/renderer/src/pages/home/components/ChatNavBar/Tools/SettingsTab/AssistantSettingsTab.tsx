@@ -1,14 +1,9 @@
+import { loggerService } from '@logger'
 import EditableNumber from '@renderer/components/EditableNumber'
-import { HStack } from '@renderer/components/Layout'
 import Scrollbar from '@renderer/components/Scrollbar'
 import Selector from '@renderer/components/Selector'
 import { HelpTooltip } from '@renderer/components/TooltipIcons'
-import {
-  DEFAULT_CONTEXTCOUNT,
-  DEFAULT_MAX_TOKENS,
-  DEFAULT_TEMPERATURE,
-  MAX_CONTEXT_COUNT
-} from '@renderer/config/constant'
+import { DEFAULT_CONTEXTCOUNT, DEFAULT_MAX_TOKENS, DEFAULT_TEMPERATURE } from '@renderer/config/constant'
 import { isOpenAIModel, isSupportVerbosityModel } from '@renderer/config/models'
 import { UNKNOWN } from '@renderer/config/translate'
 import { useCodeStyle } from '@renderer/context/CodeStyleProvider'
@@ -19,7 +14,6 @@ import { useRuntime } from '@renderer/hooks/useRuntime'
 import { useSettings } from '@renderer/hooks/useSettings'
 import useTranslate from '@renderer/hooks/useTranslate'
 import { SettingDivider, SettingRow, SettingRowTitle } from '@renderer/pages/settings'
-import AssistantSettingsPopup from '@renderer/pages/settings/AssistantSettings'
 import { CollapsibleSettingGroup } from '@renderer/pages/settings/SettingGroup'
 import { getDefaultModel } from '@renderer/services/AssistantService'
 import { useAppDispatch } from '@renderer/store'
@@ -56,29 +50,27 @@ import {
 import type { Assistant, CodeStyleVarious, MathEngine } from '@renderer/types'
 import { isGroqSystemProvider, ThemeMode } from '@renderer/types'
 import type { ContextStrategyType } from '@renderer/types/contextStrategy'
-import { CONTEXT_STRATEGY_LABELS } from '@renderer/types/contextStrategy'
-import { modalConfirm } from '@renderer/utils'
 import { getSendMessageShortcutLabel } from '@renderer/utils/input'
 import {
   isOpenAICompatibleProvider,
   isSupportServiceTierProvider,
   isSupportVerbosityProvider
 } from '@renderer/utils/provider'
-import { Button, Col, InputNumber, Row, Slider, Switch } from 'antd'
-import { Layers, Settings2 } from 'lucide-react'
-import type { FC } from 'react'
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { Col, Row, Slider, Switch } from 'antd'
+import { useCallback, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import styled from 'styled-components'
 
-import GroqSettingsGroup from './components/GroqSettingsGroup'
-import OpenAISettingsGroup from './components/OpenAISettingsGroup'
+import GroqSettingsGroup from './GroqSettingsGroup'
+import OpenAISettingsGroup from './OpenAISettingsGroup'
+
+const logger = loggerService.withContext('AssistantSettingsTab')
 
 interface Props {
   assistant: Assistant
 }
 
-const SettingsTab: FC<Props> = (props) => {
+const AssistantSettingsTab = (props: Props) => {
   const { chat } = useRuntime()
   const { assistant } = useAssistant(props.assistant.id)
   const { provider } = useProvider(assistant.model.provider)
@@ -207,182 +199,13 @@ const SettingsTab: FC<Props> = (props) => {
 
   const isTopicSettings = chat.activeTopicOrSession === 'topic'
 
+  if (!isTopicSettings) {
+    logger.warn('AssistantSettingsTab is rendered when not topic activated.')
+    return null
+  }
+
   return (
     <Container className="settings-tab">
-      {props.assistant.id !== 'fake' && (
-        <CollapsibleSettingGroup
-          title={t('assistants.settings.title')}
-          defaultExpanded={true}
-          extra={
-            <HStack alignItems="center" gap={2}>
-              <Button
-                type="text"
-                size="small"
-                icon={<Settings2 size={16} />}
-                onClick={() => AssistantSettingsPopup.show({ assistant, tab: 'model' })}
-              />
-            </HStack>
-          }>
-          <SettingGroup style={{ marginTop: 5 }}>
-            <Row align="middle">
-              <SettingRowTitleSmall>
-                {t('chat.settings.temperature.label')}
-                <HelpTooltip title={t('chat.settings.temperature.tip')} />
-              </SettingRowTitleSmall>
-              <Switch
-                size="small"
-                style={{ marginLeft: 'auto' }}
-                checked={enableTemperature}
-                onChange={(enabled) => {
-                  setEnableTemperature(enabled)
-                  onUpdateAssistantSettings({ enableTemperature: enabled })
-                }}
-              />
-            </Row>
-            {enableTemperature ? (
-              <Row align="middle" gutter={10}>
-                <Col span={23}>
-                  <Slider
-                    min={0}
-                    max={2}
-                    onChange={setTemperature}
-                    onChangeComplete={onTemperatureChange}
-                    value={typeof temperature === 'number' ? temperature : 0}
-                    step={0.1}
-                  />
-                </Col>
-              </Row>
-            ) : (
-              <SettingDivider />
-            )}
-            <Row align="middle" gutter={10} justify="space-between">
-              <SettingRowTitleSmall>
-                {t('chat.settings.context_count.label')}
-                <HelpTooltip title={t('chat.settings.context_count.tip')} />
-              </SettingRowTitleSmall>
-              <Col span={8}>
-                <EditableNumber
-                  min={0}
-                  max={20}
-                  step={1}
-                  value={contextCount}
-                  changeOnBlur
-                  onChange={(value) => {
-                    if (value !== null && value >= 0 && value <= 20) {
-                      setContextCount(value)
-                      onContextCountChange(value)
-                    }
-                  }}
-                  formatter={(value) => (value === MAX_CONTEXT_COUNT ? t('chat.settings.max') : (value ?? ''))}
-                  style={{ width: '100%' }}
-                />
-              </Col>
-            </Row>
-            <Row align="middle" gutter={10}>
-              <Col span={24}>
-                <Slider
-                  min={0}
-                  max={20}
-                  onChange={setContextCount}
-                  onChangeComplete={onContextCountChange}
-                  value={Math.min(contextCount, 20)}
-                  tooltip={{ open: false }}
-                  step={1}
-                  marks={{
-                    0: '0',
-                    10: '10',
-                    20: '20'
-                  }}
-                />
-              </Col>
-            </Row>
-            <SettingDivider />
-            <SettingRow>
-              <SettingRowTitleSmall>{t('models.stream_output')}</SettingRowTitleSmall>
-              <Switch
-                size="small"
-                checked={streamOutput}
-                onChange={(checked) => {
-                  setStreamOutput(checked)
-                  onUpdateAssistantSettings({ streamOutput: checked })
-                }}
-              />
-            </SettingRow>
-            <SettingDivider />
-            <SettingRow>
-              <Row align="middle">
-                <SettingRowTitleSmall>
-                  {t('chat.settings.max_tokens.label')}
-                  <HelpTooltip title={t('chat.settings.max_tokens.tip')} />
-                </SettingRowTitleSmall>
-              </Row>
-              <Switch
-                size="small"
-                checked={enableMaxTokens}
-                onChange={async (enabled) => {
-                  if (enabled) {
-                    const confirmed = await modalConfirm({
-                      title: t('chat.settings.max_tokens.confirm'),
-                      content: t('chat.settings.max_tokens.confirm_content'),
-                      okButtonProps: {
-                        danger: true
-                      }
-                    })
-                    if (!confirmed) return
-                  }
-                  setEnableMaxTokens(enabled)
-                  onUpdateAssistantSettings({ enableMaxTokens: enabled })
-                }}
-              />
-            </SettingRow>
-            {enableMaxTokens && (
-              <Row align="middle" gutter={10} style={{ marginTop: 10 }}>
-                <Col span={24}>
-                  <InputNumber
-                    disabled={!enableMaxTokens}
-                    min={0}
-                    max={10000000}
-                    step={100}
-                    value={typeof maxTokens === 'number' ? maxTokens : 0}
-                    changeOnBlur
-                    onChange={(value) => value && setMaxTokens(value)}
-                    onBlur={() => onMaxTokensChange(maxTokens)}
-                    style={{ width: '100%' }}
-                  />
-                </Col>
-              </Row>
-            )}
-            <SettingDivider />
-            <SettingRow>
-              <SettingRowTitleSmall>
-                <Layers size={14} style={{ marginRight: 4 }} />
-                {t('settings.contextStrategy.title', { defaultValue: 'Context Management' })}
-                <HelpTooltip
-                  title={t('settings.contextStrategy.tooltip', {
-                    defaultValue:
-                      'Automatically manages conversation context to prevent exceeding model limits. Applies to all conversations unless overridden.'
-                  })}
-                />
-              </SettingRowTitleSmall>
-              <Selector
-                value={contextStrategy ?? 'inherit'}
-                onChange={(value) => onContextStrategyChange(value as ContextStrategyType | 'inherit')}
-                options={[
-                  {
-                    value: 'inherit',
-                    label: t('assistants.settings.context.use_global', { defaultValue: 'Use Global Default' })
-                  },
-                  ...Object.entries(CONTEXT_STRATEGY_LABELS).map(([value, label]) => ({
-                    value,
-                    label: t(`settings.contextStrategy.types.${value}`, { defaultValue: label })
-                  }))
-                ]}
-              />
-            </SettingRow>
-            <SettingDivider />
-          </SettingGroup>
-        </CollapsibleSettingGroup>
-      )}
       {showOpenAiSettings && (
         <OpenAISettingsGroup
           model={model}
@@ -396,15 +219,11 @@ const SettingsTab: FC<Props> = (props) => {
       )}
       <CollapsibleSettingGroup title={t('settings.messages.title')} defaultExpanded={true}>
         <SettingGroup>
-          {isTopicSettings && (
-            <>
-              <SettingRow>
-                <SettingRowTitleSmall>{t('settings.messages.prompt')}</SettingRowTitleSmall>
-                <Switch size="small" checked={showPrompt} onChange={(checked) => dispatch(setShowPrompt(checked))} />
-              </SettingRow>
-              <SettingDivider />
-            </>
-          )}
+          <SettingRow>
+            <SettingRowTitleSmall>{t('settings.messages.prompt')}</SettingRowTitleSmall>
+            <Switch size="small" checked={showPrompt} onChange={(checked) => dispatch(setShowPrompt(checked))} />
+          </SettingRow>
+          <SettingDivider />
           <SettingRow>
             <SettingRowTitleSmall>{t('settings.messages.use_serif_font')}</SettingRowTitleSmall>
             <Switch
@@ -426,19 +245,15 @@ const SettingsTab: FC<Props> = (props) => {
             />
           </SettingRow>
           <SettingDivider />
-          {isTopicSettings && (
-            <>
-              <SettingRow>
-                <SettingRowTitleSmall>{t('settings.messages.show_message_outline')}</SettingRowTitleSmall>
-                <Switch
-                  size="small"
-                  checked={showMessageOutline}
-                  onChange={(checked) => dispatch(setShowMessageOutline(checked))}
-                />
-              </SettingRow>
-              <SettingDivider />
-            </>
-          )}
+          <SettingRow>
+            <SettingRowTitleSmall>{t('settings.messages.show_message_outline')}</SettingRowTitleSmall>
+            <Switch
+              size="small"
+              checked={showMessageOutline}
+              onChange={(checked) => dispatch(setShowMessageOutline(checked))}
+            />
+          </SettingRow>
+          <SettingDivider />
           <SettingRow>
             <SettingRowTitleSmall>{t('message.message.style.label')}</SettingRowTitleSmall>
             <Selector
@@ -451,24 +266,21 @@ const SettingsTab: FC<Props> = (props) => {
             />
           </SettingRow>
           <SettingDivider />
-          {isTopicSettings && (
-            <>
-              <SettingRow>
-                <SettingRowTitleSmall>{t('message.message.multi_model_style.label')}</SettingRowTitleSmall>
-                <Selector
-                  value={multiModelMessageStyle}
-                  onChange={(value) => dispatch(setMultiModelMessageStyle(value))}
-                  options={[
-                    { value: 'fold', label: t('message.message.multi_model_style.fold.label') },
-                    { value: 'vertical', label: t('message.message.multi_model_style.vertical') },
-                    { value: 'horizontal', label: t('message.message.multi_model_style.horizontal') },
-                    { value: 'grid', label: t('message.message.multi_model_style.grid') }
-                  ]}
-                />
-              </SettingRow>
-              <SettingDivider />
-            </>
-          )}
+
+          <SettingRow>
+            <SettingRowTitleSmall>{t('message.message.multi_model_style.label')}</SettingRowTitleSmall>
+            <Selector
+              value={multiModelMessageStyle}
+              onChange={(value) => dispatch(setMultiModelMessageStyle(value))}
+              options={[
+                { value: 'fold', label: t('message.message.multi_model_style.fold.label') },
+                { value: 'vertical', label: t('message.message.multi_model_style.vertical') },
+                { value: 'horizontal', label: t('message.message.multi_model_style.horizontal') },
+                { value: 'grid', label: t('message.message.multi_model_style.grid') }
+              ]}
+            />
+          </SettingRow>
+          <SettingDivider />
           <SettingRow>
             <SettingRowTitleSmall>{t('settings.messages.navigation.label')}</SettingRowTitleSmall>
             <Selector
@@ -680,19 +492,15 @@ const SettingsTab: FC<Props> = (props) => {
       </CollapsibleSettingGroup>
       <CollapsibleSettingGroup title={t('settings.messages.input.title')} defaultExpanded={false}>
         <SettingGroup>
-          {isTopicSettings && (
-            <>
-              <SettingRow>
-                <SettingRowTitleSmall>{t('settings.messages.input.show_estimated_tokens')}</SettingRowTitleSmall>
-                <Switch
-                  size="small"
-                  checked={showInputEstimatedTokens}
-                  onChange={(checked) => dispatch(setShowInputEstimatedTokens(checked))}
-                />
-              </SettingRow>
-              <SettingDivider />
-            </>
-          )}
+          <SettingRow>
+            <SettingRowTitleSmall>{t('settings.messages.input.show_estimated_tokens')}</SettingRowTitleSmall>
+            <Switch
+              size="small"
+              checked={showInputEstimatedTokens}
+              onChange={(checked) => dispatch(setShowInputEstimatedTokens(checked))}
+            />
+          </SettingRow>
+          <SettingDivider />
           <SettingRow>
             <SettingRowTitleSmall>{t('settings.messages.input.paste_long_text_as_file')}</SettingRowTitleSmall>
             <Switch
@@ -833,4 +641,4 @@ const SettingGroup = styled.div<{ theme?: ThemeMode }>`
   margin-bottom: 10px;
 `
 
-export default SettingsTab
+export default AssistantSettingsTab
