@@ -18,15 +18,15 @@ export const MessageMemorySearchToolTitle = ({ toolResponse }: { toolResponse: N
       text={
         <MessageWebSearchToolTitleTextWrapper>
           {t('memory.search_placeholder')}
-          <span>{toolInput?.query ?? ''}</span>
+          <span>{(toolInput as any)?.query ?? ''}</span>
         </MessageWebSearchToolTitleTextWrapper>
       }
     />
-  ) : toolOutput?.length ? (
+  ) : (toolOutput as any)?.length ? (
     <MessageWebSearchToolTitleTextWrapper type="secondary">
       <ChevronRight size={16} style={{ color: 'unset' }} />
       {/* <Search size={16} style={{ color: 'unset' }} /> */}
-      <span>{toolOutput?.length ?? 0}</span>
+      <span>{(toolOutput as any)?.length ?? 0}</span>
       {t('memory.memory')}
     </MessageWebSearchToolTitleTextWrapper>
   ) : null

@@ -27,7 +27,7 @@ export const createCherryIn = (_options?: CherryInProviderSettings) => ({
     doStream: async () => ({ stream: (async function* () {})() })
   }),
   // oxlint-disable-next-line no-unused-vars
-  textEmbeddingModel: (_modelId: string) => ({
+  embeddingModel: (_modelId: string) => ({
     specificationVersion: 'v1',
     provider: 'cherryin',
     modelId: 'mock-embedding-model'

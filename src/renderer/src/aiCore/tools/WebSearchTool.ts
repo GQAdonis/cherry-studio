@@ -19,8 +19,7 @@ export const webSearchToolWithPreExtractedKeywords = (
 ) => {
   const webSearchProvider = WebSearchService.getWebSearchProvider(webSearchProviderId)
 
-  return tool({
-    name: 'builtin_web_search',
+  return tool<{ additionalContext?: string }, any>({
     description: `Web search tool for finding current information, news, and real-time data from the internet.
 
 This tool has been configured with search parameters based on the conversation context:
@@ -69,9 +68,9 @@ You can use this tool as-is to search with the prepared queries, or provide addi
       }
       searchResults = await WebSearchService.processWebsearch(webSearchProvider!, extractResults, requestId)
 
-      return searchResults
+      return searchResults as any
     },
-    toModelOutput: (results) => {
+    toModelOutput: (results: any) => {
       let summary = 'No search needed based on the query analysis.'
       if (results.query && results.results.length > 0) {
         summary = `Found ${results.results.length} relevant sources. Use [number] format to cite specific information.`

@@ -18,7 +18,7 @@ export const MessageWebSearchToolTitle = ({ toolResponse }: { toolResponse: Norm
       text={
         <PrepareToolWrapper>
           {t('message.searching')}
-          <span>{toolInput?.additionalContext ?? ''}</span>
+          <span>{(toolInput as any)?.additionalContext ?? ''}</span>
         </PrepareToolWrapper>
       }
     />
@@ -26,7 +26,7 @@ export const MessageWebSearchToolTitle = ({ toolResponse }: { toolResponse: Norm
     <MessageWebSearchToolTitleTextWrapper type="secondary">
       <Search size={16} style={{ color: 'unset' }} />
       {t('message.websearch.fetch_complete', {
-        count: toolOutput?.results?.length ?? 0
+        count: (toolOutput as any)?.results?.length ?? 0
       })}
     </MessageWebSearchToolTitleTextWrapper>
   )

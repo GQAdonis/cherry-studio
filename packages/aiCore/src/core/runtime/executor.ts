@@ -2,7 +2,7 @@
  * 运行时执行器
  * 专注于插件化的AI调用处理
  */
-import type { ImageModelV2, LanguageModelV2, LanguageModelV2Middleware } from '@ai-sdk/provider'
+import type { ImageModelV3, LanguageModelV3, LanguageModelV3Middleware } from '@ai-sdk/provider'
 import type { LanguageModel } from 'ai'
 import {
   experimental_generateImage as _generateImage,
@@ -44,9 +44,9 @@ export class RuntimeExecutor<T extends ProviderId = ProviderId> {
     this.pluginEngine = new PluginEngine(config.providerId, config.plugins || [])
   }
 
-  private createResolveModelPlugin(middlewares?: LanguageModelV2Middleware[]) {
+  private createResolveModelPlugin(middlewares?: LanguageModelV3Middleware[]) {
     return definePlugin({
-      name: '_internal_resolveModel',
+      name: '_internal_resolveModel' as any,
       enforce: 'post',
 
       resolveModel: async (modelId: string) => {
@@ -58,7 +58,7 @@ export class RuntimeExecutor<T extends ProviderId = ProviderId> {
 
   private createResolveImageModelPlugin() {
     return definePlugin({
-      name: '_internal_resolveImageModel',
+      name: '_internal_resolveImageModel' as any,
       enforce: 'post',
 
       resolveModel: async (modelId: string) => {
@@ -69,7 +69,7 @@ export class RuntimeExecutor<T extends ProviderId = ProviderId> {
 
   private createConfigureContextPlugin() {
     return definePlugin({
-      name: '_internal_configureContext',
+      name: '_internal_configureContext' as any,
       configureContext: async (context: AiRequestContext) => {
         context.executor = this
       }
@@ -84,7 +84,7 @@ export class RuntimeExecutor<T extends ProviderId = ProviderId> {
   async streamText(
     params: streamTextParams,
     options?: {
-      middlewares?: LanguageModelV2Middleware[]
+      middlewares?: LanguageModelV3Middleware[]
     }
   ): Promise<ReturnType<typeof _streamText>> {
     const { model } = params
@@ -123,7 +123,7 @@ export class RuntimeExecutor<T extends ProviderId = ProviderId> {
   async generateText(
     params: generateTextParams,
     options?: {
-      middlewares?: LanguageModelV2Middleware[]
+      middlewares?: LanguageModelV3Middleware[]
     }
   ): Promise<ReturnType<typeof _generateText>> {
     const { model } = params
@@ -151,7 +151,7 @@ export class RuntimeExecutor<T extends ProviderId = ProviderId> {
   async generateObject(
     params: generateObjectParams,
     options?: {
-      middlewares?: LanguageModelV2Middleware[]
+      middlewares?: LanguageModelV3Middleware[]
     }
   ): Promise<ReturnType<typeof _generateObject>> {
     const { model } = params
@@ -179,7 +179,7 @@ export class RuntimeExecutor<T extends ProviderId = ProviderId> {
   streamObject(
     params: streamObjectParams,
     options?: {
-      middlewares?: LanguageModelV2Middleware[]
+      middlewares?: LanguageModelV3Middleware[]
     }
   ): Promise<ReturnType<typeof _streamObject>> {
     const { model } = params
@@ -213,8 +213,11 @@ export class RuntimeExecutor<T extends ProviderId = ProviderId> {
         this.pluginEngine.usePlugins([this.createConfigureContextPlugin()])
       }
 
-      return this.pluginEngine.executeImageWithPlugins('generateImage', params, (resolvedModel, transformedParams) =>
-        _generateImage({ ...transformedParams, model: resolvedModel })
+      return this.pluginEngine.executeImageWithPlugins(
+        'generateImage',
+        params,
+        (resolvedModel, transformedParams) =>
+          _generateImage({ ...transformedParams, model: resolvedModel as any }) as any
       )
     } catch (error) {
       if (error instanceof Error) {
@@ -237,8 +240,8 @@ export class RuntimeExecutor<T extends ProviderId = ProviderId> {
    */
   private async resolveModel(
     modelOrId: LanguageModel,
-    middlewares?: LanguageModelV2Middleware[]
-  ): Promise<LanguageModelV2> {
+    middlewares?: LanguageModelV3Middleware[]
+  ): Promise<LanguageModelV3> {
     if (typeof modelOrId === 'string') {
       // 🎯 字符串modelId，使用新的ModelResolver解析，传递完整参数
       return await globalModelResolver.resolveLanguageModel(
@@ -249,14 +252,14 @@ export class RuntimeExecutor<T extends ProviderId = ProviderId> {
       )
     } else {
       // 已经是模型，直接返回
-      return modelOrId
+      return modelOrId as LanguageModelV3
     }
   }
 
   /**
    * 解析图像模型：如果是字符串则创建图像模型，如果是模型则直接返回
    */
-  private async resolveImageModel(modelOrId: ImageModelV2 | string): Promise<ImageModelV2> {
+  private async resolveImageModel(modelOrId: ImageModelV3 | string): Promise<ImageModelV3> {
     try {
       if (typeof modelOrId === 'string') {
         // 字符串modelId，使用新的ModelResolver解析

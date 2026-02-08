@@ -380,7 +380,7 @@ providerRouter.post('/', async (req: Request, res: Response) => {
     }
 
     // Get provider directly by ID from URL path
-    const provider = await getProviderById(providerId)
+    const provider = await getProviderById(providerId as string)
     if (!provider) {
       return res.status(400).json({
         type: 'error',

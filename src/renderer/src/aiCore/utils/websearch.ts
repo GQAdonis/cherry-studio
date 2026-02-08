@@ -1,6 +1,5 @@
 import type {
   AnthropicSearchConfig,
-  OpenAISearchConfig,
   WebSearchPluginConfig
 } from '@cherrystudio/ai-core/core/plugins/built-in/webSearchPlugin/helper'
 import type { BaseProviderId } from '@cherrystudio/ai-core/provider'
@@ -37,7 +36,7 @@ export function getWebSearchParams(model: Model): Record<string, any> {
  * range in [0, 100]
  * @param maxResults
  */
-function mapMaxResultToOpenAIContextSize(maxResults: number): OpenAISearchConfig['searchContextSize'] {
+function mapMaxResultToOpenAIContextSize(maxResults: number): 'low' | 'medium' | 'high' {
   if (maxResults <= 33) return 'low'
   if (maxResults <= 66) return 'medium'
   return 'high'
@@ -47,7 +46,7 @@ export function buildProviderBuiltinWebSearchConfig(
   providerId: BaseProviderId,
   webSearchConfig: CherryWebSearchConfig,
   model?: Model
-): WebSearchPluginConfig | undefined {
+): WebSearchPluginConfig {
   switch (providerId) {
     case 'azure-responses':
     case 'openai': {

@@ -1,10 +1,8 @@
 import { definePlugin } from '@cherrystudio/ai-core'
 import type { TextStreamPart, ToolSet } from 'ai'
 
-export default definePlugin({
-  name: 'reasoningTimePlugin',
-
-  transformStream: () => () => {
+export default definePlugin(() => ({
+  transformStream: () => {
     // === 时间跟踪状态 ===
     let thinkingStartTime = 0
     let accumulatedThinkingContent = ''
@@ -34,4 +32,4 @@ export default definePlugin({
       }
     })
   }
-})
+}))

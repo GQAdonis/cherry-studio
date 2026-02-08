@@ -166,7 +166,7 @@ class UnstructuredService {
 
       // Read file
       const fileBuffer = await fs.promises.readFile(filePath)
-      const fileBlob = new Blob([fileBuffer])
+      const fileBlob = new Blob([new Uint8Array(fileBuffer)])
       const fileName = path.basename(filePath)
 
       // Get provider options
@@ -260,7 +260,7 @@ class UnstructuredService {
 
       // Create a simple test by attempting to partition a tiny text file
       const testContent = 'Test connection'
-      const testBlob = new Blob([testContent])
+      const testBlob = new Blob([new TextEncoder().encode(testContent)])
 
       const response = await client.general.partition({
         partitionParameters: {

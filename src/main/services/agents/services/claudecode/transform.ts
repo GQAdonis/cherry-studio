@@ -56,14 +56,16 @@ const finishReasonMapping: Record<BetaStopReason, FinishReason> = {
   max_tokens: 'length',
   stop_sequence: 'stop',
   tool_use: 'tool-calls',
-  pause_turn: 'unknown',
+  pause_turn: 'other',
   refusal: 'content-filter'
 }
 
 const emptyUsage: LanguageModelUsage = {
   inputTokens: 0,
   outputTokens: 0,
-  totalTokens: 0
+  totalTokens: 0,
+  inputTokenDetails: { noCacheTokens: 0, cacheReadTokens: 0, cacheWriteTokens: 0 },
+  outputTokenDetails: { textTokens: 0, reasoningTokens: 0 }
 }
 
 /**
@@ -307,7 +309,7 @@ function finalizeNonStreamingStep(
     usage: usage ?? emptyUsage,
     finishReason,
     providerMetadata: sdkMessageToProviderMetadata(message)
-  })
+  } as any)
   state.resetStep()
   return chunks
 }
@@ -531,7 +533,7 @@ function handleStreamEvent(
         usage: pending.usage ?? emptyUsage,
         finishReason: pending.finishReason ?? 'stop',
         providerMetadata
-      })
+      } as any)
       state.resetStep()
       break
     }
@@ -717,7 +719,9 @@ function handleResultMessage(message: Extract<SDKMessage, { type: 'result' }>): 
     usage = {
       inputTokens: message.usage.input_tokens ?? 0,
       outputTokens: message.usage.output_tokens ?? 0,
-      totalTokens: (message.usage.input_tokens ?? 0) + (message.usage.output_tokens ?? 0)
+      totalTokens: (message.usage.input_tokens ?? 0) + (message.usage.output_tokens ?? 0),
+      inputTokenDetails: { noCacheTokens: 0, cacheReadTokens: 0, cacheWriteTokens: 0 },
+      outputTokenDetails: { textTokens: 0, reasoningTokens: 0 }
     }
   }
 
@@ -726,6 +730,7 @@ function handleResultMessage(message: Extract<SDKMessage, { type: 'result' }>): 
       type: 'finish',
       totalUsage: usage ?? emptyUsage,
       finishReason: mapClaudeCodeFinishReason(message.subtype),
+      rawFinishReason: message.subtype,
       providerMetadata: {
         ...sdkMessageToProviderMetadata(message),
         usage: message.usage,
@@ -733,14 +738,14 @@ function handleResultMessage(message: Extract<SDKMessage, { type: 'result' }>): 
         costUsd: message.total_cost_usd,
         raw: message
       }
-    } as AgentStreamPart)
+    } as any)
   } else {
     chunks.push({
       type: 'error',
       error: {
         message: `${message.subtype}: Process failed after ${message.num_turns} turns`
       }
-    } as AgentStreamPart)
+    } as any)
   }
   return chunks
 }
@@ -763,7 +768,9 @@ function convertUsage(
   return {
     inputTokens,
     outputTokens,
-    totalTokens: inputTokens + outputTokens
+    totalTokens: inputTokens + outputTokens,
+    inputTokenDetails: { noCacheTokens: 0, cacheReadTokens: 0, cacheWriteTokens: 0 },
+    outputTokenDetails: { textTokens: 0, reasoningTokens: 0 }
   }
 }
 
@@ -787,7 +794,9 @@ function calculateUsageFromMessage(
   return {
     inputTokens: usage.input_tokens ?? 0,
     outputTokens: usage.output_tokens ?? 0,
-    totalTokens: (usage.input_tokens ?? 0) + (usage.output_tokens ?? 0)
+    totalTokens: (usage.input_tokens ?? 0) + (usage.output_tokens ?? 0),
+    inputTokenDetails: { noCacheTokens: 0, cacheReadTokens: 0, cacheWriteTokens: 0 },
+    outputTokenDetails: { textTokens: 0, reasoningTokens: 0 }
   }
 }
 

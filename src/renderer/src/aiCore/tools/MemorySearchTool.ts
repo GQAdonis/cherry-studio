@@ -10,8 +10,7 @@ import { MemoryProcessor } from '../../services/MemoryProcessor'
  * AI 可以主动调用的简单记忆搜索
  */
 export const memorySearchTool = () => {
-  return tool({
-    name: 'builtin_memory_search',
+  return tool<{ query: string; limit?: number }, any>({
     description: 'Search through conversation memories and stored facts for relevant context',
     inputSchema: z.object({
       query: z.string().describe('Search query to find relevant memories'),

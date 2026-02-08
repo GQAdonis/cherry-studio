@@ -379,7 +379,7 @@ export class AiSdkToChunkAdapter {
         if (chunk.sourceType === 'url') {
           // oxlint-disable-next-line @typescript-eslint/no-unused-vars
           const { sourceType: _, ...rest } = chunk
-          final.webSearchResults.push(rest)
+          final.webSearchResults.push(rest as any)
         }
         break
       case 'file':

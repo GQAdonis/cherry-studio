@@ -221,7 +221,7 @@ export class ArtifactServerService {
 
       try {
         // Check for registered handler
-        const handler = this.handlers.get(action)
+        const handler = this.handlers.get(action as string)
         if (handler) {
           const html = await handler(ctx, req)
           res.setHeader('Content-Type', 'text/html')
@@ -230,7 +230,7 @@ export class ArtifactServerService {
         }
 
         // Default handlers
-        const html = await this.handleDefaultAction(action, ctx, req)
+        const html = await this.handleDefaultAction(action as string, ctx, req)
         res.setHeader('Content-Type', 'text/html')
         res.send(html)
       } catch (error) {
@@ -241,17 +241,17 @@ export class ArtifactServerService {
 
     // State management endpoints
     this.app.get('/state/:artifactId', (req: Request, res: Response) => {
-      const state = this.getArtifactState(req.params.artifactId)
+      const state = this.getArtifactState(req.params.artifactId as string)
       res.json(state)
     })
 
     this.app.post('/state/:artifactId', (req: Request, res: Response) => {
-      this.updateArtifactState(req.params.artifactId, req.body)
+      this.updateArtifactState(req.params.artifactId as string, req.body)
       res.json({ success: true })
     })
 
     this.app.delete('/state/:artifactId', (req: Request, res: Response) => {
-      this.clearArtifactState(req.params.artifactId)
+      this.clearArtifactState(req.params.artifactId as string)
       res.json({ success: true })
     })
 
@@ -264,7 +264,7 @@ export class ArtifactServerService {
 
     // Form submission endpoint
     this.app.post('/form/:formId', async (req: Request, res: Response) => {
-      const formId = req.params.formId
+      const formId = req.params.formId as string
       const artifactId = (req.headers['x-artifact-id'] as string) || ''
 
       // Store form data in artifact state

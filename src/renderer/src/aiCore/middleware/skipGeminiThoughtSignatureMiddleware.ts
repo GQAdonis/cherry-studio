@@ -11,7 +11,7 @@ import type { LanguageModelMiddleware } from 'ai'
 export function skipGeminiThoughtSignatureMiddleware(aiSdkId: string): LanguageModelMiddleware {
   const MAGIC_STRING = 'skip_thought_signature_validator'
   return {
-    middlewareVersion: 'v2',
+    specificationVersion: 'v3' as any,
 
     transformParams: async ({ params }) => {
       const transformedParams = { ...params }

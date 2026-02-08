@@ -354,7 +354,7 @@ export const ContentSearch = React.forwardRef<ContentSearchRef, Props>(
             <InputWrapper>
               <Input
                 ref={searchInputRef}
-                onInput={userInputHandler}
+                onChange={userInputHandler}
                 onKeyDown={keyDownHandler}
                 placeholder={t('chat.assistant.search.placeholder')}
                 style={{ lineHeight: '20px' }}

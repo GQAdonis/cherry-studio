@@ -3,7 +3,6 @@ import EditableNumber from '@renderer/components/EditableNumber'
 import Scrollbar from '@renderer/components/Scrollbar'
 import Selector from '@renderer/components/Selector'
 import { HelpTooltip } from '@renderer/components/TooltipIcons'
-import { DEFAULT_CONTEXTCOUNT, DEFAULT_MAX_TOKENS, DEFAULT_TEMPERATURE } from '@renderer/config/constant'
 import { isOpenAIModel, isSupportVerbosityModel } from '@renderer/config/models'
 import { UNKNOWN } from '@renderer/config/translate'
 import { useCodeStyle } from '@renderer/context/CodeStyleProvider'
@@ -49,7 +48,6 @@ import {
 } from '@renderer/store/settings'
 import type { Assistant, CodeStyleVarious, MathEngine } from '@renderer/types'
 import { isGroqSystemProvider, ThemeMode } from '@renderer/types'
-import type { ContextStrategyType } from '@renderer/types/contextStrategy'
 import { getSendMessageShortcutLabel } from '@renderer/utils/input'
 import {
   isOpenAICompatibleProvider,
@@ -80,10 +78,6 @@ const AssistantSettingsTab = (props: Props) => {
   const { themeNames } = useCodeStyle()
 
   const [fontSizeValue, setFontSizeValue] = useState(fontSize)
-  const [streamOutput, setStreamOutput] = useState(assistant?.settings?.streamOutput)
-  const [contextStrategy, setContextStrategy] = useState<ContextStrategyType | undefined>(
-    assistant?.settings?.contextStrategy?.type
-  )
   const { translateLanguages } = useTranslate()
 
   const { t } = useTranslation()
@@ -147,47 +141,7 @@ const AssistantSettingsTab = (props: Props) => {
     },
     [dispatch, theme, codeEditor.enabled]
   )
-
   // State for assistant settings
-  const [temperature, setTemperature] = useState(assistant?.settings?.temperature ?? DEFAULT_TEMPERATURE)
-  const [enableTemperature, setEnableTemperature] = useState(assistant?.settings?.enableTemperature ?? true)
-  const [contextCount, setContextCount] = useState(assistant?.settings?.contextCount ?? DEFAULT_CONTEXTCOUNT)
-  const [enableMaxTokens, setEnableMaxTokens] = useState(assistant?.settings?.enableMaxTokens ?? false)
-  const [maxTokens, setMaxTokens] = useState(assistant?.settings?.maxTokens ?? DEFAULT_MAX_TOKENS)
-
-  useEffect(() => {
-    setTemperature(assistant?.settings?.temperature ?? DEFAULT_TEMPERATURE)
-    setEnableTemperature(assistant?.settings?.enableTemperature ?? true)
-    setContextCount(assistant?.settings?.contextCount ?? DEFAULT_CONTEXTCOUNT)
-    setEnableMaxTokens(assistant?.settings?.enableMaxTokens ?? false)
-    setMaxTokens(assistant?.settings?.maxTokens ?? DEFAULT_MAX_TOKENS)
-    setStreamOutput(assistant?.settings?.streamOutput ?? true)
-    setContextStrategy(assistant?.settings?.contextStrategy?.type)
-  }, [assistant])
-
-  const { updateAssistantSettings: onUpdateAssistantSettings } = useAssistant(props.assistant.id)
-
-  const onTemperatureChange = (value: number) => {
-    onUpdateAssistantSettings({ temperature: value })
-  }
-
-  const onContextCountChange = (value: number) => {
-    onUpdateAssistantSettings({ contextCount: value })
-  }
-
-  const onMaxTokensChange = (value: number) => {
-    onUpdateAssistantSettings({ maxTokens: value })
-  }
-
-  const onContextStrategyChange = (value: ContextStrategyType | 'inherit') => {
-    if (value === 'inherit') {
-      setContextStrategy(undefined)
-      onUpdateAssistantSettings({ contextStrategy: undefined })
-    } else {
-      setContextStrategy(value)
-      onUpdateAssistantSettings({ contextStrategy: { type: value } })
-    }
-  }
 
   const model = assistant.model || getDefaultModel()
 

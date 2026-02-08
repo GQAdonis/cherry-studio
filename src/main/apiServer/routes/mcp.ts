@@ -107,7 +107,7 @@ router.get('/:server_id', async (req: Request, res: Response) => {
     logger.debug('Get MCP server info request received', {
       serverId: req.params.server_id
     })
-    const server = await mcpApiService.getServerInfo(req.params.server_id)
+    const server = await mcpApiService.getServerInfo(req.params.server_id as string)
     if (!server) {
       logger.warn('MCP server not found', { serverId: req.params.server_id })
       return res.status(404).json({
@@ -138,7 +138,7 @@ router.get('/:server_id', async (req: Request, res: Response) => {
 
 // Connect to MCP server
 router.all('/:server_id/mcp', async (req: Request, res: Response) => {
-  const server = await mcpApiService.getServerById(req.params.server_id)
+  const server = await mcpApiService.getServerById(req.params.server_id as string)
   if (!server) {
     logger.warn('MCP server not found', { serverId: req.params.server_id })
     return res.status(404).json({

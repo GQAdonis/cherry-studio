@@ -6,7 +6,6 @@ import type { LanguageModelMiddleware } from 'ai'
  * https://openrouter.ai/docs/features/multimodal/image-generation
  *
  * Remarks:
- * - The middleware declares middlewareVersion as 'v2'.
  * - transformParams asynchronously clones the incoming params and sets
  *   providerOptions.openrouter.modalities = ['image', 'text'], preserving other providerOptions and
  *   openrouter fields when present.
@@ -17,8 +16,7 @@ import type { LanguageModelMiddleware } from 'ai'
  */
 export function openrouterGenerateImageMiddleware(): LanguageModelMiddleware {
   return {
-    middlewareVersion: 'v2',
-
+    specificationVersion: 'v3',
     transformParams: async ({ params }) => {
       const transformedParams = { ...params }
       transformedParams.providerOptions = {

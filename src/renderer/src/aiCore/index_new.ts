@@ -17,7 +17,7 @@ import { type Assistant, type GenerateImageParams, type Model, type Provider, Sy
 import type { AiSdkModel, StreamTextParams } from '@renderer/types/aiCoreTypes'
 import { SUPPORTED_IMAGE_ENDPOINT_LIST } from '@renderer/utils'
 import { buildClaudeCodeSystemModelMessage } from '@shared/anthropic'
-import { gateway, type ImageModel, type LanguageModel, type Provider as AiSdkProvider, wrapLanguageModel } from 'ai'
+import { gateway, type LanguageModel, type Provider as AiSdkProvider, wrapLanguageModel } from 'ai'
 
 import AiSdkToChunkAdapter from './chunk/AiSdkToChunkAdapter'
 import LegacyAiProvider from './legacy/index'
@@ -166,14 +166,18 @@ export default class ModernAiProvider {
       model = this.localProvider.languageModel(modelId)
       // 如果有中间件，应用到语言模型上
       if (middlewares.length > 0 && typeof model === 'object') {
-        model = wrapLanguageModel({ model, middleware: middlewares })
+        model = wrapLanguageModel({ model: model as any, middleware: middlewares }) as any
       }
     }
 
     if (this.actualProvider.id === 'anthropic' && this.actualProvider.authType === 'oauth') {
-      const claudeCodeSystemMessage = buildClaudeCodeSystemModelMessage(params.system)
+      const claudeCodeSystemMessage = buildClaudeCodeSystemModelMessage(params.system as any)
       params.system = undefined // 清除原有system，避免重复
-      params.messages = [...claudeCodeSystemMessage, ...(params.messages || [])]
+      params.messages = [...(claudeCodeSystemMessage as any), ...(params.messages || [])]
+    }
+
+    if (!model) {
+      throw new Error('Failed to create model instance')
     }
 
     if (providerConfig.topicId && getEnableDeveloperMode()) {
@@ -544,7 +548,7 @@ export default class ModernAiProvider {
 
     const executor = createExecutor(this.config!.providerId, this.config!.options, [])
     const result = await executor.generateImage({
-      model: this.localProvider?.imageModel(model) as ImageModel,
+      model: this.localProvider?.imageModel(model) as any,
       ...aiSdkParams
     })
 

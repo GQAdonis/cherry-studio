@@ -11,7 +11,7 @@ export function qwenThinkingMiddleware(enableThinking: boolean): LanguageModelMi
   const suffix = enableThinking ? ' /think' : ' /no_think'
 
   return {
-    middlewareVersion: 'v2',
+    specificationVersion: 'v3' as any,
 
     transformParams: async ({ params }) => {
       const transformedParams = { ...params }

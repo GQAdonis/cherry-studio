@@ -349,35 +349,47 @@ describe('websearch utils', () => {
       it('should handle maxResults at boundary values', () => {
         // Test boundary at 33 (low/medium)
         const config33: CherryWebSearchConfig = { searchWithTime: true, maxResults: 33, excludeDomains: [] }
-        const result33 = buildProviderBuiltinWebSearchConfig('openai', config33)
-        expect(result33?.openai?.searchContextSize).toBe('low')
+        const result33 = buildProviderBuiltinWebSearchConfig('openai', config33) as {
+          openai: { searchContextSize: string }
+        }
+        expect(result33.openai.searchContextSize).toBe('low')
 
         // Test boundary at 34 (medium)
         const config34: CherryWebSearchConfig = { searchWithTime: true, maxResults: 34, excludeDomains: [] }
-        const result34 = buildProviderBuiltinWebSearchConfig('openai', config34)
-        expect(result34?.openai?.searchContextSize).toBe('medium')
+        const result34 = buildProviderBuiltinWebSearchConfig('openai', config34) as {
+          openai: { searchContextSize: string }
+        }
+        expect(result34.openai.searchContextSize).toBe('medium')
 
         // Test boundary at 66 (medium)
         const config66: CherryWebSearchConfig = { searchWithTime: true, maxResults: 66, excludeDomains: [] }
-        const result66 = buildProviderBuiltinWebSearchConfig('openai', config66)
-        expect(result66?.openai?.searchContextSize).toBe('medium')
+        const result66 = buildProviderBuiltinWebSearchConfig('openai', config66) as {
+          openai: { searchContextSize: string }
+        }
+        expect(result66.openai.searchContextSize).toBe('medium')
 
         // Test boundary at 67 (high)
         const config67: CherryWebSearchConfig = { searchWithTime: true, maxResults: 67, excludeDomains: [] }
-        const result67 = buildProviderBuiltinWebSearchConfig('openai', config67)
-        expect(result67?.openai?.searchContextSize).toBe('high')
+        const result67 = buildProviderBuiltinWebSearchConfig('openai', config67) as {
+          openai: { searchContextSize: string }
+        }
+        expect(result67.openai.searchContextSize).toBe('high')
       })
 
       it('should handle zero maxResults', () => {
         const config: CherryWebSearchConfig = { searchWithTime: true, maxResults: 0, excludeDomains: [] }
-        const result = buildProviderBuiltinWebSearchConfig('openai', config)
-        expect(result?.openai?.searchContextSize).toBe('low')
+        const result = buildProviderBuiltinWebSearchConfig('openai', config) as {
+          openai: { searchContextSize: string }
+        }
+        expect(result.openai.searchContextSize).toBe('low')
       })
 
       it('should handle very large maxResults', () => {
         const config: CherryWebSearchConfig = { searchWithTime: true, maxResults: 1000, excludeDomains: [] }
-        const result = buildProviderBuiltinWebSearchConfig('openai', config)
-        expect(result?.openai?.searchContextSize).toBe('high')
+        const result = buildProviderBuiltinWebSearchConfig('openai', config) as {
+          openai: { searchContextSize: string }
+        }
+        expect(result.openai.searchContextSize).toBe('high')
       })
     })
   })

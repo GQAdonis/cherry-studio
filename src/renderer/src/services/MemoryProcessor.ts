@@ -9,8 +9,8 @@ import {
   updateMemorySystemPrompt
 } from '@renderer/utils/memory-prompts'
 import type { MemoryConfig, MemoryItem } from '@types'
-import jaison from 'jaison/lib/index.js'
 
+// import jaison from 'jaison'
 import { fetchGenerate } from './ApiService'
 import MemoryService from './MemoryService'
 
@@ -62,7 +62,7 @@ export class MemoryProcessor {
       // Parse response using Zod schema
       try {
         logger.debug(`Response content for extraction: ${responseContent}`)
-        const jsonParsed = jaison(responseContent)
+        const jsonParsed = JSON.parse(responseContent)
         // Handle both expected format and potential variations
         let dataToValidate = jsonParsed
 
@@ -131,7 +131,7 @@ export class MemoryProcessor {
 
       try {
         logger.debug(`Response content for memory update: ${responseContent}`)
-        const jsonParsed = jaison(responseContent)
+        const jsonParsed = JSON.parse(responseContent)
         // Handle both direct array and wrapped object format
         const dataToValidate = Array.isArray(jsonParsed) ? jsonParsed : jsonParsed.memory
         parsed = MemoryUpdateSchema.parse(dataToValidate)

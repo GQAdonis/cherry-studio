@@ -11,7 +11,7 @@ const logger = loggerService.withContext('noThinkMiddleware')
  */
 export function noThinkMiddleware(): LanguageModelMiddleware {
   return {
-    middlewareVersion: 'v2',
+    specificationVersion: 'v3' as any,
 
     transformParams: async ({ params }) => {
       const transformedParams = { ...params }

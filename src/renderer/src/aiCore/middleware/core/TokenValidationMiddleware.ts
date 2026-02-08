@@ -58,6 +58,7 @@ function estimateTotalPayloadTokens(params: any): number {
  */
 export function createTokenValidationMiddleware(config: AiSdkMiddlewareConfig): LanguageModelMiddleware {
   return {
+    specificationVersion: 'v3' as any,
     wrapGenerate: async ({ doGenerate, params }) => {
       if (!config.model) {
         logger.warn('No model provided to token validation middleware, skipping validation')

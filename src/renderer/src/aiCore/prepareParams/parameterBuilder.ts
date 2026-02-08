@@ -166,7 +166,7 @@ export async function buildStreamTextParams(
       }) as any
     } else if (aiSdkProviderId === 'azure-responses') {
       tools.web_search_preview = azure.tools.webSearchPreview({
-        searchContextSize: webSearchPluginConfig?.openai!.searchContextSize
+        searchContextSize: (webSearchPluginConfig as any)?.openai?.searchContextSize || 'medium'
       }) as any
     } else if (aiSdkProviderId === 'azure-anthropic') {
       const blockedDomains = mapRegexToPatterns(webSearchConfig.excludeDomains)
@@ -200,7 +200,7 @@ export async function buildStreamTextParams(
                 maxUses: webSearchConfig.maxResults,
                 blockedDomains: blockedDomains.length > 0 ? blockedDomains : undefined
               })
-            : vertexAnthropic.tools.webFetch_20250910({
+            : anthropic.tools.webFetch_20250910({
                 maxUses: webSearchConfig.maxResults,
                 blockedDomains: blockedDomains.length > 0 ? blockedDomains : undefined
               })

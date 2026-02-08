@@ -3,13 +3,13 @@
  * Provides mock implementations for all supported AI providers
  */
 
-import type { ImageModelV2, LanguageModelV2 } from '@ai-sdk/provider'
+import type { ImageModelV3, LanguageModelV3 } from '@ai-sdk/provider'
 import { vi } from 'vitest'
 
 /**
  * Creates a mock language model with customizable behavior
  */
-export function createMockLanguageModel(overrides?: Partial<LanguageModelV2>): LanguageModelV2 {
+export function createMockLanguageModel(overrides?: Partial<LanguageModelV3>): LanguageModelV3 {
   return {
     specificationVersion: 'v1',
     provider: 'mock-provider',
@@ -59,13 +59,13 @@ export function createMockLanguageModel(overrides?: Partial<LanguageModelV2>): L
     }),
 
     ...overrides
-  } as LanguageModelV2
+  } as LanguageModelV3
 }
 
 /**
  * Creates a mock image model with customizable behavior
  */
-export function createMockImageModel(overrides?: Partial<ImageModelV2>): ImageModelV2 {
+export function createMockImageModel(overrides?: Partial<ImageModelV3>): ImageModelV3 {
   return {
     specificationVersion: 'v2',
     provider: 'mock-provider',
@@ -83,7 +83,7 @@ export function createMockImageModel(overrides?: Partial<ImageModelV2>): ImageMo
     }),
 
     ...overrides
-  } as ImageModelV2
+  } as ImageModelV3
 }
 
 /**

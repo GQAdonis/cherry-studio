@@ -84,7 +84,7 @@ const HeaderNavbar: FC<Props> = ({ activeAssistant, setActiveAssistant, activeTo
             </motion.div>
           )}
         </AnimatePresence>
-        <ChatNavbarContent assistant={assistant} topic={activeTopic} />
+        <ChatNavbarContent assistant={assistant} />
       </div>
     </NavbarHeader>
   )

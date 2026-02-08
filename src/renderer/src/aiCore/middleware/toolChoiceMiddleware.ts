@@ -19,7 +19,7 @@ export function toolChoiceMiddleware(forceFirstToolName: string): LanguageModelM
   let toolCallRound = 0
 
   return {
-    middlewareVersion: 'v2',
+    specificationVersion: 'v3' as any,
 
     transformParams: async ({ params }) => {
       toolCallRound++

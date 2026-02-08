@@ -69,7 +69,7 @@ export default class UnstructuredPreprocessProvider extends BasePreprocessProvid
 
       // Read file as buffer
       const fileBuffer = await fs.promises.readFile(filePath)
-      const fileBlob = new Blob([fileBuffer])
+      const fileBlob = new Blob([new Uint8Array(fileBuffer)])
 
       // Prepare partition parameters
       const strategy = (this.provider.options?.strategy as string) || 'auto'

@@ -33,7 +33,7 @@ export const createMessage = async (req: Request, res: Response): Promise<void> 
   let streamController: StreamAbortController | undefined
 
   try {
-    const { agentId, sessionId } = req.params
+    const { agentId, sessionId } = req.params as { agentId: string; sessionId: string }
 
     const session = await verifyAgentAndSession(agentId, sessionId)
 
@@ -263,7 +263,15 @@ export const createMessage = async (req: Request, res: Response): Promise<void> 
 
 export const deleteMessage = async (req: Request, res: Response): Promise<Response> => {
   try {
-    const { agentId, sessionId, messageId: messageIdParam } = req.params
+    const {
+      agentId,
+      sessionId,
+      messageId: messageIdParam
+    } = req.params as {
+      agentId: string
+      sessionId: string
+      messageId: string
+    }
     const messageId = Number(messageIdParam)
 
     await verifyAgentAndSession(agentId, sessionId)
