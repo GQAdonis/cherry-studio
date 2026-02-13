@@ -17,6 +17,7 @@ import process from 'node:process'
 
 import { registerIpc } from './ipc'
 import { agentService } from './services/agents'
+import { analyticsService } from './services/AnalyticsService'
 import { apiServerService } from './services/ApiServerService'
 import { appMenuService } from './services/AppMenuService'
 import { configManager } from './services/ConfigManager'
@@ -187,6 +188,7 @@ if (!app.requestSingleInstanceLock()) {
 
     nodeTraceService.init()
     powerMonitorService.init()
+    analyticsService.init()
 
     app.on('activate', function () {
       const mainWindow = windowService.getMainWindow()
@@ -302,6 +304,7 @@ if (!app.requestSingleInstanceLock()) {
     }
 
     try {
+      await analyticsService.destroy()
       await openClawService.stopGateway()
       await mcpService.cleanup()
       await apiServerService.stop()

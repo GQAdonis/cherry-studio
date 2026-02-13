@@ -1,11 +1,13 @@
 import { loggerService } from '@logger'
 import type { AppDispatch } from '@renderer/store'
+import store from '@renderer/store'
 import { toolPermissionsActions } from '@renderer/store/toolPermissions'
 import type { MCPToolResponse, NormalToolResponse } from '@renderer/types'
-import { WebSearchSource } from '@renderer/types'
+import { WEB_SEARCH_SOURCE } from '@renderer/types'
 import type { ToolMessageBlock } from '@renderer/types/newMessage'
 import { MessageBlockStatus, MessageBlockType } from '@renderer/types/newMessage'
 import { createCitationBlock, createContextActionBlock, createToolBlock } from '@renderer/utils/messageUtils/create'
+import { isPlainObject } from 'lodash'
 
 import { condenseToolResult } from '../../ToolResultCondenser'
 import type { BlockManager } from '../BlockManager'
@@ -103,6 +105,9 @@ export const createToolCallbacks = (deps: ToolCallbacksDependencies) => {
     },
 
     onToolCallComplete: (toolResponse: ToolResponse) => {
+      // Read resolvedInput BEFORE removing from store (removeByToolCallId deletes it)
+      const state = store.getState()
+      const resolvedInput = toolResponse?.id ? state.toolPermissions.resolvedInputs[toolResponse.id] : undefined
       const toolCallKey = getToolCallKey(toolResponse)
 
       if (toolResponse?.id) {
@@ -116,6 +121,25 @@ export const createToolCallbacks = (deps: ToolCallbacksDependencies) => {
           toolResponse.status === 'done' || toolResponse.status === 'cancelled'
             ? MessageBlockStatus.SUCCESS
             : MessageBlockStatus.ERROR
+
+        const existingBlock = existingBlockId
+          ? (state.messageBlocks.entities[existingBlockId] as ToolMessageBlock | undefined)
+          : undefined
+
+        const existingResponse = existingBlock?.metadata?.rawMcpToolResponse
+        // Merge order: toolResponse.arguments (base) -> existingResponse?.arguments -> resolvedInput (user answers take precedence)
+        const mergedArguments = Object.assign(
+          {},
+          isPlainObject(toolResponse.arguments) ? toolResponse.arguments : null,
+          isPlainObject(existingResponse?.arguments) ? existingResponse?.arguments : null,
+          isPlainObject(resolvedInput) ? resolvedInput : null
+        )
+
+        const mergedToolResponse: MCPToolResponse | NormalToolResponse = {
+          ...(existingResponse ?? toolResponse),
+          ...toolResponse,
+          arguments: mergedArguments
+        }
 
         let content = toolResponse.response
         let wasCondensed = false
@@ -140,7 +164,7 @@ export const createToolCallbacks = (deps: ToolCallbacksDependencies) => {
           content: content,
           status: finalStatus,
           metadata: {
-            rawMcpToolResponse: toolResponse,
+            rawMcpToolResponse: mergedToolResponse,
             fullContent: wasCondensed ? toolResponse.response : undefined
           }
         }
@@ -177,7 +201,7 @@ export const createToolCallbacks = (deps: ToolCallbacksDependencies) => {
           const citationBlock = createCitationBlock(
             assistantMsgId,
             {
-              response: { results: toolResponse.response, source: WebSearchSource.WEBSEARCH }
+              response: { results: toolResponse.response, source: WEB_SEARCH_SOURCE.WEBSEARCH }
             },
             {
               status: MessageBlockStatus.SUCCESS
