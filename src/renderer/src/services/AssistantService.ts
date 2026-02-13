@@ -9,6 +9,7 @@ import {
 import { getModelSupportedReasoningEffortOptions } from '@renderer/config/models'
 import { isQwenMTModel } from '@renderer/config/models/qwen'
 import { CHERRYAI_PROVIDER } from '@renderer/config/providers'
+import { SKILLS_CREATOR_SYSTEM_PROMPT } from '@renderer/config/skillsCreatorPrompt'
 import { UNKNOWN } from '@renderer/config/translate'
 import i18n from '@renderer/i18n'
 import type {
@@ -70,6 +71,31 @@ export function getDefaultAssistant(): Assistant {
     type: 'assistant',
     regularPhrases: [], // Added regularPhrases
     settings: DEFAULT_ASSISTANT_SETTINGS
+  }
+}
+
+/**
+ * Returns the built-in Skills Creator assistant.
+ *
+ * This assistant guides users through the 6-step skill creation
+ * process from the Anthropic skills-creator specification, adapted
+ * for Cherry Studio's skill storage provider architecture.
+ */
+export function getSkillsCreatorAssistant(): Assistant {
+  return {
+    id: 'skills-creator',
+    name: safeT('settings.skills.creator.assistantName'),
+    emoji: '🛠️',
+    prompt: SKILLS_CREATOR_SYSTEM_PROMPT,
+    topics: [getDefaultTopic('skills-creator')],
+    messages: [],
+    type: 'assistant',
+    regularPhrases: [],
+    settings: {
+      ...DEFAULT_ASSISTANT_SETTINGS,
+      temperature: 0.7,
+      contextCount: 20
+    }
   }
 }
 

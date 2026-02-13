@@ -1,5 +1,6 @@
 import { loggerService } from '@logger'
 import { TopView } from '@renderer/components/TopView'
+import { useRuntime } from '@renderer/hooks/useRuntime'
 import { handleSaveData, useAppDispatch } from '@renderer/store'
 import { setUpdateState } from '@renderer/store/runtime'
 import { Button, Modal } from 'antd'
@@ -21,6 +22,7 @@ interface Props extends ShowParams {
 
 const PopupContainer: React.FC<Props> = ({ releaseInfo, resolve }) => {
   const { t } = useTranslation()
+  const { update } = useRuntime()
   const [open, setOpen] = useState(true)
   const [isInstalling, setIsInstalling] = useState(false)
   const dispatch = useAppDispatch()
@@ -32,15 +34,22 @@ const PopupContainer: React.FC<Props> = ({ releaseInfo, resolve }) => {
   }, [releaseInfo])
 
   const handleInstall = async () => {
-    setIsInstalling(true)
-    try {
-      await handleSaveData()
-      await window.api.quitAndInstall()
+    if (update.downloaded) {
+      setIsInstalling(true)
+      try {
+        await handleSaveData()
+        await window.api.quitAndInstall()
+        setOpen(false)
+      } catch (error) {
+        logger.error('Failed to save data before update', error as Error)
+        setIsInstalling(false)
+        window.toast.error(t('update.saveDataError'))
+      }
+    } else {
+      // Manual download
       setOpen(false)
-    } catch (error) {
-      logger.error('Failed to save data before update', error as Error)
-      setIsInstalling(false)
-      window.toast.error(t('update.saveDataError'))
+      window.electron.ipcRenderer.invoke('app:download-update')
+      window.toast.info(t('update.downloadStarted'))
     }
   }
 
@@ -80,7 +89,7 @@ const PopupContainer: React.FC<Props> = ({ releaseInfo, resolve }) => {
           {t('update.later')}
         </Button>,
         <Button key="install" type="primary" onClick={handleInstall} loading={isInstalling}>
-          {t('update.install')}
+          {update.downloaded ? t('update.install') : t('update.download')}
         </Button>
       ]}>
       <ModalBodyWrapper>

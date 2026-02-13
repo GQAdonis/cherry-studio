@@ -13,6 +13,7 @@ import { useTranslation } from 'react-i18next'
 import { styled } from 'styled-components'
 
 import SettingsButton from './SettingsButton'
+import SkillSelector from './SkillSelector'
 
 interface ToolsProps {
   assistant?: Assistant
@@ -33,6 +34,7 @@ const Tools = ({ assistant }: ToolsProps) => {
   return (
     <HStack alignItems="center" gap={8}>
       <SettingsButton assistant={assistant} />
+      <SkillSelector />
       {isTopNavbar && (
         <Tooltip title={t('navbar.expand')} mouseEnterDelay={0.8}>
           <NarrowIcon onClick={handleNarrowModeToggle}>

@@ -30,6 +30,7 @@ import FileBlock from './FileBlock'
 import ImageBlock from './ImageBlock'
 import MainTextBlock from './MainTextBlock'
 import PlaceholderBlock from './PlaceholderBlock'
+import SkillBlock from './SkillBlock'
 import ThinkingBlock from './ThinkingBlock'
 import ToolBlock from './ToolBlock'
 import ToolBlockGroup from './ToolBlockGroup'
@@ -259,6 +260,10 @@ const MessageBlockRenderer: React.FC<Props> = ({ blocks, message }) => {
             break
           case MessageBlockType.CONTEXT_ACTION:
             blockComponent = <ContextActionBlock key={block.id} block={block as ContextActionMessageBlock} />
+            break
+          case MessageBlockType.SKILL:
+            // @ts-ignore
+            blockComponent = <SkillBlock key={block.id} block={block} />
             break
           default:
             logger.warn('Unsupported block type in MessageBlockRenderer:', (block as any).type, block)

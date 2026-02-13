@@ -125,7 +125,8 @@ const ThinkModelTypes = [
   'zhipu',
   'perplexity',
   'deepseek_hybrid',
-  'kimi_k2_5'
+  'kimi_k2_5',
+  'opus46'
 ] as const
 
 /** If the model's reasoning effort could be controlled, or its reasoning behavior could be turned on/off.
@@ -635,6 +636,138 @@ export interface TranslateHistory {
   createdAt: string
   /** 收藏状态 */
   star?: boolean
+}
+
+// ── Skill Storage Provider Types ──────────────────────────────────────────
+
+/**
+ * Supported skill storage backend types.
+ */
+export type SkillStorageType = 'filesystem' | 'ipfs' | 'sqlite' | 'postgres'
+
+/**
+ * Configuration for a named skill storage provider instance.
+ */
+export interface SkillStorageProviderConfig {
+  /** Unique provider instance ID (uuid) */
+  id: string
+  /** User-given display name */
+  name: string
+  /** Backend type */
+  type: SkillStorageType
+  /** Whether this provider is active */
+  enabled: boolean
+  // Type-specific configuration
+  filesystem?: { directoryPath: string }
+  ipfs?: { gatewayUrl: string; apiUrl: string; pinningKey?: string }
+  sqlite?: { useDefault: boolean; dbPath?: string }
+  postgres?: {
+    mode: 'dsn' | 'supabase'
+    dsn?: string
+    supabaseUrl?: string
+    supabaseAnonKey?: string
+    supabaseServiceKey?: string
+  }
+}
+
+// ── Skill Bundled-Resource Manifests ─────────────────────────────────────
+
+/** A script bundled inside a skill's `scripts/` directory. */
+export interface SkillScript {
+  /** Filename, e.g. "rotate_pdf.py" */
+  name: string
+  /** Relative path within the skill directory */
+  path: string
+  /** Language: python, bash, javascript, etc. */
+  language: string
+  /** Human-readable description of what the script does */
+  description: string
+  /** Expected CLI arguments */
+  args?: string[]
+}
+
+/** A reference document inside a skill's `references/` directory. */
+export interface SkillReference {
+  /** Filename, e.g. "schema.md" */
+  name: string
+  /** Relative path within the skill directory */
+  path: string
+  /** Describes when to load this reference */
+  description: string
+}
+
+/** An asset inside a skill's `assets/` directory. */
+export interface SkillAssetEntry {
+  /** Filename, e.g. "template.pptx" */
+  name: string
+  /** Relative path within the skill directory */
+  path: string
+  /** MIME type or category */
+  type: string
+}
+
+// ── Core Skill Interface ─────────────────────────────────────────────────
+
+export interface Skill {
+  id: string
+  name: string
+  description: string
+  path: string // Absolute path to skill folder
+  instructions: string // Content of SKILL.md
+  tools?: string[] // List of tools defined in the skill
+  enabled?: boolean // Whether the skill is globally enabled
+  // Matching metadata
+  examples?: string[] // Example utterances for semantic routing
+  tags?: string[] // Categorical tags for clustering
+  triggerPatterns?: string[] // Regex patterns for rule-based fast-path
+  // Storage provider attribution
+  providerId?: string // Which storage provider this skill comes from
+  providerName?: string // Display name of the provider
+  storageType?: SkillStorageType
+  // agentskills.io spec fields
+  license?: string
+  compatibility?: string
+  metadata?: Record<string, string>
+  /** Pre-approved tools (maps to `allowed-tools` YAML frontmatter) */
+  allowedTools?: string[]
+  // Bundled resource manifests
+  /** Declared scripts in scripts/ directory */
+  scripts?: SkillScript[]
+  /** Declared reference documents in references/ directory */
+  references?: SkillReference[]
+  /** Declared assets in assets/ directory */
+  assets?: SkillAssetEntry[]
+}
+
+/**
+ * Skill matching strategy names
+ */
+export type SkillMatchingStrategy = 'none' | 'keyword' | 'embedding' | 'local-embedding' | 'llm' | 'hybrid'
+
+/**
+ * Result of matching a user query against available skills
+ */
+export interface SkillMatchResult {
+  skill: Skill
+  score: number // 0-1 confidence
+  method: string // Which matcher produced this result
+}
+
+/**
+ * Configuration for skill matching
+ */
+export interface SkillMatchingConfig {
+  strategy: SkillMatchingStrategy
+  threshold: number // Minimum score to consider a match (0-1)
+  maxMatched: number // Maximum number of skills to match per request
+  /** Minimum number of enabled skills before matching kicks in */
+  minSkillsForMatching: number
+  /** Embedding model ApiClient config (for 'embedding' strategy) */
+  embeddingApiClient?: ApiClient
+  /** LLM model ID (for 'llm' / 'hybrid' strategy) */
+  llmModelId?: string
+  /** LLM provider ID (for 'llm' / 'hybrid' strategy) */
+  llmProviderId?: string
 }
 
 export type CustomTranslateLanguage = {

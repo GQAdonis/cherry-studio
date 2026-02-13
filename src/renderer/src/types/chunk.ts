@@ -49,6 +49,7 @@ export enum ChunkType {
   SEARCH_COMPLETE_UNION = 'search_complete_union',
   VIDEO_SEARCHED = 'video.searched',
   IMAGE_SEARCHED = 'image.searched',
+  SKILL_ACTIVATION = 'skill.activation',
   CONTEXT_ACTION = 'context.action',
 
   RAW = 'raw'
@@ -439,6 +440,15 @@ export interface ContextActionChunk {
   removedCount?: number
 }
 
+export interface SkillActivationChunk {
+  type: ChunkType.SKILL_ACTIVATION
+  skillName: string
+  action: 'activated' | 'completed' | 'failed'
+  toolName?: string
+  result?: string
+  error?: string
+}
+
 export interface RawChunk {
   /**
    * The type of the chunk
@@ -487,5 +497,6 @@ export type Chunk =
   | SearchCompleteUnionChunk // 搜索(知识库/互联网)完成
   | VideoSearchedChunk // 知识库检索视频
   | ImageSearchedChunk // 知识库检索图片
+  | SkillActivationChunk // 技能激活
   | ContextActionChunk // 上下文管理动作
   | RawChunk

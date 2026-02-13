@@ -16,7 +16,11 @@ const UpdateAppButton: FC = () => {
     return null
   }
 
-  if (!update.downloaded || !autoCheckUpdate) {
+  if (!update.available && !update.downloaded) {
+    return null
+  }
+
+  if (!autoCheckUpdate) {
     return null
   }
 

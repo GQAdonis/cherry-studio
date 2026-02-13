@@ -28,6 +28,7 @@ import type {
   OcrProvider,
   Provider,
   Shortcut,
+  SkillMatchingConfig,
   SupportedOcrFile,
   ThemeMode
 } from '@types'
@@ -71,6 +72,7 @@ import { FileServiceManager } from './services/remotefile/FileServiceManager'
 import { searchService } from './services/SearchService'
 import { SelectionService } from './services/SelectionService'
 import { registerShortcuts, unregisterAllShortcuts } from './services/ShortcutService'
+import { skillService } from './services/SkillService'
 import {
   addEndMessage,
   addStreamMessage,
@@ -184,6 +186,7 @@ export async function registerIpc(mainWindow: BrowserWindow, app: Electron.App) 
 
   // Update
   ipcMain.handle(IpcChannel.App_QuitAndInstall, () => appUpdater.quitAndInstall())
+  ipcMain.handle(IpcChannel.App_DownloadUpdate, () => appUpdater.downloadUpdate())
 
   // language
   ipcMain.handle(IpcChannel.App_SetLanguage, (_, language) => {
@@ -595,6 +598,18 @@ export async function registerIpc(mainWindow: BrowserWindow, app: Electron.App) 
 
   // file
   ipcMain.handle(IpcChannel.File_Open, fileManager.open.bind(fileManager))
+
+  // skills
+  ipcMain.handle(IpcChannel.Skill_GetList, () => skillService.getSkills())
+  ipcMain.handle(IpcChannel.Skill_Refresh, () => skillService.refreshSkills())
+  ipcMain.handle(IpcChannel.Skill_Toggle, (_, id: string, enabled: boolean) => skillService.toggleSkill(id, enabled))
+  ipcMain.handle(IpcChannel.Skill_ExecuteScript, (_, skillId: string, scriptName: string, args: string[]) =>
+    skillService.executeScript(skillId, scriptName, args)
+  )
+  ipcMain.handle(IpcChannel.Skill_GetMatchingConfig, () => skillService.getMatchingConfig())
+  ipcMain.handle(IpcChannel.Skill_SetMatchingConfig, (_, config) => skillService.setMatchingConfig(config))
+  ipcMain.handle(IpcChannel.Skill_InitializeMatching, () => skillService.initializeMatchingProvider())
+
   ipcMain.handle(IpcChannel.File_OpenPath, fileManager.openPath.bind(fileManager))
   ipcMain.handle(IpcChannel.File_Save, fileManager.save.bind(fileManager))
   ipcMain.handle(IpcChannel.File_Select, fileManager.selectFile.bind(fileManager))
@@ -1190,6 +1205,87 @@ export async function registerIpc(mainWindow: BrowserWindow, app: Electron.App) 
   ipcMain.handle(IpcChannel.APP_CrashRenderProcess, () => {
     mainWindow.webContents.forcefullyCrashRenderer()
   })
+
+  // Skills
+  ipcMain.handle('skill:get-list', () => skillService.getSkills())
+  ipcMain.handle('skill:toggle', (_event, id: string, enabled: boolean) => skillService.toggleSkill(id, enabled))
+  ipcMain.handle('skill:get-matching-config', () => skillService.getMatchingConfig())
+  ipcMain.handle('skill:set-matching-config', (_event, config: Partial<SkillMatchingConfig>) =>
+    skillService.setMatchingConfig(config)
+  )
+  ipcMain.handle('skill:initialize-matching', () => skillService.initializeMatchingProvider())
+  ipcMain.handle('skill:get-agent-skills', (_event, agentId: string) => skillService.getAgentSkills(agentId))
+  ipcMain.handle('skill:set-agent-skills', (_event, agentId: string, skillIds: string[]) =>
+    skillService.setAgentSkills(agentId, skillIds)
+  )
+  ipcMain.handle('skill:add-to-agent', (_event, agentId: string, skillId: string) =>
+    skillService.addSkillToAgent(agentId, skillId)
+  )
+  ipcMain.handle('skill:remove-from-agent', (_event, agentId: string, skillId: string) =>
+    skillService.removeSkillFromAgent(agentId, skillId)
+  )
+  ipcMain.handle('skill:get-enabled-for-agent', (_event, agentId: string) =>
+    skillService.getEnabledSkillsForAgent(agentId)
+  )
+
+  // Skill storage providers
+  const storageManager = skillService.getStorageManager()
+
+  ipcMain.handle(IpcChannel.SkillStorage_GetProviders, () => storageManager.getProviderConfigs())
+
+  ipcMain.handle(IpcChannel.SkillStorage_AddProvider, async (_, config) => {
+    return storageManager.addProvider(config)
+  })
+
+  ipcMain.handle(IpcChannel.SkillStorage_UpdateProvider, async (_, id: string, updates) => {
+    return storageManager.updateProvider(id, updates)
+  })
+
+  ipcMain.handle(IpcChannel.SkillStorage_RemoveProvider, async (_, id: string) => {
+    return storageManager.removeProvider(id)
+  })
+
+  ipcMain.handle(IpcChannel.SkillStorage_TestConnection, async (_, config) => {
+    return storageManager.testConnection(config)
+  })
+
+  ipcMain.handle(IpcChannel.SkillStorage_SelectDirectory, async () => {
+    const result = await dialog.showOpenDialog({
+      title: 'Select Skills Directory',
+      properties: ['openDirectory', 'createDirectory']
+    })
+    return result.canceled ? null : result.filePaths[0]
+  })
+
+  ipcMain.handle(IpcChannel.SkillStorage_RunMigrations, async (_, providerId: string) => {
+    const provider = storageManager.getProvider(providerId) as any
+    if (provider?.runMigrations) {
+      await provider.runMigrations()
+      return true
+    }
+    return false
+  })
+
+  // Skill creator
+  ipcMain.handle(IpcChannel.SkillCreator_Validate, async (_, skillData) => {
+    const { SkillValidator } = await import('./services/SkillValidator')
+    const validator = new SkillValidator()
+    return validator.validate(skillData)
+  })
+
+  ipcMain.handle(IpcChannel.SkillCreator_InitTemplate, async (_, skillName: string) => {
+    const { SkillValidator } = await import('./services/SkillValidator')
+    return SkillValidator.createTemplate(skillName)
+  })
+
+  ipcMain.handle(IpcChannel.SkillCreator_SaveToProvider, async (_, providerId: string, skillRecord) => {
+    await skillService.saveSkill(providerId, skillRecord)
+    return true
+  })
+
+  ipcMain.handle(IpcChannel.SkillCreator_TestScript, async (_, skillId: string, scriptName: string, args: string[]) =>
+    skillService.executeScript(skillId, scriptName, args)
+  )
 
   // OpenClaw
   ipcMain.handle(IpcChannel.OpenClaw_CheckInstalled, openClawService.checkInstalled)

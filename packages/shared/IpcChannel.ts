@@ -7,6 +7,7 @@ export enum IpcChannel {
   App_SetSpellCheckLanguages = 'app:set-spell-check-languages',
   App_CheckForUpdate = 'app:check-for-update',
   App_QuitAndInstall = 'app:quit-and-install',
+  App_DownloadUpdate = 'app:download-update',
   App_Reload = 'app:reload',
   App_Quit = 'app:quit',
   App_Info = 'app:info',
@@ -219,6 +220,32 @@ export enum IpcChannel {
   FileService_List = 'file-service:list',
   FileService_Delete = 'file-service:delete',
   FileService_Retrieve = 'file-service:retrieve',
+
+  // skills
+  Skill_GetList = 'skill:get-list',
+  Skill_Refresh = 'skill:refresh',
+  Skill_Toggle = 'skill:toggle',
+  Skill_ExecuteScript = 'skill:execute-script',
+  Skill_GetMatchingConfig = 'skill:get-matching-config',
+  Skill_SetMatchingConfig = 'skill:set-matching-config',
+  Skill_InitializeMatching = 'skill:initialize-matching',
+
+  // skill storage providers
+  SkillStorage_GetProviders = 'skill-storage:get-providers',
+  SkillStorage_AddProvider = 'skill-storage:add-provider',
+  SkillStorage_UpdateProvider = 'skill-storage:update-provider',
+  SkillStorage_RemoveProvider = 'skill-storage:remove-provider',
+  SkillStorage_TestConnection = 'skill-storage:test-connection',
+  SkillStorage_SelectDirectory = 'skill-storage:select-directory',
+  SkillStorage_RunMigrations = 'skill-storage:run-migrations',
+
+  // skill creator
+  SkillCreator_Validate = 'skill-creator:validate',
+  SkillCreator_InitTemplate = 'skill-creator:init-template',
+  SkillCreator_SaveToProvider = 'skill-creator:save-to-provider',
+  SkillCreator_Package = 'skill-creator:package',
+  SkillCreator_SuggestTools = 'skill-creator:suggest-tools',
+  SkillCreator_TestScript = 'skill-creator:test-script',
 
   Export_Word = 'export:word',
 

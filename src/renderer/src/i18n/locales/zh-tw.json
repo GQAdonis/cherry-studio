@@ -2419,6 +2419,7 @@
     },
     "function_calling": "函式呼叫",
     "invalid_model": "無效模型",
+    "json_parse_error": "無效的 JSON 格式",
     "no_matches": "無可用模型",
     "parameter_name": "參數名稱",
     "parameter_type": {
@@ -2665,7 +2666,7 @@
       "version": "版本"
     },
     "install_progress": "安裝進度",
-    "installed_at": "OpenClaw 安裝路徑：{{path}}",
+    "installed_at": "OpenClaw 安裝路徑",
     "model_config": {
       "auth_token": "認證令牌",
       "auth_token_hint": "閘道認證令牌（必填）。留空時將自動產生。",
@@ -5487,6 +5488,66 @@
           "title": "[to be translated]:Unstructured.io"
         }
       },
+      "skills": {
+        "createSkill": "建立技能",
+        "creator": {
+          "addAsset": "新增資源",
+          "addReference": "新增參考文件",
+          "addScript": "新增腳本",
+          "allowedTools": "允許的工具",
+          "assistantName": "技能建立器",
+          "body": "指令（SKILL.md 正文）",
+          "compatibility": "相容性",
+          "description": "描述",
+          "examples": "範例觸發詞",
+          "frontmatter": "前置資訊",
+          "license": "授權",
+          "loadTemplate": "載入範本",
+          "name": "技能名稱",
+          "preview": "SKILL.md 預覽",
+          "resources": "捆綁資源",
+          "save": "儲存技能",
+          "saveToProvider": "儲存至儲存提供者",
+          "selectProvider": "選擇儲存技能的位置：",
+          "tags": "標籤",
+          "title": "建立新技能"
+        },
+        "description": "管理本地技能以擴展智慧體功能",
+        "empty": "未找到技能",
+        "filterByProvider": "按提供者篩選",
+        "matching": {
+          "description": "設定技能與使用者查詢的比對方式。智慧比對透過僅注入相關技能來減少令牌使用。",
+          "initialize": "初始化 / 重建索引",
+          "initializeHint": "變更策略或更新技能後需要執行。預先計算嵌入以實現快速比對。",
+          "maxMatched": "最大比對技能數",
+          "minSkillsForMatching": "最小比對技能數",
+          "strategy": "策略",
+          "threshold": "信心度閾值",
+          "title": "技能比對"
+        },
+        "storage": {
+          "addProvider": "新增提供者",
+          "browse": "瀏覽",
+          "description": "設定技能儲存位置。技能可以分佈在多個提供者之間進行共享和備份。",
+          "directoryPath": "目錄路徑",
+          "editProvider": "編輯提供者",
+          "enabled": "啟用",
+          "ipfsApi": "API 位址",
+          "ipfsGateway": "閘道位址",
+          "ipfsPinningKey": "固定金鑰",
+          "noProviders": "未設定儲存提供者",
+          "postgresDsn": "連線字串",
+          "postgresMode": "連線模式",
+          "providerName": "名稱",
+          "providerType": "類型",
+          "supabaseAnonKey": "匿名金鑰",
+          "supabaseServiceKey": "服務金鑰（用於遷移）",
+          "supabaseUrl": "Supabase URL",
+          "testConnection": "測試連線",
+          "title": "儲存提供者"
+        },
+        "title": "技能庫"
+      },
       "title": "其他設定",
       "websearch": {
         "apikey": "API 金鑰",
@@ -5809,6 +5870,8 @@
     "show_window": "顯示視窗"
   },
   "update": {
+    "download": "[to be translated]:Download",
+    "downloadStarted": "[to be translated]:Download started...",
     "install": "立即安裝",
     "later": "稍後",
     "message": "新版本 {{version}} 已準備就緒，是否立即安裝？",

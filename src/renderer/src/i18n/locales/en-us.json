@@ -2419,6 +2419,7 @@
     },
     "function_calling": "Function Calling",
     "invalid_model": "Invalid Model",
+    "json_parse_error": "Invalid JSON format",
     "no_matches": "No models available",
     "parameter_name": "Parameter Name",
     "parameter_type": {
@@ -2665,7 +2666,7 @@
       "version": "Version"
     },
     "install_progress": "Install Progress",
-    "installed_at": "OpenClaw installed at: {{path}}",
+    "installed_at": "OpenClaw installed at",
     "model_config": {
       "auth_token": "Auth Token",
       "auth_token_hint": "Token for gateway authentication (required). Will be auto-generated if empty.",
@@ -5487,6 +5488,66 @@
           "title": "Unstructured.io"
         }
       },
+      "skills": {
+        "createSkill": "Create Skill",
+        "creator": {
+          "addAsset": "Add Asset",
+          "addReference": "Add Reference",
+          "addScript": "Add Script",
+          "allowedTools": "Allowed Tools",
+          "assistantName": "Skills Creator",
+          "body": "Instructions (SKILL.md body)",
+          "compatibility": "Compatibility",
+          "description": "Description",
+          "examples": "Example Triggers",
+          "frontmatter": "Frontmatter",
+          "license": "License",
+          "loadTemplate": "Load Template",
+          "name": "Skill Name",
+          "preview": "SKILL.md Preview",
+          "resources": "Bundled Resources",
+          "save": "Save Skill",
+          "saveToProvider": "Save to Storage Provider",
+          "selectProvider": "Choose where to save this skill:",
+          "tags": "Tags",
+          "title": "Create New Skill"
+        },
+        "description": "Manage local skills to extend agent capabilities",
+        "empty": "No skills found",
+        "filterByProvider": "Filter by provider",
+        "matching": {
+          "description": "Configure how skills are matched to user queries. Intelligent matching reduces token usage by only injecting relevant skills.",
+          "initialize": "Initialize / Rebuild Index",
+          "initializeHint": "Required after changing strategy or when skills are updated. Pre-computes embeddings for fast matching.",
+          "maxMatched": "Max Matched Skills",
+          "minSkillsForMatching": "Min Skills for Matching",
+          "strategy": "Strategy",
+          "threshold": "Confidence Threshold",
+          "title": "Skill Matching"
+        },
+        "storage": {
+          "addProvider": "Add Provider",
+          "browse": "Browse",
+          "description": "Configure where skills are stored. Skills can be spread across multiple providers for sharing and backup.",
+          "directoryPath": "Directory Path",
+          "editProvider": "Edit Provider",
+          "enabled": "Enabled",
+          "ipfsApi": "API URL",
+          "ipfsGateway": "Gateway URL",
+          "ipfsPinningKey": "Pinning Key",
+          "noProviders": "No storage providers configured",
+          "postgresDsn": "Connection String",
+          "postgresMode": "Connection Mode",
+          "providerName": "Name",
+          "providerType": "Type",
+          "supabaseAnonKey": "Anon Key",
+          "supabaseServiceKey": "Service Key (for migrations)",
+          "supabaseUrl": "Supabase URL",
+          "testConnection": "Test Connection",
+          "title": "Storage Providers"
+        },
+        "title": "Skills Library"
+      },
       "title": "Other Settings",
       "websearch": {
         "apikey": "API key",
@@ -5809,6 +5870,8 @@
     "show_window": "Show Window"
   },
   "update": {
+    "download": "Download",
+    "downloadStarted": "Download started...",
     "install": "Install",
     "later": "Later",
     "message": "New version {{version}} is ready, do you want to install it now?",

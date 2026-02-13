@@ -11,6 +11,7 @@ import {
   Code2,
   Command,
   FileCode,
+  GraduationCap,
   HardDrive,
   Info,
   Layers,
@@ -46,6 +47,8 @@ import QuickAssistantSettings from './QuickAssistantSettings'
 import QuickPhraseSettings from './QuickPhraseSettings'
 import SelectionAssistantSettings from './SelectionAssistantSettings/SelectionAssistantSettings'
 import ShortcutSettings from './ShortcutSettings'
+import SkillCreator from './SkillCreator'
+import SkillSettings from './SkillSettings'
 import { ApiServerSettings } from './ToolSettings/ApiServerSettings'
 import WebSearchSettings from './WebSearchSettings'
 
@@ -98,6 +101,12 @@ const SettingsPage: FC = () => {
             <MenuItem className={isRoute('/settings/mcp')}>
               <McpLogo width={18} height={18} />
               {t('settings.mcp.title')}
+            </MenuItem>
+          </MenuItemLink>
+          <MenuItemLink to="/settings/skills">
+            <MenuItem className={isRoute('/settings/skills')}>
+              <GraduationCap size={18} />
+              {t('settings.skills.title', 'Skills')}
             </MenuItem>
           </MenuItemLink>
           <MenuItemLink to="/settings/minapp">
@@ -199,6 +208,8 @@ const SettingsPage: FC = () => {
             <Route path="e2b" element={<E2BSettings />} />
             <Route path="quickphrase" element={<QuickPhraseSettings />} />
             <Route path="mcp/*" element={<MCPSettings />} />
+            <Route path="skills" element={<SkillSettings />} />
+            <Route path="skills/create" element={<SkillCreator />} />
             <Route path="minapp" element={<MinAppSettings />} />
             <Route path="memory" element={<MemorySettings />} />
             <Route path="context" element={<ContextManagementSettings />} />

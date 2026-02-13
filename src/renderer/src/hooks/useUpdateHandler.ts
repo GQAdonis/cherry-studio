@@ -37,7 +37,7 @@ export default function useUpdateHandler() {
         dispatch(
           setUpdateState({
             checking: false,
-            downloading: true,
+            downloading: false,
             info: releaseInfo,
             available: true
           })

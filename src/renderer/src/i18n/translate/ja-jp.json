@@ -2419,6 +2419,7 @@
     },
     "function_calling": "関数呼び出し",
     "invalid_model": "無効なモデル",
+    "json_parse_error": "無効なJSON形式",
     "no_matches": "利用可能なモデルがありません",
     "parameter_name": "パラメータ名",
     "parameter_type": {
@@ -2665,7 +2666,7 @@
       "version": "バージョン"
     },
     "install_progress": "インストール進行状況",
-    "installed_at": "OpenClawのインストール先: {{path}}",
+    "installed_at": "OpenClawのインストール先",
     "model_config": {
       "auth_token": "認証トークン",
       "auth_token_hint": "ゲートウェイ認証用のトークン。認証を無効にする場合は空のままにしてください。",
@@ -5487,6 +5488,66 @@
           "title": "[to be translated]:Unstructured.io"
         }
       },
+      "skills": {
+        "createSkill": "[to be translated]:Create Skill",
+        "creator": {
+          "addAsset": "[to be translated]:Add Asset",
+          "addReference": "[to be translated]:Add Reference",
+          "addScript": "[to be translated]:Add Script",
+          "allowedTools": "[to be translated]:Allowed Tools",
+          "assistantName": "[to be translated]:Skills Creator",
+          "body": "[to be translated]:Instructions (SKILL.md body)",
+          "compatibility": "[to be translated]:Compatibility",
+          "description": "[to be translated]:Description",
+          "examples": "[to be translated]:Example Triggers",
+          "frontmatter": "[to be translated]:Frontmatter",
+          "license": "[to be translated]:License",
+          "loadTemplate": "[to be translated]:Load Template",
+          "name": "[to be translated]:Skill Name",
+          "preview": "[to be translated]:SKILL.md Preview",
+          "resources": "[to be translated]:Bundled Resources",
+          "save": "[to be translated]:Save Skill",
+          "saveToProvider": "[to be translated]:Save to Storage Provider",
+          "selectProvider": "[to be translated]:Choose where to save this skill:",
+          "tags": "[to be translated]:Tags",
+          "title": "[to be translated]:Create New Skill"
+        },
+        "description": "[to be translated]:Manage local skills to extend agent capabilities",
+        "empty": "[to be translated]:No skills found",
+        "filterByProvider": "[to be translated]:Filter by provider",
+        "matching": {
+          "description": "[to be translated]:Configure how skills are matched to user queries. Intelligent matching reduces token usage by only injecting relevant skills.",
+          "initialize": "[to be translated]:Initialize / Rebuild Index",
+          "initializeHint": "[to be translated]:Required after changing strategy or when skills are updated. Pre-computes embeddings for fast matching.",
+          "maxMatched": "[to be translated]:Max Matched Skills",
+          "minSkillsForMatching": "[to be translated]:Min Skills for Matching",
+          "strategy": "[to be translated]:Strategy",
+          "threshold": "[to be translated]:Confidence Threshold",
+          "title": "[to be translated]:Skill Matching"
+        },
+        "storage": {
+          "addProvider": "[to be translated]:Add Provider",
+          "browse": "[to be translated]:Browse",
+          "description": "[to be translated]:Configure where skills are stored. Skills can be spread across multiple providers for sharing and backup.",
+          "directoryPath": "[to be translated]:Directory Path",
+          "editProvider": "[to be translated]:Edit Provider",
+          "enabled": "[to be translated]:Enabled",
+          "ipfsApi": "[to be translated]:API URL",
+          "ipfsGateway": "[to be translated]:Gateway URL",
+          "ipfsPinningKey": "[to be translated]:Pinning Key",
+          "noProviders": "[to be translated]:No storage providers configured",
+          "postgresDsn": "[to be translated]:Connection String",
+          "postgresMode": "[to be translated]:Connection Mode",
+          "providerName": "[to be translated]:Name",
+          "providerType": "[to be translated]:Type",
+          "supabaseAnonKey": "[to be translated]:Anon Key",
+          "supabaseServiceKey": "[to be translated]:Service Key (for migrations)",
+          "supabaseUrl": "[to be translated]:Supabase URL",
+          "testConnection": "[to be translated]:Test Connection",
+          "title": "[to be translated]:Storage Providers"
+        },
+        "title": "[to be translated]:Skills Library"
+      },
       "title": "その他の設定",
       "websearch": {
         "apikey": "APIキー",
@@ -5809,6 +5870,8 @@
     "show_window": "ウィンドウを表示"
   },
   "update": {
+    "download": "[to be translated]:Download",
+    "downloadStarted": "[to be translated]:Download started...",
     "install": "今すぐインストール",
     "later": "後で",
     "message": "新バージョン {{version}} が利用可能です。今すぐインストールしますか？",

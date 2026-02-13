@@ -105,31 +105,34 @@ const resolveConfiguredHeaders = (headers?: HeadersInput): Record<string, Header
   return headers ? { ...headers } : {}
 }
 
-const createJsonHeaders = (options: CherryInProviderSettings): Record<string, string> => {
-  const configuredHeaders = resolveConfiguredHeaders(options.headers)
-  const apiKey = resolveApiKey(options)
+const createJsonHeaders = (options: CherryInProviderSettings): (() => Record<string, string>) => {
+  return () => {
+    const configuredHeaders = resolveConfiguredHeaders(options.headers)
+    const apiKey = resolveApiKey(options)
 
-  const headers: Record<string, string> = {
-    'Content-Type': 'application/json',
-    ...Object.fromEntries(
-      Object.entries(configuredHeaders)
-        .filter(([, value]) => value !== undefined)
-        .map(([key, value]) => [key, value!])
-    )
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json',
+      ...Object.fromEntries(
+        Object.entries(configuredHeaders)
+          .filter(([, value]) => value !== undefined)
+          .map(([key, value]) => [key, value!])
+      )
+    }
+
+    // Only add Authorization header if we have an API key
+    if (apiKey) {
+      headers.Authorization = `Bearer ${apiKey}`
+    }
+
+    return headers
   }
-
-  // Only add Authorization header if we have an API key
-  if (apiKey) {
-    headers.Authorization = `Bearer ${apiKey}`
-  }
-
-  return headers
 }
 
 export const createCherryIn = (options: CherryInProviderSettings = {}): CherryInProvider => {
   const { baseURL = DEFAULT_CHERRYIN_BASE_URL, fetch } = options
 
-  const headers = createJsonHeaders(options)
+  // Only resolve headers if an API key is provided
+  const headers = options.apiKey ? createJsonHeaders(options)() : { 'Content-Type': 'application/json' }
 
   // Create a single OpenAI provider for all models
   const openaiProvider = createOpenAI({

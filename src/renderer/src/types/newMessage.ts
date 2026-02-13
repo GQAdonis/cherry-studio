@@ -28,6 +28,7 @@ export enum MessageBlockType {
   IMAGE = 'image', // 图片内容
   CODE = 'code', // 代码块
   TOOL = 'tool', // Added unified tool block type
+  SKILL = 'skill', // New type
   FILE = 'file', // 文件内容
   ERROR = 'error', // 错误信息
   CITATION = 'citation', // 引用类型 (Now includes web search, grounding, etc.)
@@ -165,6 +166,14 @@ export interface ArtifactMessageBlock extends BaseMessageBlock {
   conversationId: string // 所属会话ID
 }
 
+export interface SkillMessageBlock extends BaseMessageBlock {
+  type: MessageBlockType.SKILL
+  skillName: string
+  action: 'activated' | 'completed' | 'failed'
+  toolName?: string
+  result?: string
+}
+
 // Context Action Block - Context management events
 export interface ContextActionMessageBlock extends BaseMessageBlock {
   type: MessageBlockType.CONTEXT_ACTION
@@ -189,6 +198,7 @@ export type MessageBlock =
   | CompactMessageBlock
   | ArtifactMessageBlock
   | ContextActionMessageBlock
+  | SkillMessageBlock
 
 export enum UserMessageStatus {
   SUCCESS = 'success'
