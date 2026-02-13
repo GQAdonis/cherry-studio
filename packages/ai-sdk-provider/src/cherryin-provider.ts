@@ -141,12 +141,13 @@ export const createCherryIn = (options: CherryInProviderSettings = {}): CherryIn
     fetch: fetch ? createCustomFetch(fetch) : undefined
   })
 
-  const createChatModel = (modelId: string, _settings?: OpenAIProviderSettings) => openaiProvider.languageModel(modelId)
+  const createChatModel = (modelId: string, _settings?: OpenAIProviderSettings) =>
+    openaiProvider.languageModel(modelId) as any as LanguageModelV3
 
   const createEmbeddingModel = (modelId: string, _settings?: OpenAIProviderSettings) =>
-    openaiProvider.embeddingModel(modelId)
+    openaiProvider.textEmbeddingModel(modelId) as any as EmbeddingModelV3
 
-  const provider: CherryInProvider = Object.assign(
+  const provider = Object.assign(
     function (modelId: string, settings?: OpenAIProviderSettings) {
       if (new.target) {
         throw new Error('CherryIN provider function cannot be called with the new keyword.')
@@ -158,19 +159,19 @@ export const createCherryIn = (options: CherryInProviderSettings = {}): CherryIn
       languageModel: createChatModel,
       embeddingModel: createEmbeddingModel,
       chat: createChatModel,
-      responses: (modelId: string) => openaiProvider.responses(modelId),
-      completion: (modelId: string) => openaiProvider.completion(modelId),
+      responses: (modelId: string) => openaiProvider.responses(modelId) as any as LanguageModelV3,
+      completion: (modelId: string) => openaiProvider.completion(modelId) as any as LanguageModelV3,
       embedding: createEmbeddingModel,
       textEmbedding: createEmbeddingModel,
       textEmbeddingModel: createEmbeddingModel,
-      image: (modelId: string) => openaiProvider.imageModel(modelId),
-      imageModel: (modelId: string) => openaiProvider.imageModel(modelId),
-      transcription: (modelId: string) => openaiProvider.transcription(modelId),
-      transcriptionModel: (modelId: string) => openaiProvider.transcription(modelId),
-      speech: (modelId: string) => openaiProvider.speech(modelId),
-      speechModel: (modelId: string) => openaiProvider.speech(modelId)
+      image: (modelId: string) => openaiProvider.imageModel(modelId) as any as ImageModelV3,
+      imageModel: (modelId: string) => openaiProvider.imageModel(modelId) as any as ImageModelV3,
+      transcription: (modelId: string) => openaiProvider.transcription(modelId) as any as TranscriptionModelV3,
+      transcriptionModel: (modelId: string) => openaiProvider.transcription(modelId) as any as TranscriptionModelV3,
+      speech: (modelId: string) => openaiProvider.speech(modelId) as any as SpeechModelV3,
+      speechModel: (modelId: string) => openaiProvider.speech(modelId) as any as SpeechModelV3
     }
-  )
+  ) as CherryInProvider
 
   return provider
 }
