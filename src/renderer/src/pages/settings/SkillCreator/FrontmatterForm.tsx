@@ -38,7 +38,7 @@ const FrontmatterForm: FC<FrontmatterFormProps> = ({ formData, onChange, validat
     <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
       <div>
         <Text strong style={{ fontSize: 12 }}>
-          {t('settings.skills.creator.name', 'Skill Name')} *
+          {t('settings.tool.skills.creator.name', 'Skill Name')} *
         </Text>
         <Input
           value={formData.name}
@@ -60,7 +60,7 @@ const FrontmatterForm: FC<FrontmatterFormProps> = ({ formData, onChange, validat
 
       <div>
         <Text strong style={{ fontSize: 12 }}>
-          {t('settings.skills.creator.description', 'Description')} *
+          {t('settings.tool.skills.creator.description', 'Description')} *
         </Text>
         <TextArea
           value={formData.description}
@@ -83,7 +83,7 @@ const FrontmatterForm: FC<FrontmatterFormProps> = ({ formData, onChange, validat
 
       <div>
         <Text strong style={{ fontSize: 12 }}>
-          {t('settings.skills.creator.license', 'License')}
+          {t('settings.tool.skills.creator.license', 'License')}
         </Text>
         <Input
           value={formData.license}
@@ -95,7 +95,7 @@ const FrontmatterForm: FC<FrontmatterFormProps> = ({ formData, onChange, validat
 
       <div>
         <Text strong style={{ fontSize: 12 }}>
-          {t('settings.skills.creator.compatibility', 'Compatibility')}
+          {t('settings.tool.skills.creator.compatibility', 'Compatibility')}
         </Text>
         <Input
           value={formData.compatibility}
@@ -108,7 +108,7 @@ const FrontmatterForm: FC<FrontmatterFormProps> = ({ formData, onChange, validat
 
       <div>
         <Text strong style={{ fontSize: 12 }}>
-          {t('settings.skills.creator.allowedTools', 'Allowed Tools')}
+          {t('settings.tool.skills.creator.allowedTools', 'Allowed Tools')}
         </Text>
         <Select
           mode="tags"
@@ -125,7 +125,7 @@ const FrontmatterForm: FC<FrontmatterFormProps> = ({ formData, onChange, validat
 
       <div>
         <Text strong style={{ fontSize: 12 }}>
-          {t('settings.skills.creator.tags', 'Tags')}
+          {t('settings.tool.skills.creator.tags', 'Tags')}
         </Text>
         <Select
           mode="tags"
@@ -139,7 +139,7 @@ const FrontmatterForm: FC<FrontmatterFormProps> = ({ formData, onChange, validat
 
       <div>
         <Text strong style={{ fontSize: 12 }}>
-          {t('settings.skills.creator.examples', 'Example Triggers')}
+          {t('settings.tool.skills.creator.examples', 'Example Triggers')}
         </Text>
         <Select
           mode="tags"

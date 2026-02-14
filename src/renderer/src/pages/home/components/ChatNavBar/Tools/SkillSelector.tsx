@@ -74,9 +74,9 @@ export const SkillSelector = () => {
       trigger="click"
       open={open}
       onOpenChange={setOpen}
-      title={t('settings.skills.title', 'Skills')}
+      title={t('settings.tool.skills.title', 'Skills')}
       placement="bottomRight">
-      <Tooltip title={t('settings.skills.title', 'Skills')}>
+      <Tooltip title={t('settings.tool.skills.title', 'Skills')}>
         <Button
           type="text"
           icon={<GraduationCap size={16} />}

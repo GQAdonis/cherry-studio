@@ -201,7 +201,7 @@ const SkillCreator: FC = () => {
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
           <Button icon={<ArrowLeftOutlined />} type="text" onClick={() => navigate('/settings/skills')} />
           <Title level={4} style={{ margin: 0 }}>
-            {t('settings.skills.creator.title', 'Create New Skill')}
+            {t('settings.tool.skills.creator.title', 'Create New Skill')}
           </Title>
         </div>
         <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
@@ -215,9 +215,11 @@ const SkillCreator: FC = () => {
               {validation.warnings.length} warning{validation.warnings.length !== 1 ? 's' : ''}
             </Tag>
           )}
-          <Button onClick={handleLoadTemplate}>{t('settings.skills.creator.loadTemplate', 'Load Template')}</Button>
+          <Button onClick={handleLoadTemplate}>
+            {t('settings.tool.skills.creator.loadTemplate', 'Load Template')}
+          </Button>
           <Button type="primary" icon={<SaveOutlined />} onClick={() => setSaveModalVisible(true)}>
-            {t('settings.skills.creator.save', 'Save Skill')}
+            {t('settings.tool.skills.creator.save', 'Save Skill')}
           </Button>
         </div>
       </Header>
@@ -228,7 +230,7 @@ const SkillCreator: FC = () => {
         <LeftPanel>
           <PanelSection>
             <Title level={5} style={{ marginTop: 0 }}>
-              {t('settings.skills.creator.frontmatter', 'Frontmatter')}
+              {t('settings.tool.skills.creator.frontmatter', 'Frontmatter')}
             </Title>
             <FrontmatterForm formData={formData} onChange={updateFormData} validationErrors={validation.errors} />
           </PanelSection>
@@ -242,7 +244,7 @@ const SkillCreator: FC = () => {
         <RightPanel>
           <PanelSection>
             <Title level={5} style={{ marginTop: 0 }}>
-              {t('settings.skills.creator.resources', 'Bundled Resources')}
+              {t('settings.tool.skills.creator.resources', 'Bundled Resources')}
             </Title>
             <ResourcesPanel
               scripts={formData.scripts}
@@ -256,7 +258,7 @@ const SkillCreator: FC = () => {
 
           <PanelSection style={{ flex: 1 }}>
             <Title level={5} style={{ marginTop: 0 }}>
-              {t('settings.skills.creator.preview', 'SKILL.md Preview')}
+              {t('settings.tool.skills.creator.preview', 'SKILL.md Preview')}
             </Title>
             <pre
               style={{
@@ -279,14 +281,14 @@ const SkillCreator: FC = () => {
 
       {/* Save Modal - Provider Picker */}
       <Modal
-        title={t('settings.skills.creator.saveToProvider', 'Save to Storage Provider')}
+        title={t('settings.tool.skills.creator.saveToProvider', 'Save to Storage Provider')}
         open={saveModalVisible}
         onCancel={() => setSaveModalVisible(false)}
         onOk={handleSave}
         confirmLoading={saving}
         okText={t('common.save', 'Save')}>
         <div style={{ marginBottom: 16 }}>
-          <Text>{t('settings.skills.creator.selectProvider', 'Choose where to save this skill:')}</Text>
+          <Text>{t('settings.tool.skills.creator.selectProvider', 'Choose where to save this skill:')}</Text>
         </div>
         <Select
           value={selectedProviderId}

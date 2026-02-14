@@ -320,14 +320,14 @@ export default function SkillSettings() {
     <SettingContainer>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
         <div>
-          <SettingTitle>{t('settings.skills.title', 'Skills Library')}</SettingTitle>
+          <SettingTitle>{t('settings.tool.skills.title', 'Skills Library')}</SettingTitle>
           <SettingDescription>
-            {t('settings.skills.description', 'Manage local skills to extend agent capabilities')}
+            {t('settings.tool.skills.description', 'Manage local skills to extend agent capabilities')}
           </SettingDescription>
         </div>
         <div style={{ display: 'flex', gap: 8 }}>
           <Button type="primary" icon={<PlusOutlined />} onClick={() => navigate('/settings/skills/create')}>
-            {t('settings.skills.createSkill', 'Create Skill')}
+            {t('settings.tool.skills.createSkill', 'Create Skill')}
           </Button>
           <Button onClick={handleRefresh} loading={loading}>
             {t('common.refresh', 'Refresh')}
@@ -340,22 +340,22 @@ export default function SkillSettings() {
         <SettingGroup style={{ marginBottom: 20 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
             <Title level={5} style={{ margin: 0 }}>
-              {t('settings.skills.storage.title', 'Storage Providers')}
+              {t('settings.tool.skills.storage.title', 'Storage Providers')}
             </Title>
             <Button size="small" icon={<PlusOutlined />} onClick={() => openProviderModal()}>
-              {t('settings.skills.storage.addProvider', 'Add Provider')}
+              {t('settings.tool.skills.storage.addProvider', 'Add Provider')}
             </Button>
           </div>
           <Text type="secondary" style={{ display: 'block', marginBottom: 12, fontSize: 12 }}>
             {t(
-              'settings.skills.storage.description',
+              'settings.tool.skills.storage.description',
               'Configure where skills are stored. Skills can be spread across multiple providers for sharing and backup.'
             )}
           </Text>
 
           {providers.length === 0 ? (
             <Empty
-              description={t('settings.skills.storage.noProviders', 'No storage providers configured')}
+              description={t('settings.tool.skills.storage.noProviders', 'No storage providers configured')}
               image={Empty.PRESENTED_IMAGE_SIMPLE}
             />
           ) : (
@@ -397,17 +397,17 @@ export default function SkillSettings() {
         {/* Skill Matching Configuration */}
         <SettingGroup style={{ marginBottom: 20 }}>
           <Title level={5} style={{ marginTop: 0, marginBottom: 12 }}>
-            {t('settings.skills.matching.title', 'Skill Matching')}
+            {t('settings.tool.skills.matching.title', 'Skill Matching')}
           </Title>
           <Text type="secondary" style={{ display: 'block', marginBottom: 16, fontSize: 12 }}>
             {t(
-              'settings.skills.matching.description',
+              'settings.tool.skills.matching.description',
               'Configure how skills are matched to user queries. Intelligent matching reduces token usage by only injecting relevant skills.'
             )}
           </Text>
 
           <SettingRow style={{ marginBottom: 16 }}>
-            <SettingRowTitle>{t('settings.skills.matching.strategy', 'Strategy')}</SettingRowTitle>
+            <SettingRowTitle>{t('settings.tool.skills.matching.strategy', 'Strategy')}</SettingRowTitle>
             <Select
               value={matchingConfig.strategy}
               onChange={(value) => updateMatchingConfig({ strategy: value })}
@@ -426,7 +426,9 @@ export default function SkillSettings() {
               </Text>
 
               <SettingRow style={{ marginBottom: 12 }}>
-                <SettingRowTitle>{t('settings.skills.matching.threshold', 'Confidence Threshold')}</SettingRowTitle>
+                <SettingRowTitle>
+                  {t('settings.tool.skills.matching.threshold', 'Confidence Threshold')}
+                </SettingRowTitle>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 12, width: 220 }}>
                   <Slider
                     min={0.1}
@@ -443,7 +445,7 @@ export default function SkillSettings() {
               </SettingRow>
 
               <SettingRow style={{ marginBottom: 12 }}>
-                <SettingRowTitle>{t('settings.skills.matching.maxMatched', 'Max Matched Skills')}</SettingRowTitle>
+                <SettingRowTitle>{t('settings.tool.skills.matching.maxMatched', 'Max Matched Skills')}</SettingRowTitle>
                 <InputNumber
                   min={1}
                   max={10}
@@ -455,7 +457,7 @@ export default function SkillSettings() {
 
               <SettingRow style={{ marginBottom: 12 }}>
                 <SettingRowTitle>
-                  {t('settings.skills.matching.minSkillsForMatching', 'Min Skills for Matching')}
+                  {t('settings.tool.skills.matching.minSkillsForMatching', 'Min Skills for Matching')}
                 </SettingRowTitle>
                 <InputNumber
                   min={1}
@@ -468,11 +470,11 @@ export default function SkillSettings() {
 
               <div style={{ marginTop: 16 }}>
                 <Button type="primary" onClick={handleInitializeMatching} loading={initializingMatcher}>
-                  {t('settings.skills.matching.initialize', 'Initialize / Rebuild Index')}
+                  {t('settings.tool.skills.matching.initialize', 'Initialize / Rebuild Index')}
                 </Button>
                 <Text type="secondary" style={{ display: 'block', fontSize: 11, marginTop: 4 }}>
                   {t(
-                    'settings.skills.matching.initializeHint',
+                    'settings.tool.skills.matching.initializeHint',
                     'Required after changing strategy or when skills are updated. Pre-computes embeddings for fast matching.'
                   )}
                 </Text>
@@ -496,7 +498,7 @@ export default function SkillSettings() {
           {providers.length > 1 && (
             <Select
               allowClear
-              placeholder={t('settings.skills.filterByProvider', 'Filter by provider')}
+              placeholder={t('settings.tool.skills.filterByProvider', 'Filter by provider')}
               style={{ width: 180 }}
               value={filterProviderId}
               onChange={(val) => setFilterProviderId(val ?? null)}
@@ -512,7 +514,7 @@ export default function SkillSettings() {
           grid={{ gutter: 16, column: 1 }}
           dataSource={filteredSkills}
           loading={loading}
-          locale={{ emptyText: <Empty description={t('settings.skills.empty', 'No skills found')} /> }}
+          locale={{ emptyText: <Empty description={t('settings.tool.skills.empty', 'No skills found')} /> }}
           renderItem={(skill) => (
             <List.Item>
               <Card
@@ -644,8 +646,8 @@ export default function SkillSettings() {
       <Modal
         title={
           editingProvider
-            ? t('settings.skills.storage.editProvider', 'Edit Provider')
-            : t('settings.skills.storage.addProvider', 'Add Provider')
+            ? t('settings.tool.skills.storage.editProvider', 'Edit Provider')
+            : t('settings.tool.skills.storage.addProvider', 'Add Provider')
         }
         open={providerModalVisible}
         onCancel={() => setProviderModalVisible(false)}
@@ -653,7 +655,7 @@ export default function SkillSettings() {
         width={520}
         footer={[
           <Button key="test" onClick={handleTestConnection} loading={testingConnection}>
-            {t('settings.skills.storage.testConnection', 'Test Connection')}
+            {t('settings.tool.skills.storage.testConnection', 'Test Connection')}
           </Button>,
           <Button key="cancel" onClick={() => setProviderModalVisible(false)}>
             {t('common.cancel', 'Cancel')}
@@ -663,15 +665,24 @@ export default function SkillSettings() {
           </Button>
         ]}>
         <Form form={providerForm} layout="vertical">
-          <Form.Item name="name" label={t('settings.skills.storage.providerName', 'Name')} rules={[{ required: true }]}>
+          <Form.Item
+            name="name"
+            label={t('settings.tool.skills.storage.providerName', 'Name')}
+            rules={[{ required: true }]}>
             <Input placeholder="My Skills Storage" />
           </Form.Item>
 
-          <Form.Item name="type" label={t('settings.skills.storage.providerType', 'Type')} rules={[{ required: true }]}>
+          <Form.Item
+            name="type"
+            label={t('settings.tool.skills.storage.providerType', 'Type')}
+            rules={[{ required: true }]}>
             <Select options={STORAGE_TYPE_OPTIONS.map((o) => ({ value: o.value, label: o.label }))} />
           </Form.Item>
 
-          <Form.Item name="enabled" label={t('settings.skills.storage.enabled', 'Enabled')} valuePropName="checked">
+          <Form.Item
+            name="enabled"
+            label={t('settings.tool.skills.storage.enabled', 'Enabled')}
+            valuePropName="checked">
             <Switch />
           </Form.Item>
 
@@ -679,13 +690,13 @@ export default function SkillSettings() {
           {currentType === 'filesystem' && (
             <Form.Item
               name="filesystem.directoryPath"
-              label={t('settings.skills.storage.directoryPath', 'Directory Path')}
+              label={t('settings.tool.skills.storage.directoryPath', 'Directory Path')}
               rules={[{ required: true }]}>
               <Input
                 placeholder="/path/to/skills"
                 addonAfter={
                   <Button type="text" size="small" onClick={handleSelectDirectory}>
-                    {t('settings.skills.storage.browse', 'Browse')}
+                    {t('settings.tool.skills.storage.browse', 'Browse')}
                   </Button>
                 }
               />
@@ -697,17 +708,17 @@ export default function SkillSettings() {
             <>
               <Form.Item
                 name="ipfs.gatewayUrl"
-                label={t('settings.skills.storage.ipfsGateway', 'Gateway URL')}
+                label={t('settings.tool.skills.storage.ipfsGateway', 'Gateway URL')}
                 rules={[{ required: true }]}>
                 <Input placeholder="http://localhost:8080" />
               </Form.Item>
               <Form.Item
                 name="ipfs.apiUrl"
-                label={t('settings.skills.storage.ipfsApi', 'API URL')}
+                label={t('settings.tool.skills.storage.ipfsApi', 'API URL')}
                 rules={[{ required: true }]}>
                 <Input placeholder="http://localhost:5001" />
               </Form.Item>
-              <Form.Item name="ipfs.pinningKey" label={t('settings.skills.storage.ipfsPinningKey', 'Pinning Key')}>
+              <Form.Item name="ipfs.pinningKey" label={t('settings.tool.skills.storage.ipfsPinningKey', 'Pinning Key')}>
                 <Input.Password placeholder="Optional" />
               </Form.Item>
             </>
@@ -718,7 +729,7 @@ export default function SkillSettings() {
             <>
               <Form.Item
                 name="postgres.mode"
-                label={t('settings.skills.storage.postgresMode', 'Connection Mode')}
+                label={t('settings.tool.skills.storage.postgresMode', 'Connection Mode')}
                 rules={[{ required: true }]}>
                 <Select
                   options={[
@@ -733,7 +744,7 @@ export default function SkillSettings() {
                   getFieldValue('postgres.mode') === 'dsn' ? (
                     <Form.Item
                       name="postgres.dsn"
-                      label={t('settings.skills.storage.postgresDsn', 'Connection String')}
+                      label={t('settings.tool.skills.storage.postgresDsn', 'Connection String')}
                       rules={[{ required: true }]}>
                       <Input.Password placeholder="postgresql://user:pass@host:5432/db" />
                     </Form.Item>
@@ -741,19 +752,19 @@ export default function SkillSettings() {
                     <>
                       <Form.Item
                         name="postgres.supabaseUrl"
-                        label={t('settings.skills.storage.supabaseUrl', 'Supabase URL')}
+                        label={t('settings.tool.skills.storage.supabaseUrl', 'Supabase URL')}
                         rules={[{ required: true }]}>
                         <Input placeholder="https://xxx.supabase.co" />
                       </Form.Item>
                       <Form.Item
                         name="postgres.supabaseAnonKey"
-                        label={t('settings.skills.storage.supabaseAnonKey', 'Anon Key')}
+                        label={t('settings.tool.skills.storage.supabaseAnonKey', 'Anon Key')}
                         rules={[{ required: true }]}>
                         <Input.Password placeholder="eyJ..." />
                       </Form.Item>
                       <Form.Item
                         name="postgres.supabaseServiceKey"
-                        label={t('settings.skills.storage.supabaseServiceKey', 'Service Key (for migrations)')}>
+                        label={t('settings.tool.skills.storage.supabaseServiceKey', 'Service Key (for migrations)')}>
                         <Input.Password placeholder="eyJ... (optional, for running migrations)" />
                       </Form.Item>
                     </>

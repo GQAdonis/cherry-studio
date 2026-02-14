@@ -1,4 +1,4 @@
-import { type ProviderConfig, registerMultipleProviderConfigs } from '@cherrystudio/ai-core/provider'
+import { hasProviderConfig, type ProviderConfig, registerMultipleProviderConfigs } from '@cherrystudio/ai-core/provider'
 import { loggerService } from '@logger'
 import * as z from 'zod'
 
@@ -122,8 +122,9 @@ export const registeredNewProviderIdSchema = z.enum(registeredNewProviderIds)
  */
 export async function initializeNewProviders(): Promise<void> {
   try {
-    const successCount = registerMultipleProviderConfigs(NEW_PROVIDER_CONFIGS)
-    if (successCount < NEW_PROVIDER_CONFIGS.length) {
+    const newConfigs = NEW_PROVIDER_CONFIGS.filter((config) => !hasProviderConfig(config.id))
+    const successCount = registerMultipleProviderConfigs(newConfigs)
+    if (successCount < newConfigs.length) {
       logger.warn('Some providers failed to register. Check previous error logs.')
     }
   } catch (error) {

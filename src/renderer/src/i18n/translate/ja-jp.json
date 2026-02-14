@@ -1982,6 +1982,10 @@
     },
     "citation": "{{count}}個の引用内容",
     "citations": "引用内容",
+    "context_action": {
+      "pruned": "[to be translated]:Context was adjusted to fit limits ({{count}} items removed).",
+      "title": "[to be translated]:Context Management"
+    },
     "copied": "コピーしました！",
     "copy": {
       "failed": "コピーに失敗しました",

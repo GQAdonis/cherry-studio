@@ -106,7 +106,7 @@ const SettingsPage: FC = () => {
           <MenuItemLink to="/settings/skills">
             <MenuItem className={isRoute('/settings/skills')}>
               <GraduationCap size={18} />
-              {t('settings.skills.title', 'Skills')}
+              {t('settings.tool.skills.title', 'Skills')}
             </MenuItem>
           </MenuItemLink>
           <MenuItemLink to="/settings/minapp">

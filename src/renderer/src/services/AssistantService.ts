@@ -84,7 +84,7 @@ export function getDefaultAssistant(): Assistant {
 export function getSkillsCreatorAssistant(): Assistant {
   return {
     id: 'skills-creator',
-    name: safeT('settings.skills.creator.assistantName'),
+    name: safeT('settings.tool.skills.creator.assistantName'),
     emoji: '🛠️',
     prompt: SKILLS_CREATOR_SYSTEM_PROMPT,
     topics: [getDefaultTopic('skills-creator')],

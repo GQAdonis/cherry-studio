@@ -1982,6 +1982,10 @@
     },
     "citation": "{{count}} 個引用內容",
     "citations": "引用內容",
+    "context_action": {
+      "pruned": "[to be translated]:Context was adjusted to fit limits ({{count}} items removed).",
+      "title": "[to be translated]:Context Management"
+    },
     "copied": "已複製！",
     "copy": {
       "failed": "複製失敗",

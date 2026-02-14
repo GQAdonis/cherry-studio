@@ -21,7 +21,7 @@ const SkillBodyEditor: FC<SkillBodyEditorProps> = ({ value, onChange }) => {
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
         <Text strong style={{ fontSize: 12 }}>
-          {t('settings.skills.creator.body', 'Instructions (SKILL.md body)')}
+          {t('settings.tool.skills.creator.body', 'Instructions (SKILL.md body)')}
         </Text>
         <div style={{ display: 'flex', gap: 4, alignItems: 'center' }}>
           {isOverLimit && <Tag color="warning">Over 500 lines</Tag>}

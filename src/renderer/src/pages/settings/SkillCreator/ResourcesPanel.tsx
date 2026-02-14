@@ -146,7 +146,7 @@ const ResourcesPanel: FC<ResourcesPanelProps> = ({
                 </div>
               ))}
               <Button size="small" icon={<PlusOutlined />} onClick={addScript}>
-                {t('settings.skills.creator.addScript', 'Add Script')}
+                {t('settings.tool.skills.creator.addScript', 'Add Script')}
               </Button>
             </div>
           )
@@ -186,7 +186,7 @@ const ResourcesPanel: FC<ResourcesPanelProps> = ({
                 </div>
               ))}
               <Button size="small" icon={<PlusOutlined />} onClick={addReference}>
-                {t('settings.skills.creator.addReference', 'Add Reference')}
+                {t('settings.tool.skills.creator.addReference', 'Add Reference')}
               </Button>
             </div>
           )
@@ -218,7 +218,7 @@ const ResourcesPanel: FC<ResourcesPanelProps> = ({
                 </div>
               ))}
               <Button size="small" icon={<PlusOutlined />} onClick={addAsset}>
-                {t('settings.skills.creator.addAsset', 'Add Asset')}
+                {t('settings.tool.skills.creator.addAsset', 'Add Asset')}
               </Button>
             </div>
           )

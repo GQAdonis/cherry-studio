@@ -1982,6 +1982,10 @@
     },
     "citation": "{{count}} éléments cités",
     "citations": "Citations",
+    "context_action": {
+      "pruned": "[to be translated]:Context was adjusted to fit limits ({{count}} items removed).",
+      "title": "[to be translated]:Context Management"
+    },
     "copied": "Copié",
     "copy": {
       "failed": "La copie a échoué",
