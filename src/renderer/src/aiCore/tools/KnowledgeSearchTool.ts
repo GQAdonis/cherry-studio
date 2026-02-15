@@ -103,6 +103,35 @@ You can use this tool as-is, or provide additionalContext to refine the search f
       return knowledgeReferencesData as any
     },
     toModelOutput: (results: any) => {
+      // Defensive check: handle undefined or malformed results
+      if (!results || !Array.isArray(results)) {
+        const fallbackResults = []
+        const summary = 'No search needed based on the query analysis.'
+        const referenceContent = `\`\`\`json\n${JSON.stringify(fallbackResults, null, 2)}\n\`\`\``
+        const fullInstructions = REFERENCE_PROMPT.replace(
+          '{question}',
+          "Based on the knowledge references, please answer the user's question with proper citations."
+        ).replace('{references}', referenceContent)
+
+        return {
+          type: 'content',
+          value: [
+            {
+              type: 'text',
+              text: 'This tool searches for relevant information and formats results for easy citation. The returned sources should be cited using [1], [2], etc. format in your response.'
+            },
+            {
+              type: 'text',
+              text: summary
+            },
+            {
+              type: 'text',
+              text: fullInstructions
+            }
+          ]
+        }
+      }
+
       let summary = 'No search needed based on the query analysis.'
       if (results.length > 0) {
         summary = `Found ${results.length} relevant sources. Use [number] format to cite specific information.`
