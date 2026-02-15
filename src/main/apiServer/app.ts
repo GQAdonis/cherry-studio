@@ -9,7 +9,9 @@ import { errorHandler } from './middleware/error'
 import { setupOpenAPIDocumentation } from './middleware/openapi'
 import { agentsRoutes } from './routes/agents'
 import { chatRoutes } from './routes/chat'
+import { knowledgeBasesRoutes } from './routes/knowledge-bases'
 import { mcpRoutes } from './routes/mcp'
+import { mcpExposeRoutes } from './routes/mcp-expose'
 import { messagesProviderRoutes, messagesRoutes } from './routes/messages'
 import { modelsRoutes } from './routes/models'
 
@@ -140,6 +142,8 @@ apiRouter.use('/mcps', mcpRoutes)
 apiRouter.use('/messages', extendMessagesTimeout, messagesRoutes)
 apiRouter.use('/models', modelsRoutes)
 apiRouter.use('/agents', agentsRoutes)
+apiRouter.use('/knowledge-bases', knowledgeBasesRoutes)
+apiRouter.use('/mcp-servers', mcpExposeRoutes)
 app.use('/v1', apiRouter)
 
 // Error handling (must be last)

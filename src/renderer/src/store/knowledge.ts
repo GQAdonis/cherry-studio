@@ -234,6 +234,13 @@ const knowledgeSlice = createSlice({
           item.isPreprocessed = action.payload.isPreprocessed
         }
       }
+    },
+
+    setKnowledgeBaseExposed(state, action: PayloadAction<{ baseId: string; exposed: boolean }>) {
+      const base = state.bases.find((b) => b.id === action.payload.baseId)
+      if (base) {
+        base.exposedViaMcp = action.payload.exposed
+      }
     }
   }
 })
@@ -254,7 +261,8 @@ export const {
   clearAllProcessing,
   updateBaseItemUniqueId,
   updateBaseItemIsPreprocessed,
-  syncPreprocessProvider
+  syncPreprocessProvider,
+  setKnowledgeBaseExposed
 } = knowledgeSlice.actions
 
 export default knowledgeSlice.reducer

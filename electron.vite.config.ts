@@ -41,6 +41,7 @@ export default defineConfig({
           '@e2b/code-interpreter',
           'e2b',
           'unstructured-client',
+          '@libsql/client', // Externalize to preserve native dependencies (tr46, whatwg-url, node-fetch)
           // Bundle packages with problematic transitive dependencies
           ...Object.keys(pkg.dependencies).filter(
             (dep) =>

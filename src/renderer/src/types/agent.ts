@@ -111,7 +111,9 @@ export const AgentEntitySchema = AgentBaseSchema.extend({
   id: z.string(),
   type: AgentTypeSchema,
   created_at: z.iso.datetime(),
-  updated_at: z.iso.datetime()
+  updated_at: z.iso.datetime(),
+  /** Whether this agent is exposed as an MCP tool for external AI tools */
+  exposed_via_mcp: z.boolean().optional()
 })
 
 export type AgentEntity = z.infer<typeof AgentEntitySchema>
@@ -256,7 +258,9 @@ export const CreateAgentResponseSchema = AgentEntitySchema
 
 export type CreateAgentResponse = AgentEntity
 
-export interface UpdateAgentRequest extends Partial<AgentBase> {}
+export interface UpdateAgentRequest extends Partial<AgentBase> {
+  exposed_via_mcp?: boolean
+}
 
 export type ReplaceAgentRequest = AgentBase
 
@@ -359,7 +363,9 @@ export const CreateAgentRequestSchema = agentCreatableSchema.extend({
   type: AgentTypeSchema
 })
 
-export const UpdateAgentRequestSchema = AgentBaseSchema.partial()
+export const UpdateAgentRequestSchema = AgentBaseSchema.partial().extend({
+  exposed_via_mcp: z.boolean().optional()
+})
 
 export const ReplaceAgentRequestSchema = AgentBaseSchema
 
@@ -385,8 +391,6 @@ export type PermissionModeCard = {
   titleFallback: string
   descriptionKey: string
   descriptionFallback: string
-  behaviorKey: string
-  behaviorFallback: string
   caution?: boolean
   unsupported?: boolean
 }

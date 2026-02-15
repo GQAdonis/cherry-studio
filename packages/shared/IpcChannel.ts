@@ -230,6 +230,11 @@ export enum IpcChannel {
   Skill_GetMatchingConfig = 'skill:get-matching-config',
   Skill_SetMatchingConfig = 'skill:set-matching-config',
   Skill_InitializeMatching = 'skill:initialize-matching',
+  Skill_GetAgentSkills = 'skill:get-agent-skills',
+  Skill_SetAgentSkills = 'skill:set-agent-skills',
+  Skill_AddToAgent = 'skill:add-to-agent',
+  Skill_RemoveFromAgent = 'skill:remove-from-agent',
+  Skill_GetEnabledForAgent = 'skill:get-enabled-for-agent',
 
   // skill storage providers
   SkillStorage_GetProviders = 'skill-storage:get-providers',
@@ -510,7 +515,7 @@ export enum IpcChannel {
 
   // OpenClaw
   OpenClaw_CheckInstalled = 'openclaw:check-installed',
-  OpenClaw_CheckNpmAvailable = 'openclaw:check-npm-available',
+  OpenClaw_CheckNodeVersion = 'openclaw:check-node-version',
   OpenClaw_CheckGitAvailable = 'openclaw:check-git-available',
   OpenClaw_GetNodeDownloadUrl = 'openclaw:get-node-download-url',
   OpenClaw_GetGitDownloadUrl = 'openclaw:get-git-download-url',

@@ -102,7 +102,7 @@ export default function SkillSettings() {
   const fetchSkills = useCallback(async () => {
     setLoading(true)
     try {
-      const list = await (window.api as any).invoke('skill:get-list')
+      const list = await window.api.skill.getList()
       setSkills(list)
     } catch (error) {
       message.error('Failed to load skills')
@@ -113,7 +113,7 @@ export default function SkillSettings() {
 
   const fetchMatchingConfig = useCallback(async () => {
     try {
-      const config = await (window.api as any).invoke('skill:get-matching-config')
+      const config = await window.api.skill.getMatchingConfig()
       if (config) {
         setMatchingConfig({ ...DEFAULT_MATCHING_CONFIG, ...config })
       }
@@ -124,7 +124,7 @@ export default function SkillSettings() {
 
   const fetchProviders = useCallback(async () => {
     try {
-      const list = await (window.api as any).invoke('skill-storage:get-providers')
+      const list = await window.api.skillStorage.getProviders()
       setProviders(list ?? [])
     } catch {
       // Ignore
@@ -139,7 +139,7 @@ export default function SkillSettings() {
 
   const handleToggle = async (id: string, enabled: boolean) => {
     try {
-      await (window.api as any).invoke('skill:toggle', id, enabled)
+      await window.api.skill.toggle(id, enabled)
       setSkills((prev) => prev.map((s) => (s.id === id ? { ...s, enabled } : s)))
       message.success(enabled ? 'Skill enabled' : 'Skill disabled')
     } catch (error) {
@@ -156,7 +156,7 @@ export default function SkillSettings() {
     const updated = { ...matchingConfig, ...updates }
     setMatchingConfig(updated)
     try {
-      await (window.api as any).invoke('skill:set-matching-config', updates)
+      await window.api.skill.setMatchingConfig(updates)
     } catch {
       message.error('Failed to save matching configuration')
     }
@@ -165,7 +165,7 @@ export default function SkillSettings() {
   const handleInitializeMatching = async () => {
     setInitializingMatcher(true)
     try {
-      await (window.api as any).invoke('skill:initialize-matching')
+      await window.api.skill.initializeMatching()
       message.success('Skill matching provider initialized')
     } catch (error) {
       message.error('Failed to initialize matching provider')
@@ -237,10 +237,10 @@ export default function SkillSettings() {
       }
 
       if (editingProvider) {
-        await (window.api as any).invoke('skill-storage:update-provider', editingProvider.id, config)
+        await window.api.skillStorage.updateProvider(editingProvider.id, config)
         message.success('Provider updated')
       } else {
-        await (window.api as any).invoke('skill-storage:add-provider', config)
+        await window.api.skillStorage.addProvider(config as SkillStorageProviderConfig)
         message.success('Provider added')
       }
 
@@ -254,7 +254,7 @@ export default function SkillSettings() {
 
   const handleRemoveProvider = async (id: string) => {
     try {
-      await (window.api as any).invoke('skill-storage:remove-provider', id)
+      await window.api.skillStorage.removeProvider(id)
       message.success('Provider removed')
       await fetchProviders()
       await fetchSkills()
@@ -295,7 +295,7 @@ export default function SkillSettings() {
         sqlite: type === 'sqlite' ? { useDefault: true } : undefined
       }
 
-      await (window.api as any).invoke('skill-storage:test-connection', config)
+      await window.api.skillStorage.testConnection(config)
       message.success('Connection successful!')
     } catch (error) {
       message.error('Connection failed: ' + ((error as Error).message || 'Unknown error'))
@@ -305,7 +305,7 @@ export default function SkillSettings() {
   }
 
   const handleSelectDirectory = async () => {
-    const dir = await (window.api as any).invoke('skill-storage:select-directory')
+    const dir = await window.api.skillStorage.selectDirectory()
     if (dir) {
       providerForm.setFieldsValue({ 'filesystem.directoryPath': dir })
     }

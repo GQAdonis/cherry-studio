@@ -153,6 +153,10 @@
         "title": "Paramètres avancés"
       },
       "essential": "Paramètres essentiels",
+      "permissionMode": {
+        "tab": "Mode d'autorisation",
+        "title": "Mode d'autorisation"
+      },
       "plugins": {
         "available": {
           "title": "Plugins disponibles"
@@ -223,17 +227,16 @@
         "mcp": {
           "description": "Connectez des serveurs MCP pour débloquer des outils supplémentaires que vous pouvez approuver ci-dessus.",
           "empty": "Aucun serveur MCP détecté. Ajoutez-en un depuis la page des paramètres MCP.",
+          "inactiveTooltip": "Ce serveur MCP n’est pas actif. Veuillez le démarrer d’abord.",
           "manageHint": "Besoin d'une configuration avancée ? Visitez Paramètres → Serveurs MCP.",
           "toggle": "Basculer {{name}}"
         },
         "permissionMode": {
           "acceptEdits": {
-            "behavior": "Pré-approuve les outils de système de fichiers de confiance afin que les modifications s'exécutent immédiatement.",
             "description": "Les modifications de fichiers et les opérations sur le système de fichiers sont automatiquement approuvées.",
             "title": "Accepter automatiquement les modifications de fichiers"
           },
           "bypassPermissions": {
-            "behavior": "Chaque outil est pré-approuvé automatiquement.",
             "description": "Toutes les demandes de permission sont ignorées — à utiliser avec prudence.",
             "title": "Contourner les vérifications de permission",
             "warning": "Utiliser avec prudence — tous les outils s'exécuteront sans demander d'approbation."
@@ -243,14 +246,12 @@
             "title": "Changer le mode d'autorisation ?"
           },
           "default": {
-            "behavior": "Aucun outil n’est pré-approuvé automatiquement.",
             "description": "Les vérifications d'autorisation normales s'appliquent.",
             "title": "Par défaut (demander avant de continuer)"
           },
           "helper": "Spécifie comment l'agent gère l'autorisation d'utilisation des outils",
           "placeholder": "Sélectionner le mode de permission",
           "plan": {
-            "behavior": "Outils en lecture seule uniquement. L'exécution est désactivée.",
             "description": "Claude ne peut utiliser que des outils en lecture seule et présente un plan avant l'exécution.",
             "title": "Mode de planification (à venir)"
           },
@@ -259,38 +260,13 @@
         "preapproved": {
           "autoBadge": "Ajouté par mode",
           "autoDescription": "Cet outil est automatiquement approuvé par le mode d'autorisation actuel.",
+          "autoDisabledTooltip": "Auto-approuvé par \"{{mode}}\" et ne peut pas être désactivé.",
           "empty": "Aucun outil ne correspond à vos filtres.",
           "mcpBadge": "outil MCP",
           "requiresApproval": "Nécessite une approbation lorsqu’il est désactivé",
           "search": "Outils de recherche",
-          "toggle": "Basculer {{name}}",
-          "warning": {
-            "description": "Activez uniquement les outils en lesquels vous avez confiance. Les paramètres par défaut du mode sont mis en surbrillance automatiquement.",
-            "title": "Les outils pré-approuvés s'exécutent sans révision manuelle."
-          }
-        },
-        "review": {
-          "autoTools": "Auto : {{count}}",
-          "customTools": "Personnalisé : {{count}}",
-          "helper": "Les modifications sont enregistrées automatiquement. Ajustez les étapes ci-dessus à tout moment pour affiner les autorisations.",
-          "mcp": "MCP : {{count}}",
-          "mode": "Mode : {{mode}}"
-        },
-        "steps": {
-          "mcp": {
-            "title": "Serveurs MCP"
-          },
-          "permissionMode": {
-            "title": "Étape 1 · Mode d’autorisation"
-          },
-          "preapproved": {
-            "title": "Étape 2 · Outils pré-approuvés"
-          },
-          "review": {
-            "title": "Étape 3 · Révision"
-          }
-        },
-        "tab": "Outils et autorisations"
+          "toggle": "Basculer {{name}}"
+        }
       },
       "tools": {
         "approved": "approuvé",
@@ -298,8 +274,17 @@
         "description": "Choisissez quels outils peuvent s'exécuter sans approbation manuelle.",
         "requiresPermission": "Nécessite une autorisation lorsqu'elle n'est pas préapprouvée.",
         "tab": "Outils pré-approuvés",
-        "title": "Outils pré-approuvés",
+        "title": "Outils",
         "toggle": "{{defaultValue}}"
+      },
+      "toolsMcp": {
+        "mcp": {
+          "title": "Serveurs MCP"
+        },
+        "tab": "Outils",
+        "tools": {
+          "title": "Outils"
+        }
       }
     },
     "todo": {
@@ -348,6 +333,49 @@
       },
       "toolPendingFallback": "Outil",
       "waiting": "En attente de la décision d'autorisation de l'outil..."
+    },
+    "tools": {
+      "builtin": {
+        "Bash": {
+          "description": "Exécute des commandes shell dans votre environnement"
+        },
+        "Edit": {
+          "description": "Effectue des modifications ciblées sur des fichiers spécifiques"
+        },
+        "Glob": {
+          "description": "Trouve des fichiers selon la correspondance de modèles"
+        },
+        "Grep": {
+          "description": "Recherche des motifs dans le contenu des fichiers"
+        },
+        "MultiEdit": {
+          "description": "Effectue plusieurs modifications sur un fichier unique de manière atomique"
+        },
+        "NotebookEdit": {
+          "description": "Modifie les cellules du notebook Jupyter"
+        },
+        "NotebookRead": {
+          "description": "Lit et affiche le contenu des notebooks Jupyter"
+        },
+        "Read": {
+          "description": "Lit le contenu des fichiers"
+        },
+        "Task": {
+          "description": "Exécute un sous-agent pour gérer des tâches complexes en plusieurs étapes"
+        },
+        "TodoWrite": {
+          "description": "Crée et gère des listes de tâches structurées"
+        },
+        "WebFetch": {
+          "description": "Récupère le contenu à partir d'une URL spécifiée"
+        },
+        "WebSearch": {
+          "description": "Effectue des recherches web avec filtrage par domaine"
+        },
+        "Write": {
+          "description": "Crée ou écrase des fichiers"
+        }
+      }
     },
     "type": {
       "label": "Type d'agent",
@@ -398,6 +426,49 @@
         "copyTooltip": "Copier l'URL",
         "label": "URL"
       }
+    },
+    "mcpExposure": {
+      "agents": {
+        "description": "Agents disponibles en tant qu'outils MCP pour les clients externes",
+        "empty": "Aucun agent n'est marqué pour une exposition MCP.",
+        "title": "Agents exposés",
+        "toggle": "Expose via MCP"
+      },
+      "description": "Exposez les agents, les bases de connaissances et les serveurs MCP en tant que points de terminaison MCP pour les outils IA externes (Claude Desktop, Gemini CLI, etc.).",
+      "enabled": "Activer l'exposition MCP",
+      "enabledDescription": "Lorsqu'il est activé, les ressources sélectionnées sont accessibles en tant que serveurs d'outils MCP via le transport SSE.",
+      "endpoint": {
+        "copied": "URL de point de terminaison MCP copiée dans le presse-papiers",
+        "copyTooltip": "Copier l'URL de point de terminaison MCP",
+        "description": "[to be translated]:Discovery and proxy endpoint for exposed MCP resources",
+        "title": "Point de terminaison MCP",
+        "url": "URL de point de terminaison SSE"
+      },
+      "knowledgeBases": {
+        "description": "Bases de connaissances disponibles en tant que ressources MCP pour les clients externes",
+        "empty": "Aucune base de connaissances n'est marquée pour une exposition MCP.",
+        "title": "Bases de connaissances exposées",
+        "toggle": "Expose via MCP"
+      },
+      "mcpServers": {
+        "description": "Serveurs MCP proxy pour un accès externe",
+        "empty": "Aucun serveur MCP n'est marqué pour l'exposition.",
+        "title": "Serveurs MCP exposés",
+        "toggle": "Expose via MCP"
+      },
+      "status": {
+        "active": "L'exposition MCP est active.",
+        "inactive": "L'exposition MCP est inactive.",
+        "requiresApiServer": "Le serveur API doit être en cours d'exécution pour utiliser l'exposition MCP."
+      },
+      "title": "Exposition MCP"
+    },
+    "mcpGuide": {
+      "configPath": "[to be translated]:Config File",
+      "copied": "[to be translated]:Copied!",
+      "copy": "[to be translated]:Copy",
+      "description": "[to be translated]:Configure external AI tools to connect to your exposed MCP servers. Each snippet uses your current server URL and API key.",
+      "title": "[to be translated]:Connection Guide"
     },
     "messages": {
       "apiKeyCopied": "Clé API copiée dans le presse-papiers",
@@ -455,46 +526,46 @@
     "zoomOut": "Dézoomer"
   },
   "artifacts": {
-    "attach_image": "[to be translated]:Attach image",
-    "change_model": "[to be translated]:Click to change model",
-    "click_to_open": "[to be translated]:Click to open artifact",
-    "code": "[to be translated]:Code",
-    "console": "[to be translated]:Console",
-    "description_help": "[to be translated]:Used for searching artifacts in your library",
-    "description_placeholder": "[to be translated]:What does this artifact do?",
-    "generating": "[to be translated]:Generating artifact...",
-    "library": "[to be translated]:Artifact Library",
-    "model_locked": "[to be translated]:Model selection is locked",
-    "new_artifact": "[to be translated]:New Artifact",
-    "no_artifacts": "[to be translated]:No artifacts found",
-    "open_artifact": "[to be translated]:Open Artifact",
-    "preview": "[to be translated]:Preview",
-    "preview_type": "[to be translated]:Type",
-    "refinement": "[to be translated]:Refinement Chat",
-    "refinement_empty": "[to be translated]:No messages yet",
-    "refinement_hint": "[to be translated]:Ask the AI to modify this artifact",
-    "refinement_placeholder": "[to be translated]:Describe the changes you want...",
-    "save_from_modal": "[to be translated]:Open the artifact to save it",
-    "save_to_library": "[to be translated]:Save to Library",
-    "saved": "[to be translated]:Artifact saved to library",
-    "split": "[to be translated]:Split",
-    "tags_placeholder": "[to be translated]:Add tags...",
-    "title": "[to be translated]:Artifacts",
-    "title_placeholder": "[to be translated]:Enter artifact title",
+    "attach_image": "Joindre une image",
+    "change_model": "Cliquez pour changer de modèle",
+    "click_to_open": "Cliquez pour ouvrir l'artefact",
+    "code": "Code",
+    "console": "Console",
+    "description_help": "Utilisé pour rechercher des artefacts dans votre bibliothèque",
+    "description_placeholder": "Que fait cet artefact ?",
+    "generating": "Génération d'artefact...",
+    "library": "Bibliothèque d'artefacts",
+    "model_locked": "La sélection du modèle est verrouillée.",
+    "new_artifact": "Nouvel Artefact",
+    "no_artifacts": "Aucun artefact trouvé",
+    "open_artifact": "Ouvrir l'Artifact",
+    "preview": "Aperçu",
+    "preview_type": "Type",
+    "refinement": "Affinage Chat",
+    "refinement_empty": "Aucun message pour l'instant",
+    "refinement_hint": "Demander à l'IA de modifier cet artefact.",
+    "refinement_placeholder": "Décrivez les changements que vous souhaitez...",
+    "save_from_modal": "Ouvrez l'artefact pour le sauvegarder.",
+    "save_to_library": "Enregistrer dans la bibliothèque",
+    "saved": "Artifact enregistré dans la bibliothèque",
+    "split": "Diviser",
+    "tags_placeholder": "Ajouter des balises...",
+    "title": "Artefacts",
+    "title_placeholder": "Entrez le titre de l'artéfact",
     "type": {
-      "code": "[to be translated]:Code",
-      "html": "[to be translated]:HTML",
-      "htmx": "[to be translated]:HTMX",
-      "markdown": "[to be translated]:Markdown",
-      "mermaid": "[to be translated]:Mermaid",
-      "react": "[to be translated]:React",
-      "svg": "[to be translated]:SVG"
+      "code": "Code",
+      "html": "HTML",
+      "htmx": "HTMX",
+      "markdown": "Markdown",
+      "mermaid": "Sirène",
+      "react": "React",
+      "svg": "SVG"
     },
-    "version": "[to be translated]:Version",
+    "version": "Version",
     "view": {
-      "code": "[to be translated]:Code",
-      "preview": "[to be translated]:Preview",
-      "split": "[to be translated]:Split"
+      "code": "Code",
+      "preview": "Aperçu",
+      "split": "Diviser"
     }
   },
   "assistants": {
@@ -619,11 +690,11 @@
     "search": "Rechercher des assistants...",
     "settings": {
       "context": {
-        "custom_info": "[to be translated]:Custom context strategy will override the global setting for all conversations with this assistant.",
-        "description": "[to be translated]:Configure how this assistant manages conversation context when approaching model limits. You can use the global default or customize settings for this assistant.",
-        "label": "[to be translated]:Context",
-        "title": "[to be translated]:Context Management",
-        "use_global": "[to be translated]:Use Global Default"
+        "custom_info": "La stratégie de contexte personnalisée remplacera le paramètre global pour toutes les conversations avec cet assistant.",
+        "description": "Configurer la façon dont cet assistant gère le contexte de conversation lorsqu'il approche des limites du modèle. Vous pouvez utiliser le paramètre par défaut global ou personnaliser les paramètres pour cet assistant.",
+        "label": "Contexte",
+        "title": "Gestion du contexte",
+        "use_global": "Utiliser la valeur par défaut globale"
       },
       "default_model": "Modèle par défaut",
       "knowledge_base": {
@@ -1107,8 +1178,8 @@
         "title": "Effacer le message"
       },
       "context_strategy": {
-        "label": "[to be translated]:Context Strategy",
-        "use_assistant": "[to be translated]:Use Assistant Default"
+        "label": "Stratégie de Contexte",
+        "use_assistant": "Utiliser l'assistant par défaut"
       },
       "copy": {
         "image": "Copier sous forme d'image",
@@ -1323,7 +1394,7 @@
     "copy_failed": "Échec de la copie",
     "current": "Actuel",
     "cut": "Couper",
-    "dark_mode": "[to be translated]:Dark Mode",
+    "dark_mode": "Mode Sombre",
     "default": "Défaut",
     "delete": "Supprimer",
     "delete_confirm": "Êtes-vous sûr de vouloir supprimer ?",
@@ -1365,7 +1436,7 @@
     "invalid_value": "valeur invalide",
     "knowledge_base": "Base de connaissances",
     "language": "Langue",
-    "light_mode": "[to be translated]:Light Mode",
+    "light_mode": "Mode clair",
     "loading": "Chargement...",
     "model": "Modèle",
     "models": "Modèles",
@@ -1416,8 +1487,8 @@
     "subscribe": "S'abonner",
     "success": "Succès",
     "swap": "Échanger",
-    "tags": "[to be translated]:Tags",
-    "title": "[to be translated]:Title",
+    "tags": "Étiquettes",
+    "title": "Titre",
     "topics": "Sujets",
     "translate_text": "Traduire le texte",
     "unknown": "Inconnu",
@@ -1432,13 +1503,13 @@
   },
   "conversation": {
     "contextStrategy": {
-      "button": "[to be translated]:Context",
-      "customActive": "[to be translated]:Custom context strategy active",
-      "customInfo": "[to be translated]:Custom context strategy will override the assistant's setting for this conversation only.",
-      "description": "[to be translated]:Configure how this conversation manages context. You can use the assistant's default or customize for this conversation.",
-      "title": "[to be translated]:Conversation Context Strategy",
-      "useAssistantDefault": "[to be translated]:Use Assistant Default",
-      "usingDefault": "[to be translated]:Using assistant default"
+      "button": "Contexte",
+      "customActive": "Stratégie de contexte personnalisée active",
+      "customInfo": "La stratégie de contexte personnalisée remplacera les paramètres de l'assistant pour cette conversation uniquement.",
+      "description": "Configurez la façon dont cette conversation gère le contexte. Vous pouvez utiliser le paramètre par défaut de l'assistant ou personnaliser pour cette conversation.",
+      "title": "Stratégie de contexte de conversation",
+      "useAssistantDefault": "Utiliser l'assistant par défaut",
+      "usingDefault": "Utiliser l'assistant par défaut"
     }
   },
   "dialog": {
@@ -1983,8 +2054,8 @@
     "citation": "{{count}} éléments cités",
     "citations": "Citations",
     "context_action": {
-      "pruned": "[to be translated]:Context was adjusted to fit limits ({{count}} items removed).",
-      "title": "[to be translated]:Context Management"
+      "pruned": "Le contexte a été ajusté pour respecter les limites ({{count}} éléments supprimés).",
+      "title": "Gestion du contexte"
     },
     "copied": "Copié",
     "copy": {
@@ -2281,29 +2352,29 @@
     "add_to_launchpad": "Ajouter au tableau de bord",
     "add_to_sidebar": "Ajouter à la barre latérale",
     "automation": {
-      "contentScript": "[to be translated]:Content script injection",
-      "contentScriptDescription": "[to be translated]:Enable communication bridge with mini-apps",
-      "contextMenu": "[to be translated]:Enhanced context menu",
-      "contextMenuDescription": "[to be translated]:Add 'Send to Chat' and 'Send to KB' options to right-click menu",
-      "conversationExtraction": "[to be translated]:Conversation extraction",
-      "conversationExtractionDescription": "[to be translated]:Extract conversations from AI chat apps (ChatGPT, Claude, etc.)",
-      "description": "[to be translated]:Control and extract data from embedded mini-apps",
-      "enabled": "[to be translated]:Enable automation features",
-      "enabledDescription": "[to be translated]:Allow AI assistants to control mini-apps via MCP tools",
-      "title": "[to be translated]:Mini-App Automation"
+      "contentScript": "Injection de script de contenu",
+      "contentScriptDescription": "Activer le pont de communication avec les mini-apps",
+      "contextMenu": "Menu contextuel amélioré",
+      "contextMenuDescription": "Ajouter les options 'Envoyer au chat' et 'Envoyer à la KB' au menu contextuel",
+      "conversationExtraction": "Extraction de conversation",
+      "conversationExtractionDescription": "Extraire des conversations d'applications de chat IA (ChatGPT, Claude, etc.)",
+      "description": "Contrôler et extraire des données des mini-applications intégrées",
+      "enabled": "Activer les fonctionnalités d'automatisation",
+      "enabledDescription": "Permettre aux assistants IA de contrôler des mini-applications via les outils MCP",
+      "title": "Automatisation des Mini-App"
     },
     "context": {
-      "allConversations": "[to be translated]:All Recent Conversations",
-      "askAbout": "[to be translated]:Ask about this...",
-      "contentPreview": "[to be translated]:Content Preview",
-      "currentConversation": "[to be translated]:Current Conversation",
-      "extractConversations": "[to be translated]:Extract Conversations",
-      "extractPage": "[to be translated]:Extract Page Content",
-      "noKnowledgeBases": "[to be translated]:No knowledge bases yet",
-      "saveAsNote": "[to be translated]:Save as Note",
-      "selectKnowledgeBase": "[to be translated]:Select Knowledge Base",
-      "sendToChat": "[to be translated]:Send to Chat",
-      "sendToKB": "[to be translated]:Send to Knowledge Base..."
+      "allConversations": "Toutes les conversations récentes",
+      "askAbout": "Demandez à propos de cela...",
+      "contentPreview": "Aperçu du contenu",
+      "currentConversation": "Conversation actuelle",
+      "extractConversations": "Extraire des conversations",
+      "extractPage": "Extraire le contenu de la page",
+      "noKnowledgeBases": "Pas encore de bases de connaissances",
+      "saveAsNote": "Enregistrer en tant que note",
+      "selectKnowledgeBase": "Sélectionner la base de connaissances",
+      "sendToChat": "Envoyer au chat",
+      "sendToKB": "Envoyer à la base de connaissances..."
     },
     "popup": {
       "close": "Закрыть мини-программу",
@@ -2320,16 +2391,16 @@
     "remove_from_launchpad": "Supprimer du tableau de bord",
     "remove_from_sidebar": "Supprimer de la barre latérale",
     "sdk": {
-      "autoStart": "[to be translated]:Auto-start server",
-      "autoStartDescription": "[to be translated]:Start SDK server when Cherry Studio launches",
-      "description": "[to be translated]:Allow external apps to integrate with Cherry Studio",
-      "enableServer": "[to be translated]:Enable SDK server",
-      "enableServerDescription": "[to be translated]:Start WebSocket server for external app connections",
-      "port": "[to be translated]:Server port",
-      "portDescription": "[to be translated]:Port for the SDK WebSocket server",
-      "requireApproval": "[to be translated]:Require approval",
-      "requireApprovalDescription": "[to be translated]:Ask for permission when new apps connect",
-      "title": "[to be translated]:Developer SDK"
+      "autoStart": "Serveur à démarrage automatique",
+      "autoStartDescription": "Démarrer le serveur SDK lorsque Cherry Studio se lance",
+      "description": "Autoriser les applications externes à s'intégrer avec Cherry Studio",
+      "enableServer": "Activer le serveur SDK",
+      "enableServerDescription": "Démarrer le serveur WebSocket pour les connexions d'applications externes",
+      "port": "port du serveur",
+      "portDescription": "Port pour le serveur WebSocket SDK",
+      "requireApproval": "Exiger une approbation",
+      "requireApprovalDescription": "Demandez la permission lorsque de nouvelles applications se connectent.",
+      "title": "SDK de développement"
     },
     "sidebar": {
       "close": {
@@ -2347,36 +2418,36 @@
     },
     "title": "Mini-programme",
     "trust": {
-      "approve": "[to be translated]:Allow",
+      "approve": "Permettre",
       "capabilities": {
-        "ai": "[to be translated]:AI Completion",
-        "aiDescription": "[to be translated]:Access AI chat completion services",
-        "clipboard": "[to be translated]:Clipboard",
-        "clipboardDescription": "[to be translated]:Read and write clipboard",
-        "files": "[to be translated]:File Access",
-        "filesDescription": "[to be translated]:Sandboxed file system access",
-        "knowledge": "[to be translated]:Knowledge Bases",
-        "knowledgeDescription": "[to be translated]:Search and add to knowledge bases",
-        "mcp": "[to be translated]:MCP Tools",
-        "mcpDescription": "[to be translated]:Call available MCP tools",
-        "memory": "[to be translated]:Memory Storage",
-        "memoryDescription": "[to be translated]:Store and retrieve persistent data",
-        "notifications": "[to be translated]:Notifications",
-        "notificationsDescription": "[to be translated]:Show system notifications",
-        "settings": "[to be translated]:Settings",
-        "settingsDescription": "[to be translated]:Read app settings",
-        "tools": "[to be translated]:Tool Registration",
-        "toolsDescription": "[to be translated]:Register as an MCP tool"
+        "ai": "Achèvement IA",
+        "aiDescription": "Accéder aux services de complétion de chat IA",
+        "clipboard": "Presse-papiers",
+        "clipboardDescription": "Lire et écrire le presse-papiers",
+        "files": "Accès aux fichiers",
+        "filesDescription": "Accès au système de fichiers en mode sécurisé",
+        "knowledge": "Bases de connaissances",
+        "knowledgeDescription": "Rechercher et ajouter aux bases de connaissances",
+        "mcp": "Outils MCP",
+        "mcpDescription": "Appeler les outils MCP disponibles",
+        "memory": "Stockage de mémoire",
+        "memoryDescription": "Stocker et récupérer des données persistantes",
+        "notifications": "Notifications",
+        "notificationsDescription": "Afficher les notifications système",
+        "settings": "Paramètres",
+        "settingsDescription": "Lire les paramètres de l'application",
+        "tools": "Enregistrement des outils",
+        "toolsDescription": "Enregistrer en tant qu'outil MCP"
       },
-      "deny": "[to be translated]:Deny",
-      "description": "[to be translated]:{{appName}} wants to connect to Cherry Studio",
-      "noTrustedApps": "[to be translated]:No trusted apps",
-      "remember": "[to be translated]:Remember this choice",
-      "requestedCapabilities": "[to be translated]:Requested permissions:",
-      "revoke": "[to be translated]:Revoke",
-      "revokeConfirm": "[to be translated]:Are you sure you want to revoke trust for {{appName}}?",
-      "title": "[to be translated]:App Trust Request",
-      "trustedApps": "[to be translated]:Trusted Apps"
+      "deny": "Nier",
+      "description": "{{appName}} souhaite se connecter à Cherry Studio",
+      "noTrustedApps": "Pas d'applications de confiance",
+      "remember": "Souviens-toi de ce choix.",
+      "requestedCapabilities": "Autorisations demandées :",
+      "revoke": "Révoquer",
+      "revokeConfirm": "Êtes-vous sûr de vouloir révoquer la confiance pour {{appName}} ?",
+      "title": "Demande de confiance d'application",
+      "trustedApps": "Applications de confiance"
     }
   },
   "minapps": {
@@ -2460,21 +2531,21 @@
     },
     "parameters": {
       "default_temperature": {
-        "label": "[to be translated]:Default Temperature",
-        "tooltip": "[to be translated]:Controls randomness: Lowering results in less random completions"
+        "label": "Température par défaut",
+        "tooltip": "Contrôle de l'aléatoire : Diminuer le niveau entraîne des complétions moins aléatoires."
       },
       "default_top_p": {
-        "label": "[to be translated]:Default Top P",
-        "tooltip": "[to be translated]:Controls diversity via nucleus sampling"
+        "label": "Valeur par défaut de Top P",
+        "tooltip": "Contrôle de la diversité via l'échantillonnage par noyau."
       },
-      "label": "[to be translated]:Parameters",
+      "label": "Paramètres",
       "max_context_tokens": {
-        "label": "[to be translated]:Max Context Tokens",
-        "tooltip": "[to be translated]:The maximum number of tokens the model can process, click to edit"
+        "label": "Max Context Tokens",
+        "tooltip": "Le nombre maximal de jetons que le modèle peut traiter, cliquez pour éditer"
       },
       "max_output_tokens": {
-        "label": "[to be translated]:Max Output Tokens",
-        "tooltip": "[to be translated]:The maximum number of tokens the model can generate"
+        "label": "Max Output Tokens",
+        "tooltip": "Le nombre maximum de jetons que le modèle peut générer"
       }
     },
     "pinned": "Épinglé",
@@ -2715,6 +2786,17 @@
       "sync_hint": "Le fournisseur et le modèle sélectionnés seront synchronisés avec le fichier de configuration OpenClaw.",
       "title": "Configuration du modèle"
     },
+    "node_missing": {
+      "description": "OpenClaw nécessite Node.js/npm. Veuillez d'abord installer Node.js, puis redémarrez Cherry Studio.",
+      "download_button": "Télécharger Node.js",
+      "hint": "macOS : brew install node | Windows : Télécharger la version LTS depuis nodejs.org",
+      "title": "Node.js requis"
+    },
+    "node_version_low": {
+      "description": "OpenClaw nécessite Node.js 22.0 ou supérieur. Votre version actuelle est v{{version}}. Veuillez d’abord mettre à jour Node.js.",
+      "hint": "nvm : nvm install 22 && nvm use 22 | mise : mise use node@22",
+      "title": "Version de Node.js trop basse"
+    },
     "not_installed": {
       "description": "OpenClaw n’est pas installé sur votre système. Veuillez d’abord l’installer pour utiliser cette fonctionnalité.",
       "install_button": "Installer OpenClaw",
@@ -2725,12 +2807,6 @@
       "step2_title": "Étape 2 : Vérifier l'installation",
       "title": "OpenClaw Non Installé",
       "windows_title": "Windows"
-    },
-    "npm_missing": {
-      "description": "OpenClaw nécessite Node.js/npm. Veuillez d'abord installer Node.js, puis redémarrez Cherry Studio.",
-      "download_button": "Télécharger Node.js",
-      "hint": "macOS : brew install node | Windows : Télécharger la version LTS depuis nodejs.org",
-      "title": "Node.js requis"
     },
     "quick_actions": {
       "open_dashboard": "Ouvrir le tableau de bord",
@@ -3129,7 +3205,7 @@
     "alayanew": "Alaya NeW",
     "anthropic": "Anthropic",
     "aws-bedrock": "AWS Bedrock",
-    "azure-foundry": "[to be translated]:Azure AI Foundry",
+    "azure-foundry": "Azure AI Foundry",
     "azure-openai": "Azure OpenAI",
     "baichuan": "BaiChuan",
     "baidu-cloud": "Baidu Cloud Qianfan",
@@ -3662,38 +3738,38 @@
       "title": "Paramètres avancés"
     },
     "artifacts": {
-      "auto_open": "[to be translated]:Auto-open Artifacts",
-      "auto_open_help": "[to be translated]:Automatically open the artifact viewer when a new artifact is created.",
-      "enable": "[to be translated]:Enable Artifact Support",
-      "enable_help": "[to be translated]:When enabled, AI-generated interactive content will be detected and rendered as artifacts.",
-      "enabled_types": "[to be translated]:Enabled Artifact Types",
-      "items": "[to be translated]:items",
+      "auto_open": "Artifacts à ouverture automatique",
+      "auto_open_help": "Ouvrez automatiquement le visualiseur d'artefacts lorsqu'un nouvel artefact est créé.",
+      "enable": "Activer le support des artefacts",
+      "enable_help": "Lorsqu'il est activé, le contenu interactif généré par l'IA sera détecté et rendu sous forme d'artéfacts.",
+      "enabled_types": "Types d'artéfacts activés",
+      "items": "articles",
       "react": {
-        "add_dep": "[to be translated]:Add",
-        "custom_bundler_url": "[to be translated]:Custom Bundler URL",
-        "custom_bundler_url_help": "[to be translated]:Optional: URL for a self-hosted Sandpack bundler. Leave empty to use the default CodeSandbox bundler.",
-        "dep_actions": "[to be translated]:Actions",
-        "dep_name": "[to be translated]:Package",
-        "dep_name_placeholder": "[to be translated]:Package name (e.g., framer-motion)",
-        "dep_version": "[to be translated]:Version",
-        "dependencies_help": "[to be translated]:These packages will be available in Sandpack React artifacts. Add commonly used packages here.",
-        "dependencies_title": "[to be translated]:Available Dependencies",
-        "no_deps": "[to be translated]:No dependencies configured",
-        "show_console": "[to be translated]:Show Console",
-        "show_console_help": "[to be translated]:Show the console output panel for debugging React artifacts.",
-        "show_editor": "[to be translated]:Show Code Editor",
-        "show_editor_help": "[to be translated]:Show the code editor panel alongside the preview in Sandpack mode.",
-        "title": "[to be translated]:React Artifact Settings",
-        "use_sandpack": "[to be translated]:Use Sandpack Runtime",
-        "use_sandpack_help": "[to be translated]:Use CodeSandbox Sandpack for React artifacts. Enables NPM dependencies, hot reload, and better error handling. Disable for simple Babel-only transpilation."
+        "add_dep": "Ajouter",
+        "custom_bundler_url": "URL du bundler personnalisé",
+        "custom_bundler_url_help": "Optionnel : URL pour un assembleur Sandpack auto-hébergé. Laissez vide pour utiliser l'assembleur CodeSandbox par défaut.",
+        "dep_actions": "Actions",
+        "dep_name": "Colis",
+        "dep_name_placeholder": "Nom du paquet (par exemple, framer-motion)",
+        "dep_version": "Version",
+        "dependencies_help": "Ces packages seront disponibles dans les artefacts Sandpack React. Ajoutez les packages couramment utilisés ici.",
+        "dependencies_title": "Dépendances disponibles",
+        "no_deps": "Aucune dépendance configurée",
+        "show_console": "Afficher la Console",
+        "show_console_help": "Afficher le panneau de sortie de la console pour le débogage des artefacts React.",
+        "show_editor": "Afficher l'éditeur de code",
+        "show_editor_help": "Affichez le panneau de l'éditeur de code à côté de l'aperçu en mode Sandpack.",
+        "title": "Paramètres d'artefact React",
+        "use_sandpack": "Utiliser Sandpack Runtime",
+        "use_sandpack_help": "Utilisez CodeSandbox Sandpack pour les artefacts React. Active les dépendances NPM, le rechargement à chaud et une meilleure gestion des erreurs. Désactivez pour une simple transpilation Babel uniquement."
       },
-      "required": "[to be translated]:Required",
-      "storage_limit": "[to be translated]:Storage Limit",
-      "storage_limit_help": "[to be translated]:Maximum number of artifacts to store. Older artifacts will be automatically removed.",
-      "storage_title": "[to be translated]:Storage",
-      "title": "[to be translated]:Artifacts",
-      "types_help": "[to be translated]:Select which types of artifacts should be generated. HTMX is always enabled.",
-      "types_title": "[to be translated]:Artifact Types"
+      "required": "Requis",
+      "storage_limit": "Limite de stockage",
+      "storage_limit_help": "Nombre maximum d'artefacts à stocker. Les artefacts plus anciens seront automatiquement supprimés.",
+      "storage_title": "Stockage",
+      "title": "Artifacts",
+      "types_help": "Sélectionnez les types d'artefacts qui doivent être générés. HTMX est toujours activé.",
+      "types_title": "Types d'artefacts"
     },
     "assistant": {
       "icon": {
@@ -3709,52 +3785,52 @@
       "title": "Assistant par défaut"
     },
     "contextStrategy": {
-      "configuration": "[to be translated]:Strategy Configuration",
-      "configurationHelp": "[to be translated]:Configure how context is managed when conversations approach model limits. Different strategies offer different tradeoffs between context preservation and token efficiency.",
-      "description": "[to be translated]:Choose how to manage conversation context when it approaches model limits. This prevents \"Prompt is too long\" errors while preserving important context.",
+      "configuration": "Configuration de la stratégie",
+      "configurationHelp": "Configurez la gestion du contexte lorsque les conversations approchent des limites du modèle. Différentes stratégies offrent différents compromis entre la préservation du contexte et l'efficacité des jetons.",
+      "description": "Choisissez comment gérer le contexte de la conversation lorsqu'il s'approche des limites du modèle. Cela évite les erreurs \"Le prompt est trop long\" tout en préservant un contexte important.",
       "descriptions": {
-        "hierarchical": "[to be translated]:Three-tier memory system: recent messages verbatim, older messages summarized, key facts extracted.",
-        "none": "[to be translated]:No context management. May exceed model limits on long conversations.",
-        "sliding_window": "[to be translated]:Keeps only the most recent messages within the token budget. Simple and predictable.",
-        "summarize": "[to be translated]:Progressively summarizes older messages to preserve key information while reducing tokens.",
-        "truncate_middle": "[to be translated]:Preserves initial instructions and recent context, removes middle messages."
+        "hierarchical": "Système de mémoire en trois niveaux : messages récents mot à mot, messages plus anciens résumés, faits clés extraits.",
+        "none": "Pas de gestion du contexte. Peut dépasser les limites du modèle lors de longues conversations.",
+        "sliding_window": "Garde uniquement les messages les plus récents dans le budget de jetons. Simple et prévisible.",
+        "summarize": "Résumé progressivement les anciens messages pour conserver les informations clés tout en réduisant le nombre de tokens.",
+        "truncate_middle": "Préserve les instructions initiales et le contexte récent, supprime les messages intermédiaires."
       },
-      "globalDescription": "[to be translated]:Automatically manages conversation context to prevent exceeding model limits. This setting applies globally and can be overridden per assistant or conversation.",
-      "howItWorks": "[to be translated]:How It Works",
-      "inheritedStrategy": "[to be translated]:Currently using:",
-      "keepFirst": "[to be translated]:Keep First Messages",
-      "keepFirstHelp": "[to be translated]:Number of initial messages to preserve (system context, instructions).",
-      "keepLast": "[to be translated]:Keep Last Messages",
-      "keepLastHelp": "[to be translated]:Number of recent messages to preserve.",
-      "longTermBudget": "[to be translated]:Long-term Budget",
-      "longTermBudgetHelp": "[to be translated]:Token budget for extracted long-term facts and preferences.",
-      "maxMessages": "[to be translated]:Max Messages",
-      "maxMessagesHelp": "[to be translated]:Maximum number of messages to keep. Leave empty for automatic (token-based) management.",
-      "midTermBudget": "[to be translated]:Mid-term Budget",
-      "midTermBudgetHelp": "[to be translated]:Token budget for mid-term memory summaries.",
-      "nav_title": "[to be translated]:Context Management",
-      "selectModel": "[to be translated]:Model",
-      "selectModelPlaceholder": "[to be translated]:Select summarization model",
-      "shortTermTurns": "[to be translated]:Short-term Turns",
-      "shortTermTurnsHelp": "[to be translated]:Number of recent conversation turns to keep verbatim.",
-      "strategy": "[to be translated]:Strategy",
-      "summarizationModel": "[to be translated]:Summarization Model",
-      "summarizationModelDescription": "[to be translated]:This model will be used to generate conversation summaries. Choose a fast model to minimize latency. If not set, the current conversation model will be used.",
-      "summarizationModelHelp": "[to be translated]:Select a fast, lightweight model for generating summaries. Recommended: Claude Haiku, GPT-3.5 Turbo, or similar quick models.",
-      "summarizeThreshold": "[to be translated]:Min Messages Before Summarizing",
-      "summarizeThresholdHelp": "[to be translated]:Minimum number of messages before summarization kicks in.",
-      "summaryMaxTokens": "[to be translated]:Summary Budget",
-      "summaryMaxTokensHelp": "[to be translated]:Maximum tokens allocated for the conversation summary.",
-      "title": "[to be translated]:Context Management",
-      "tooltip": "[to be translated]:Automatically manages conversation context to prevent exceeding model limits. Applies to all conversations unless overridden.",
+      "globalDescription": "Gère automatiquement le contexte de la conversation pour éviter de dépasser les limites du modèle. Ce paramètre s'applique globalement et peut être remplacé par assistant ou conversation.",
+      "howItWorks": "Comment ça marche",
+      "inheritedStrategy": "Actuellement utilisé :",
+      "keepFirst": "Conserver les premiers messages",
+      "keepFirstHelp": "Nombre de messages initiaux à préserver (contexte système, instructions).",
+      "keepLast": "Conserver les derniers messages",
+      "keepLastHelp": "Nombre de messages récents à préserver.",
+      "longTermBudget": "Budget à long terme",
+      "longTermBudgetHelp": "Budget de jetons pour les faits et préférences à long terme extraits.",
+      "maxMessages": "Messages maximum",
+      "maxMessagesHelp": "Nombre maximum de messages à conserver. Laisser vide pour une gestion automatique (basée sur des jetons).",
+      "midTermBudget": "Budget à moyen terme",
+      "midTermBudgetHelp": "Budget de jetons pour les résumés de mémoire à moyen terme.",
+      "nav_title": "Gestion de contexte",
+      "selectModel": "Modèle",
+      "selectModelPlaceholder": "Sélectionner le modèle de résumé",
+      "shortTermTurns": "Transformations à court terme",
+      "shortTermTurnsHelp": "Nombre de tours de conversation récents à conserver tel quel.",
+      "strategy": "Stratégie",
+      "summarizationModel": "Modèle de résumé",
+      "summarizationModelDescription": "Ce modèle sera utilisé pour générer des résumés de conversation. Choisissez un modèle rapide pour minimiser la latence. Si cela n'est pas défini, le modèle de conversation actuel sera utilisé.",
+      "summarizationModelHelp": "Sélectionnez un modèle rapide et léger pour générer des résumés. Recommandé : Claude Haiku, GPT-3.5 Turbo, ou d'autres modèles similaires rapides.",
+      "summarizeThreshold": "Messages minimaux avant de résumer",
+      "summarizeThresholdHelp": "Nombre minimum de messages avant que le résumé ne soit activé.",
+      "summaryMaxTokens": "Résumé du budget",
+      "summaryMaxTokensHelp": "Résumé de la conversation : maximum de jetons alloués.",
+      "title": "Gestion de contexte",
+      "tooltip": "Gère automatiquement le contexte de la conversation pour éviter de dépasser les limites du modèle. S'applique à toutes les conversations, sauf indication contraire.",
       "types": {
-        "hierarchical": "[to be translated]:Hierarchical Memory",
-        "none": "[to be translated]:None (No Management)",
-        "sliding_window": "[to be translated]:Sliding Window",
-        "summarize": "[to be translated]:Progressive Summarization",
-        "truncate_middle": "[to be translated]:Keep First & Last"
+        "hierarchical": "Mémoire Hiérarchique",
+        "none": "Aucun (Pas de gestion)",
+        "sliding_window": "Fenêtre glissante",
+        "summarize": "Résumé progressif",
+        "truncate_middle": "Gardez le premier et le dernier"
       },
-      "useInherited": "[to be translated]:Use Default"
+      "useInherited": "Utiliser par défaut"
     },
     "data": {
       "app_data": {
@@ -4560,21 +4636,21 @@
       "builtinServersDescriptions": {
         "brave_search": "Une implémentation de serveur MCP intégrant l'API de recherche Brave, offrant des fonctionnalités de recherche web et locale. Nécessite la configuration de la variable d'environnement BRAVE_API_KEY",
         "browser": "Contrôle une fenêtre Electron headless via Chrome DevTools Protocol. Outils : ouvrir une URL, exécuter du JS en une ligne, réinitialiser la session.",
-        "browser_automation": "[to be translated]:Vision-optimized browser automation for embedded mini-apps. Provides high-level tools for AI models to interact with web content using screenshots and element detection.",
+        "browser_automation": "Automatisation de navigateur optimisée pour la vision pour des mini-applications intégrées. Fournit des outils de haut niveau pour que les modèles d'IA interagissent avec le contenu web en utilisant des captures d'écran et la détection d'éléments.",
         "didi_mcp": "Serveur DiDi MCP fournissant des services de transport incluant la recherche de cartes, l'estimation des prix, la gestion des commandes et le suivi des conducteurs. Disponible uniquement en Chine continentale. Nécessite la configuration de la variable d'environnement DIDI_API_KEY",
         "dify_knowledge": "Implémentation du serveur MCP de Dify, fournissant une API simple pour interagir avec Dify. Nécessite la configuration de la clé Dify",
-        "e2b": "[to be translated]:Execute Python code in secure E2B cloud sandboxes with full file operations support. Provides persistent Jupyter-like environments with common data science libraries pre-installed. Requires configuring the E2B_API_KEY environment variable. Supports both hosted and self-hosted deployments via E2B_API_URL.",
+        "e2b": "Exécutez du code Python dans des environnements de cloud E2B sécurisés avec un support complet des opérations de fichiers. Fournit des environnements persistants similaires à Jupyter avec des bibliothèques de science des données courantes préinstallées. Nécessite la configuration de la variable d'environnement E2B_API_KEY. Prend en charge à la fois les déploiements hébergés et auto-hébergés via E2B_API_URL.",
         "fetch": "serveur MCP utilisé pour récupérer le contenu des pages web URL",
         "filesystem": "Serveur Node.js implémentant le protocole de contexte de modèle (MCP) pour les opérations de système de fichiers. Nécessite une configuration des répertoires autorisés à être accédés.",
         "mcp_auto_install": "Installation automatique du service MCP (version bêta)",
         "memory": "Implémentation de base de mémoire persistante basée sur un graphe de connaissances local. Cela permet au modèle de se souvenir des informations relatives à l'utilisateur entre différentes conversations. Nécessite la configuration de la variable d'environnement MEMORY_FILE_PATH.",
-        "minapp_controller": "[to be translated]:Control and extract data from embedded mini-apps. Provides tools for conversation extraction, page content scraping, and automated interaction with ChatGPT, Claude, Perplexity, and other web apps.",
+        "minapp_controller": "Contrôlez et extrayez des données des mini-apps intégrées. Fournit des outils pour l'extraction de conversations, le scraping de contenu de page et l'interaction automatisée avec ChatGPT, Claude, Perplexity et d'autres applications web.",
         "no": "sans description",
         "nowledge_mem": "Nécessite l’application Nowledge Mem exécutée localement. Conserve les discussions IA, outils, notes, agents et fichiers dans une mémoire privée sur votre ordinateur. Téléchargez depuis https://mem.nowledge.co/",
         "python": "Exécutez du code Python dans un environnement bac à sable sécurisé. Utilisez Pyodide pour exécuter Python, prenant en charge la plupart des bibliothèques standard et des packages de calcul scientifique.",
-        "sdk_bridge": "[to be translated]:Bridge for dynamically registered tools from mini-apps using the @theboss/sdk. Enables third-party apps to register custom MCP tools at runtime.",
+        "sdk_bridge": "Pont pour les outils enregistrés dynamiquement à partir de mini-apps utilisant le @theboss/sdk. Permet aux applications tierces d'enregistrer des outils MCP personnalisés à l'exécution.",
         "sequentialthinking": "Un serveur MCP qui fournit des outils permettant une résolution dynamique et réflexive des problèmes à travers un processus de pensée structuré",
-        "unstructured": "[to be translated]:Process and extract content from 50+ document formats including PDF, Word, Excel, PowerPoint, images (with OCR), HTML, and more. Returns structured text that can be analyzed or summarized. Requires configuring the UNSTRUCTURED_API_KEY environment variable. Supports both hosted and self-hosted deployments via UNSTRUCTURED_API_URL."
+        "unstructured": "Traitez et extrayez du contenu de plus de 50 formats de documents, y compris PDF, Word, Excel, PowerPoint, images (avec OCR), HTML, et plus encore. Renvoie un texte structuré qui peut être analysé ou résumé. Nécessite la configuration de la variable d'environnement UNSTRUCTURED_API_KEY. Prend en charge les déploiements hébergés et auto-hébergés via UNSTRUCTURED_API_URL."
       },
       "command": "Commande",
       "config_description": "Configurer le modèle du protocole de contexte du serveur",
@@ -4781,19 +4857,19 @@
       "user": "Пользователь"
     },
     "mcpContent": {
-      "autoSummarization": "[to be translated]:Auto-Summarization",
-      "autoSummarizationHelp": "[to be translated]:When enabled, large MCP tool results will be automatically summarized using the quick model. When disabled, large results will be truncated instead.",
-      "description": "[to be translated]:These settings help prevent \"Prompt is too long\" errors when MCP tools return large content (e.g., web search results, extracted pages). Large content is automatically summarized or truncated before being sent to the model.",
-      "maxCharactersForTruncation": "[to be translated]:Truncation Limit (chars)",
-      "maxCharactersForTruncationHelp": "[to be translated]:Maximum characters to keep when truncating (fallback when summarization fails or is disabled). Content beyond this is removed.",
-      "maxToolResultTokens": "[to be translated]:Max Result Tokens",
-      "maxToolResultTokensHelp": "[to be translated]:Absolute maximum tokens allowed for a single MCP tool result. Results exceeding this will always be processed regardless of other settings.",
-      "summarizationThreshold": "[to be translated]:Summarization Threshold",
-      "summarizationThresholdHelp": "[to be translated]:Token count that triggers automatic summarization. Content exceeding this will be processed. Lower values mean more aggressive summarization.",
-      "targetSummarizedTokens": "[to be translated]:Target Summary Size",
-      "targetSummarizedTokensHelp": "[to be translated]:Target token count after summarization. Larger values preserve more detail but use more context. Recommended: 4000-12000 tokens.",
-      "title": "[to be translated]:MCP Tool Content Management",
-      "tooltip": "[to be translated]:Automatically manages large content from MCP tools (like web search) to prevent \"Prompt is too long\" errors. Large results are summarized or truncated before being sent to the model."
+      "autoSummarization": "Résumé automatique",
+      "autoSummarizationHelp": "Lorsque activé, les résultats importants des outils MCP seront automatiquement résumés à l'aide du modèle rapide. Lorsque désactivé, les grands résultats seront plutôt tronqués.",
+      "description": "Ces paramètres aident à prévenir les erreurs \"Le prompt est trop long\" lorsque les outils MCP renvoient un contenu volumineux (par exemple, des résultats de recherche sur le web, des pages extraites). Le contenu volumineux est automatiquement résumé ou tronqué avant d'être envoyé au modèle.",
+      "maxCharactersForTruncation": "Limite de troncature (caractères)",
+      "maxCharactersForTruncationHelp": "Nombre maximum de caractères à conserver lors de la troncature (solution de secours lorsque le résumé échoue ou est désactivé). Le contenu au-delà de cela est supprimé.",
+      "maxToolResultTokens": "Max Result Tokens",
+      "maxToolResultTokensHelp": "Nombre maximum absolu de jetons autorisés pour un seul résultat d'outil MCP. Les résultats dépassant cela seront toujours traités, indépendamment des autres paramètres.",
+      "summarizationThreshold": "Seuil de résumé",
+      "summarizationThresholdHelp": "Nombre de jetons qui déclenche la synthèse automatique. Le contenu dépassant cela sera traité. Des valeurs plus faibles signifient une synthèse plus agressive.",
+      "targetSummarizedTokens": "Résumé de la taille cible",
+      "targetSummarizedTokensHelp": "Nombre de tokens cible après résumé. Des valeurs plus élevées préservent plus de détails mais utilisent plus de contexte. Recommandé : 4000-12000 tokens.",
+      "title": "Gestion de contenu de l'outil MCP",
+      "tooltip": "Gère automatiquement de grands contenus provenant des outils MCP (comme la recherche sur le web) pour éviter les erreurs \"Le prompt est trop long\". Les résultats volumineux sont résumés ou tronqués avant d'être envoyés au modèle."
     },
     "messages": {
       "divider": {
@@ -5160,15 +5236,15 @@
         }
       },
       "azure-foundry": {
-        "description": "[to be translated]:Universal access to 10+ model providers",
-        "help": "[to be translated]:Supports OpenAI, Anthropic, Meta, Mistral, Cohere, DeepSeek, xAI, Microsoft, AI21, and other models through a single endpoint",
-        "openai_host_help": "[to be translated]:Required for GPT/o/Embedding deployments hosted at https://{resource}.openai.azure.com",
-        "openai_host_label": "[to be translated]:OpenAI deployment endpoint",
-        "openai_host_placeholder": "[to be translated]:https://<resource>.openai.azure.com",
-        "openai_host_preview": "[to be translated]:Current OpenAI endpoint: {{url}}",
-        "openai_host_warning": "[to be translated]:OpenAI endpoint should use https://{resource}.openai.azure.com. You entered a project or legacy Cognitive Services host.",
-        "project_host_help": "[to be translated]:Project base URL must be https://{resource}.services.ai.azure.com/api/projects/<project>",
-        "project_host_warning": "[to be translated]:Project endpoints should use https://{resource}.services.ai.azure.com/api/projects/<project>. You entered an OpenAI/Cognitive Services host."
+        "description": "Accès universel à plus de 10 fournisseurs de modèles",
+        "help": "Prend en charge OpenAI, Anthropic, Meta, Mistral, Cohere, DeepSeek, xAI, Microsoft, AI21, et d'autres modèles via un seul point de terminaison.",
+        "openai_host_help": "Requis pour les déploiements GPT/o/Embedding hébergés sur https://{resource}.openai.azure.com",
+        "openai_host_label": "Point de terminaison de déploiement OpenAI",
+        "openai_host_placeholder": "https://<resource>.openai.azure.com",
+        "openai_host_preview": "Point de terminaison OpenAI actuel : {{url}}",
+        "openai_host_warning": "L'endpoint OpenAI doit utiliser https://{resource}.openai.azure.com. Vous avez saisi un projet ou un hôte de services cognitifs hérité.",
+        "project_host_help": "L'URL de base du projet doit être https://{resource}.services.ai.azure.com/api/projects/<project>",
+        "project_host_warning": "Les points de terminaison du projet doivent utiliser https://{resource}.services.ai.azure.com/api/projects/<project>. Vous avez saisi un hôte OpenAI/Cognitive Services."
       },
       "balance": "Équilibre",
       "basic_auth": {
@@ -5425,41 +5501,41 @@
       },
       "preprocess": {
         "e2b": {
-          "api_key": "[to be translated]:API Key",
-          "api_key_placeholder": "[to be translated]:Enter your E2B API key",
-          "api_url": "[to be translated]:API URL",
-          "api_url_placeholder": "[to be translated]:https://api.e2b.dev or self-hosted URL",
+          "api_key": "Clé API",
+          "api_key_placeholder": "Entrez votre clé API E2B",
+          "api_url": "URL de l'API",
+          "api_url_placeholder": "https://api.e2b.dev ou URL auto-hébergée",
           "chat_tool": {
-            "description": "[to be translated]:When enabled, AI can run Python code in E2B sandboxes",
-            "label": "[to be translated]:Enable Chat Tool",
-            "requires_api_key": "[to be translated]:Requires valid API key to enable",
-            "tool_name": "[to be translated]:Tool name: execute_code_in_e2b",
-            "tooltip": "[to be translated]:Allow AI to execute code during conversations"
+            "description": "Lorsque activé, l'IA peut exécuter du code Python dans des bacs à sable E2B.",
+            "label": "Activer l'outil de discussion",
+            "requires_api_key": "Nécessite une clé API valide pour activer",
+            "tool_name": "Nom de l'outil : execute_code_in_e2b",
+            "tooltip": "Permettre à l'IA d'exécuter du code pendant les conversations."
           },
-          "description": "[to be translated]:Run AI-generated code in secure cloud sandboxes",
+          "description": "Exécutez du code généré par l'IA dans des environnements cloud sécurisés.",
           "health_check": {
-            "button": "[to be translated]:Test Connection",
-            "failed": "[to be translated]:E2B connection failed. Check your API key and URL.",
-            "success": "[to be translated]:E2B connection successful!"
+            "button": "Tester la connexion",
+            "failed": "Échec de la connexion E2B. Vérifiez votre clé API et l'URL.",
+            "success": "Connexion E2B réussie !"
           },
           "options": {
             "sandbox_mode": {
-              "label": "[to be translated]:Sandbox Mode",
-              "per_session": "[to be translated]:Per Session - New sandbox each chat",
-              "persistent": "[to be translated]:Persistent - Reuse sandbox",
-              "tooltip": "[to be translated]:Per-session creates fresh sandboxes; persistent reuses them for better performance"
+              "label": "Mode bac à sable",
+              "per_session": "Par session - Nouveau bac à sable à chaque chat",
+              "persistent": "Persistant - Réutiliser le bac à sable",
+              "tooltip": "Chaque session crée de nouveaux environnements; la persistance les réutilise pour de meilleures performances."
             },
             "template": {
-              "label": "[to be translated]:Custom Template ID",
-              "placeholder": "[to be translated]:Optional: custom E2B template",
-              "tooltip": "[to be translated]:Use a custom E2B template for specialized environments"
+              "label": "ID de modèle personnalisé",
+              "placeholder": "Optionnel : modèle E2B personnalisé",
+              "tooltip": "Utilisez un modèle E2B personnalisé pour des environnements spécialisés."
             },
             "timeout": {
-              "label": "[to be translated]:Execution Timeout",
-              "tooltip": "[to be translated]:Maximum time for code execution (seconds)"
+              "label": "Délai d'exécution dépassé",
+              "tooltip": "Temps maximal d'exécution du code (secondes)"
             }
           },
-          "title": "[to be translated]:E2B Code Interpreter"
+          "title": "Interprète de code E2B"
         },
         "paddleocr": {
           "aistudio_access_token": "Jeton d’accès à la communauté AI Studio",
@@ -5472,124 +5548,124 @@
         "title": "Prétraitement des documents",
         "tooltip": "Configurer un fournisseur de prétraitement de documents ou OCR dans Paramètres -> Outils. Le prétraitement des documents améliore efficacement la précision de recherche pour les documents à format complexe ou les versions scannées, tandis que l'OCR permet uniquement d'extraire le texte contenu dans les images ou les PDF scannés.",
         "unstructured": {
-          "api_host": "[to be translated]:API Host",
-          "api_host_placeholder": "[to be translated]:https://api.unstructured.io or self-hosted URL",
-          "api_key": "[to be translated]:API Key",
-          "api_key_placeholder": "[to be translated]:Enter your Unstructured API key",
+          "api_host": "Hôte d'API",
+          "api_host_placeholder": "https://api.unstructured.io ou URL auto-hébergée",
+          "api_key": "Clé API",
+          "api_key_placeholder": "Entrez votre clé API non structurée",
           "chat_tool": {
-            "description": "[to be translated]:Allow AI to process documents during conversations",
-            "label": "[to be translated]:Enable Chat Tool",
-            "requires_api_key": "[to be translated]:Requires valid API key to enable",
-            "tool_name": "[to be translated]:Tool name: process_document_with_unstructured",
-            "tooltip": "[to be translated]:When enabled, the AI can use the 'process_document_with_unstructured' tool to extract content from documents"
+            "description": "Permettre à l'IA de traiter des documents pendant les conversations.",
+            "label": "Activer l'outil de chat",
+            "requires_api_key": "Nécessite une clé API valide pour activer",
+            "tool_name": "Nom de l'outil : process_document_with_unstructured",
+            "tooltip": "Lorsqu'elle est activée, l'IA peut utiliser l'outil 'process_document_with_unstructured' pour extraire du contenu des documents."
           },
-          "description": "[to be translated]:Enterprise-grade document processing supporting 50+ file types",
+          "description": "Traitement de documents de niveau entreprise prenant en charge plus de 50 types de fichiers",
           "health_check": {
-            "button": "[to be translated]:Test Connection",
-            "failed": "[to be translated]:Connection failed",
-            "success": "[to be translated]:Connection successful"
+            "button": "Tester la connexion",
+            "failed": "Connexion échouée",
+            "success": "Connexion réussie"
           },
           "options": {
             "chunking_strategy": {
-              "basic": "[to be translated]:Basic - Simple chunking",
-              "by_title": "[to be translated]:By Title - Semantic chunking",
-              "label": "[to be translated]:Chunking Strategy"
+              "basic": "De base - Découpage simple",
+              "by_title": "Par titre - Découpage sémantique",
+              "label": "Stratégie de segmentation"
             },
             "concurrency": {
-              "label": "[to be translated]:Concurrency Level",
-              "tooltip": "[to be translated]:Number of parallel requests (1-15)"
+              "label": "Niveau de concurrence",
+              "tooltip": "Nombre de demandes parallèles (1-15)"
             },
             "mime_types": {
               "categories": {
-                "document": "[to be translated]:Documents",
-                "image": "[to be translated]:Images (OCR)",
-                "other": "[to be translated]:Other Formats",
-                "presentation": "[to be translated]:Presentations",
-                "spreadsheet": "[to be translated]:Spreadsheets",
-                "text": "[to be translated]:Text Files",
-                "web": "[to be translated]:Web Pages"
+                "document": "Documents",
+                "image": "Images (OCR)",
+                "other": "Autres formats",
+                "presentation": "Présentations",
+                "spreadsheet": "Tableurs",
+                "text": "Fichiers texte",
+                "web": "Pages Web"
               },
-              "description": "[to be translated]:Select which file types should be processed by Unstructured.io",
-              "deselect_all": "[to be translated]:Deselect All",
-              "label": "[to be translated]:Supported File Types",
-              "search_placeholder": "[to be translated]:Search file types...",
-              "select_all": "[to be translated]:Select All",
-              "selected_count": "[to be translated]:{{count}} file type(s) selected"
+              "description": "Sélectionnez les types de fichiers qui doivent être traités par Unstructured.io.",
+              "deselect_all": "Désélectionner tout",
+              "label": "Types de fichiers pris en charge",
+              "search_placeholder": "Rechercher des types de fichiers...",
+              "select_all": "Sélectionner tout",
+              "selected_count": "{{count}} type(s) de fichier sélectionné(s)"
             },
             "split_pdf": {
-              "label": "[to be translated]:Split PDF Pages",
-              "tooltip": "[to be translated]:Process PDF pages in parallel for faster processing"
+              "label": "Séparer les pages PDF",
+              "tooltip": "Traitez les pages PDF en parallèle pour un traitement plus rapide."
             },
             "strategy": {
-              "auto": "[to be translated]:Auto - Automatic detection",
-              "fast": "[to be translated]:Fast - Quick processing",
-              "hi_res": "[to be translated]:High Resolution - Best quality",
-              "label": "[to be translated]:Processing Strategy",
-              "ocr_only": "[to be translated]:OCR Only - Text extraction"
+              "auto": "Auto - Détection automatique",
+              "fast": "Rapide - Traitement rapide",
+              "hi_res": "Haute résolution - Meilleure qualité",
+              "label": "Stratégie de traitement",
+              "ocr_only": "OCR seulement - Extraction de texte"
             }
           },
-          "title": "[to be translated]:Unstructured.io"
+          "title": "Unstructured.io"
         }
       },
       "skills": {
-        "createSkill": "[to be translated]:Create Skill",
+        "createSkill": "Créer une compétence",
         "creator": {
-          "addAsset": "[to be translated]:Add Asset",
-          "addReference": "[to be translated]:Add Reference",
-          "addScript": "[to be translated]:Add Script",
-          "allowedTools": "[to be translated]:Allowed Tools",
-          "assistantName": "[to be translated]:Skills Creator",
-          "body": "[to be translated]:Instructions (SKILL.md body)",
-          "compatibility": "[to be translated]:Compatibility",
-          "description": "[to be translated]:Description",
-          "examples": "[to be translated]:Example Triggers",
-          "frontmatter": "[to be translated]:Frontmatter",
-          "license": "[to be translated]:License",
-          "loadTemplate": "[to be translated]:Load Template",
-          "name": "[to be translated]:Skill Name",
-          "preview": "[to be translated]:SKILL.md Preview",
-          "resources": "[to be translated]:Bundled Resources",
-          "save": "[to be translated]:Save Skill",
-          "saveToProvider": "[to be translated]:Save to Storage Provider",
-          "selectProvider": "[to be translated]:Choose where to save this skill:",
-          "tags": "[to be translated]:Tags",
-          "title": "[to be translated]:Create New Skill"
+          "addAsset": "Ajouter un actif",
+          "addReference": "Ajouter une référence",
+          "addScript": "Ajouter un script",
+          "allowedTools": "Outils autorisés",
+          "assistantName": "Créateur de compétences",
+          "body": "Instructions (corps de SKILL.md)",
+          "compatibility": "Compatibilité",
+          "description": "Description",
+          "examples": "Exemples de déclencheurs",
+          "frontmatter": "Avant-propos",
+          "license": "Licence",
+          "loadTemplate": "Charger le modèle",
+          "name": "Nom de Compétence",
+          "preview": "SKILL.md Prévisualisation",
+          "resources": "Ressources regroupées",
+          "save": "Sauvegarder la compétence",
+          "saveToProvider": "Enregistrer sur le fournisseur de stockage",
+          "selectProvider": "Choisissez où enregistrer cette compétence :",
+          "tags": "Étiquettes",
+          "title": "Créer une nouvelle compétence"
         },
-        "description": "[to be translated]:Manage local skills to extend agent capabilities",
-        "empty": "[to be translated]:No skills found",
-        "filterByProvider": "[to be translated]:Filter by provider",
+        "description": "Gérer les compétences locales pour étendre les capacités des agents",
+        "empty": "Aucune compétence trouvée",
+        "filterByProvider": "Filtrer par fournisseur",
         "matching": {
-          "description": "[to be translated]:Configure how skills are matched to user queries. Intelligent matching reduces token usage by only injecting relevant skills.",
-          "initialize": "[to be translated]:Initialize / Rebuild Index",
-          "initializeHint": "[to be translated]:Required after changing strategy or when skills are updated. Pre-computes embeddings for fast matching.",
-          "maxMatched": "[to be translated]:Max Matched Skills",
-          "minSkillsForMatching": "[to be translated]:Min Skills for Matching",
-          "strategy": "[to be translated]:Strategy",
-          "threshold": "[to be translated]:Confidence Threshold",
-          "title": "[to be translated]:Skill Matching"
+          "description": "Configurez la façon dont les compétences sont associées aux requêtes des utilisateurs. L'appariement intelligent réduit l'utilisation des jetons en n'injectant que des compétences pertinentes.",
+          "initialize": "Initialiser / Reconstruire l'index",
+          "initializeHint": "Nécessaire après avoir changé de stratégie ou lorsque les compétences sont mises à jour. Précalcule les embeddings pour un appariement rapide.",
+          "maxMatched": "Compétences Maximales Correspondantes",
+          "minSkillsForMatching": "Compétences minimales pour le match",
+          "strategy": "Stratégie",
+          "threshold": "Seuil de confiance",
+          "title": "Correspondance des compétences"
         },
         "storage": {
-          "addProvider": "[to be translated]:Add Provider",
-          "browse": "[to be translated]:Browse",
-          "description": "[to be translated]:Configure where skills are stored. Skills can be spread across multiple providers for sharing and backup.",
-          "directoryPath": "[to be translated]:Directory Path",
-          "editProvider": "[to be translated]:Edit Provider",
-          "enabled": "[to be translated]:Enabled",
-          "ipfsApi": "[to be translated]:API URL",
-          "ipfsGateway": "[to be translated]:Gateway URL",
-          "ipfsPinningKey": "[to be translated]:Pinning Key",
-          "noProviders": "[to be translated]:No storage providers configured",
-          "postgresDsn": "[to be translated]:Connection String",
-          "postgresMode": "[to be translated]:Connection Mode",
-          "providerName": "[to be translated]:Name",
-          "providerType": "[to be translated]:Type",
-          "supabaseAnonKey": "[to be translated]:Anon Key",
-          "supabaseServiceKey": "[to be translated]:Service Key (for migrations)",
-          "supabaseUrl": "[to be translated]:Supabase URL",
-          "testConnection": "[to be translated]:Test Connection",
-          "title": "[to be translated]:Storage Providers"
+          "addProvider": "Ajouter un fournisseur",
+          "browse": "Parcourir",
+          "description": "Configurez où les compétences sont stockées. Les compétences peuvent être réparties sur plusieurs fournisseurs pour le partage et la sauvegarde.",
+          "directoryPath": "Chemin du répertoire",
+          "editProvider": "Modifier le fournisseur",
+          "enabled": "Activé",
+          "ipfsApi": "URL de l'API",
+          "ipfsGateway": "URL de la passerelle",
+          "ipfsPinningKey": "Clé de épingle",
+          "noProviders": "Aucun fournisseur de stockage configuré",
+          "postgresDsn": "Chaîne de connexion",
+          "postgresMode": "Mode de connexion",
+          "providerName": "Nom",
+          "providerType": "Type",
+          "supabaseAnonKey": "Clé Anon",
+          "supabaseServiceKey": "Clé de service (pour les migrations)",
+          "supabaseUrl": "URL de Supabase",
+          "testConnection": "Tester la connexion",
+          "title": "Fournisseurs de stockage"
         },
-        "title": "[to be translated]:Skills Library"
+        "title": "Bibliothèque de compétences"
       },
       "title": "Paramètres des outils",
       "websearch": {
@@ -5913,8 +5989,8 @@
     "show_window": "Afficher la fenêtre"
   },
   "update": {
-    "download": "[to be translated]:Download",
-    "downloadStarted": "[to be translated]:Download started...",
+    "download": "Télécharger",
+    "downloadStarted": "Téléchargement en cours...",
     "install": "Installer",
     "later": "Plus tard",
     "message": "Nouvelle version {{version}} disponible, voulez-vous l'installer maintenant ?",

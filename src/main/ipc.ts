@@ -30,7 +30,6 @@ import type {
   PluginError,
   Provider,
   Shortcut,
-  SkillMatchingConfig,
   SupportedOcrFile,
   ThemeMode
 } from '@types'
@@ -1221,25 +1220,18 @@ export async function registerIpc(mainWindow: BrowserWindow, app: Electron.App) 
     mainWindow.webContents.forcefullyCrashRenderer()
   })
 
-  // Skills
-  ipcMain.handle('skill:get-list', () => skillService.getSkills())
-  ipcMain.handle('skill:toggle', (_event, id: string, enabled: boolean) => skillService.toggleSkill(id, enabled))
-  ipcMain.handle('skill:get-matching-config', () => skillService.getMatchingConfig())
-  ipcMain.handle('skill:set-matching-config', (_event, config: Partial<SkillMatchingConfig>) =>
-    skillService.setMatchingConfig(config)
-  )
-  ipcMain.handle('skill:initialize-matching', () => skillService.initializeMatchingProvider())
-  ipcMain.handle('skill:get-agent-skills', (_event, agentId: string) => skillService.getAgentSkills(agentId))
-  ipcMain.handle('skill:set-agent-skills', (_event, agentId: string, skillIds: string[]) =>
+  // Agent-Skill association handlers
+  ipcMain.handle(IpcChannel.Skill_GetAgentSkills, (_event, agentId: string) => skillService.getAgentSkills(agentId))
+  ipcMain.handle(IpcChannel.Skill_SetAgentSkills, (_event, agentId: string, skillIds: string[]) =>
     skillService.setAgentSkills(agentId, skillIds)
   )
-  ipcMain.handle('skill:add-to-agent', (_event, agentId: string, skillId: string) =>
+  ipcMain.handle(IpcChannel.Skill_AddToAgent, (_event, agentId: string, skillId: string) =>
     skillService.addSkillToAgent(agentId, skillId)
   )
-  ipcMain.handle('skill:remove-from-agent', (_event, agentId: string, skillId: string) =>
+  ipcMain.handle(IpcChannel.Skill_RemoveFromAgent, (_event, agentId: string, skillId: string) =>
     skillService.removeSkillFromAgent(agentId, skillId)
   )
-  ipcMain.handle('skill:get-enabled-for-agent', (_event, agentId: string) =>
+  ipcMain.handle(IpcChannel.Skill_GetEnabledForAgent, (_event, agentId: string) =>
     skillService.getEnabledSkillsForAgent(agentId)
   )
 
@@ -1304,7 +1296,7 @@ export async function registerIpc(mainWindow: BrowserWindow, app: Electron.App) 
 
   // OpenClaw
   ipcMain.handle(IpcChannel.OpenClaw_CheckInstalled, openClawService.checkInstalled)
-  ipcMain.handle(IpcChannel.OpenClaw_CheckNpmAvailable, openClawService.checkNpmAvailable)
+  ipcMain.handle(IpcChannel.OpenClaw_CheckNodeVersion, openClawService.checkNodeVersion)
   ipcMain.handle(IpcChannel.OpenClaw_CheckGitAvailable, checkGitAvailable)
   ipcMain.handle(IpcChannel.OpenClaw_GetNodeDownloadUrl, openClawService.getNodeDownloadUrl)
   ipcMain.handle(IpcChannel.OpenClaw_GetGitDownloadUrl, openClawService.getGitDownloadUrl)

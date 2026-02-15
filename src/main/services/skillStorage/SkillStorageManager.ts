@@ -142,12 +142,15 @@ export class SkillStorageManager {
   public async getAllSkills(enabledSkillIds: Set<string>): Promise<Skill[]> {
     const results: Skill[] = []
 
+    logger.info(`getAllSkills called: ${this.providers.size} active provider(s), ${this.configs.size} config(s)`)
+
     for (const [id, provider] of this.providers) {
       const config = this.configs.get(id)
       if (!config) continue
 
       try {
         const records = await provider.listSkills()
+        logger.info(`Provider "${config.name}" (${id}) returned ${records.length} skill(s)`)
         for (const record of records) {
           results.push(
             skillRecordToSkill(
@@ -165,6 +168,7 @@ export class SkillStorageManager {
       }
     }
 
+    logger.info(`getAllSkills returning ${results.length} total skill(s)`)
     return results
   }
 

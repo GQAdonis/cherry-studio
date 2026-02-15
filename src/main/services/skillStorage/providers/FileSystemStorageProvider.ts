@@ -38,21 +38,63 @@ export class FileSystemStorageProvider implements SkillStorageProvider {
 
   async listSkills(): Promise<SkillRecord[]> {
     try {
-      const entries = await fs.readdir(this.directoryPath, { withFileTypes: true })
-      const skillDirs = entries.filter((e) => e.isDirectory())
+      logger.info(`listSkills: scanning directory ${this.directoryPath}`)
       const skills: SkillRecord[] = []
-
-      for (const dir of skillDirs) {
-        const record = await this.readSkillDir(dir.name)
-        if (record) {
-          skills.push(record)
-        }
-      }
-
+      await this.discoverSkillsRecursive(this.directoryPath, '', skills)
+      logger.info(`listSkills: found ${skills.length} skill(s) in ${this.directoryPath}`)
       return skills
     } catch (error) {
       logger.error('Failed to list skills', error as Error)
       return []
+    }
+  }
+
+  /**
+   * Recursively discover skill directories containing SKILL.md.
+   * Supports both flat layouts (skills/my-skill/SKILL.md) and nested
+   * layouts (skills/category/my-skill/SKILL.md).
+   *
+   * When a directory contains SKILL.md it is treated as a skill and
+   * its children are NOT scanned further (a skill can't nest skills).
+   */
+  private async discoverSkillsRecursive(currentDir: string, relativeTo: string, results: SkillRecord[]): Promise<void> {
+    const entries = await fs.readdir(currentDir, { withFileTypes: true })
+
+    for (const entry of entries) {
+      // Check if entry is a directory, following symlinks
+      let isDir = entry.isDirectory()
+      if (!isDir && entry.isSymbolicLink()) {
+        try {
+          const targetStat = await fs.stat(path.join(currentDir, entry.name)) // stat follows symlinks
+          isDir = targetStat.isDirectory()
+        } catch {
+          // Broken symlink — skip
+          logger.warn(`discoverSkillsRecursive: broken symlink "${entry.name}" in ${currentDir}`)
+          continue
+        }
+      }
+
+      if (!isDir) continue
+
+      const childDir = path.join(currentDir, entry.name)
+      const relPath = relativeTo ? `${relativeTo}/${entry.name}` : entry.name
+      const skillMdPath = path.join(childDir, 'SKILL.md')
+
+      try {
+        await fs.access(skillMdPath)
+        logger.info(`discoverSkillsRecursive: found SKILL.md at ${skillMdPath}, reading as "${relPath}"`)
+        // This directory contains SKILL.md → treat it as a skill
+        const record = await this.readSkillDir(relPath)
+        if (record) {
+          logger.info(`discoverSkillsRecursive: successfully parsed skill "${record.name}" (id: ${record.id})`)
+          results.push(record)
+        } else {
+          logger.warn(`discoverSkillsRecursive: readSkillDir returned null for "${relPath}"`)
+        }
+      } catch {
+        // No SKILL.md here → recurse into subdirectories
+        await this.discoverSkillsRecursive(childDir, relPath, results)
+      }
     }
   }
 
@@ -196,8 +238,10 @@ export class FileSystemStorageProvider implements SkillStorageProvider {
         references: references.length ? references : undefined,
         assets: assets.length ? assets : undefined
       }
-    } catch {
-      // Silently skip directories that don't have a valid SKILL.md
+    } catch (error) {
+      logger.warn(
+        `readSkillDir: failed to parse "${dirName}": ${error instanceof Error ? error.message : String(error)}`
+      )
       return null
     }
   }

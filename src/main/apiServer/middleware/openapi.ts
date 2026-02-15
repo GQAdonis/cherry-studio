@@ -224,6 +224,7 @@ const openApiSpec: Record<string, unknown> = {
             properties: {
               id: { type: 'string', description: 'Unique agent identifier' },
               type: { $ref: '#/components/schemas/AgentType' },
+              exposed_via_mcp: { type: 'boolean', description: 'Whether this agent is exposed as an MCP tool' },
               created_at: { type: 'string', format: 'date-time' },
               updated_at: { type: 'string', format: 'date-time' }
             },
@@ -258,7 +259,8 @@ const openApiSpec: Record<string, unknown> = {
           small_model: { type: 'string' },
           mcps: { type: 'array', items: { type: 'string' } },
           allowed_tools: { type: 'array', items: { type: 'string' } },
-          configuration: { $ref: '#/components/schemas/AgentConfiguration' }
+          configuration: { $ref: '#/components/schemas/AgentConfiguration' },
+          exposed_via_mcp: { type: 'boolean', description: 'Whether to expose this agent as an MCP tool' }
         }
       },
       ReplaceAgentRequest: { $ref: '#/components/schemas/AgentBase' },
@@ -1048,6 +1050,384 @@ const openApiSpec: Record<string, unknown> = {
         responses: {
           '200': { description: 'Message details' },
           '404': { description: 'Not found' }
+        }
+      }
+    },
+
+    // ── MCP Exposure endpoints ──
+    '/v1/mcp-servers': {
+      get: {
+        summary: 'Discover exposed MCP servers',
+        description:
+          'Lists all resources (agents, knowledge bases, MCP servers) exposed as MCP endpoints. External AI tools use this for discovery.',
+        tags: ['MCP Exposure'],
+        responses: {
+          '200': {
+            description: 'List of exposed MCP servers',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    success: { type: 'boolean' },
+                    data: {
+                      type: 'object',
+                      properties: {
+                        servers: {
+                          type: 'array',
+                          items: {
+                            type: 'object',
+                            properties: {
+                              id: { type: 'string' },
+                              name: { type: 'string' },
+                              type: { type: 'string', enum: ['agent', 'knowledge', 'mcp-proxy'] },
+                              url: { type: 'string', description: 'Full endpoint URL for this MCP server' }
+                            }
+                          }
+                        },
+                        count: { type: 'integer' }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          '500': {
+            description: 'Internal server error',
+            content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } }
+          }
+        }
+      }
+    },
+    '/v1/mcp-servers/agents': {
+      post: {
+        summary: 'Agent MCP endpoint (StreamableHTTP)',
+        description:
+          'MCP JSON-RPC endpoint for exposed agents. Supports tools: list_agents, get_agent, invoke_agent, list_agent_tools.',
+        tags: ['MCP Exposure'],
+        requestBody: {
+          required: true,
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                description: 'MCP JSON-RPC request',
+                properties: {
+                  jsonrpc: { type: 'string', example: '2.0' },
+                  id: { type: 'integer' },
+                  method: { type: 'string', enum: ['tools/list', 'tools/call', 'initialize'] },
+                  params: { type: 'object' }
+                }
+              }
+            }
+          }
+        },
+        responses: {
+          '200': { description: 'MCP JSON-RPC response' },
+          '500': { description: 'Agent MCP request failed' }
+        }
+      },
+      get: {
+        summary: 'Agent MCP SSE stream',
+        description: 'Server-Sent Events stream for the agent MCP server.',
+        tags: ['MCP Exposure'],
+        responses: {
+          '200': {
+            description: 'SSE event stream',
+            content: { 'text/event-stream': { schema: { type: 'string' } } }
+          }
+        }
+      }
+    },
+    '/v1/mcp-servers/knowledge': {
+      post: {
+        summary: 'Knowledge base MCP endpoint (StreamableHTTP)',
+        description:
+          'MCP JSON-RPC endpoint for exposed knowledge bases. Supports tools: list_knowledge_bases, search_knowledge, get_knowledge_item.',
+        tags: ['MCP Exposure'],
+        requestBody: {
+          required: true,
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                description: 'MCP JSON-RPC request',
+                properties: {
+                  jsonrpc: { type: 'string', example: '2.0' },
+                  id: { type: 'integer' },
+                  method: { type: 'string', enum: ['tools/list', 'tools/call', 'initialize'] },
+                  params: { type: 'object' }
+                }
+              }
+            }
+          }
+        },
+        responses: {
+          '200': { description: 'MCP JSON-RPC response' },
+          '500': { description: 'Knowledge MCP request failed' }
+        }
+      },
+      get: {
+        summary: 'Knowledge base MCP SSE stream',
+        description: 'Server-Sent Events stream for the knowledge base MCP server.',
+        tags: ['MCP Exposure'],
+        responses: {
+          '200': {
+            description: 'SSE event stream',
+            content: { 'text/event-stream': { schema: { type: 'string' } } }
+          }
+        }
+      }
+    },
+    '/v1/mcp-servers/proxy/{serverId}': {
+      post: {
+        summary: 'Proxy to configured MCP server (StreamableHTTP)',
+        description:
+          'Forwards MCP requests to an exposed configured MCP server. Only servers with exposedViaMcp=true and isActive=true are accessible.',
+        tags: ['MCP Exposure'],
+        parameters: [
+          {
+            in: 'path',
+            name: 'serverId',
+            required: true,
+            schema: { type: 'string' },
+            description: 'ID of the configured MCP server to proxy to'
+          }
+        ],
+        requestBody: {
+          required: true,
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                description: 'MCP JSON-RPC request to forward',
+                properties: {
+                  jsonrpc: { type: 'string', example: '2.0' },
+                  id: { type: 'integer' },
+                  method: { type: 'string' },
+                  params: { type: 'object' }
+                }
+              }
+            }
+          }
+        },
+        responses: {
+          '200': { description: 'MCP JSON-RPC response from proxied server' },
+          '400': { description: 'Server ID is required' },
+          '404': { description: 'MCP server not found or not exposed' },
+          '500': { description: 'Proxy MCP request failed' }
+        }
+      },
+      get: {
+        summary: 'Proxy MCP SSE stream',
+        description: 'Server-Sent Events stream forwarded from the proxied MCP server.',
+        tags: ['MCP Exposure'],
+        parameters: [
+          {
+            in: 'path',
+            name: 'serverId',
+            required: true,
+            schema: { type: 'string' },
+            description: 'ID of the configured MCP server'
+          }
+        ],
+        responses: {
+          '200': {
+            description: 'SSE event stream',
+            content: { 'text/event-stream': { schema: { type: 'string' } } }
+          },
+          '404': { description: 'MCP server not found or not exposed' }
+        }
+      }
+    },
+
+    // ── Per-resource MCP endpoints ──
+    '/v1/mcp-servers/agents/{agentId}': {
+      post: {
+        summary: 'Single agent MCP endpoint',
+        description:
+          'MCP endpoint scoped to a single agent. Tools: invoke (just prompt), get_info, list_tools — no agent_id param needed.',
+        tags: ['MCP Exposure'],
+        parameters: [
+          {
+            in: 'path',
+            name: 'agentId',
+            required: true,
+            schema: { type: 'string' },
+            description: 'ID of the agent'
+          }
+        ],
+        requestBody: {
+          required: true,
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                description: 'MCP JSON-RPC request',
+                properties: {
+                  jsonrpc: { type: 'string', example: '2.0' },
+                  id: { type: 'integer' },
+                  method: { type: 'string', enum: ['tools/list', 'tools/call', 'initialize'] },
+                  params: { type: 'object' }
+                }
+              }
+            }
+          }
+        },
+        responses: {
+          '200': { description: 'MCP JSON-RPC response' },
+          '404': { description: 'Agent not found or not exposed' },
+          '500': { description: 'Agent MCP request failed' }
+        }
+      },
+      get: {
+        summary: 'Single agent MCP SSE stream',
+        description: 'SSE stream for a specific agent MCP server.',
+        tags: ['MCP Exposure'],
+        parameters: [
+          {
+            in: 'path',
+            name: 'agentId',
+            required: true,
+            schema: { type: 'string' },
+            description: 'ID of the agent'
+          }
+        ],
+        responses: {
+          '200': {
+            description: 'SSE event stream',
+            content: { 'text/event-stream': { schema: { type: 'string' } } }
+          },
+          '404': { description: 'Agent not found or not exposed' }
+        }
+      }
+    },
+    '/v1/mcp-servers/knowledge/{kbId}': {
+      post: {
+        summary: 'Single knowledge base MCP endpoint',
+        description:
+          'MCP endpoint scoped to a single knowledge base. Tools: search (just query), get_info — no kb_id param needed.',
+        tags: ['MCP Exposure'],
+        parameters: [
+          {
+            in: 'path',
+            name: 'kbId',
+            required: true,
+            schema: { type: 'string' },
+            description: 'ID of the knowledge base'
+          }
+        ],
+        requestBody: {
+          required: true,
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                description: 'MCP JSON-RPC request',
+                properties: {
+                  jsonrpc: { type: 'string', example: '2.0' },
+                  id: { type: 'integer' },
+                  method: { type: 'string', enum: ['tools/list', 'tools/call', 'initialize'] },
+                  params: { type: 'object' }
+                }
+              }
+            }
+          }
+        },
+        responses: {
+          '200': { description: 'MCP JSON-RPC response' },
+          '404': { description: 'Knowledge base not found or not exposed' },
+          '500': { description: 'Knowledge MCP request failed' }
+        }
+      },
+      get: {
+        summary: 'Single knowledge base MCP SSE stream',
+        description: 'SSE stream for a specific knowledge base MCP server.',
+        tags: ['MCP Exposure'],
+        parameters: [
+          {
+            in: 'path',
+            name: 'kbId',
+            required: true,
+            schema: { type: 'string' },
+            description: 'ID of the knowledge base'
+          }
+        ],
+        responses: {
+          '200': {
+            description: 'SSE event stream',
+            content: { 'text/event-stream': { schema: { type: 'string' } } }
+          },
+          '404': { description: 'Knowledge base not found or not exposed' }
+        }
+      }
+    },
+
+    // ── Knowledge Bases REST API ──
+    '/v1/knowledge-bases': {
+      get: {
+        summary: 'List exposed knowledge bases',
+        description:
+          'Retrieves all knowledge bases that are exposed via MCP. Use this to discover KB IDs for per-resource MCP endpoints.',
+        tags: ['Knowledge Bases'],
+        responses: {
+          '200': {
+            description: 'List of exposed knowledge bases',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    success: { type: 'boolean' },
+                    data: {
+                      type: 'object',
+                      properties: {
+                        knowledge_bases: {
+                          type: 'array',
+                          items: {
+                            type: 'object',
+                            properties: {
+                              id: { type: 'string' },
+                              name: { type: 'string' },
+                              description: { type: 'string' },
+                              model: { type: 'string' },
+                              document_count: { type: 'integer' },
+                              dimensions: { type: 'integer' },
+                              mcp_endpoint: { type: 'string', description: 'Per-resource MCP endpoint URL' }
+                            }
+                          }
+                        },
+                        count: { type: 'integer' }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          '500': { description: 'Internal server error' }
+        }
+      }
+    },
+    '/v1/knowledge-bases/{kbId}': {
+      get: {
+        summary: 'Get knowledge base by ID',
+        description: 'Retrieves a specific exposed knowledge base with full details.',
+        tags: ['Knowledge Bases'],
+        parameters: [
+          {
+            in: 'path',
+            name: 'kbId',
+            required: true,
+            schema: { type: 'string' },
+            description: 'Knowledge base ID'
+          }
+        ],
+        responses: {
+          '200': { description: 'Knowledge base details' },
+          '404': { description: 'Knowledge base not found or not exposed' },
+          '500': { description: 'Internal server error' }
         }
       }
     }

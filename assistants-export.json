@@ -1,0 +1,3733 @@
+{
+  "defaultAssistant": {
+    "id": "default",
+    "name": "Default Assistant",
+    "emoji": "😀",
+    "prompt": "",
+    "topics": [
+      {
+        "id": "9de226d2-67b4-423a-b7c0-8d11276b63b4",
+        "assistantId": "default",
+        "createdAt": "2025-11-25T00:38:11.820Z",
+        "updatedAt": "2025-11-25T00:38:11.820Z",
+        "name": "Default Topic",
+        "messages": [],
+        "isNameManuallyEdited": false
+      }
+    ],
+    "messages": [],
+    "type": "assistant",
+    "regularPhrases": [],
+    "settings": {
+      "temperature": 1,
+      "enableTemperature": true,
+      "contextCount": 5,
+      "enableMaxTokens": false,
+      "maxTokens": 0,
+      "streamOutput": true,
+      "topP": 1,
+      "enableTopP": false,
+      "toolUseMode": "function",
+      "customParameters": []
+    }
+  },
+  "assistants": [
+    {
+      "id": "ca3264c6-97ab-46c9-8fe4-0acfae7f14f0",
+      "name": "Prometheus Sales",
+      "knowledge_bases": [
+        {
+          "id": "NUv_AnRUFU9AfHXaHFy5i",
+          "name": "Sales Discussions",
+          "model": {
+            "id": "openai/text-embedding-3-small",
+            "name": "OpenAI: Text Embedding 3 Small",
+            "provider": "openrouter",
+            "group": "openai",
+            "description": "text-embedding-3-small is OpenAI's improved, more performant version of the ada embedding model. Embeddings are a numerical representation of text that can be used to measure the relatedness between two pieces of text. Embeddings are useful for search, clustering, recommendations, anomaly detection, and classification tasks.",
+            "supported_text_delta": true
+          },
+          "items": [
+            {
+              "id": "179d66ff-2063-476a-a19a-5d613a11c72d",
+              "type": "file",
+              "content": {
+                "id": "f5fbed1d-024b-4a08-8a90-231afb1bf640",
+                "origin_name": "Updates-with-John-Seabaugh-c7539499-c25b.md",
+                "name": "f5fbed1d-024b-4a08-8a90-231afb1bf640.md",
+                "path": "/Users/gqadonis/Library/Application Support/CherryStudio/Data/Files/f5fbed1d-024b-4a08-8a90-231afb1bf640.md",
+                "created_at": "2026-01-08T00:56:09.962Z",
+                "size": 103534,
+                "ext": ".md",
+                "type": "text",
+                "count": 1
+              },
+              "created_at": 1767833835032,
+              "updated_at": 1767833835032,
+              "uniqueId": "LocalPathLoader_c405406cbbdd548f0562165f1dc40ac8",
+              "uniqueIds": [
+                "LocalPathLoader_c405406cbbdd548f0562165f1dc40ac8"
+              ],
+              "isPreprocessed": false
+            },
+            {
+              "id": "76418255-8acf-419c-b5c8-69be11620585",
+              "type": "file",
+              "content": {
+                "id": "4be0100c-a94d-4e21-8274-ac21d4610550",
+                "origin_name": "Updates with John Seabaugh Jan 7, 2026.md",
+                "name": "4be0100c-a94d-4e21-8274-ac21d4610550.md",
+                "path": "/Users/gqadonis/Library/Application Support/CherryStudio/Data/Files/4be0100c-a94d-4e21-8274-ac21d4610550.md",
+                "created_at": "2026-01-08T00:56:30.546Z",
+                "size": 10104,
+                "ext": ".md",
+                "type": "text",
+                "count": 1
+              },
+              "created_at": 1767833835032,
+              "updated_at": 1767833835032,
+              "uniqueId": "LocalPathLoader_d4c23c5331f375c9ab629e5c6eaeb507",
+              "uniqueIds": [
+                "LocalPathLoader_d4c23c5331f375c9ab629e5c6eaeb507"
+              ],
+              "isPreprocessed": false
+            }
+          ],
+          "created_at": 1767833820549,
+          "updated_at": 1767833835032,
+          "version": 1,
+          "dimensions": 1536
+        },
+        {
+          "id": "SNxk9_-otzbQu7CQvGdzv",
+          "name": "Prometheus Unified Agent Runtime",
+          "model": {
+            "id": "text-embedding-3-small",
+            "name": "text-embedding-3-small",
+            "provider": "openai",
+            "group": "text-embedding",
+            "description": "",
+            "owned_by": "system",
+            "supported_text_delta": true
+          },
+          "items": [
+            {
+              "id": "cc2b99c8-499a-4777-b2a6-8fbbdd88c848",
+              "type": "file",
+              "content": {
+                "id": "e71a21c4-365b-4ffe-af0b-7952325d7378",
+                "origin_name": "A2UI + AG-UI.md",
+                "name": "e71a21c4-365b-4ffe-af0b-7952325d7378.md",
+                "path": "/Users/gqadonis/Library/Application Support/CherryStudio/Data/Files/e71a21c4-365b-4ffe-af0b-7952325d7378.md",
+                "created_at": "2025-12-26T16:15:04.881Z",
+                "size": 263526,
+                "ext": ".md",
+                "type": "text",
+                "count": 1
+              },
+              "created_at": 1766840072027,
+              "updated_at": 1766840072027,
+              "uniqueId": "LocalPathLoader_c4a9a2ab46e521767993f54808a834fb",
+              "uniqueIds": [
+                "LocalPathLoader_c4a9a2ab46e521767993f54808a834fb"
+              ],
+              "isPreprocessed": false
+            },
+            {
+              "id": "3c17f4ed-ee97-433e-aba7-6d84491407ac",
+              "type": "file",
+              "content": {
+                "id": "e1825fab-4cb7-4d92-b847-20ed777d7503",
+                "origin_name": "PMPO, Universal Agent Runtime, and the LLM Provider Framework.md",
+                "name": "e1825fab-4cb7-4d92-b847-20ed777d7503.md",
+                "path": "/Users/gqadonis/Library/Application Support/CherryStudio/Data/Files/e1825fab-4cb7-4d92-b847-20ed777d7503.md",
+                "created_at": "2025-12-26T16:15:04.882Z",
+                "size": 7771,
+                "ext": ".md",
+                "type": "text",
+                "count": 1
+              },
+              "created_at": 1766840072027,
+              "updated_at": 1766840072027,
+              "uniqueId": "LocalPathLoader_9ae42f4b0a1ea27324e36050a7f722b3",
+              "uniqueIds": [
+                "LocalPathLoader_9ae42f4b0a1ea27324e36050a7f722b3"
+              ],
+              "isPreprocessed": false
+            },
+            {
+              "id": "09b862a0-7311-4434-bf91-d13b59730240",
+              "type": "file",
+              "content": {
+                "id": "a8094159-51ae-4292-b7aa-bc9dcb420756",
+                "origin_name": "Universal Agent Runtime.md",
+                "name": "a8094159-51ae-4292-b7aa-bc9dcb420756.md",
+                "path": "/Users/gqadonis/Library/Application Support/CherryStudio/Data/Files/a8094159-51ae-4292-b7aa-bc9dcb420756.md",
+                "created_at": "2025-12-26T16:15:04.882Z",
+                "size": 19123,
+                "ext": ".md",
+                "type": "text",
+                "count": 1
+              },
+              "created_at": 1766840072027,
+              "updated_at": 1766840072027,
+              "uniqueId": "LocalPathLoader_6a5a58dad32dde9b83065c68876ae155",
+              "uniqueIds": [
+                "LocalPathLoader_6a5a58dad32dde9b83065c68876ae155"
+              ],
+              "isPreprocessed": false
+            },
+            {
+              "id": "88d45213-af09-4a14-bcd7-1e0e8798e382",
+              "type": "file",
+              "content": {
+                "id": "a18a2d5f-fa6e-4712-8d35-7b9d66f6d607",
+                "origin_name": "universal_agent_runtime_and_agent_artifact_specification.md",
+                "name": "a18a2d5f-fa6e-4712-8d35-7b9d66f6d607.md",
+                "path": "/Users/gqadonis/Library/Application Support/CherryStudio/Data/Files/a18a2d5f-fa6e-4712-8d35-7b9d66f6d607.md",
+                "created_at": "2025-12-26T16:15:04.883Z",
+                "size": 25293,
+                "ext": ".md",
+                "type": "text",
+                "count": 1
+              },
+              "created_at": 1766840072027,
+              "updated_at": 1766840072027,
+              "uniqueId": "LocalPathLoader_51a28d5b4f403af1760cc2562a0ca5d7",
+              "uniqueIds": [
+                "LocalPathLoader_51a28d5b4f403af1760cc2562a0ca5d7"
+              ],
+              "isPreprocessed": false
+            },
+            {
+              "id": "1eb0b04e-8666-4653-aa90-198904701aed",
+              "type": "file",
+              "content": {
+                "id": "eaa97364-de22-4507-9333-f21b0d2e3c7f",
+                "origin_name": "VISION.md",
+                "name": "eaa97364-de22-4507-9333-f21b0d2e3c7f.md",
+                "path": "/Users/gqadonis/Library/Application Support/CherryStudio/Data/Files/eaa97364-de22-4507-9333-f21b0d2e3c7f.md",
+                "created_at": "2025-12-26T16:15:04.882Z",
+                "size": 4392,
+                "ext": ".md",
+                "type": "text",
+                "count": 1
+              },
+              "created_at": 1766840072027,
+              "updated_at": 1766840072027,
+              "uniqueId": "LocalPathLoader_d1872b13d3631c5099b62559d31d2ce6",
+              "uniqueIds": [
+                "LocalPathLoader_d1872b13d3631c5099b62559d31d2ce6"
+              ],
+              "isPreprocessed": false
+            },
+            {
+              "id": "0059a367-7b73-4683-bbe8-b9d3ac69def6",
+              "type": "file",
+              "content": {
+                "id": "fe91688b-09d2-4007-8ee1-f27e0b2ce5b5",
+                "origin_name": "Why Prometheus Is Different.md",
+                "name": "fe91688b-09d2-4007-8ee1-f27e0b2ce5b5.md",
+                "path": "/Users/gqadonis/Library/Application Support/CherryStudio/Data/Files/fe91688b-09d2-4007-8ee1-f27e0b2ce5b5.md",
+                "created_at": "2025-12-26T13:29:36.472Z",
+                "size": 5352,
+                "ext": ".md",
+                "type": "text",
+                "count": 1
+              },
+              "created_at": 1766840150293,
+              "updated_at": 1766840150293,
+              "uniqueId": "LocalPathLoader_b682e68f480ecbb992b165ba0c294a65",
+              "uniqueIds": [
+                "LocalPathLoader_b682e68f480ecbb992b165ba0c294a65"
+              ],
+              "isPreprocessed": false
+            },
+            {
+              "id": "7e420f7a-2001-46d5-845a-72ada2281eb2",
+              "type": "file",
+              "content": {
+                "id": "15a0c615-24c3-4e6b-99ff-9eba8f96e09d",
+                "origin_name": "Statement of Work (SOW).md",
+                "name": "15a0c615-24c3-4e6b-99ff-9eba8f96e09d.md",
+                "path": "/Users/gqadonis/Library/Application Support/CherryStudio/Data/Files/15a0c615-24c3-4e6b-99ff-9eba8f96e09d.md",
+                "created_at": "2025-12-25T21:18:28.819Z",
+                "size": 6283,
+                "ext": ".md",
+                "type": "text",
+                "count": 1
+              },
+              "created_at": 1766840150293,
+              "updated_at": 1766840150293,
+              "uniqueId": "LocalPathLoader_117e83f9cf4666f722c5d5b59110429e",
+              "uniqueIds": [
+                "LocalPathLoader_117e83f9cf4666f722c5d5b59110429e"
+              ],
+              "isPreprocessed": false
+            },
+            {
+              "id": "d1cba0af-bc69-4f89-a61e-20ff6de9f091",
+              "type": "file",
+              "content": {
+                "id": "f26cc23d-1970-4a3a-a16d-7450c4939736",
+                "origin_name": "Prometheus Enterprise Sales Playbook (Internal).md",
+                "name": "f26cc23d-1970-4a3a-a16d-7450c4939736.md",
+                "path": "/Users/gqadonis/Library/Application Support/CherryStudio/Data/Files/f26cc23d-1970-4a3a-a16d-7450c4939736.md",
+                "created_at": "2025-12-25T21:15:39.462Z",
+                "size": 4115,
+                "ext": ".md",
+                "type": "text",
+                "count": 1
+              },
+              "created_at": 1766840150293,
+              "updated_at": 1766840150293,
+              "uniqueId": "LocalPathLoader_fea85e34c8d5cc6a423c3bc1ff9c50d0",
+              "uniqueIds": [
+                "LocalPathLoader_fea85e34c8d5cc6a423c3bc1ff9c50d0"
+              ],
+              "isPreprocessed": false
+            },
+            {
+              "id": "9971a8e3-0b46-41ab-ab54-6dbbdd201f6f",
+              "type": "file",
+              "content": {
+                "id": "7e81b6e2-07fb-4a29-abe3-8f7bd5dc039e",
+                "origin_name": "Prometheus Enterprise Sales Qualification Checklist.md",
+                "name": "7e81b6e2-07fb-4a29-abe3-8f7bd5dc039e.md",
+                "path": "/Users/gqadonis/Library/Application Support/CherryStudio/Data/Files/7e81b6e2-07fb-4a29-abe3-8f7bd5dc039e.md",
+                "created_at": "2025-12-25T21:13:08.375Z",
+                "size": 6763,
+                "ext": ".md",
+                "type": "text",
+                "count": 1
+              },
+              "created_at": 1766840150293,
+              "updated_at": 1766840150293,
+              "uniqueId": "LocalPathLoader_e83ea3ba7f3f10fa7dc89b0454b012bd",
+              "uniqueIds": [
+                "LocalPathLoader_e83ea3ba7f3f10fa7dc89b0454b012bd"
+              ],
+              "isPreprocessed": false
+            },
+            {
+              "id": "1d3b21db-87f1-45ed-a01b-564d6d61f281",
+              "type": "file",
+              "content": {
+                "id": "e224823f-3dc3-44e5-81ce-dd6c3c102821",
+                "origin_name": "Prometheus Universal Agent Platform — Pricing Matrix.md",
+                "name": "e224823f-3dc3-44e5-81ce-dd6c3c102821.md",
+                "path": "/Users/gqadonis/Library/Application Support/CherryStudio/Data/Files/e224823f-3dc3-44e5-81ce-dd6c3c102821.md",
+                "created_at": "2025-12-25T21:04:19.356Z",
+                "size": 8313,
+                "ext": ".md",
+                "type": "text",
+                "count": 1
+              },
+              "created_at": 1766840150293,
+              "updated_at": 1766840150293,
+              "uniqueId": "LocalPathLoader_33de5aec5815d623839f66c50975631c",
+              "uniqueIds": [
+                "LocalPathLoader_33de5aec5815d623839f66c50975631c"
+              ],
+              "isPreprocessed": false
+            },
+            {
+              "id": "b8cda392-5fa9-4cfc-a59b-ec0cbb2a1909",
+              "type": "file",
+              "content": {
+                "id": "9417dcbd-04c5-45b6-8e79-65c2f80bced1",
+                "origin_name": "S‑Tier UIUX Design.md",
+                "name": "9417dcbd-04c5-45b6-8e79-65c2f80bced1.md",
+                "path": "/Users/gqadonis/Library/Application Support/CherryStudio/Data/Files/9417dcbd-04c5-45b6-8e79-65c2f80bced1.md",
+                "created_at": "2025-12-15T20:57:06.835Z",
+                "size": 6055,
+                "ext": ".md",
+                "type": "text",
+                "count": 1
+              },
+              "created_at": 1766840227828,
+              "updated_at": 1766840227828,
+              "uniqueId": "LocalPathLoader_9890500963c9daed58789685e9afbaa1",
+              "uniqueIds": [
+                "LocalPathLoader_9890500963c9daed58789685e9afbaa1"
+              ],
+              "isPreprocessed": false
+            },
+            {
+              "id": "c1982d99-6bd9-42da-b2ab-d6257ec44c56",
+              "type": "file",
+              "content": {
+                "id": "fcf47956-b57f-4c93-aa9a-f7cc9c64e48c",
+                "origin_name": "Prometheus Views Reference App.md",
+                "name": "fcf47956-b57f-4c93-aa9a-f7cc9c64e48c.md",
+                "path": "/Users/gqadonis/Library/Application Support/CherryStudio/Data/Files/fcf47956-b57f-4c93-aa9a-f7cc9c64e48c.md",
+                "created_at": "2025-12-18T13:33:26.531Z",
+                "size": 17262,
+                "ext": ".md",
+                "type": "text",
+                "count": 1
+              },
+              "created_at": 1766840227828,
+              "updated_at": 1766840227828,
+              "uniqueId": "LocalPathLoader_7df720b5bfe9ed9bd31314b18b94e870",
+              "uniqueIds": [
+                "LocalPathLoader_7df720b5bfe9ed9bd31314b18b94e870"
+              ],
+              "isPreprocessed": false
+            },
+            {
+              "id": "2496f135-92a3-416a-893a-af3e638de16d",
+              "type": "file",
+              "content": {
+                "id": "7f9b3a8d-1b07-4aa4-87c8-e7953edf4136",
+                "origin_name": "Prometheus Experience Blueprint™.md",
+                "name": "7f9b3a8d-1b07-4aa4-87c8-e7953edf4136.md",
+                "path": "/Users/gqadonis/Library/Application Support/CherryStudio/Data/Files/7f9b3a8d-1b07-4aa4-87c8-e7953edf4136.md",
+                "created_at": "2025-12-15T20:52:12.645Z",
+                "size": 6562,
+                "ext": ".md",
+                "type": "text",
+                "count": 1
+              },
+              "created_at": 1766840227828,
+              "updated_at": 1766840227828,
+              "uniqueId": "LocalPathLoader_f527aca5bd4af653f741713451d48dd9",
+              "uniqueIds": [
+                "LocalPathLoader_f527aca5bd4af653f741713451d48dd9"
+              ],
+              "isPreprocessed": false
+            },
+            {
+              "id": "c1717bcf-2c82-4562-8e60-d66640fa34ae",
+              "type": "file",
+              "content": {
+                "id": "391d8a82-c4d6-4f88-930e-a30d628f324e",
+                "origin_name": "uar-bible.html",
+                "name": "391d8a82-c4d6-4f88-930e-a30d628f324e.html",
+                "path": "/Users/gqadonis/Library/Application Support/CherryStudio/Data/Files/391d8a82-c4d6-4f88-930e-a30d628f324e.html",
+                "created_at": "2025-12-12T17:54:48.885Z",
+                "size": 28319,
+                "ext": ".html",
+                "type": "text",
+                "count": 1
+              },
+              "created_at": 1766840227828,
+              "updated_at": 1766840227828,
+              "uniqueId": "WebLoader_82dbadf88fba22633ecec98cdb440046",
+              "uniqueIds": [
+                "WebLoader_82dbadf88fba22633ecec98cdb440046"
+              ],
+              "isPreprocessed": false
+            },
+            {
+              "id": "38b0a99e-44ab-4613-a2e8-27833aebb7b3",
+              "type": "file",
+              "content": {
+                "id": "2cba5881-e0b6-4837-a02c-4d5687b5169d",
+                "origin_name": "What PMPO stands for.md",
+                "name": "2cba5881-e0b6-4837-a02c-4d5687b5169d.md",
+                "path": "/Users/gqadonis/Library/Application Support/CherryStudio/Data/Files/2cba5881-e0b6-4837-a02c-4d5687b5169d.md",
+                "created_at": "2025-12-12T17:34:29.756Z",
+                "size": 4575,
+                "ext": ".md",
+                "type": "text",
+                "count": 1
+              },
+              "created_at": 1766840227828,
+              "updated_at": 1766840227828,
+              "uniqueId": "LocalPathLoader_0eb7d03d2a5760691ce922f7e3fe7314",
+              "uniqueIds": [
+                "LocalPathLoader_0eb7d03d2a5760691ce922f7e3fe7314"
+              ],
+              "isPreprocessed": false
+            },
+            {
+              "id": "c4272765-c54b-40d1-b7e7-22ba810da41e",
+              "type": "file",
+              "content": {
+                "id": "ab84ba37-6748-4d1e-a0f7-67c12b20ffb2",
+                "origin_name": "Universal Agent Runtime (UAR) v1.md",
+                "name": "ab84ba37-6748-4d1e-a0f7-67c12b20ffb2.md",
+                "path": "/Users/gqadonis/Library/Application Support/CherryStudio/Data/Files/ab84ba37-6748-4d1e-a0f7-67c12b20ffb2.md",
+                "created_at": "2025-12-12T17:08:49.654Z",
+                "size": 7230,
+                "ext": ".md",
+                "type": "text",
+                "count": 1
+              },
+              "created_at": 1766840227828,
+              "updated_at": 1766840227828,
+              "uniqueId": "LocalPathLoader_6c4c20b15f5ed034f0f3df52e2a61e35",
+              "uniqueIds": [
+                "LocalPathLoader_6c4c20b15f5ed034f0f3df52e2a61e35"
+              ],
+              "isPreprocessed": false
+            },
+            {
+              "id": "056c8c11-6e52-40db-b844-e7279edc1c17",
+              "type": "file",
+              "content": {
+                "id": "ade253af-a2b5-48ab-86af-7336d3b3169b",
+                "origin_name": "Prometheus Meta-Prompting Orchestrator (PMPO).md",
+                "name": "ade253af-a2b5-48ab-86af-7336d3b3169b.md",
+                "path": "/Users/gqadonis/Library/Application Support/CherryStudio/Data/Files/ade253af-a2b5-48ab-86af-7336d3b3169b.md",
+                "created_at": "2025-12-08T08:37:59.923Z",
+                "size": 11389,
+                "ext": ".md",
+                "type": "text",
+                "count": 1
+              },
+              "created_at": 1766840227828,
+              "updated_at": 1766840227828,
+              "uniqueId": "LocalPathLoader_4f46018848327216cf051855a528bbe9",
+              "uniqueIds": [
+                "LocalPathLoader_4f46018848327216cf051855a528bbe9"
+              ],
+              "isPreprocessed": false
+            },
+            {
+              "id": "1bbcc31f-e51b-4216-8131-c0e16686e404",
+              "type": "file",
+              "content": {
+                "id": "fef22624-8724-443a-9899-726a619bfe8f",
+                "origin_name": "Prometheus Agent Application Architecture.md",
+                "name": "fef22624-8724-443a-9899-726a619bfe8f.md",
+                "path": "/Users/gqadonis/Library/Application Support/CherryStudio/Data/Files/fef22624-8724-443a-9899-726a619bfe8f.md",
+                "created_at": "2025-12-10T13:23:36.559Z",
+                "size": 12316,
+                "ext": ".md",
+                "type": "text",
+                "count": 1
+              },
+              "created_at": 1766840227828,
+              "updated_at": 1766840227828,
+              "uniqueId": "LocalPathLoader_05bb2092f877ce9c0cc610d1540cf9f2",
+              "uniqueIds": [
+                "LocalPathLoader_05bb2092f877ce9c0cc610d1540cf9f2"
+              ],
+              "isPreprocessed": false
+            },
+            {
+              "id": "3140e7f2-333b-4412-abb2-e2e905f91bc2",
+              "type": "file",
+              "content": {
+                "id": "df1b4d90-1f3b-4638-a9bc-eb78b9c7983b",
+                "origin_name": "Prometheus Platform Full Stack.md",
+                "name": "df1b4d90-1f3b-4638-a9bc-eb78b9c7983b.md",
+                "path": "/Users/gqadonis/Library/Application Support/CherryStudio/Data/Files/df1b4d90-1f3b-4638-a9bc-eb78b9c7983b.md",
+                "created_at": "2025-12-08T08:37:53.184Z",
+                "size": 10958,
+                "ext": ".md",
+                "type": "text",
+                "count": 1
+              },
+              "created_at": 1766840227828,
+              "updated_at": 1766840227828,
+              "uniqueId": "LocalPathLoader_ab9793c03aaf39c5a4501be277cdee69",
+              "uniqueIds": [
+                "LocalPathLoader_ab9793c03aaf39c5a4501be277cdee69"
+              ],
+              "isPreprocessed": false
+            },
+            {
+              "id": "b2f15422-41d1-4d9e-93b8-3024ad7f271c",
+              "type": "file",
+              "content": {
+                "id": "d30238d7-74c2-4815-b354-f2c0f25a6403",
+                "origin_name": "Scalable Candle-VLLM as a Service in Infrastructure.md",
+                "name": "d30238d7-74c2-4815-b354-f2c0f25a6403.md",
+                "path": "/Users/gqadonis/Library/Application Support/CherryStudio/Data/Files/d30238d7-74c2-4815-b354-f2c0f25a6403.md",
+                "created_at": "2025-12-07T14:11:14.695Z",
+                "size": 6799,
+                "ext": ".md",
+                "type": "text",
+                "count": 1
+              },
+              "created_at": 1766840227828,
+              "updated_at": 1766840227828,
+              "uniqueId": "LocalPathLoader_5a43953caa351d17cac8f47bed11a69f",
+              "uniqueIds": [
+                "LocalPathLoader_5a43953caa351d17cac8f47bed11a69f"
+              ],
+              "isPreprocessed": false
+            },
+            {
+              "id": "96fdcab4-fa75-4ac5-a41a-a6707c1f85f0",
+              "type": "file",
+              "content": {
+                "id": "6b674ccb-c3a1-46fe-9759-0fd1c5c750d2",
+                "origin_name": "PMPO and Core Agents in Universal Runtime.md",
+                "name": "6b674ccb-c3a1-46fe-9759-0fd1c5c750d2.md",
+                "path": "/Users/gqadonis/Library/Application Support/CherryStudio/Data/Files/6b674ccb-c3a1-46fe-9759-0fd1c5c750d2.md",
+                "created_at": "2025-12-07T13:58:59.885Z",
+                "size": 18129,
+                "ext": ".md",
+                "type": "text",
+                "count": 1
+              },
+              "created_at": 1766840227828,
+              "updated_at": 1766840227828,
+              "uniqueId": "LocalPathLoader_8c60db7c24f7a7a6f9601cea107cec77",
+              "uniqueIds": [
+                "LocalPathLoader_8c60db7c24f7a7a6f9601cea107cec77"
+              ],
+              "isPreprocessed": false
+            },
+            {
+              "id": "c40fdeff-3b70-4978-b3ce-f706c63f06e1",
+              "type": "file",
+              "content": {
+                "id": "911a4bd1-a586-44b9-bc0b-823de7852161",
+                "origin_name": "Universal Control Loop For Intelligence.md",
+                "name": "911a4bd1-a586-44b9-bc0b-823de7852161.md",
+                "path": "/Users/gqadonis/Library/Application Support/CherryStudio/Data/Files/911a4bd1-a586-44b9-bc0b-823de7852161.md",
+                "created_at": "2025-12-07T13:47:12.801Z",
+                "size": 12044,
+                "ext": ".md",
+                "type": "text",
+                "count": 1
+              },
+              "created_at": 1766840227828,
+              "updated_at": 1766840227828,
+              "uniqueId": "LocalPathLoader_24c6b9d9f360f7061e687457f48f12af",
+              "uniqueIds": [
+                "LocalPathLoader_24c6b9d9f360f7061e687457f48f12af"
+              ],
+              "isPreprocessed": false
+            },
+            {
+              "id": "d062d745-d50e-4188-8a9b-92655f6ed588",
+              "type": "file",
+              "content": {
+                "id": "b29832d2-257c-4872-9266-7d02878fd9a4",
+                "origin_name": "Prompt Chain Related to Parking Log Algorithm.md",
+                "name": "b29832d2-257c-4872-9266-7d02878fd9a4.md",
+                "path": "/Users/gqadonis/Library/Application Support/CherryStudio/Data/Files/b29832d2-257c-4872-9266-7d02878fd9a4.md",
+                "created_at": "2025-12-06T20:22:27.043Z",
+                "size": 177356,
+                "ext": ".md",
+                "type": "text",
+                "count": 2
+              },
+              "created_at": 1766840227828,
+              "updated_at": 1766840227828,
+              "uniqueId": "LocalPathLoader_cfbfbbb53affd10f7b8455df48566cea",
+              "uniqueIds": [
+                "LocalPathLoader_cfbfbbb53affd10f7b8455df48566cea"
+              ],
+              "isPreprocessed": false
+            },
+            {
+              "id": "1944cb0d-f5aa-4c79-bb09-666b35ce9e03",
+              "type": "file",
+              "content": {
+                "id": "60fc4577-b52b-4ae0-b9c3-f759d25c4113",
+                "origin_name": "rust-parking-lot-analysis.md",
+                "name": "60fc4577-b52b-4ae0-b9c3-f759d25c4113.md",
+                "path": "/Users/gqadonis/Library/Application Support/CherryStudio/Data/Files/60fc4577-b52b-4ae0-b9c3-f759d25c4113.md",
+                "created_at": "2025-12-06T16:27:30.861Z",
+                "size": 23909,
+                "ext": ".md",
+                "type": "text",
+                "count": 1
+              },
+              "created_at": 1766840227828,
+              "updated_at": 1766840227828,
+              "uniqueId": "LocalPathLoader_126f4548a4715153e2352a33181776c6",
+              "uniqueIds": [
+                "LocalPathLoader_126f4548a4715153e2352a33181776c6"
+              ],
+              "isPreprocessed": false
+            },
+            {
+              "id": "964e460d-808a-4cf9-9833-60dbb98208d9",
+              "type": "file",
+              "content": {
+                "id": "daad83f4-044b-45db-911a-149f0ed872d5",
+                "origin_name": "PMPO-Enhanced-Whitepaper.md",
+                "name": "daad83f4-044b-45db-911a-149f0ed872d5.md",
+                "path": "/Users/gqadonis/Library/Application Support/CherryStudio/Data/Files/daad83f4-044b-45db-911a-149f0ed872d5.md",
+                "created_at": "2025-12-05T19:57:41.995Z",
+                "size": 37906,
+                "ext": ".md",
+                "type": "text",
+                "count": 1
+              },
+              "created_at": 1766840227828,
+              "updated_at": 1766840227828,
+              "uniqueId": "LocalPathLoader_b7b3fc2f6b93faba117d01cdff5656b6",
+              "uniqueIds": [
+                "LocalPathLoader_b7b3fc2f6b93faba117d01cdff5656b6"
+              ],
+              "isPreprocessed": false
+            },
+            {
+              "id": "7e9f915b-1362-4f64-8276-c12a5347f07b",
+              "type": "file",
+              "content": {
+                "id": "2cba5881-e0b6-4837-a02c-4d5687b5169d",
+                "origin_name": "What PMPO stands for.md",
+                "name": "2cba5881-e0b6-4837-a02c-4d5687b5169d.md",
+                "path": "/Users/gqadonis/Library/Application Support/CherryStudio/Data/Files/2cba5881-e0b6-4837-a02c-4d5687b5169d.md",
+                "created_at": "2025-12-12T17:34:29.756Z",
+                "size": 4575,
+                "ext": ".md",
+                "type": "text",
+                "count": 1
+              },
+              "created_at": 1766840289530,
+              "updated_at": 1766840289530,
+              "uniqueId": "LocalPathLoader_0eb7d03d2a5760691ce922f7e3fe7314",
+              "uniqueIds": [
+                "LocalPathLoader_0eb7d03d2a5760691ce922f7e3fe7314"
+              ],
+              "isPreprocessed": false
+            },
+            {
+              "id": "6c5513ad-783b-47d0-be4b-5f491a1f6b22",
+              "type": "file",
+              "content": {
+                "id": "74ef88ac-e451-48fd-8929-2dfcb9955558",
+                "origin_name": "Comparison Surreal Memory Server vs. Standard Anthropic MCP Memory Server.md",
+                "name": "74ef88ac-e451-48fd-8929-2dfcb9955558.md",
+                "path": "/Users/gqadonis/Library/Application Support/CherryStudio/Data/Files/74ef88ac-e451-48fd-8929-2dfcb9955558.md",
+                "created_at": "2025-11-30T10:03:23.036Z",
+                "size": 10830,
+                "ext": ".md",
+                "type": "text",
+                "count": 1
+              },
+              "created_at": 1766840289530,
+              "updated_at": 1766840289530,
+              "uniqueId": "LocalPathLoader_fdaaea1909828ba64b7439a9a0739e84",
+              "uniqueIds": [
+                "LocalPathLoader_fdaaea1909828ba64b7439a9a0739e84"
+              ],
+              "isPreprocessed": false
+            },
+            {
+              "id": "ba317504-270a-417d-96d3-928f71ce4a2b",
+              "type": "file",
+              "content": {
+                "id": "49d223f6-b360-4b76-9b88-efde1a2f84cb",
+                "origin_name": "Precision-Attention Agent Architecture Rust-Native Implementation for Fara-Day and Prometheus.md",
+                "name": "49d223f6-b360-4b76-9b88-efde1a2f84cb.md",
+                "path": "/Users/gqadonis/Library/Application Support/CherryStudio/Data/Files/49d223f6-b360-4b76-9b88-efde1a2f84cb.md",
+                "created_at": "2025-12-01T00:03:12.202Z",
+                "size": 30963,
+                "ext": ".md",
+                "type": "text",
+                "count": 1
+              },
+              "created_at": 1766840289530,
+              "updated_at": 1766840289530,
+              "uniqueId": "LocalPathLoader_14992bab460b4ec2bd738bb65c9800b0",
+              "uniqueIds": [
+                "LocalPathLoader_14992bab460b4ec2bd738bb65c9800b0"
+              ],
+              "isPreprocessed": false
+            }
+          ],
+          "created_at": 1766840022258,
+          "updated_at": 1766840289530,
+          "version": 1,
+          "dimensions": 1536
+        },
+        {
+          "id": "DwvDZM7f0SYdDQtr0odz7",
+          "name": "Prometheus Code Agent Evolution Notes",
+          "model": {
+            "id": "text-embedding-3-small",
+            "name": "text-embedding-3-small",
+            "provider": "openai",
+            "group": "text-embedding",
+            "description": "",
+            "owned_by": "system",
+            "supported_text_delta": true
+          },
+          "items": [
+            {
+              "id": "1003c9a0-847a-4568-9dab-237cf342da13",
+              "type": "note",
+              "content": "",
+              "created_at": 1764932292203,
+              "updated_at": 1764932723952,
+              "uniqueId": "NoteLoader_da1c1cacf20b7c0b7fd4a5789f285f49",
+              "uniqueIds": [
+                "NoteLoader_da1c1cacf20b7c0b7fd4a5789f285f49"
+              ],
+              "isPreprocessed": false
+            },
+            {
+              "id": "76f90c3c-27ee-46c0-9ae2-f7c08c811a60",
+              "type": "note",
+              "content": "",
+              "created_at": 1764932700400,
+              "updated_at": 1764932700400,
+              "uniqueId": "NoteLoader_94b37a9a398f1d78b8e7ccde54f17d8b",
+              "uniqueIds": [
+                "NoteLoader_94b37a9a398f1d78b8e7ccde54f17d8b"
+              ],
+              "isPreprocessed": false
+            },
+            {
+              "id": "b05af05e-af3f-4d74-859b-755416cda463",
+              "type": "note",
+              "content": "",
+              "created_at": 1764933200799,
+              "updated_at": 1764933200799,
+              "uniqueId": "NoteLoader_67e3b6b15aa0e6985fbcaea695a3719c",
+              "uniqueIds": [
+                "NoteLoader_67e3b6b15aa0e6985fbcaea695a3719c"
+              ],
+              "isPreprocessed": false
+            },
+            {
+              "id": "fc24ade4-6e88-44e7-b1fe-035680b24748",
+              "type": "note",
+              "content": "",
+              "created_at": 1764934129705,
+              "updated_at": 1764934129705,
+              "uniqueId": "NoteLoader_9dc59090989f5557a38a7d33b9bbfdaa",
+              "uniqueIds": [
+                "NoteLoader_9dc59090989f5557a38a7d33b9bbfdaa"
+              ],
+              "isPreprocessed": false
+            },
+            {
+              "id": "31f535e9-c29c-4784-a11c-7a31abca455f",
+              "type": "file",
+              "content": {
+                "id": "e99b5738-58d4-4bdd-b6ea-fc9ba63607c5",
+                "origin_name": "README.md",
+                "name": "e99b5738-58d4-4bdd-b6ea-fc9ba63607c5.md",
+                "path": "/Users/gqadonis/Library/Application Support/CherryStudio/Data/Files/e99b5738-58d4-4bdd-b6ea-fc9ba63607c5.md",
+                "created_at": "2025-12-03T23:24:15.117Z",
+                "size": 90137,
+                "ext": ".md",
+                "type": "text",
+                "count": 1
+              },
+              "created_at": 1764934259265,
+              "updated_at": 1764934259265,
+              "uniqueId": "LocalPathLoader_578c0cf5d4373a8b280f7c7a7999641f",
+              "uniqueIds": [
+                "LocalPathLoader_578c0cf5d4373a8b280f7c7a7999641f"
+              ],
+              "isPreprocessed": false
+            }
+          ],
+          "created_at": 1764931614502,
+          "updated_at": 1764934259265,
+          "version": 1,
+          "dimensions": 1536
+        },
+        {
+          "id": "lOhGE_xXq9F_d8Oql4oQK",
+          "name": "Prometheus",
+          "model": {
+            "id": "text-embedding-3-small",
+            "name": "text-embedding-3-small",
+            "provider": "openai",
+            "group": "text-embedding",
+            "description": "",
+            "owned_by": "system",
+            "supported_text_delta": true
+          },
+          "items": [
+            {
+              "id": "5c9d3dc6-61c7-4b3f-8afc-e6dc739073ce",
+              "type": "file",
+              "content": {
+                "id": "364d1609-ba2f-4db7-832e-3d97e52f805b",
+                "origin_name": "planner-service-intent-classification-spec.md",
+                "name": "364d1609-ba2f-4db7-832e-3d97e52f805b.md",
+                "path": "/Users/gqadonis/Library/Application Support/CherryStudio/Data/Files/364d1609-ba2f-4db7-832e-3d97e52f805b.md",
+                "created_at": "2025-11-20T11:10:19.816Z",
+                "size": 58123,
+                "ext": ".md",
+                "type": "text",
+                "count": 2
+              },
+              "created_at": 1764546675350,
+              "updated_at": 1764546675350,
+              "uniqueId": "LocalPathLoader_44a8a86baa25f6db4fb8855042f9356e",
+              "uniqueIds": [
+                "LocalPathLoader_44a8a86baa25f6db4fb8855042f9356e"
+              ],
+              "isPreprocessed": false
+            },
+            {
+              "id": "f87b10e0-92b0-4a80-a328-8db18d914831",
+              "type": "file",
+              "content": {
+                "id": "d24f0c0f-3ce2-4aa5-a77c-9990d3c01208",
+                "origin_name": "planner-service-metaprompting-implementation.md",
+                "name": "d24f0c0f-3ce2-4aa5-a77c-9990d3c01208.md",
+                "path": "/Users/gqadonis/Library/Application Support/CherryStudio/Data/Files/d24f0c0f-3ce2-4aa5-a77c-9990d3c01208.md",
+                "created_at": "2025-11-20T08:45:04.341Z",
+                "size": 71874,
+                "ext": ".md",
+                "type": "text",
+                "count": 2
+              },
+              "created_at": 1764546675392,
+              "updated_at": 1764546675392,
+              "uniqueId": "LocalPathLoader_94f91a960c017c730beb2ae7190333f5",
+              "uniqueIds": [
+                "LocalPathLoader_94f91a960c017c730beb2ae7190333f5"
+              ],
+              "isPreprocessed": false
+            },
+            {
+              "id": "49615794-b372-4f76-86ec-3a875b7ed668",
+              "type": "file",
+              "content": {
+                "id": "7fb781dd-1c2e-4090-9016-253488e89ae2",
+                "origin_name": "Prometheus Artifact Specification 4.1 — Unified HTMX Application Artifact Standard.md",
+                "name": "7fb781dd-1c2e-4090-9016-253488e89ae2.md",
+                "path": "/Users/gqadonis/Library/Application Support/CherryStudio/Data/Files/7fb781dd-1c2e-4090-9016-253488e89ae2.md",
+                "created_at": "2025-11-26T08:43:39.882Z",
+                "size": 24539,
+                "ext": ".md",
+                "type": "text",
+                "count": 1
+              },
+              "created_at": 1764547455048,
+              "updated_at": 1764547455048,
+              "uniqueId": "LocalPathLoader_7c1ee6d01f9ab2bc0af505aba5786301",
+              "uniqueIds": [
+                "LocalPathLoader_7c1ee6d01f9ab2bc0af505aba5786301"
+              ],
+              "isPreprocessed": false
+            },
+            {
+              "id": "826fc8e9-1234-45ca-b4c5-bf6b0a06a4c2",
+              "type": "file",
+              "content": {
+                "id": "6395f60b-31cb-4de5-a581-b01cfd6f150e",
+                "origin_name": "PromptForge - Prompt Creator Agent v2.0.md",
+                "name": "6395f60b-31cb-4de5-a581-b01cfd6f150e.md",
+                "path": "/Users/gqadonis/Library/Application Support/CherryStudio/Data/Files/6395f60b-31cb-4de5-a581-b01cfd6f150e.md",
+                "created_at": "2025-11-26T11:42:08.910Z",
+                "size": 31763,
+                "ext": ".md",
+                "type": "text",
+                "count": 1
+              },
+              "created_at": 1764547455048,
+              "updated_at": 1764547455048,
+              "uniqueId": "LocalPathLoader_aef2a68377251738d6261445004434a8",
+              "uniqueIds": [
+                "LocalPathLoader_aef2a68377251738d6261445004434a8"
+              ],
+              "isPreprocessed": false
+            },
+            {
+              "id": "93ba6d26-3a4d-441e-8a27-20e34992b4be",
+              "type": "file",
+              "content": {
+                "id": "6c09b6cd-474c-4e86-be1d-5d47f3e9f4c9",
+                "origin_name": "1. Concept Form-Based Data-Gathering Chunk Sets.md",
+                "name": "6c09b6cd-474c-4e86-be1d-5d47f3e9f4c9.md",
+                "path": "/Users/gqadonis/Library/Application Support/CherryStudio/Data/Files/6c09b6cd-474c-4e86-be1d-5d47f3e9f4c9.md",
+                "created_at": "2025-11-26T08:20:35.969Z",
+                "size": 15237,
+                "ext": ".md",
+                "type": "text",
+                "count": 1
+              },
+              "created_at": 1764547455048,
+              "updated_at": 1764547455048,
+              "uniqueId": "LocalPathLoader_c17e8465b5b2425b0af862d05c490518",
+              "uniqueIds": [
+                "LocalPathLoader_c17e8465b5b2425b0af862d05c490518"
+              ],
+              "isPreprocessed": false
+            },
+            {
+              "id": "632de4e4-3ad4-4de6-93b5-0d80b809c275",
+              "type": "file",
+              "content": {
+                "id": "c4b94ad8-8207-48da-ac3b-aa33d9cef14f",
+                "origin_name": "HTMX Markdown Editor Prompting.md",
+                "name": "c4b94ad8-8207-48da-ac3b-aa33d9cef14f.md",
+                "path": "/Users/gqadonis/Library/Application Support/CherryStudio/Data/Files/c4b94ad8-8207-48da-ac3b-aa33d9cef14f.md",
+                "created_at": "2025-11-26T08:08:36.386Z",
+                "size": 36681,
+                "ext": ".md",
+                "type": "text",
+                "count": 1
+              },
+              "created_at": 1764547455048,
+              "updated_at": 1764547455048,
+              "uniqueId": "LocalPathLoader_38ba310a79eb7f2bd35f453e0c03582d",
+              "uniqueIds": [
+                "LocalPathLoader_38ba310a79eb7f2bd35f453e0c03582d"
+              ],
+              "isPreprocessed": false
+            },
+            {
+              "id": "ef7d02e9-1567-49c4-a6af-73a418b06cd1",
+              "type": "file",
+              "content": {
+                "id": "97195d19-ef0e-4270-8b13-17b54b55ce06",
+                "origin_name": "HTMX AG-UI Artifact Chat Interface Template.md",
+                "name": "97195d19-ef0e-4270-8b13-17b54b55ce06.md",
+                "path": "/Users/gqadonis/Library/Application Support/CherryStudio/Data/Files/97195d19-ef0e-4270-8b13-17b54b55ce06.md",
+                "created_at": "2025-11-26T08:07:22.284Z",
+                "size": 40099,
+                "ext": ".md",
+                "type": "text",
+                "count": 1
+              },
+              "created_at": 1764547455048,
+              "updated_at": 1764547455048,
+              "uniqueId": "LocalPathLoader_0aff4ffead4bea0d59e1a2efcda91aff",
+              "uniqueIds": [
+                "LocalPathLoader_0aff4ffead4bea0d59e1a2efcda91aff"
+              ],
+              "isPreprocessed": false
+            },
+            {
+              "id": "8c70897c-e152-4040-8a5c-3c078b93671d",
+              "type": "file",
+              "content": {
+                "id": "2634e928-01b2-46fa-a0ee-8bde84fdf77c",
+                "origin_name": "🔥 THE NEW PROMETHEUS ARTIFACT SPECIFICATION.md",
+                "name": "2634e928-01b2-46fa-a0ee-8bde84fdf77c.md",
+                "path": "/Users/gqadonis/Library/Application Support/CherryStudio/Data/Files/2634e928-01b2-46fa-a0ee-8bde84fdf77c.md",
+                "created_at": "2025-11-19T08:13:57.512Z",
+                "size": 29667,
+                "ext": ".md",
+                "type": "text",
+                "count": 1
+              },
+              "created_at": 1764547491472,
+              "updated_at": 1764547491472,
+              "uniqueId": "LocalPathLoader_db01a4be94eea34cfef4e3ff228d818b",
+              "uniqueIds": [
+                "LocalPathLoader_db01a4be94eea34cfef4e3ff228d818b"
+              ],
+              "isPreprocessed": false
+            },
+            {
+              "id": "f57e1b0b-8466-4f01-86c0-eced4f1c6b05",
+              "type": "file",
+              "content": {
+                "id": "508bc439-64cc-4dca-8e77-9d8836aa447b",
+                "origin_name": "🔥 The Prometheus AGS Interpretation of the Lincoln “Sharpen the Axe” Principle.md",
+                "name": "508bc439-64cc-4dca-8e77-9d8836aa447b.md",
+                "path": "/Users/gqadonis/Library/Application Support/CherryStudio/Data/Files/508bc439-64cc-4dca-8e77-9d8836aa447b.md",
+                "created_at": "2025-11-30T00:37:05.238Z",
+                "size": 4189,
+                "ext": ".md",
+                "type": "text",
+                "count": 1
+              },
+              "created_at": 1764547491472,
+              "updated_at": 1764547491472,
+              "uniqueId": "LocalPathLoader_b7ba7034e9443d11474a65b5dec34e75",
+              "uniqueIds": [
+                "LocalPathLoader_b7ba7034e9443d11474a65b5dec34e75"
+              ],
+              "isPreprocessed": false
+            },
+            {
+              "id": "fdfa28e1-43da-4734-8b0d-1b489b4659cd",
+              "type": "file",
+              "content": {
+                "id": "49d223f6-b360-4b76-9b88-efde1a2f84cb",
+                "origin_name": "Precision-Attention Agent Architecture Rust-Native Implementation for Fara-Day and Prometheus.md",
+                "name": "49d223f6-b360-4b76-9b88-efde1a2f84cb.md",
+                "path": "/Users/gqadonis/Library/Application Support/CherryStudio/Data/Files/49d223f6-b360-4b76-9b88-efde1a2f84cb.md",
+                "created_at": "2025-12-01T00:03:12.202Z",
+                "size": 30963,
+                "ext": ".md",
+                "type": "text",
+                "count": 1
+              },
+              "created_at": 1764547526292,
+              "updated_at": 1764547526292,
+              "uniqueId": "LocalPathLoader_14992bab460b4ec2bd738bb65c9800b0",
+              "uniqueIds": [
+                "LocalPathLoader_14992bab460b4ec2bd738bb65c9800b0"
+              ],
+              "isPreprocessed": false
+            },
+            {
+              "id": "9fe86593-8ec4-4f36-9780-069a802ce707",
+              "type": "file",
+              "content": {
+                "id": "4315fa2a-6cc7-42b3-b6da-c2846ea0224a",
+                "origin_name": "React Wrapping HTMX code and artifacts.md",
+                "name": "4315fa2a-6cc7-42b3-b6da-c2846ea0224a.md",
+                "path": "/Users/gqadonis/Library/Application Support/CherryStudio/Data/Files/4315fa2a-6cc7-42b3-b6da-c2846ea0224a.md",
+                "created_at": "2025-11-30T11:58:37.154Z",
+                "size": 15203,
+                "ext": ".md",
+                "type": "text",
+                "count": 3
+              },
+              "created_at": 1764547526292,
+              "updated_at": 1764547526292,
+              "uniqueId": "LocalPathLoader_01e2892582c60c69b8ced6491b0ec3df",
+              "uniqueIds": [
+                "LocalPathLoader_01e2892582c60c69b8ced6491b0ec3df"
+              ],
+              "isPreprocessed": false
+            },
+            {
+              "id": "adf6ccb2-4f24-4750-a1dc-71cb57503121",
+              "type": "file",
+              "content": {
+                "id": "74ef88ac-e451-48fd-8929-2dfcb9955558",
+                "origin_name": "Comparison Surreal Memory Server vs. Standard Anthropic MCP Memory Server.md",
+                "name": "74ef88ac-e451-48fd-8929-2dfcb9955558.md",
+                "path": "/Users/gqadonis/Library/Application Support/CherryStudio/Data/Files/74ef88ac-e451-48fd-8929-2dfcb9955558.md",
+                "created_at": "2025-11-30T10:03:23.036Z",
+                "size": 10830,
+                "ext": ".md",
+                "type": "text",
+                "count": 1
+              },
+              "created_at": 1764547526292,
+              "updated_at": 1764547526292,
+              "uniqueId": "LocalPathLoader_fdaaea1909828ba64b7439a9a0739e84",
+              "uniqueIds": [
+                "LocalPathLoader_fdaaea1909828ba64b7439a9a0739e84"
+              ],
+              "isPreprocessed": false
+            },
+            {
+              "id": "f694eac9-07eb-474b-805e-ecd881db9e54",
+              "type": "file",
+              "content": {
+                "id": "72f9abb6-fb78-470b-ac94-fdeb36649474",
+                "origin_name": "Prometheus The Open, Agentic Future Beyond Google Opal.md",
+                "name": "72f9abb6-fb78-470b-ac94-fdeb36649474.md",
+                "path": "/Users/gqadonis/Library/Application Support/CherryStudio/Data/Files/72f9abb6-fb78-470b-ac94-fdeb36649474.md",
+                "created_at": "2025-11-11T20:26:37.646Z",
+                "size": 8810,
+                "ext": ".md",
+                "type": "text",
+                "count": 1
+              },
+              "created_at": 1764547575483,
+              "updated_at": 1764547575483,
+              "uniqueId": "LocalPathLoader_7fb1c319e39c1bccc64a3b6b00fe1f32",
+              "uniqueIds": [
+                "LocalPathLoader_7fb1c319e39c1bccc64a3b6b00fe1f32"
+              ],
+              "isPreprocessed": false
+            },
+            {
+              "id": "19bfd1d6-efd5-4f48-9db1-d7ec37ca82a5",
+              "type": "file",
+              "content": {
+                "id": "9d7388c7-1295-4a06-989c-734a8bae5211",
+                "origin_name": "Prometheus PAS-X Agent Artifact Specification (Agent Artifacts v1.0).md",
+                "name": "9d7388c7-1295-4a06-989c-734a8bae5211.md",
+                "path": "/Users/gqadonis/Library/Application Support/CherryStudio/Data/Files/9d7388c7-1295-4a06-989c-734a8bae5211.md",
+                "created_at": "2025-11-20T00:10:34.840Z",
+                "size": 7999,
+                "ext": ".md",
+                "type": "text",
+                "count": 1
+              },
+              "created_at": 1764547575483,
+              "updated_at": 1764547575483,
+              "uniqueId": "LocalPathLoader_4782a8b95cd930b980966ca16bc21627",
+              "uniqueIds": [
+                "LocalPathLoader_4782a8b95cd930b980966ca16bc21627"
+              ],
+              "isPreprocessed": false
+            },
+            {
+              "id": "93552c01-1a17-42ac-976d-33efec55740f",
+              "type": "file",
+              "content": {
+                "id": "766aedbf-2ff0-4d32-a0f3-ee888ea10c68",
+                "origin_name": "Prometheus Advanced AI Platform with Studio & Kit Environment.md",
+                "name": "766aedbf-2ff0-4d32-a0f3-ee888ea10c68.md",
+                "path": "/Users/gqadonis/Library/Application Support/CherryStudio/Data/Files/766aedbf-2ff0-4d32-a0f3-ee888ea10c68.md",
+                "created_at": "2025-10-15T14:26:34.288Z",
+                "size": 32670,
+                "ext": ".md",
+                "type": "text",
+                "count": 1
+              },
+              "created_at": 1764547575483,
+              "updated_at": 1764547575483,
+              "uniqueId": "LocalPathLoader_c49b072ccf30dc8e5ff85f75c0193a0d",
+              "uniqueIds": [
+                "LocalPathLoader_c49b072ccf30dc8e5ff85f75c0193a0d"
+              ],
+              "isPreprocessed": false
+            },
+            {
+              "id": "244df797-33c8-4fa2-af1c-3f5ffb7bc132",
+              "type": "file",
+              "content": {
+                "id": "16a075a9-f342-4f2c-a95f-21e85a6a291c",
+                "origin_name": "The AI-Accelerated Software Development Revolution v2.0.md",
+                "name": "16a075a9-f342-4f2c-a95f-21e85a6a291c.md",
+                "path": "/Users/gqadonis/Library/Application Support/CherryStudio/Data/Files/16a075a9-f342-4f2c-a95f-21e85a6a291c.md",
+                "created_at": "2025-10-15T10:50:08.642Z",
+                "size": 115290,
+                "ext": ".md",
+                "type": "text",
+                "count": 1
+              },
+              "created_at": 1764547575483,
+              "updated_at": 1764547575483,
+              "uniqueId": "LocalPathLoader_3417f0a7d25aeca1ca214dd98351a95a",
+              "uniqueIds": [
+                "LocalPathLoader_3417f0a7d25aeca1ca214dd98351a95a"
+              ],
+              "isPreprocessed": false
+            },
+            {
+              "id": "3e1b91d6-ea89-479c-b9e9-60d6357f1c6e",
+              "type": "file",
+              "content": {
+                "id": "b204d6cd-e70a-4c2f-b554-79b4102657c1",
+                "origin_name": "The AI-Accelerated Software Development Revolution.md",
+                "name": "b204d6cd-e70a-4c2f-b554-79b4102657c1.md",
+                "path": "/Users/gqadonis/Library/Application Support/CherryStudio/Data/Files/b204d6cd-e70a-4c2f-b554-79b4102657c1.md",
+                "created_at": "2025-10-15T09:54:00.225Z",
+                "size": 73302,
+                "ext": ".md",
+                "type": "text",
+                "count": 1
+              },
+              "created_at": 1764547575483,
+              "updated_at": 1764547575483,
+              "uniqueId": "LocalPathLoader_1b6202a379a019e726f4c3bb36ef74a1",
+              "uniqueIds": [
+                "LocalPathLoader_1b6202a379a019e726f4c3bb36ef74a1"
+              ],
+              "isPreprocessed": false
+            },
+            {
+              "id": "dbe1ee28-28f6-49bf-bee8-11b7e3bd2c09",
+              "type": "file",
+              "content": {
+                "id": "4a376900-6c0f-42cd-82f6-744cd80219c7",
+                "origin_name": "AI SaaS UIUX Design Knowledge Base.md",
+                "name": "4a376900-6c0f-42cd-82f6-744cd80219c7.md",
+                "path": "/Users/gqadonis/Library/Application Support/CherryStudio/Data/Files/4a376900-6c0f-42cd-82f6-744cd80219c7.md",
+                "created_at": "2025-10-28T10:41:53.047Z",
+                "size": 60672,
+                "ext": ".md",
+                "type": "text",
+                "count": 1
+              },
+              "created_at": 1764547590112,
+              "updated_at": 1764547590112,
+              "uniqueId": "LocalPathLoader_d0c2e3587bd149b016e3114de0c21c04",
+              "uniqueIds": [
+                "LocalPathLoader_d0c2e3587bd149b016e3114de0c21c04"
+              ],
+              "isPreprocessed": false
+            },
+            {
+              "id": "b4d87076-0f13-4a78-890f-9dfe3774e5bc",
+              "type": "file",
+              "content": {
+                "id": "75f1a5a3-3038-4506-87e0-6781c3e0df1e",
+                "origin_name": "Fara-Day-RS Automation Service.md",
+                "name": "75f1a5a3-3038-4506-87e0-6781c3e0df1e.md",
+                "path": "/Users/gqadonis/Library/Application Support/CherryStudio/Data/Files/75f1a5a3-3038-4506-87e0-6781c3e0df1e.md",
+                "created_at": "2025-11-28T05:07:12.148Z",
+                "size": 10360,
+                "ext": ".md",
+                "type": "text",
+                "count": 1
+              },
+              "created_at": 1764547601133,
+              "updated_at": 1764547601133,
+              "uniqueId": "LocalPathLoader_bbefd33e96694636535445b5404012fa",
+              "uniqueIds": [
+                "LocalPathLoader_bbefd33e96694636535445b5404012fa"
+              ],
+              "isPreprocessed": false
+            },
+            {
+              "id": "2482695e-12fa-446c-81d1-93a06d03f42d",
+              "type": "file",
+              "content": {
+                "id": "7c14cbb3-4340-4c98-ac34-bc941497a101",
+                "origin_name": "2510.03847.pdf",
+                "name": "7c14cbb3-4340-4c98-ac34-bc941497a101.pdf",
+                "path": "/Users/gqadonis/Library/Application Support/CherryStudio/Data/Files/7c14cbb3-4340-4c98-ac34-bc941497a101.pdf",
+                "created_at": "2025-11-21T15:26:22.160Z",
+                "size": 1191346,
+                "ext": ".pdf",
+                "type": "document",
+                "count": 1
+              },
+              "created_at": 1764547609041,
+              "updated_at": 1764547609041,
+              "uniqueId": "LocalPathLoader_916a291b98aa7ed212a03dbbcbd873e2",
+              "uniqueIds": [
+                "LocalPathLoader_916a291b98aa7ed212a03dbbcbd873e2"
+              ],
+              "isPreprocessed": false
+            },
+            {
+              "id": "e2af1ba0-e87d-4076-bfaf-498e29d68c68",
+              "type": "file",
+              "content": {
+                "id": "7a8dd85b-5da0-40f9-b1d4-aa01c4db717d",
+                "origin_name": "SpecPlanExecute Tools Comprehensive Architecture Guide.md",
+                "name": "7a8dd85b-5da0-40f9-b1d4-aa01c4db717d.md",
+                "path": "/Users/gqadonis/Library/Application Support/CherryStudio/Data/Files/7a8dd85b-5da0-40f9-b1d4-aa01c4db717d.md",
+                "created_at": "2025-11-06T14:01:15.848Z",
+                "size": 23664,
+                "ext": ".md",
+                "type": "text",
+                "count": 1
+              },
+              "created_at": 1764547628254,
+              "updated_at": 1764547628254,
+              "uniqueId": "LocalPathLoader_eb6861ee75686d2de55996731db64e84",
+              "uniqueIds": [
+                "LocalPathLoader_eb6861ee75686d2de55996731db64e84"
+              ],
+              "isPreprocessed": false
+            },
+            {
+              "id": "5ad5b0fa-5439-4064-ab16-0dfa41c6c02f",
+              "type": "file",
+              "content": {
+                "id": "d40d39f0-b4ea-44d3-8d2f-15f4a84e593d",
+                "origin_name": "Superior Reference Rust + Vite Application Architecture.md",
+                "name": "d40d39f0-b4ea-44d3-8d2f-15f4a84e593d.md",
+                "path": "/Users/gqadonis/Library/Application Support/CherryStudio/Data/Files/d40d39f0-b4ea-44d3-8d2f-15f4a84e593d.md",
+                "created_at": "2025-11-05T16:00:28.261Z",
+                "size": 9320,
+                "ext": ".md",
+                "type": "text",
+                "count": 1
+              },
+              "created_at": 1764547628254,
+              "updated_at": 1764547628254,
+              "uniqueId": "LocalPathLoader_5a5a10a61d323a3ac1dd21d1998211b3",
+              "uniqueIds": [
+                "LocalPathLoader_5a5a10a61d323a3ac1dd21d1998211b3"
+              ],
+              "isPreprocessed": false
+            },
+            {
+              "id": "f7c41cbc-db2e-40c4-b4e8-7b49ce99112a",
+              "type": "file",
+              "content": {
+                "id": "c4565bd9-e6da-41e9-a21e-6febaaa35ea9",
+                "origin_name": "AI Products Possible With Common Mechanisms.pdf",
+                "name": "c4565bd9-e6da-41e9-a21e-6febaaa35ea9.pdf",
+                "path": "/Users/gqadonis/Library/Application Support/CherryStudio/Data/Files/c4565bd9-e6da-41e9-a21e-6febaaa35ea9.pdf",
+                "created_at": "2025-11-06T09:43:21.190Z",
+                "size": 44370,
+                "ext": ".pdf",
+                "type": "document",
+                "count": 1
+              },
+              "created_at": 1764547628254,
+              "updated_at": 1764547628254,
+              "uniqueId": "LocalPathLoader_bcee644ebeb51d8ed8fcf58bb63e0b31",
+              "uniqueIds": [
+                "LocalPathLoader_bcee644ebeb51d8ed8fcf58bb63e0b31"
+              ],
+              "isPreprocessed": false
+            },
+            {
+              "id": "2207c8d4-b26f-44ac-bd94-1a7a64ecd3ad",
+              "type": "file",
+              "content": {
+                "id": "a9b149f4-7293-48a1-b46d-5c878d42a0ce",
+                "origin_name": "Brius Document Management & Embedding Specification.md",
+                "name": "a9b149f4-7293-48a1-b46d-5c878d42a0ce.md",
+                "path": "/Users/gqadonis/Library/Application Support/CherryStudio/Data/Files/a9b149f4-7293-48a1-b46d-5c878d42a0ce.md",
+                "created_at": "2025-10-19T22:30:08.213Z",
+                "size": 54908,
+                "ext": ".md",
+                "type": "text",
+                "count": 1
+              },
+              "created_at": 1764547692303,
+              "updated_at": 1764547692303,
+              "uniqueId": "LocalPathLoader_7ac59e8956ff51a7bc344c8e8af04827",
+              "uniqueIds": [
+                "LocalPathLoader_7ac59e8956ff51a7bc344c8e8af04827"
+              ],
+              "isPreprocessed": false
+            },
+            {
+              "id": "90ed9eb8-ed9e-4aeb-97f3-156b6adb1985",
+              "type": "file",
+              "content": {
+                "id": "c7e9754f-8605-45a6-87d7-f1f16cb1a60a",
+                "origin_name": "Hephaestus Studio - Universal AI Development Platform.md",
+                "name": "c7e9754f-8605-45a6-87d7-f1f16cb1a60a.md",
+                "path": "/Users/gqadonis/Library/Application Support/CherryStudio/Data/Files/c7e9754f-8605-45a6-87d7-f1f16cb1a60a.md",
+                "created_at": "2025-10-19T12:09:37.191Z",
+                "size": 43981,
+                "ext": ".md",
+                "type": "text",
+                "count": 1
+              },
+              "created_at": 1764547692303,
+              "updated_at": 1764547692303,
+              "uniqueId": "LocalPathLoader_5f20ca71bae1621dfd344ca45aa256a0",
+              "uniqueIds": [
+                "LocalPathLoader_5f20ca71bae1621dfd344ca45aa256a0"
+              ],
+              "isPreprocessed": false
+            },
+            {
+              "id": "70eded6c-5d52-4b5a-968e-48d643cae077",
+              "type": "file",
+              "content": {
+                "id": "766aedbf-2ff0-4d32-a0f3-ee888ea10c68",
+                "origin_name": "Prometheus Advanced AI Platform with Studio & Kit Environment.md",
+                "name": "766aedbf-2ff0-4d32-a0f3-ee888ea10c68.md",
+                "path": "/Users/gqadonis/Library/Application Support/CherryStudio/Data/Files/766aedbf-2ff0-4d32-a0f3-ee888ea10c68.md",
+                "created_at": "2025-10-15T14:26:34.288Z",
+                "size": 32670,
+                "ext": ".md",
+                "type": "text",
+                "count": 1
+              },
+              "created_at": 1764547692303,
+              "updated_at": 1764547692303,
+              "uniqueId": "LocalPathLoader_c49b072ccf30dc8e5ff85f75c0193a0d",
+              "uniqueIds": [
+                "LocalPathLoader_c49b072ccf30dc8e5ff85f75c0193a0d"
+              ],
+              "isPreprocessed": false
+            },
+            {
+              "id": "5e51b97f-2bd3-4ef1-9c6b-dde7ac2cf5d3",
+              "type": "file",
+              "content": {
+                "id": "ea1dbbdd-3a74-4bca-96a1-333b7773a77a",
+                "origin_name": "Prometheus AI Platform Advanced Artifact System.md",
+                "name": "ea1dbbdd-3a74-4bca-96a1-333b7773a77a.md",
+                "path": "/Users/gqadonis/Library/Application Support/CherryStudio/Data/Files/ea1dbbdd-3a74-4bca-96a1-333b7773a77a.md",
+                "created_at": "2025-10-10T06:06:10.531Z",
+                "size": 89241,
+                "ext": ".md",
+                "type": "text",
+                "count": 1
+              },
+              "created_at": 1764547692303,
+              "updated_at": 1764547692303,
+              "uniqueId": "LocalPathLoader_bb446d6c7e036f9f6459d72af28f0c00",
+              "uniqueIds": [
+                "LocalPathLoader_bb446d6c7e036f9f6459d72af28f0c00"
+              ],
+              "isPreprocessed": false
+            },
+            {
+              "id": "1ecc464d-121b-4763-a1de-cf57521f2cf0",
+              "type": "file",
+              "content": {
+                "id": "527e4bb6-8f09-4936-a566-526f9e345a27",
+                "origin_name": "Prometheus Spec-Driven Agent System.md",
+                "name": "527e4bb6-8f09-4936-a566-526f9e345a27.md",
+                "path": "/Users/gqadonis/Library/Application Support/CherryStudio/Data/Files/527e4bb6-8f09-4936-a566-526f9e345a27.md",
+                "created_at": "2025-09-26T09:12:48.160Z",
+                "size": 52832,
+                "ext": ".md",
+                "type": "text",
+                "count": 1
+              },
+              "created_at": 1764547692303,
+              "updated_at": 1764547692303,
+              "uniqueId": "LocalPathLoader_d6a215fb10817cf69e54ec9359756ef4",
+              "uniqueIds": [
+                "LocalPathLoader_d6a215fb10817cf69e54ec9359756ef4"
+              ],
+              "isPreprocessed": false
+            },
+            {
+              "id": "0e5e5eed-c8aa-4f9f-9f31-5a7d4cd56370",
+              "type": "file",
+              "content": {
+                "id": "95824e5a-3a83-4a83-b886-aba3d27725b0",
+                "origin_name": "Prometheus AI Advanced Prompt Engineering & Context Management Strategy.md",
+                "name": "95824e5a-3a83-4a83-b886-aba3d27725b0.md",
+                "path": "/Users/gqadonis/Library/Application Support/CherryStudio/Data/Files/95824e5a-3a83-4a83-b886-aba3d27725b0.md",
+                "created_at": "2025-09-26T09:50:07.561Z",
+                "size": 53372,
+                "ext": ".md",
+                "type": "text",
+                "count": 1
+              },
+              "created_at": 1764547692303,
+              "updated_at": 1764547692303,
+              "uniqueId": "LocalPathLoader_a48ef15ef49146ac406a3c40a6357951",
+              "uniqueIds": [
+                "LocalPathLoader_a48ef15ef49146ac406a3c40a6357951"
+              ],
+              "isPreprocessed": false
+            },
+            {
+              "id": "d25a9b6c-855d-491e-8fdf-8de6371918fe",
+              "type": "file",
+              "content": {
+                "id": "368d70a2-6597-4ce1-926d-571b38df748c",
+                "origin_name": "Prometheus Spec System Domain-Specific Adaptations.md",
+                "name": "368d70a2-6597-4ce1-926d-571b38df748c.md",
+                "path": "/Users/gqadonis/Library/Application Support/CherryStudio/Data/Files/368d70a2-6597-4ce1-926d-571b38df748c.md",
+                "created_at": "2025-09-26T09:23:31.138Z",
+                "size": 50894,
+                "ext": ".md",
+                "type": "text",
+                "count": 1
+              },
+              "created_at": 1764547692303,
+              "updated_at": 1764547692303,
+              "uniqueId": "LocalPathLoader_88583d6b143b3e75d5d94653cf7fbbd7",
+              "uniqueIds": [
+                "LocalPathLoader_88583d6b143b3e75d5d94653cf7fbbd7"
+              ],
+              "isPreprocessed": false
+            },
+            {
+              "id": "0759ee13-571d-4950-b328-367382b9f58f",
+              "type": "file",
+              "content": {
+                "id": "0c485335-36f1-424c-af3a-43751a74280d",
+                "origin_name": "Universal AI Voice & Real-Time Knowledge Platform.md",
+                "name": "0c485335-36f1-424c-af3a-43751a74280d.md",
+                "path": "/Users/gqadonis/Library/Application Support/CherryStudio/Data/Files/0c485335-36f1-424c-af3a-43751a74280d.md",
+                "created_at": "2025-10-03T01:06:00.674Z",
+                "size": 33236,
+                "ext": ".md",
+                "type": "text",
+                "count": 1
+              },
+              "created_at": 1764547713790,
+              "updated_at": 1764547713790,
+              "uniqueId": "LocalPathLoader_47e7266721914d9d974ad58de0cda361",
+              "uniqueIds": [
+                "LocalPathLoader_47e7266721914d9d974ad58de0cda361"
+              ],
+              "isPreprocessed": false
+            },
+            {
+              "id": "42d5e138-f8a3-496b-a87b-db91e4030fe2",
+              "type": "file",
+              "content": {
+                "id": "feacf08d-2649-4318-86a6-eef6d5df065b",
+                "origin_name": "Prometheus AgentKit UI React + Tuono + PGlite Architecture.md",
+                "name": "feacf08d-2649-4318-86a6-eef6d5df065b.md",
+                "path": "/Users/gqadonis/Library/Application Support/CherryStudio/Data/Files/feacf08d-2649-4318-86a6-eef6d5df065b.md",
+                "created_at": "2025-10-07T17:24:54.552Z",
+                "size": 18555,
+                "ext": ".md",
+                "type": "text",
+                "count": 1
+              },
+              "created_at": 1764547765233,
+              "updated_at": 1764547765233,
+              "uniqueId": "LocalPathLoader_abe2bb705fe73baa40ec4dd9e5ef4d37",
+              "uniqueIds": [
+                "LocalPathLoader_abe2bb705fe73baa40ec4dd9e5ef4d37"
+              ],
+              "isPreprocessed": false
+            },
+            {
+              "id": "da42334c-6ab3-4ba5-a9a9-753fb3a7d068",
+              "type": "file",
+              "content": {
+                "id": "1ec2ec91-8b5c-48fc-93a3-7dc5de7bf891",
+                "origin_name": "Strategic Analysis Prometheus as an Open Alternative to OpenAI AgentKit.md",
+                "name": "1ec2ec91-8b5c-48fc-93a3-7dc5de7bf891.md",
+                "path": "/Users/gqadonis/Library/Application Support/CherryStudio/Data/Files/1ec2ec91-8b5c-48fc-93a3-7dc5de7bf891.md",
+                "created_at": "2025-10-07T17:23:54.532Z",
+                "size": 8701,
+                "ext": ".md",
+                "type": "text",
+                "count": 1
+              },
+              "created_at": 1764547765233,
+              "updated_at": 1764547765233,
+              "uniqueId": "LocalPathLoader_1dc90ba7f31394b10d99ddc86d7182c3",
+              "uniqueIds": [
+                "LocalPathLoader_1dc90ba7f31394b10d99ddc86d7182c3"
+              ],
+              "isPreprocessed": false
+            },
+            {
+              "id": "d4281f38-f54c-4e4f-9a12-ed40fd7a7824",
+              "type": "file",
+              "content": {
+                "id": "65c2589c-0ae3-4e5b-9bb9-41ef5dc362a6",
+                "origin_name": "Prometheus AgentKit - Technical Knowledge Base.md",
+                "name": "65c2589c-0ae3-4e5b-9bb9-41ef5dc362a6.md",
+                "path": "/Users/gqadonis/Library/Application Support/CherryStudio/Data/Files/65c2589c-0ae3-4e5b-9bb9-41ef5dc362a6.md",
+                "created_at": "2025-10-07T17:58:21.841Z",
+                "size": 19298,
+                "ext": ".md",
+                "type": "text",
+                "count": 1
+              },
+              "created_at": 1764547765233,
+              "updated_at": 1764547765233,
+              "uniqueId": "LocalPathLoader_c78f747028ffd67fc70645bc1d55800b",
+              "uniqueIds": [
+                "LocalPathLoader_c78f747028ffd67fc70645bc1d55800b"
+              ],
+              "isPreprocessed": false
+            },
+            {
+              "id": "419192cc-5b91-4d15-8221-6fc7688d52a7",
+              "type": "file",
+              "content": {
+                "id": "1c091674-b32d-4bb5-8be0-facf60e2c2df",
+                "origin_name": "Prometheus Platform Competitive Analysis 2025.md",
+                "name": "1c091674-b32d-4bb5-8be0-facf60e2c2df.md",
+                "path": "/Users/gqadonis/Library/Application Support/CherryStudio/Data/Files/1c091674-b32d-4bb5-8be0-facf60e2c2df.md",
+                "created_at": "2025-09-17T01:36:24.686Z",
+                "size": 15513,
+                "ext": ".md",
+                "type": "text",
+                "count": 1
+              },
+              "created_at": 1764547765233,
+              "updated_at": 1764547765233,
+              "uniqueId": "LocalPathLoader_6b5903742f3f78bde5bebcfcc60d20f4",
+              "uniqueIds": [
+                "LocalPathLoader_6b5903742f3f78bde5bebcfcc60d20f4"
+              ],
+              "isPreprocessed": false
+            },
+            {
+              "id": "59ab5535-df20-489a-9bd6-31e8056cfac3",
+              "type": "file",
+              "content": {
+                "id": "70299e1c-b02a-45cc-99bc-106aeab00f6f",
+                "origin_name": "Prometheus Agentic Platform Revolutionary Enterprise AI Architecture.md",
+                "name": "70299e1c-b02a-45cc-99bc-106aeab00f6f.md",
+                "path": "/Users/gqadonis/Library/Application Support/CherryStudio/Data/Files/70299e1c-b02a-45cc-99bc-106aeab00f6f.md",
+                "created_at": "2025-09-17T01:19:42.517Z",
+                "size": 18498,
+                "ext": ".md",
+                "type": "text",
+                "count": 1
+              },
+              "created_at": 1764547765233,
+              "updated_at": 1764547765233,
+              "uniqueId": "LocalPathLoader_d40cccaea08d913a6297e4dd93190196",
+              "uniqueIds": [
+                "LocalPathLoader_d40cccaea08d913a6297e4dd93190196"
+              ],
+              "isPreprocessed": false
+            },
+            {
+              "id": "d95fa434-c7b6-48ef-ab62-14f439089439",
+              "type": "file",
+              "content": {
+                "id": "faddee10-38b2-4def-80d4-fd3d50179407",
+                "origin_name": "Multi-Agent Architecture Specification.md",
+                "name": "faddee10-38b2-4def-80d4-fd3d50179407.md",
+                "path": "/Users/gqadonis/Library/Application Support/CherryStudio/Data/Files/faddee10-38b2-4def-80d4-fd3d50179407.md",
+                "created_at": "2025-10-26T16:23:28.752Z",
+                "size": 19479,
+                "ext": ".md",
+                "type": "text",
+                "count": 1
+              },
+              "created_at": 1764547765233,
+              "updated_at": 1764547765233,
+              "uniqueId": "LocalPathLoader_aa317ae6fea22ea740b1e8f857e888fe",
+              "uniqueIds": [
+                "LocalPathLoader_aa317ae6fea22ea740b1e8f857e888fe"
+              ],
+              "isPreprocessed": false
+            },
+            {
+              "id": "aafe6130-8b85-4358-bd1d-14bb94a33c9e",
+              "type": "file",
+              "content": {
+                "id": "1d326c12-edcb-4a9d-ba6e-c22fea9c73b3",
+                "origin_name": "Artifact Creator.md",
+                "name": "1d326c12-edcb-4a9d-ba6e-c22fea9c73b3.md",
+                "path": "/Users/gqadonis/Library/Application Support/CherryStudio/Data/Files/1d326c12-edcb-4a9d-ba6e-c22fea9c73b3.md",
+                "created_at": "2025-10-07T18:58:20.936Z",
+                "size": 58189,
+                "ext": ".md",
+                "type": "text",
+                "count": 1
+              },
+              "created_at": 1764547765233,
+              "updated_at": 1764547765233,
+              "uniqueId": "LocalPathLoader_a9d1afa4261d211ccd3a7c54f1bd92ad",
+              "uniqueIds": [
+                "LocalPathLoader_a9d1afa4261d211ccd3a7c54f1bd92ad"
+              ],
+              "isPreprocessed": false
+            },
+            {
+              "id": "ca1dabbd-0afa-4e68-851c-c50872b71910",
+              "type": "file",
+              "content": {
+                "id": "97c0caf5-e006-4e32-9851-561663c2b2dc",
+                "origin_name": "prometheus-conversation-2025-08-23.md",
+                "name": "97c0caf5-e006-4e32-9851-561663c2b2dc.md",
+                "path": "/Users/gqadonis/Library/Application Support/CherryStudio/Data/Files/97c0caf5-e006-4e32-9851-561663c2b2dc.md",
+                "created_at": "2025-08-24T12:59:47.278Z",
+                "size": 68217,
+                "ext": ".md",
+                "type": "text",
+                "count": 1
+              },
+              "created_at": 1764547765233,
+              "updated_at": 1764547765233,
+              "uniqueId": "LocalPathLoader_7ac183c4b3641ae94658c00ce67408cf",
+              "uniqueIds": [
+                "LocalPathLoader_7ac183c4b3641ae94658c00ce67408cf"
+              ],
+              "isPreprocessed": false
+            },
+            {
+              "id": "cf55f200-15b1-45f0-9e1d-1edf02f7949e",
+              "type": "file",
+              "content": {
+                "id": "44f929fb-094c-4011-91ac-94f0f9f12aa9",
+                "origin_name": "code-interpreter-architecture.md",
+                "name": "44f929fb-094c-4011-91ac-94f0f9f12aa9.md",
+                "path": "/Users/gqadonis/Library/Application Support/CherryStudio/Data/Files/44f929fb-094c-4011-91ac-94f0f9f12aa9.md",
+                "created_at": "2025-08-24T13:28:44.271Z",
+                "size": 35601,
+                "ext": ".md",
+                "type": "text",
+                "count": 1
+              },
+              "created_at": 1764547782825,
+              "updated_at": 1764547782825,
+              "uniqueId": "LocalPathLoader_c61f64c0b3dbf03bd5b064872cd69d6b",
+              "uniqueIds": [
+                "LocalPathLoader_c61f64c0b3dbf03bd5b064872cd69d6b"
+              ],
+              "isPreprocessed": false
+            },
+            {
+              "id": "9feed160-f747-4ea5-8d07-85ae5113a532",
+              "type": "file",
+              "content": {
+                "id": "e7aa8aa3-44c4-4852-b579-91bded653b9c",
+                "origin_name": "mcp_architecture_guide.md",
+                "name": "e7aa8aa3-44c4-4852-b579-91bded653b9c.md",
+                "path": "/Users/gqadonis/Library/Application Support/CherryStudio/Data/Files/e7aa8aa3-44c4-4852-b579-91bded653b9c.md",
+                "created_at": "2025-08-24T12:30:54.093Z",
+                "size": 37034,
+                "ext": ".md",
+                "type": "text",
+                "count": 1
+              },
+              "created_at": 1764547782825,
+              "updated_at": 1764547782825,
+              "uniqueId": "LocalPathLoader_9b2261250ee733d532c5e4748ff0de4c",
+              "uniqueIds": [
+                "LocalPathLoader_9b2261250ee733d532c5e4748ff0de4c"
+              ],
+              "isPreprocessed": false
+            },
+            {
+              "id": "2307817c-1ed0-4def-a5ba-c226a07ca4ec",
+              "type": "file",
+              "content": {
+                "id": "740bc688-9df0-45fd-ae15-ceb602a90da8",
+                "origin_name": "Exa-Multi-Agent-architecture.md",
+                "name": "740bc688-9df0-45fd-ae15-ceb602a90da8.md",
+                "path": "/Users/gqadonis/Library/Application Support/CherryStudio/Data/Files/740bc688-9df0-45fd-ae15-ceb602a90da8.md",
+                "created_at": "2025-07-23T21:33:30.646Z",
+                "size": 11467,
+                "ext": ".md",
+                "type": "text",
+                "count": 1
+              },
+              "created_at": 1764547843124,
+              "updated_at": 1764547843124,
+              "uniqueId": "LocalPathLoader_cceae31cae761f1a06075b917950a705",
+              "uniqueIds": [
+                "LocalPathLoader_cceae31cae761f1a06075b917950a705"
+              ],
+              "isPreprocessed": false
+            },
+            {
+              "id": "79526203-93e4-4ec8-afd8-551fe8b6f415",
+              "type": "file",
+              "content": {
+                "id": "4be6f300-278f-43d8-a577-387df6a4d75e",
+                "origin_name": "ScaleRL + I-Con Integration Plan for llm-supabase-rs.md",
+                "name": "4be6f300-278f-43d8-a577-387df6a4d75e.md",
+                "path": "/Users/gqadonis/Library/Application Support/CherryStudio/Data/Files/4be6f300-278f-43d8-a577-387df6a4d75e.md",
+                "created_at": "2025-10-20T12:54:49.121Z",
+                "size": 32061,
+                "ext": ".md",
+                "type": "text",
+                "count": 1
+              },
+              "created_at": 1764547843124,
+              "updated_at": 1764547843124,
+              "uniqueId": "LocalPathLoader_8253f93b9c6feddf96c3a61c366d4544",
+              "uniqueIds": [
+                "LocalPathLoader_8253f93b9c6feddf96c3a61c366d4544"
+              ],
+              "isPreprocessed": false
+            },
+            {
+              "id": "c2540d18-a17c-4df9-a235-a4f5f389df30",
+              "type": "file",
+              "content": {
+                "id": "f140fbd2-dd0b-4b8f-9740-5ae9db8a1b87",
+                "origin_name": "Prometheus AI The Self-Improving Platform.md",
+                "name": "f140fbd2-dd0b-4b8f-9740-5ae9db8a1b87.md",
+                "path": "/Users/gqadonis/Library/Application Support/CherryStudio/Data/Files/f140fbd2-dd0b-4b8f-9740-5ae9db8a1b87.md",
+                "created_at": "2025-10-20T11:48:02.252Z",
+                "size": 22699,
+                "ext": ".md",
+                "type": "text",
+                "count": 1
+              },
+              "created_at": 1764547843124,
+              "updated_at": 1764547843124,
+              "uniqueId": "LocalPathLoader_37200f74c8de036b66d605098eec8961",
+              "uniqueIds": [
+                "LocalPathLoader_37200f74c8de036b66d605098eec8961"
+              ],
+              "isPreprocessed": false
+            },
+            {
+              "id": "cca3b6c0-9416-4d1a-9885-31954745e51c",
+              "type": "file",
+              "content": {
+                "id": "ccc9efa3-4659-4f44-af8d-42b69e10abeb",
+                "origin_name": "2510.13786v1.pdf",
+                "name": "ccc9efa3-4659-4f44-af8d-42b69e10abeb.pdf",
+                "path": "/Users/gqadonis/Library/Application Support/CherryStudio/Data/Files/ccc9efa3-4659-4f44-af8d-42b69e10abeb.pdf",
+                "created_at": "2025-10-20T12:38:57.105Z",
+                "size": 4092502,
+                "ext": ".pdf",
+                "type": "document",
+                "count": 1
+              },
+              "created_at": 1764547843124,
+              "updated_at": 1764547843124,
+              "uniqueId": "LocalPathLoader_dcfe7094330461d3bb07a414baa9c869",
+              "uniqueIds": [
+                "LocalPathLoader_dcfe7094330461d3bb07a414baa9c869"
+              ],
+              "isPreprocessed": false
+            },
+            {
+              "id": "34642c4b-4566-4685-93f6-581467e842b2",
+              "type": "file",
+              "content": {
+                "id": "b640c78e-e000-44e4-8324-6c49fe9c94c7",
+                "origin_name": "🧠 How I-Con Enables Continuously Learning Agents.md",
+                "name": "b640c78e-e000-44e4-8324-6c49fe9c94c7.md",
+                "path": "/Users/gqadonis/Library/Application Support/CherryStudio/Data/Files/b640c78e-e000-44e4-8324-6c49fe9c94c7.md",
+                "created_at": "2025-10-20T11:38:15.204Z",
+                "size": 10692,
+                "ext": ".md",
+                "type": "text",
+                "count": 1
+              },
+              "created_at": 1764547843124,
+              "updated_at": 1764547843124,
+              "uniqueId": "LocalPathLoader_41593ab4eef9b1e6b12eb7bdf1280483",
+              "uniqueIds": [
+                "LocalPathLoader_41593ab4eef9b1e6b12eb7bdf1280483"
+              ],
+              "isPreprocessed": false
+            },
+            {
+              "id": "e9ea817d-59b1-43d6-8b70-4081bac49ee1",
+              "type": "file",
+              "content": {
+                "id": "a1088d92-4fd2-4881-a5dd-75da34ae4ae4",
+                "origin_name": "I-Con Embeddings Integration.md",
+                "name": "a1088d92-4fd2-4881-a5dd-75da34ae4ae4.md",
+                "path": "/Users/gqadonis/Library/Application Support/CherryStudio/Data/Files/a1088d92-4fd2-4881-a5dd-75da34ae4ae4.md",
+                "created_at": "2025-10-20T11:26:12.548Z",
+                "size": 66284,
+                "ext": ".md",
+                "type": "text",
+                "count": 1
+              },
+              "created_at": 1764547843124,
+              "updated_at": 1764547843124,
+              "uniqueId": "LocalPathLoader_9ea529a7c586d75950c41824b98085b8",
+              "uniqueIds": [
+                "LocalPathLoader_9ea529a7c586d75950c41824b98085b8"
+              ],
+              "isPreprocessed": false
+            },
+            {
+              "id": "87e12050-f305-4d95-a64b-6f57cb3756de",
+              "type": "file",
+              "content": {
+                "id": "247345c4-256e-4b5a-85cd-c190a5cf887d",
+                "origin_name": "2504.16929v1.pdf",
+                "name": "247345c4-256e-4b5a-85cd-c190a5cf887d.pdf",
+                "path": "/Users/gqadonis/Library/Application Support/CherryStudio/Data/Files/247345c4-256e-4b5a-85cd-c190a5cf887d.pdf",
+                "created_at": "2025-10-20T10:36:39.015Z",
+                "size": 9141384,
+                "ext": ".pdf",
+                "type": "document",
+                "count": 1
+              },
+              "created_at": 1764547843124,
+              "updated_at": 1764547843124,
+              "uniqueId": "LocalPathLoader_54770ec5d4feb255b91e62fae521ef3e",
+              "uniqueIds": [
+                "LocalPathLoader_54770ec5d4feb255b91e62fae521ef3e"
+              ],
+              "isPreprocessed": false
+            },
+            {
+              "id": "ecec17b1-0f32-4a89-8f84-21644ad11975",
+              "type": "file",
+              "content": {
+                "id": "99436fb3-4748-4e72-99e9-936272b075e7",
+                "origin_name": "vllm_controller_usage.md",
+                "name": "99436fb3-4748-4e72-99e9-936272b075e7.md",
+                "path": "/Users/gqadonis/Library/Application Support/CherryStudio/Data/Files/99436fb3-4748-4e72-99e9-936272b075e7.md",
+                "created_at": "2025-08-23T13:15:55.008Z",
+                "size": 7277,
+                "ext": ".md",
+                "type": "text",
+                "count": 1
+              },
+              "created_at": 1764547843124,
+              "updated_at": 1764547843124,
+              "uniqueId": "LocalPathLoader_b60db5ee0eabe790ca90d5ba1ca66ec4",
+              "uniqueIds": [
+                "LocalPathLoader_b60db5ee0eabe790ca90d5ba1ca66ec4"
+              ],
+              "isPreprocessed": false
+            },
+            {
+              "id": "b39be753-ed99-494a-b760-7028d4d3098f",
+              "type": "file",
+              "content": {
+                "id": "854951bd-0180-4cac-a8b6-a92384ce5593",
+                "origin_name": "vllm.md",
+                "name": "854951bd-0180-4cac-a8b6-a92384ce5593.md",
+                "path": "/Users/gqadonis/Library/Application Support/CherryStudio/Data/Files/854951bd-0180-4cac-a8b6-a92384ce5593.md",
+                "created_at": "2025-06-10T15:27:20.456Z",
+                "size": 86530,
+                "ext": ".md",
+                "type": "text",
+                "count": 1
+              },
+              "created_at": 1764547843124,
+              "updated_at": 1764547843124,
+              "uniqueId": "LocalPathLoader_73500d0c34c3346c181e318359af9e74",
+              "uniqueIds": [
+                "LocalPathLoader_73500d0c34c3346c181e318359af9e74"
+              ],
+              "isPreprocessed": false
+            },
+            {
+              "id": "d761b71a-97d7-411f-8d82-d2b5cc79a7ca",
+              "type": "file",
+              "content": {
+                "id": "a9a46795-06ae-4d63-b4c3-9139d1be3eb4",
+                "origin_name": "beeai-server-rs.md",
+                "name": "a9a46795-06ae-4d63-b4c3-9139d1be3eb4.md",
+                "path": "/Users/gqadonis/Library/Application Support/CherryStudio/Data/Files/a9a46795-06ae-4d63-b4c3-9139d1be3eb4.md",
+                "created_at": "2025-06-07T14:25:54.930Z",
+                "size": 49349,
+                "ext": ".md",
+                "type": "text",
+                "count": 1
+              },
+              "created_at": 1764547852937,
+              "updated_at": 1764547852937,
+              "uniqueId": "LocalPathLoader_90bcf05b9f1edcf1c723e656a5c85829",
+              "uniqueIds": [
+                "LocalPathLoader_90bcf05b9f1edcf1c723e656a5c85829"
+              ],
+              "isPreprocessed": false
+            },
+            {
+              "id": "57b1521a-56d7-4db1-9543-988c75f3f44a",
+              "type": "file",
+              "content": {
+                "id": "62171c96-b0e6-4f1d-8133-f145ef63738c",
+                "origin_name": "Adaptive Intelligence Framework.md",
+                "name": "62171c96-b0e6-4f1d-8133-f145ef63738c.md",
+                "path": "/Users/gqadonis/Library/Application Support/CherryStudio/Data/Files/62171c96-b0e6-4f1d-8133-f145ef63738c.md",
+                "created_at": "2025-08-01T23:28:21.634Z",
+                "size": 16801,
+                "ext": ".md",
+                "type": "text",
+                "count": 1
+              },
+              "created_at": 1764547907215,
+              "updated_at": 1764547907215,
+              "uniqueId": "LocalPathLoader_ccf24583f6e13bf117f2887115ac3d4c",
+              "uniqueIds": [
+                "LocalPathLoader_ccf24583f6e13bf117f2887115ac3d4c"
+              ],
+              "isPreprocessed": false
+            },
+            {
+              "id": "5ddc5fb1-22b9-4d5d-aadd-b49470c654f6",
+              "type": "file",
+              "content": {
+                "id": "0f718e4c-20c2-440f-87db-6d9440bf0488",
+                "origin_name": "kaia-cli-architecture.md",
+                "name": "0f718e4c-20c2-440f-87db-6d9440bf0488.md",
+                "path": "/Users/gqadonis/Library/Application Support/CherryStudio/Data/Files/0f718e4c-20c2-440f-87db-6d9440bf0488.md",
+                "created_at": "2025-08-01T21:28:00.470Z",
+                "size": 14685,
+                "ext": ".md",
+                "type": "text",
+                "count": 1
+              },
+              "created_at": 1764547907216,
+              "updated_at": 1764547907216,
+              "uniqueId": "LocalPathLoader_c31d4f803e53cf44050b95052f25ae8e",
+              "uniqueIds": [
+                "LocalPathLoader_c31d4f803e53cf44050b95052f25ae8e"
+              ],
+              "isPreprocessed": false
+            },
+            {
+              "id": "90f2712a-6928-4544-932a-90d258950d5d",
+              "type": "file",
+              "content": {
+                "id": "d41af3f4-5f69-4283-aa5e-fec5e4fdb18a",
+                "origin_name": "kaia-conversation-notes.md",
+                "name": "d41af3f4-5f69-4283-aa5e-fec5e4fdb18a.md",
+                "path": "/Users/gqadonis/Library/Application Support/CherryStudio/Data/Files/d41af3f4-5f69-4283-aa5e-fec5e4fdb18a.md",
+                "created_at": "2025-08-01T21:34:48.312Z",
+                "size": 32995,
+                "ext": ".md",
+                "type": "text",
+                "count": 1
+              },
+              "created_at": 1764547907216,
+              "updated_at": 1764547907216,
+              "uniqueId": "LocalPathLoader_fa0b9ae7bd7199e3f8c84ed7aec8f71b",
+              "uniqueIds": [
+                "LocalPathLoader_fa0b9ae7bd7199e3f8c84ed7aec8f71b"
+              ],
+              "isPreprocessed": false
+            },
+            {
+              "id": "8b8f30ed-664d-46a7-b36e-1a75296fffd3",
+              "type": "file",
+              "content": {
+                "id": "b2ec33df-edb2-4257-8490-52003f475f54",
+                "origin_name": "kaia-functional-spec.md",
+                "name": "b2ec33df-edb2-4257-8490-52003f475f54.md",
+                "path": "/Users/gqadonis/Library/Application Support/CherryStudio/Data/Files/b2ec33df-edb2-4257-8490-52003f475f54.md",
+                "created_at": "2025-08-01T21:29:19.960Z",
+                "size": 18611,
+                "ext": ".md",
+                "type": "text",
+                "count": 1
+              },
+              "created_at": 1764547907216,
+              "updated_at": 1764547907216,
+              "uniqueId": "LocalPathLoader_aba97db95fe2e5aae50ee4d05bbb1c53",
+              "uniqueIds": [
+                "LocalPathLoader_aba97db95fe2e5aae50ee4d05bbb1c53"
+              ],
+              "isPreprocessed": false
+            },
+            {
+              "id": "a97b9302-130b-462c-8811-1f5d6640859b",
+              "type": "file",
+              "content": {
+                "id": "671522f9-9876-4065-bab9-e4e8fae64227",
+                "origin_name": "kaia-mvp-spec.md",
+                "name": "671522f9-9876-4065-bab9-e4e8fae64227.md",
+                "path": "/Users/gqadonis/Library/Application Support/CherryStudio/Data/Files/671522f9-9876-4065-bab9-e4e8fae64227.md",
+                "created_at": "2025-08-01T21:28:44.095Z",
+                "size": 22969,
+                "ext": ".md",
+                "type": "text",
+                "count": 1
+              },
+              "created_at": 1764547907216,
+              "updated_at": 1764547907216,
+              "uniqueId": "LocalPathLoader_03e729903c3623ee9f4803a119654d44",
+              "uniqueIds": [
+                "LocalPathLoader_03e729903c3623ee9f4803a119654d44"
+              ],
+              "isPreprocessed": false
+            },
+            {
+              "id": "dd14c8a3-27ce-46f9-bf8d-6ea6ad8c14ce",
+              "type": "file",
+              "content": {
+                "id": "03299695-758e-4866-aa6f-7e2e437de5d6",
+                "origin_name": "tauri-sandpack-guide.md",
+                "name": "03299695-758e-4866-aa6f-7e2e437de5d6.md",
+                "path": "/Users/gqadonis/Library/Application Support/CherryStudio/Data/Files/03299695-758e-4866-aa6f-7e2e437de5d6.md",
+                "created_at": "2025-08-01T22:16:37.267Z",
+                "size": 22033,
+                "ext": ".md",
+                "type": "text",
+                "count": 1
+              },
+              "created_at": 1764547907216,
+              "updated_at": 1764547907216,
+              "uniqueId": "LocalPathLoader_6b7756fbf770ea760658832db0123376",
+              "uniqueIds": [
+                "LocalPathLoader_6b7756fbf770ea760658832db0123376"
+              ],
+              "isPreprocessed": false
+            },
+            {
+              "id": "5fc26cc1-f8d9-4fc5-b38f-c7a792f62c3c",
+              "type": "file",
+              "content": {
+                "id": "b2b64265-3c8d-474f-8ca5-24247713ef93",
+                "origin_name": "Why Rust’s Mutex Is Faster Than You Think — The Parking Lot Algorithm Under the Microscope _ by TheOpinionatedDev _ Nov, 2025 _ Medium.pdf",
+                "name": "b2b64265-3c8d-474f-8ca5-24247713ef93.pdf",
+                "path": "/Users/gqadonis/Library/Application Support/CherryStudio/Data/Files/b2b64265-3c8d-474f-8ca5-24247713ef93.pdf",
+                "created_at": "2025-12-06T15:59:16.642Z",
+                "size": 7709771,
+                "ext": ".pdf",
+                "type": "document",
+                "count": 1
+              },
+              "created_at": 1765037254029,
+              "updated_at": 1765037254029,
+              "uniqueId": "LocalPathLoader_439b8457127fc8cd21021e581b4b226c",
+              "uniqueIds": [
+                "LocalPathLoader_439b8457127fc8cd21021e581b4b226c"
+              ],
+              "isPreprocessed": false
+            }
+          ],
+          "created_at": 1764546582688,
+          "updated_at": 1765037254029,
+          "version": 1,
+          "dimensions": 1536
+        },
+        {
+          "id": "niLc5jhxgM0tX0EnW8LZk",
+          "name": "Prometheus UI/UX",
+          "model": {
+            "id": "text-embedding-3-small",
+            "name": "text-embedding-3-small",
+            "provider": "openai",
+            "group": "text-embedding",
+            "description": "",
+            "owned_by": "system",
+            "supported_text_delta": true
+          },
+          "items": [
+            {
+              "id": "5c12fd4f-7fdd-4d27-9409-fa64c95f9fab",
+              "type": "file",
+              "content": {
+                "id": "4a376900-6c0f-42cd-82f6-744cd80219c7",
+                "origin_name": "AI SaaS UIUX Design Knowledge Base.md",
+                "name": "4a376900-6c0f-42cd-82f6-744cd80219c7.md",
+                "path": "/Users/gqadonis/Library/Application Support/CherryStudio/Data/Files/4a376900-6c0f-42cd-82f6-744cd80219c7.md",
+                "created_at": "2025-10-28T10:41:53.047Z",
+                "size": 60672,
+                "ext": ".md",
+                "type": "text",
+                "count": 1
+              },
+              "created_at": 1764614649851,
+              "updated_at": 1764614649851,
+              "uniqueId": "LocalPathLoader_d0c2e3587bd149b016e3114de0c21c04",
+              "uniqueIds": [
+                "LocalPathLoader_d0c2e3587bd149b016e3114de0c21c04"
+              ],
+              "isPreprocessed": false
+            },
+            {
+              "id": "cf48bb20-8bdf-44bf-8f9d-551b6dd223f9",
+              "type": "file",
+              "content": {
+                "id": "f9a2e520-0bcb-46fd-a36e-6cab9cc43938",
+                "origin_name": "ARTIFACT_VIEWERS.md",
+                "name": "f9a2e520-0bcb-46fd-a36e-6cab9cc43938.md",
+                "path": "/Users/gqadonis/Library/Application Support/CherryStudio/Data/Files/f9a2e520-0bcb-46fd-a36e-6cab9cc43938.md",
+                "created_at": "2025-12-01T18:18:53.577Z",
+                "size": 85439,
+                "ext": ".md",
+                "type": "text",
+                "count": 1
+              },
+              "created_at": 1764614649851,
+              "updated_at": 1764614649851,
+              "uniqueId": "LocalPathLoader_d3b6568b49ed5875882984d0a343d5cc",
+              "uniqueIds": [
+                "LocalPathLoader_d3b6568b49ed5875882984d0a343d5cc"
+              ],
+              "isPreprocessed": false
+            },
+            {
+              "id": "7fae1d48-22c9-45ee-b202-545f83e741fc",
+              "type": "file",
+              "content": {
+                "id": "2ba91da2-5e66-4b0e-9070-219723d1998f",
+                "origin_name": "CHUNK_IMPLEMENTATIONS.md",
+                "name": "2ba91da2-5e66-4b0e-9070-219723d1998f.md",
+                "path": "/Users/gqadonis/Library/Application Support/CherryStudio/Data/Files/2ba91da2-5e66-4b0e-9070-219723d1998f.md",
+                "created_at": "2025-12-01T17:45:33.817Z",
+                "size": 50899,
+                "ext": ".md",
+                "type": "text",
+                "count": 1
+              },
+              "created_at": 1764614649851,
+              "updated_at": 1764614649851,
+              "uniqueId": "LocalPathLoader_3fa8d56f391e9e527065f0d3d876d57a",
+              "uniqueIds": [
+                "LocalPathLoader_3fa8d56f391e9e527065f0d3d876d57a"
+              ],
+              "isPreprocessed": false
+            },
+            {
+              "id": "678486de-7e0b-4986-bb77-d2872e225a22",
+              "type": "file",
+              "content": {
+                "id": "09f987dc-49a5-4706-8574-f79cea169ccb",
+                "origin_name": "DESIGN_SYSTEM.md",
+                "name": "09f987dc-49a5-4706-8574-f79cea169ccb.md",
+                "path": "/Users/gqadonis/Library/Application Support/CherryStudio/Data/Files/09f987dc-49a5-4706-8574-f79cea169ccb.md",
+                "created_at": "2025-12-01T17:46:34.164Z",
+                "size": 56011,
+                "ext": ".md",
+                "type": "text",
+                "count": 1
+              },
+              "created_at": 1764614649851,
+              "updated_at": 1764614649851,
+              "uniqueId": "LocalPathLoader_214bef47ff141b0b08efaf4c4a8522b7",
+              "uniqueIds": [
+                "LocalPathLoader_214bef47ff141b0b08efaf4c4a8522b7"
+              ],
+              "isPreprocessed": false
+            },
+            {
+              "id": "180b4248-582c-4bd6-a464-474238f7fe78",
+              "type": "file",
+              "content": {
+                "id": "7f919208-0e4d-45ca-a761-5c65054f5042",
+                "origin_name": "MATERIAL_ZONES_FLUTTER.md",
+                "name": "7f919208-0e4d-45ca-a761-5c65054f5042.md",
+                "path": "/Users/gqadonis/Library/Application Support/CherryStudio/Data/Files/7f919208-0e4d-45ca-a761-5c65054f5042.md",
+                "created_at": "2025-12-01T17:52:44.571Z",
+                "size": 26773,
+                "ext": ".md",
+                "type": "text",
+                "count": 1
+              },
+              "created_at": 1764614649851,
+              "updated_at": 1764614649851,
+              "uniqueId": "LocalPathLoader_9fae990735044aa89c5a5c66399bdaf2",
+              "uniqueIds": [
+                "LocalPathLoader_9fae990735044aa89c5a5c66399bdaf2"
+              ],
+              "isPreprocessed": false
+            },
+            {
+              "id": "43699ba2-020a-4670-8cea-3fbce8e537ad",
+              "type": "file",
+              "content": {
+                "id": "d3376439-c4c9-476e-8ffb-3a124d804296",
+                "origin_name": "MATERIAL_ZONES_JS.md",
+                "name": "d3376439-c4c9-476e-8ffb-3a124d804296.md",
+                "path": "/Users/gqadonis/Library/Application Support/CherryStudio/Data/Files/d3376439-c4c9-476e-8ffb-3a124d804296.md",
+                "created_at": "2025-12-01T17:51:07.583Z",
+                "size": 23057,
+                "ext": ".md",
+                "type": "text",
+                "count": 1
+              },
+              "created_at": 1764614649851,
+              "updated_at": 1764614649851,
+              "uniqueId": "LocalPathLoader_8404da5e7b0d119dd59128edc16572d6",
+              "uniqueIds": [
+                "LocalPathLoader_8404da5e7b0d119dd59128edc16572d6"
+              ],
+              "isPreprocessed": false
+            },
+            {
+              "id": "b36c3a12-cdc5-41a7-a4ce-6f2b8e45f154",
+              "type": "file",
+              "content": {
+                "id": "c0929ce6-12d8-4f1b-ba10-aef1f886277e",
+                "origin_name": "metaprompt_file_based_ui_agent.md",
+                "name": "c0929ce6-12d8-4f1b-ba10-aef1f886277e.md",
+                "path": "/Users/gqadonis/Library/Application Support/CherryStudio/Data/Files/c0929ce6-12d8-4f1b-ba10-aef1f886277e.md",
+                "created_at": "2025-12-01T18:40:52.370Z",
+                "size": 8286,
+                "ext": ".md",
+                "type": "text",
+                "count": 1
+              },
+              "created_at": 1764614649851,
+              "updated_at": 1764614649851,
+              "uniqueId": "LocalPathLoader_e690d456c86a99cd6df6a54993290da7",
+              "uniqueIds": [
+                "LocalPathLoader_e690d456c86a99cd6df6a54993290da7"
+              ],
+              "isPreprocessed": false
+            },
+            {
+              "id": "4b73e52c-4376-4306-90a8-4412ce7c7b85",
+              "type": "file",
+              "content": {
+                "id": "52c7fc46-bc0e-415d-914c-2f1f6e049287",
+                "origin_name": "metaprompt_general_ui_agent.md",
+                "name": "52c7fc46-bc0e-415d-914c-2f1f6e049287.md",
+                "path": "/Users/gqadonis/Library/Application Support/CherryStudio/Data/Files/52c7fc46-bc0e-415d-914c-2f1f6e049287.md",
+                "created_at": "2025-12-01T18:41:33.247Z",
+                "size": 18025,
+                "ext": ".md",
+                "type": "text",
+                "count": 1
+              },
+              "created_at": 1764614649851,
+              "updated_at": 1764614649851,
+              "uniqueId": "LocalPathLoader_8f27cb687c6cda4cbf98cf4f388e79a8",
+              "uniqueIds": [
+                "LocalPathLoader_8f27cb687c6cda4cbf98cf4f388e79a8"
+              ],
+              "isPreprocessed": false
+            },
+            {
+              "id": "38617ca7-469a-435c-a131-7c2d2d90e0c9",
+              "type": "file",
+              "content": {
+                "id": "b580469c-0200-42d5-8115-6db4da55e875",
+                "origin_name": "metaprompt_mcp_graphrag_ui_agent.md",
+                "name": "b580469c-0200-42d5-8115-6db4da55e875.md",
+                "path": "/Users/gqadonis/Library/Application Support/CherryStudio/Data/Files/b580469c-0200-42d5-8115-6db4da55e875.md",
+                "created_at": "2025-12-01T18:41:13.483Z",
+                "size": 15529,
+                "ext": ".md",
+                "type": "text",
+                "count": 1
+              },
+              "created_at": 1764614649851,
+              "updated_at": 1764614649851,
+              "uniqueId": "LocalPathLoader_e24a1eeecc489e756b9f2096280704e6",
+              "uniqueIds": [
+                "LocalPathLoader_e24a1eeecc489e756b9f2096280704e6"
+              ],
+              "isPreprocessed": false
+            },
+            {
+              "id": "e43b8002-9941-4c42-9a44-47c1763a736f",
+              "type": "file",
+              "content": {
+                "id": "c625a2be-fa4a-43ab-96e9-49cedae8222b",
+                "origin_name": "The Core Solution Material Zones Design System.md",
+                "name": "c625a2be-fa4a-43ab-96e9-49cedae8222b.md",
+                "path": "/Users/gqadonis/Library/Application Support/CherryStudio/Data/Files/c625a2be-fa4a-43ab-96e9-49cedae8222b.md",
+                "created_at": "2025-12-01T17:18:51.701Z",
+                "size": 6658,
+                "ext": ".md",
+                "type": "text",
+                "count": 1
+              },
+              "created_at": 1764614649851,
+              "updated_at": 1764614649851,
+              "uniqueId": "LocalPathLoader_ce569a10600c98fbf3102cd3a4f32bdc",
+              "uniqueIds": [
+                "LocalPathLoader_ce569a10600c98fbf3102cd3a4f32bdc"
+              ],
+              "isPreprocessed": false
+            },
+            {
+              "id": "f4f7242d-2083-487c-9edf-e5933057a759",
+              "type": "note",
+              "content": "",
+              "created_at": 1765826186254,
+              "updated_at": 1765826186254,
+              "uniqueId": "NoteLoader_7b59c6bcf4f7a0431d5e83896b0c4bd2",
+              "uniqueIds": [
+                "NoteLoader_7b59c6bcf4f7a0431d5e83896b0c4bd2"
+              ],
+              "isPreprocessed": false
+            },
+            {
+              "id": "be653ebf-d94f-4ee6-a9ee-45cd55630f2a",
+              "type": "file",
+              "content": {
+                "id": "76b09f3e-1415-444c-b5a7-48aec5403e00",
+                "origin_name": "Accordion-shadcnui-structure-HTMX-HTMLX-artifact.html",
+                "name": "76b09f3e-1415-444c-b5a7-48aec5403e00.html",
+                "path": "/Users/gqadonis/Library/Application Support/CherryStudio/Data/Files/76b09f3e-1415-444c-b5a7-48aec5403e00.html",
+                "created_at": "2025-12-23T23:34:21.140Z",
+                "size": 18352,
+                "ext": ".html",
+                "type": "text",
+                "count": 1
+              },
+              "created_at": 1766840393488,
+              "updated_at": 1766840393488,
+              "uniqueId": "WebLoader_b634d5216b81c39a750c7768c1e0e225",
+              "uniqueIds": [
+                "WebLoader_b634d5216b81c39a750c7768c1e0e225"
+              ],
+              "isPreprocessed": false
+            },
+            {
+              "id": "7bb0f124-5615-409c-98b5-e4a41e15d5dc",
+              "type": "file",
+              "content": {
+                "id": "54d18a43-5208-4fce-a865-ba5c476f7dba",
+                "origin_name": "Alert-HTMX-Variations-single-file.html",
+                "name": "54d18a43-5208-4fce-a865-ba5c476f7dba.html",
+                "path": "/Users/gqadonis/Library/Application Support/CherryStudio/Data/Files/54d18a43-5208-4fce-a865-ba5c476f7dba.html",
+                "created_at": "2025-12-24T14:44:31.897Z",
+                "size": 9291,
+                "ext": ".html",
+                "type": "text",
+                "count": 1
+              },
+              "created_at": 1766840393488,
+              "updated_at": 1766840393488,
+              "uniqueId": "WebLoader_80b3bf08390aac1034de12252072d394",
+              "uniqueIds": [
+                "WebLoader_80b3bf08390aac1034de12252072d394"
+              ],
+              "isPreprocessed": false
+            },
+            {
+              "id": "e621c0b4-720b-4514-a502-b75ecd95d552",
+              "type": "file",
+              "content": {
+                "id": "51e0c32b-0c68-407f-a23d-f27f05635153",
+                "origin_name": "alert-htmx-variations.html",
+                "name": "51e0c32b-0c68-407f-a23d-f27f05635153.html",
+                "path": "/Users/gqadonis/Library/Application Support/CherryStudio/Data/Files/51e0c32b-0c68-407f-a23d-f27f05635153.html",
+                "created_at": "2025-12-24T14:49:00.819Z",
+                "size": 8585,
+                "ext": ".html",
+                "type": "text",
+                "count": 1
+              },
+              "created_at": 1766840393488,
+              "updated_at": 1766840393488,
+              "uniqueId": "WebLoader_863a26c7b742ccddc65fcd3d284eb0b7",
+              "uniqueIds": [
+                "WebLoader_863a26c7b742ccddc65fcd3d284eb0b7"
+              ],
+              "isPreprocessed": false
+            },
+            {
+              "id": "7fdf6570-3da1-45c5-aaad-082bfba2b1a7",
+              "type": "file",
+              "content": {
+                "id": "cf6a2dc6-6636-4073-9c41-023ed8ecfbe3",
+                "origin_name": "Aspect-Ratio-HTMX-Variations-single-file.html",
+                "name": "cf6a2dc6-6636-4073-9c41-023ed8ecfbe3.html",
+                "path": "/Users/gqadonis/Library/Application Support/CherryStudio/Data/Files/cf6a2dc6-6636-4073-9c41-023ed8ecfbe3.html",
+                "created_at": "2025-12-24T14:44:19.269Z",
+                "size": 9058,
+                "ext": ".html",
+                "type": "text",
+                "count": 1
+              },
+              "created_at": 1766840393488,
+              "updated_at": 1766840393488,
+              "uniqueId": "WebLoader_f22fb0899aaff5beac7022ca3fbd36f3",
+              "uniqueIds": [
+                "WebLoader_f22fb0899aaff5beac7022ca3fbd36f3"
+              ],
+              "isPreprocessed": false
+            },
+            {
+              "id": "5152dfb5-1ee9-4ebe-ac66-67907703b3b3",
+              "type": "file",
+              "content": {
+                "id": "6e88961a-8952-4ba9-be06-37d5e3473262",
+                "origin_name": "aspect-ratio-htmx-variations.html",
+                "name": "6e88961a-8952-4ba9-be06-37d5e3473262.html",
+                "path": "/Users/gqadonis/Library/Application Support/CherryStudio/Data/Files/6e88961a-8952-4ba9-be06-37d5e3473262.html",
+                "created_at": "2025-12-24T14:48:42.131Z",
+                "size": 8816,
+                "ext": ".html",
+                "type": "text",
+                "count": 1
+              },
+              "created_at": 1766840393488,
+              "updated_at": 1766840393488,
+              "uniqueId": "WebLoader_30e60993dccd095d93360930c353a5e1",
+              "uniqueIds": [
+                "WebLoader_30e60993dccd095d93360930c353a5e1"
+              ],
+              "isPreprocessed": false
+            },
+            {
+              "id": "a5d1f83d-c264-4d14-95c7-9921bb6f217b",
+              "type": "file",
+              "content": {
+                "id": "6a24c5d5-ad75-45fb-8961-33bfd390c9fc",
+                "origin_name": "Button-Group-HTMX-Web-Componentsready.html",
+                "name": "6a24c5d5-ad75-45fb-8961-33bfd390c9fc.html",
+                "path": "/Users/gqadonis/Library/Application Support/CherryStudio/Data/Files/6a24c5d5-ad75-45fb-8961-33bfd390c9fc.html",
+                "created_at": "2025-12-24T14:21:30.321Z",
+                "size": 18391,
+                "ext": ".html",
+                "type": "text",
+                "count": 1
+              },
+              "created_at": 1766840393488,
+              "updated_at": 1766840393488,
+              "uniqueId": "WebLoader_d721ced2ea9ce6d543d40d483a828ece",
+              "uniqueIds": [
+                "WebLoader_d721ced2ea9ce6d543d40d483a828ece"
+              ],
+              "isPreprocessed": false
+            },
+            {
+              "id": "224bfa8d-9175-4107-a684-f5048b4a4c0b",
+              "type": "file",
+              "content": {
+                "id": "6dbb4528-079b-4d1e-a985-ab1b98b2543d",
+                "origin_name": "Calendar-2month-layout-improved-HTMX-single-file.html",
+                "name": "6dbb4528-079b-4d1e-a985-ab1b98b2543d.html",
+                "path": "/Users/gqadonis/Library/Application Support/CherryStudio/Data/Files/6dbb4528-079b-4d1e-a985-ab1b98b2543d.html",
+                "created_at": "2025-12-23T23:35:27.705Z",
+                "size": 21740,
+                "ext": ".html",
+                "type": "text",
+                "count": 1
+              },
+              "created_at": 1766840393488,
+              "updated_at": 1766840393488,
+              "uniqueId": "WebLoader_c26d2c2813c51c6fb9720fdb8b45593e",
+              "uniqueIds": [
+                "WebLoader_c26d2c2813c51c6fb9720fdb8b45593e"
+              ],
+              "isPreprocessed": false
+            },
+            {
+              "id": "fd47999d-ab6a-4dbe-aa37-358178b1b89b",
+              "type": "file",
+              "content": {
+                "id": "6e89d0c9-2feb-4030-9388-df434a9215a7",
+                "origin_name": "Calendar-shadcnlike-HTMX-single-file.html",
+                "name": "6e89d0c9-2feb-4030-9388-df434a9215a7.html",
+                "path": "/Users/gqadonis/Library/Application Support/CherryStudio/Data/Files/6e89d0c9-2feb-4030-9388-df434a9215a7.html",
+                "created_at": "2025-12-23T23:35:27.732Z",
+                "size": 27317,
+                "ext": ".html",
+                "type": "text",
+                "count": 1
+              },
+              "created_at": 1766840393488,
+              "updated_at": 1766840393488,
+              "uniqueId": "WebLoader_0d4e042023ed4667db229f155a7d72d5",
+              "uniqueIds": [
+                "WebLoader_0d4e042023ed4667db229f155a7d72d5"
+              ],
+              "isPreprocessed": false
+            },
+            {
+              "id": "60b8ec30-af1b-4bae-8abb-11429a0faec2",
+              "type": "file",
+              "content": {
+                "id": "62c818dd-3ba9-420a-9874-5d066741da9d",
+                "origin_name": "checkbox-wc-htmx-variations.html",
+                "name": "62c818dd-3ba9-420a-9874-5d066741da9d.html",
+                "path": "/Users/gqadonis/Library/Application Support/CherryStudio/Data/Files/62c818dd-3ba9-420a-9874-5d066741da9d.html",
+                "created_at": "2025-12-26T16:15:04.884Z",
+                "size": 19400,
+                "ext": ".html",
+                "type": "text",
+                "count": 1
+              },
+              "created_at": 1766840393488,
+              "updated_at": 1766840393488,
+              "uniqueId": "WebLoader_b9fbefb00c634a0d213a53673f169cf7",
+              "uniqueIds": [
+                "WebLoader_b9fbefb00c634a0d213a53673f169cf7"
+              ],
+              "isPreprocessed": false
+            },
+            {
+              "id": "c82e79e1-b93f-4309-9766-70e7c9727fc3",
+              "type": "file",
+              "content": {
+                "id": "d5f72869-9bc9-459a-ae05-938dc06b2345",
+                "origin_name": "Combobox-HTMX-Web-Componentsready.html",
+                "name": "d5f72869-9bc9-459a-ae05-938dc06b2345.html",
+                "path": "/Users/gqadonis/Library/Application Support/CherryStudio/Data/Files/d5f72869-9bc9-459a-ae05-938dc06b2345.html",
+                "created_at": "2025-12-24T14:24:37.036Z",
+                "size": 20750,
+                "ext": ".html",
+                "type": "text",
+                "count": 1
+              },
+              "created_at": 1766840393488,
+              "updated_at": 1766840393488,
+              "uniqueId": "WebLoader_20c88001e6193e28247ab315f0af3104",
+              "uniqueIds": [
+                "WebLoader_20c88001e6193e28247ab315f0af3104"
+              ],
+              "isPreprocessed": false
+            },
+            {
+              "id": "330ddde1-a651-4fa2-a1c2-78c9562ce583",
+              "type": "file",
+              "content": {
+                "id": "451f3f16-27b2-4a6e-8827-933fb576ba97",
+                "origin_name": "command-01-core.html",
+                "name": "451f3f16-27b2-4a6e-8827-933fb576ba97.html",
+                "path": "/Users/gqadonis/Library/Application Support/CherryStudio/Data/Files/451f3f16-27b2-4a6e-8827-933fb576ba97.html",
+                "created_at": "2025-12-24T14:49:39.236Z",
+                "size": 11345,
+                "ext": ".html",
+                "type": "text",
+                "count": 1
+              },
+              "created_at": 1766840393488,
+              "updated_at": 1766840393488,
+              "uniqueId": "WebLoader_09d2ef339a0875e54180fd9dcf075222",
+              "uniqueIds": [
+                "WebLoader_09d2ef339a0875e54180fd9dcf075222"
+              ],
+              "isPreprocessed": false
+            },
+            {
+              "id": "e068ce01-6b24-4a4f-8569-05ec11a33de5",
+              "type": "file",
+              "content": {
+                "id": "c07a1bd7-abd0-406f-8026-bd7adbaf558e",
+                "origin_name": "command-02-keyboard-a11y.html",
+                "name": "c07a1bd7-abd0-406f-8026-bd7adbaf558e.html",
+                "path": "/Users/gqadonis/Library/Application Support/CherryStudio/Data/Files/c07a1bd7-abd0-406f-8026-bd7adbaf558e.html",
+                "created_at": "2025-12-24T14:50:22.853Z",
+                "size": 12414,
+                "ext": ".html",
+                "type": "text",
+                "count": 1
+              },
+              "created_at": 1766840393488,
+              "updated_at": 1766840393488,
+              "uniqueId": "WebLoader_9bcaad65e70671ae9fade7c739544279",
+              "uniqueIds": [
+                "WebLoader_9bcaad65e70671ae9fade7c739544279"
+              ],
+              "isPreprocessed": false
+            },
+            {
+              "id": "e8819a13-6519-4c00-b63a-73d6e26ec09d",
+              "type": "file",
+              "content": {
+                "id": "0a53e03c-f0a0-4d90-a14e-c41c3cbfc530",
+                "origin_name": "command-03-groups-nesting.html",
+                "name": "0a53e03c-f0a0-4d90-a14e-c41c3cbfc530.html",
+                "path": "/Users/gqadonis/Library/Application Support/CherryStudio/Data/Files/0a53e03c-f0a0-4d90-a14e-c41c3cbfc530.html",
+                "created_at": "2025-12-24T14:51:08.206Z",
+                "size": 9883,
+                "ext": ".html",
+                "type": "text",
+                "count": 1
+              },
+              "created_at": 1766840393488,
+              "updated_at": 1766840393488,
+              "uniqueId": "WebLoader_6961725ba06e8727613d16eb43a7b576",
+              "uniqueIds": [
+                "WebLoader_6961725ba06e8727613d16eb43a7b576"
+              ],
+              "isPreprocessed": false
+            },
+            {
+              "id": "2c082719-d4bf-406c-81e8-5389c1d45aa7",
+              "type": "file",
+              "content": {
+                "id": "6c0be6c6-92e2-400b-9161-f14f1c91698e",
+                "origin_name": "command-04-server-fragments-oob.html",
+                "name": "6c0be6c6-92e2-400b-9161-f14f1c91698e.html",
+                "path": "/Users/gqadonis/Library/Application Support/CherryStudio/Data/Files/6c0be6c6-92e2-400b-9161-f14f1c91698e.html",
+                "created_at": "2025-12-24T14:51:48.020Z",
+                "size": 8612,
+                "ext": ".html",
+                "type": "text",
+                "count": 1
+              },
+              "created_at": 1766840393488,
+              "updated_at": 1766840393488,
+              "uniqueId": "WebLoader_dae9d52ad7a5834cef4e36136dafaba2",
+              "uniqueIds": [
+                "WebLoader_dae9d52ad7a5834cef4e36136dafaba2"
+              ],
+              "isPreprocessed": false
+            },
+            {
+              "id": "a2e1c454-51c4-465f-bf7f-f3d846542fd1",
+              "type": "file",
+              "content": {
+                "id": "16e835f9-a6da-4ba9-9f02-363e97da32a9",
+                "origin_name": "command-05-feedback-states.html",
+                "name": "16e835f9-a6da-4ba9-9f02-363e97da32a9.html",
+                "path": "/Users/gqadonis/Library/Application Support/CherryStudio/Data/Files/16e835f9-a6da-4ba9-9f02-363e97da32a9.html",
+                "created_at": "2025-12-24T14:52:26.767Z",
+                "size": 9560,
+                "ext": ".html",
+                "type": "text",
+                "count": 1
+              },
+              "created_at": 1766840393488,
+              "updated_at": 1766840393488,
+              "uniqueId": "WebLoader_4b400f4dcaa66fd47083cc9c0bbcb26b",
+              "uniqueIds": [
+                "WebLoader_4b400f4dcaa66fd47083cc9c0bbcb26b"
+              ],
+              "isPreprocessed": false
+            },
+            {
+              "id": "7c4938ac-be96-4be0-8904-baa247c88864",
+              "type": "file",
+              "content": {
+                "id": "5a7d10e5-052d-4a18-a535-d1ad5b10224e",
+                "origin_name": "Data-Table-HTMX-singlefile-SortingFilteringPaginationSelectionRow-Actions.html",
+                "name": "5a7d10e5-052d-4a18-a535-d1ad5b10224e.html",
+                "path": "/Users/gqadonis/Library/Application Support/CherryStudio/Data/Files/5a7d10e5-052d-4a18-a535-d1ad5b10224e.html",
+                "created_at": "2025-12-23T23:36:25.840Z",
+                "size": 33529,
+                "ext": ".html",
+                "type": "text",
+                "count": 1
+              },
+              "created_at": 1766840393488,
+              "updated_at": 1766840393488,
+              "uniqueId": "WebLoader_a06bd4053937aba9d5c3087618e80cc4",
+              "uniqueIds": [
+                "WebLoader_a06bd4053937aba9d5c3087618e80cc4"
+              ],
+              "isPreprocessed": false
+            },
+            {
+              "id": "f4086bf6-a12a-4d6c-8f4f-257dc3ffba72",
+              "type": "file",
+              "content": {
+                "id": "4577256d-ff05-4160-86a0-500e64b1b2e9",
+                "origin_name": "Drawer-Variations-LeftRightTopBottom-HTMX-HTMLX-Artifact.html",
+                "name": "4577256d-ff05-4160-86a0-500e64b1b2e9.html",
+                "path": "/Users/gqadonis/Library/Application Support/CherryStudio/Data/Files/4577256d-ff05-4160-86a0-500e64b1b2e9.html",
+                "created_at": "2025-12-23T23:34:09.893Z",
+                "size": 20458,
+                "ext": ".html",
+                "type": "text",
+                "count": 1
+              },
+              "created_at": 1766840393488,
+              "updated_at": 1766840393488,
+              "uniqueId": "WebLoader_7f08c00255543c4257bdfa8c753edb5b",
+              "uniqueIds": [
+                "WebLoader_7f08c00255543c4257bdfa8c753edb5b"
+              ],
+              "isPreprocessed": false
+            },
+            {
+              "id": "be152057-16f0-49d1-9545-3e868a7d4c3a",
+              "type": "file",
+              "content": {
+                "id": "b7d10ef2-aee2-436d-9bac-5eac8839ea3c",
+                "origin_name": "Hover-Card-HTMX-Variations-single-file.html",
+                "name": "b7d10ef2-aee2-436d-9bac-5eac8839ea3c.html",
+                "path": "/Users/gqadonis/Library/Application Support/CherryStudio/Data/Files/b7d10ef2-aee2-436d-9bac-5eac8839ea3c.html",
+                "created_at": "2025-12-24T14:44:01.567Z",
+                "size": 14077,
+                "ext": ".html",
+                "type": "text",
+                "count": 1
+              },
+              "created_at": 1766840393488,
+              "updated_at": 1766840393488,
+              "uniqueId": "WebLoader_88e4355a04f3d9a6cf1bce0b68e99093",
+              "uniqueIds": [
+                "WebLoader_88e4355a04f3d9a6cf1bce0b68e99093"
+              ],
+              "isPreprocessed": false
+            },
+            {
+              "id": "55179de6-b836-48e7-9a17-7c3e063a8f38",
+              "type": "file",
+              "content": {
+                "id": "ded4ad12-0c62-47be-8954-751467b999a0",
+                "origin_name": "hover-card-htmx-variations.html",
+                "name": "ded4ad12-0c62-47be-8954-751467b999a0.html",
+                "path": "/Users/gqadonis/Library/Application Support/CherryStudio/Data/Files/ded4ad12-0c62-47be-8954-751467b999a0.html",
+                "created_at": "2025-12-24T14:48:23.317Z",
+                "size": 13154,
+                "ext": ".html",
+                "type": "text",
+                "count": 1
+              },
+              "created_at": 1766840393488,
+              "updated_at": 1766840393488,
+              "uniqueId": "WebLoader_7e112f7173b79ce73f2720083e402f21",
+              "uniqueIds": [
+                "WebLoader_7e112f7173b79ce73f2720083e402f21"
+              ],
+              "isPreprocessed": false
+            },
+            {
+              "id": "83c5246d-1444-48a9-9d10-193b14743c22",
+              "type": "file",
+              "content": {
+                "id": "9004f7d5-9fdf-4385-9046-919a70d49843",
+                "origin_name": "HTMX-208-shadcnlike-Button-Grid-All-Variants.html",
+                "name": "9004f7d5-9fdf-4385-9046-919a70d49843.html",
+                "path": "/Users/gqadonis/Library/Application Support/CherryStudio/Data/Files/9004f7d5-9fdf-4385-9046-919a70d49843.html",
+                "created_at": "2025-12-23T23:34:58.251Z",
+                "size": 20068,
+                "ext": ".html",
+                "type": "text",
+                "count": 1
+              },
+              "created_at": 1766840393488,
+              "updated_at": 1766840393488,
+              "uniqueId": "WebLoader_27e4c04a52d0eabc8f5d620ff68d24e4",
+              "uniqueIds": [
+                "WebLoader_27e4c04a52d0eabc8f5d620ff68d24e4"
+              ],
+              "isPreprocessed": false
+            },
+            {
+              "id": "fb60876c-e8b1-4c08-b1ff-1d8a1aa3592a",
+              "type": "file",
+              "content": {
+                "id": "a036ec3e-0762-4ad8-afb7-f51e077944a9",
+                "origin_name": "HTMX-208-shadcnlike-Forms-Token-Palette-LightDark.html",
+                "name": "a036ec3e-0762-4ad8-afb7-f51e077944a9.html",
+                "path": "/Users/gqadonis/Library/Application Support/CherryStudio/Data/Files/a036ec3e-0762-4ad8-afb7-f51e077944a9.html",
+                "created_at": "2025-12-23T23:35:05.792Z",
+                "size": 29687,
+                "ext": ".html",
+                "type": "text",
+                "count": 1
+              },
+              "created_at": 1766840393488,
+              "updated_at": 1766840393488,
+              "uniqueId": "WebLoader_9e064f6211f4509ad9539dc9898238f4",
+              "uniqueIds": [
+                "WebLoader_9e064f6211f4509ad9539dc9898238f4"
+              ],
+              "isPreprocessed": false
+            },
+            {
+              "id": "eb22592f-0a48-43a2-9ec2-3292b96a2273",
+              "type": "file",
+              "content": {
+                "id": "5f2c65b6-308c-4df9-8293-59761a1c07d6",
+                "origin_name": "HTMX-Context-Menu-single-file-all-variations.html",
+                "name": "5f2c65b6-308c-4df9-8293-59761a1c07d6.html",
+                "path": "/Users/gqadonis/Library/Application Support/CherryStudio/Data/Files/5f2c65b6-308c-4df9-8293-59761a1c07d6.html",
+                "created_at": "2025-12-24T14:36:05.638Z",
+                "size": 35415,
+                "ext": ".html",
+                "type": "text",
+                "count": 1
+              },
+              "created_at": 1766840393488,
+              "updated_at": 1766840393488,
+              "uniqueId": "WebLoader_e97c34b11fcee199b3b147cfe95d31d3",
+              "uniqueIds": [
+                "WebLoader_e97c34b11fcee199b3b147cfe95d31d3"
+              ],
+              "isPreprocessed": false
+            },
+            {
+              "id": "f926e6ad-42c3-4289-865b-a3a7dd4c3dbb",
+              "type": "file",
+              "content": {
+                "id": "6a76947e-721a-4226-8cae-097e10e71464",
+                "origin_name": "HTMX-Field-Demo-Token-datatheme.html",
+                "name": "6a76947e-721a-4226-8cae-097e10e71464.html",
+                "path": "/Users/gqadonis/Library/Application Support/CherryStudio/Data/Files/6a76947e-721a-4226-8cae-097e10e71464.html",
+                "created_at": "2025-12-23T23:36:17.394Z",
+                "size": 24518,
+                "ext": ".html",
+                "type": "text",
+                "count": 1
+              },
+              "created_at": 1766840393488,
+              "updated_at": 1766840393488,
+              "uniqueId": "WebLoader_9a69a6f8dde5f34c23b7ff3330518aab",
+              "uniqueIds": [
+                "WebLoader_9a69a6f8dde5f34c23b7ff3330518aab"
+              ],
+              "isPreprocessed": false
+            },
+            {
+              "id": "a1203831-02ec-43ed-91e4-16ed9eb3436f",
+              "type": "file",
+              "content": {
+                "id": "40e62735-c049-4d9f-a5c2-20fd0e930d0a",
+                "origin_name": "HTMX-Markdown-Editor-Pluginready-Leptosfriendly.html",
+                "name": "40e62735-c049-4d9f-a5c2-20fd0e930d0a.html",
+                "path": "/Users/gqadonis/Library/Application Support/CherryStudio/Data/Files/40e62735-c049-4d9f-a5c2-20fd0e930d0a.html",
+                "created_at": "2025-12-23T23:33:42.675Z",
+                "size": 25059,
+                "ext": ".html",
+                "type": "text",
+                "count": 1
+              },
+              "created_at": 1766840393488,
+              "updated_at": 1766840393488,
+              "uniqueId": "WebLoader_cb540e1d1b2d89b656855a3ba1dfc312",
+              "uniqueIds": [
+                "WebLoader_cb540e1d1b2d89b656855a3ba1dfc312"
+              ],
+              "isPreprocessed": false
+            },
+            {
+              "id": "22e9e619-8a37-4449-b146-738e3b236bcc",
+              "type": "file",
+              "content": {
+                "id": "b59bfd51-5c51-4a5d-8fb4-ceb2735e6b92",
+                "origin_name": "HTMX-Sheet-shadcnlike-Demo.html",
+                "name": "b59bfd51-5c51-4a5d-8fb4-ceb2735e6b92.html",
+                "path": "/Users/gqadonis/Library/Application Support/CherryStudio/Data/Files/b59bfd51-5c51-4a5d-8fb4-ceb2735e6b92.html",
+                "created_at": "2025-12-23T23:33:55.809Z",
+                "size": 12442,
+                "ext": ".html",
+                "type": "text",
+                "count": 1
+              },
+              "created_at": 1766840393488,
+              "updated_at": 1766840393488,
+              "uniqueId": "WebLoader_aaa28713b7ffd2589093c8c319ef585a",
+              "uniqueIds": [
+                "WebLoader_aaa28713b7ffd2589093c8c319ef585a"
+              ],
+              "isPreprocessed": false
+            },
+            {
+              "id": "b4c9dada-7746-490d-8823-fdb89efff2e1",
+              "type": "file",
+              "content": {
+                "id": "67a2da61-f3d1-4846-a8f5-fd401ca1f52e",
+                "origin_name": "HTMX-Web-Component-Scroll-Area.html",
+                "name": "67a2da61-f3d1-4846-a8f5-fd401ca1f52e.html",
+                "path": "/Users/gqadonis/Library/Application Support/CherryStudio/Data/Files/67a2da61-f3d1-4846-a8f5-fd401ca1f52e.html",
+                "created_at": "2025-12-26T16:15:04.883Z",
+                "size": 15884,
+                "ext": ".html",
+                "type": "text",
+                "count": 1
+              },
+              "created_at": 1766840393488,
+              "updated_at": 1766840393488,
+              "uniqueId": "WebLoader_063f7223cb97638dad9197354ff01cb1",
+              "uniqueIds": [
+                "WebLoader_063f7223cb97638dad9197354ff01cb1"
+              ],
+              "isPreprocessed": false
+            },
+            {
+              "id": "b8bd85ac-72ee-462b-925b-23c50c13d198",
+              "type": "file",
+              "content": {
+                "id": "abc27d12-c6e1-42c3-966c-bd7fcc98cdff",
+                "origin_name": "Isolated-HTMX-shadcnlike-Card-Prototype.html",
+                "name": "abc27d12-c6e1-42c3-966c-bd7fcc98cdff.html",
+                "path": "/Users/gqadonis/Library/Application Support/CherryStudio/Data/Files/abc27d12-c6e1-42c3-966c-bd7fcc98cdff.html",
+                "created_at": "2025-12-23T23:35:57.688Z",
+                "size": 13255,
+                "ext": ".html",
+                "type": "text",
+                "count": 1
+              },
+              "created_at": 1766840393488,
+              "updated_at": 1766840393488,
+              "uniqueId": "WebLoader_578f5576b0c03ed67fefb79fcd9c36e4",
+              "uniqueIds": [
+                "WebLoader_578f5576b0c03ed67fefb79fcd9c36e4"
+              ],
+              "isPreprocessed": false
+            },
+            {
+              "id": "df495656-5db8-46b8-a378-8ec7053d8ec2",
+              "type": "file",
+              "content": {
+                "id": "015d34ef-d40a-4568-bb62-f37e44f7525d",
+                "origin_name": "label-wc-htmx-variations.html",
+                "name": "015d34ef-d40a-4568-bb62-f37e44f7525d.html",
+                "path": "/Users/gqadonis/Library/Application Support/CherryStudio/Data/Files/015d34ef-d40a-4568-bb62-f37e44f7525d.html",
+                "created_at": "2025-12-26T16:15:04.884Z",
+                "size": 10063,
+                "ext": ".html",
+                "type": "text",
+                "count": 1
+              },
+              "created_at": 1766840393488,
+              "updated_at": 1766840393488,
+              "uniqueId": "WebLoader_a4ac6166674d207a6b78eb639b6198d1",
+              "uniqueIds": [
+                "WebLoader_a4ac6166674d207a6b78eb639b6198d1"
+              ],
+              "isPreprocessed": false
+            },
+            {
+              "id": "b0ce9bdd-ff1b-4d30-be78-0d89d7119085",
+              "type": "file",
+              "content": {
+                "id": "7e35c4d9-dd44-4efe-8351-a0a545940262",
+                "origin_name": "Navigation-Menu-HTMX-Explicit-hxget.html",
+                "name": "7e35c4d9-dd44-4efe-8351-a0a545940262.html",
+                "path": "/Users/gqadonis/Library/Application Support/CherryStudio/Data/Files/7e35c4d9-dd44-4efe-8351-a0a545940262.html",
+                "created_at": "2025-12-26T16:15:04.884Z",
+                "size": 7887,
+                "ext": ".html",
+                "type": "text",
+                "count": 1
+              },
+              "created_at": 1766840393488,
+              "updated_at": 1766840393488,
+              "uniqueId": "WebLoader_8dff19349c2448ca7ebbe6c04ab0ccc6",
+              "uniqueIds": [
+                "WebLoader_8dff19349c2448ca7ebbe6c04ab0ccc6"
+              ],
+              "isPreprocessed": false
+            },
+            {
+              "id": "fd5eeaf5-422e-4d46-9435-ea89db1a6d08",
+              "type": "file",
+              "content": {
+                "id": "3c2a1e7e-273f-4c78-b4b3-eb7e5a61feee",
+                "origin_name": "Navigation-Menu-shadcnlike-HTMX-single-file.html",
+                "name": "3c2a1e7e-273f-4c78-b4b3-eb7e5a61feee.html",
+                "path": "/Users/gqadonis/Library/Application Support/CherryStudio/Data/Files/3c2a1e7e-273f-4c78-b4b3-eb7e5a61feee.html",
+                "created_at": "2025-12-23T23:34:30.124Z",
+                "size": 20102,
+                "ext": ".html",
+                "type": "text",
+                "count": 1
+              },
+              "created_at": 1766840393488,
+              "updated_at": 1766840393488,
+              "uniqueId": "WebLoader_bb3436ea8c612ff81936c21e1577fdb6",
+              "uniqueIds": [
+                "WebLoader_bb3436ea8c612ff81936c21e1577fdb6"
+              ],
+              "isPreprocessed": false
+            },
+            {
+              "id": "ad209211-9964-462a-90b0-fc2fe1789b24",
+              "type": "file",
+              "content": {
+                "id": "22e20738-be01-4d8f-8067-946dbbf34c89",
+                "origin_name": "Progress-Variations-HTMX-Web-Component-ready.html",
+                "name": "22e20738-be01-4d8f-8067-946dbbf34c89.html",
+                "path": "/Users/gqadonis/Library/Application Support/CherryStudio/Data/Files/22e20738-be01-4d8f-8067-946dbbf34c89.html",
+                "created_at": "2025-12-24T14:27:40.914Z",
+                "size": 12025,
+                "ext": ".html",
+                "type": "text",
+                "count": 1
+              },
+              "created_at": 1766840393488,
+              "updated_at": 1766840393488,
+              "uniqueId": "WebLoader_a2cf6678c264bcb7fa3d906e12fc748d",
+              "uniqueIds": [
+                "WebLoader_a2cf6678c264bcb7fa3d906e12fc748d"
+              ],
+              "isPreprocessed": false
+            },
+            {
+              "id": "fec7458e-5ea6-429c-bc24-adb644e59fe1",
+              "type": "file",
+              "content": {
+                "id": "62a5b901-7ad9-44d6-b9b0-ffa4f45b7b5b",
+                "origin_name": "Prometheus-Flat-Material-3-Zones-HTMX-Shell.html",
+                "name": "62a5b901-7ad9-44d6-b9b0-ffa4f45b7b5b.html",
+                "path": "/Users/gqadonis/Library/Application Support/CherryStudio/Data/Files/62a5b901-7ad9-44d6-b9b0-ffa4f45b7b5b.html",
+                "created_at": "2025-12-23T23:35:42.821Z",
+                "size": 17443,
+                "ext": ".html",
+                "type": "text",
+                "count": 1
+              },
+              "created_at": 1766840393488,
+              "updated_at": 1766840393488,
+              "uniqueId": "WebLoader_d409cce441eca07e362d82b8201864b6",
+              "uniqueIds": [
+                "WebLoader_d409cce441eca07e362d82b8201864b6"
+              ],
+              "isPreprocessed": false
+            },
+            {
+              "id": "3e0b9ec1-2cca-4905-b72d-57b0f7f534d6",
+              "type": "file",
+              "content": {
+                "id": "80d00e71-8e06-4430-8619-8bf52477cd26",
+                "origin_name": "shadcnlike-Alert-Dialog-HTMX-Web-Componentsready.html",
+                "name": "80d00e71-8e06-4430-8619-8bf52477cd26.html",
+                "path": "/Users/gqadonis/Library/Application Support/CherryStudio/Data/Files/80d00e71-8e06-4430-8619-8bf52477cd26.html",
+                "created_at": "2025-12-24T14:19:16.248Z",
+                "size": 8046,
+                "ext": ".html",
+                "type": "text",
+                "count": 1
+              },
+              "created_at": 1766840393488,
+              "updated_at": 1766840393488,
+              "uniqueId": "WebLoader_5116d8e50a513691270383e600d661fb",
+              "uniqueIds": [
+                "WebLoader_5116d8e50a513691270383e600d661fb"
+              ],
+              "isPreprocessed": false
+            },
+            {
+              "id": "9b9bc41c-85dc-4736-922d-5ef4a752b1f2",
+              "type": "file",
+              "content": {
+                "id": "beb632fa-2aa2-496b-a804-8ad6c67695bd",
+                "origin_name": "shadcnlike-Badges-HTMX-208-Full-Variant-Set.html",
+                "name": "beb632fa-2aa2-496b-a804-8ad6c67695bd.html",
+                "path": "/Users/gqadonis/Library/Application Support/CherryStudio/Data/Files/beb632fa-2aa2-496b-a804-8ad6c67695bd.html",
+                "created_at": "2025-12-23T23:36:05.144Z",
+                "size": 9186,
+                "ext": ".html",
+                "type": "text",
+                "count": 1
+              },
+              "created_at": 1766840393488,
+              "updated_at": 1766840393488,
+              "uniqueId": "WebLoader_9d7dc91dede319a5f8b974d7bd5c0d60",
+              "uniqueIds": [
+                "WebLoader_9d7dc91dede319a5f8b974d7bd5c0d60"
+              ],
+              "isPreprocessed": false
+            },
+            {
+              "id": "ebe7017d-add4-4e8a-be03-79d048e40b44",
+              "type": "file",
+              "content": {
+                "id": "37087c44-62eb-4baa-83a0-f720a0f6c8a3",
+                "origin_name": "shadcnlike-Dialog-HTMX-Web-Componentsready.html",
+                "name": "37087c44-62eb-4baa-83a0-f720a0f6c8a3.html",
+                "path": "/Users/gqadonis/Library/Application Support/CherryStudio/Data/Files/37087c44-62eb-4baa-83a0-f720a0f6c8a3.html",
+                "created_at": "2025-12-24T14:19:09.137Z",
+                "size": 17344,
+                "ext": ".html",
+                "type": "text",
+                "count": 1
+              },
+              "created_at": 1766840393488,
+              "updated_at": 1766840393488,
+              "uniqueId": "WebLoader_6d5bd0aaaa44f30d4076682018fd6400",
+              "uniqueIds": [
+                "WebLoader_6d5bd0aaaa44f30d4076682018fd6400"
+              ],
+              "isPreprocessed": false
+            },
+            {
+              "id": "3152a5f9-ada8-4537-a62e-e6492c3b16da",
+              "type": "file",
+              "content": {
+                "id": "e64e783b-4d83-46e2-8aff-780928467418",
+                "origin_name": "shadcnui-Carousel-HTMX-Variations-single-file.html",
+                "name": "e64e783b-4d83-46e2-8aff-780928467418.html",
+                "path": "/Users/gqadonis/Library/Application Support/CherryStudio/Data/Files/e64e783b-4d83-46e2-8aff-780928467418.html",
+                "created_at": "2025-12-24T14:41:22.191Z",
+                "size": 22571,
+                "ext": ".html",
+                "type": "text",
+                "count": 1
+              },
+              "created_at": 1766840393488,
+              "updated_at": 1766840393488,
+              "uniqueId": "WebLoader_91ab48a8227a330831bdd85a768df995",
+              "uniqueIds": [
+                "WebLoader_91ab48a8227a330831bdd85a768df995"
+              ],
+              "isPreprocessed": false
+            },
+            {
+              "id": "ed860a72-8a09-47bd-a5a4-3e7c29b06ee4",
+              "type": "file",
+              "content": {
+                "id": "2e899663-7f1d-47ea-85bd-e346d4c1f4b9",
+                "origin_name": "shadcnui-Sonner-HTMX-Variations-single-file.html",
+                "name": "2e899663-7f1d-47ea-85bd-e346d4c1f4b9.html",
+                "path": "/Users/gqadonis/Library/Application Support/CherryStudio/Data/Files/2e899663-7f1d-47ea-85bd-e346d4c1f4b9.html",
+                "created_at": "2025-12-24T14:39:03.736Z",
+                "size": 12405,
+                "ext": ".html",
+                "type": "text",
+                "count": 1
+              },
+              "created_at": 1766840393488,
+              "updated_at": 1766840393488,
+              "uniqueId": "WebLoader_5b893e59eacc825610389d0637bd901f",
+              "uniqueIds": [
+                "WebLoader_5b893e59eacc825610389d0637bd901f"
+              ],
+              "isPreprocessed": false
+            },
+            {
+              "id": "9fc9f20c-98d5-4a75-b457-5833a7e73931",
+              "type": "file",
+              "content": {
+                "id": "b804c92a-8412-474a-a82f-1ca1da8632c6",
+                "origin_name": "shadcnui-Textarea-HTMX-Variations-single-file.html",
+                "name": "b804c92a-8412-474a-a82f-1ca1da8632c6.html",
+                "path": "/Users/gqadonis/Library/Application Support/CherryStudio/Data/Files/b804c92a-8412-474a-a82f-1ca1da8632c6.html",
+                "created_at": "2025-12-24T14:38:27.973Z",
+                "size": 12965,
+                "ext": ".html",
+                "type": "text",
+                "count": 1
+              },
+              "created_at": 1766840393488,
+              "updated_at": 1766840393488,
+              "uniqueId": "WebLoader_233edc804ce4c535c2c429708f136533",
+              "uniqueIds": [
+                "WebLoader_233edc804ce4c535c2c429708f136533"
+              ],
+              "isPreprocessed": false
+            },
+            {
+              "id": "18ece84d-5336-4384-bab7-1c6e6a1bfc2e",
+              "type": "file",
+              "content": {
+                "id": "da7b1d94-61c0-4019-a9f3-9e3a32e25363",
+                "origin_name": "Sidebar-shadcnui-structure-HTMLX-artifact.html",
+                "name": "da7b1d94-61c0-4019-a9f3-9e3a32e25363.html",
+                "path": "/Users/gqadonis/Library/Application Support/CherryStudio/Data/Files/da7b1d94-61c0-4019-a9f3-9e3a32e25363.html",
+                "created_at": "2025-12-23T23:34:41.122Z",
+                "size": 29500,
+                "ext": ".html",
+                "type": "text",
+                "count": 1
+              },
+              "created_at": 1766840393488,
+              "updated_at": 1766840393488,
+              "uniqueId": "WebLoader_fd54e32d9ab1c5aa50cbee18f493a2d5",
+              "uniqueIds": [
+                "WebLoader_fd54e32d9ab1c5aa50cbee18f493a2d5"
+              ],
+              "isPreprocessed": false
+            },
+            {
+              "id": "7991ca54-2f0d-4b06-8728-61fd644a130f",
+              "type": "file",
+              "content": {
+                "id": "2aeb0e43-e7fa-4118-8e8c-6123329059b2",
+                "origin_name": "README.md",
+                "name": "2aeb0e43-e7fa-4118-8e8c-6123329059b2.md",
+                "path": "/Users/gqadonis/Library/Application Support/CherryStudio/Data/Files/2aeb0e43-e7fa-4118-8e8c-6123329059b2.md",
+                "created_at": "2025-12-26T16:15:04.885Z",
+                "size": 488,
+                "ext": ".md",
+                "type": "text",
+                "count": 1
+              },
+              "created_at": 1766840408845,
+              "updated_at": 1766840408845,
+              "uniqueId": "LocalPathLoader_93754f6cb5354d80bbb2df63aa90e449",
+              "uniqueIds": [
+                "LocalPathLoader_93754f6cb5354d80bbb2df63aa90e449"
+              ],
+              "isPreprocessed": false
+            },
+            {
+              "id": "a919eb0f-3f17-404f-b3c9-394a612e3010",
+              "type": "file",
+              "content": {
+                "id": "caa03328-5830-4cfc-920d-8a876d5b4650",
+                "origin_name": "sidebar-01-app-shell.html",
+                "name": "caa03328-5830-4cfc-920d-8a876d5b4650.html",
+                "path": "/Users/gqadonis/Library/Application Support/CherryStudio/Data/Files/caa03328-5830-4cfc-920d-8a876d5b4650.html",
+                "created_at": "2025-12-26T16:15:04.885Z",
+                "size": 16285,
+                "ext": ".html",
+                "type": "text",
+                "count": 1
+              },
+              "created_at": 1766840408845,
+              "updated_at": 1766840408845,
+              "uniqueId": "WebLoader_72633f4be2cdeb11d942dd232c9d29db",
+              "uniqueIds": [
+                "WebLoader_72633f4be2cdeb11d942dd232c9d29db"
+              ],
+              "isPreprocessed": false
+            },
+            {
+              "id": "d30ee631-a6b3-47a2-91df-998e610cbb46",
+              "type": "file",
+              "content": {
+                "id": "6af3e8ee-d3e4-4be6-b1f5-1ca0501f2e45",
+                "origin_name": "sidebar-01-wc-htmx.html",
+                "name": "6af3e8ee-d3e4-4be6-b1f5-1ca0501f2e45.html",
+                "path": "/Users/gqadonis/Library/Application Support/CherryStudio/Data/Files/6af3e8ee-d3e4-4be6-b1f5-1ca0501f2e45.html",
+                "created_at": "2025-12-26T16:15:04.886Z",
+                "size": 19094,
+                "ext": ".html",
+                "type": "text",
+                "count": 1
+              },
+              "created_at": 1766840408845,
+              "updated_at": 1766840408845,
+              "uniqueId": "WebLoader_c0e8acad5f820cc29e31a6df2ddf9d16",
+              "uniqueIds": [
+                "WebLoader_c0e8acad5f820cc29e31a6df2ddf9d16"
+              ],
+              "isPreprocessed": false
+            },
+            {
+              "id": "9123f107-5e46-470d-a8ed-c08520a6a501",
+              "type": "file",
+              "content": {
+                "id": "7ade88cc-84a0-409f-8279-3a965b681d39",
+                "origin_name": "sidebar-02-sticky-header.html",
+                "name": "7ade88cc-84a0-409f-8279-3a965b681d39.html",
+                "path": "/Users/gqadonis/Library/Application Support/CherryStudio/Data/Files/7ade88cc-84a0-409f-8279-3a965b681d39.html",
+                "created_at": "2025-12-26T16:15:04.886Z",
+                "size": 8180,
+                "ext": ".html",
+                "type": "text",
+                "count": 1
+              },
+              "created_at": 1766840408845,
+              "updated_at": 1766840408845,
+              "uniqueId": "WebLoader_da1958f83f594fccae8701aa5bfbc32e",
+              "uniqueIds": [
+                "WebLoader_da1958f83f594fccae8701aa5bfbc32e"
+              ],
+              "isPreprocessed": false
+            },
+            {
+              "id": "ba1be335-fbf9-4f9d-8503-f9ca8394141c",
+              "type": "file",
+              "content": {
+                "id": "cf07d393-afbd-4cd5-a9e1-7f52465b275a",
+                "origin_name": "sidebar-02-wc-htmx-sticky-header.html",
+                "name": "cf07d393-afbd-4cd5-a9e1-7f52465b275a.html",
+                "path": "/Users/gqadonis/Library/Application Support/CherryStudio/Data/Files/cf07d393-afbd-4cd5-a9e1-7f52465b275a.html",
+                "created_at": "2025-12-26T16:15:04.886Z",
+                "size": 9301,
+                "ext": ".html",
+                "type": "text",
+                "count": 1
+              },
+              "created_at": 1766840408845,
+              "updated_at": 1766840408845,
+              "uniqueId": "WebLoader_981335732e54ba6166806cd82c5ae63c",
+              "uniqueIds": [
+                "WebLoader_981335732e54ba6166806cd82c5ae63c"
+              ],
+              "isPreprocessed": false
+            },
+            {
+              "id": "1cb8f82f-42d1-45c3-851c-bdbb59a3518e",
+              "type": "file",
+              "content": {
+                "id": "b84f2c4c-415f-47b7-b7d8-d7f79a051eab",
+                "origin_name": "sidebar-03-icon-collapse.html",
+                "name": "b84f2c4c-415f-47b7-b7d8-d7f79a051eab.html",
+                "path": "/Users/gqadonis/Library/Application Support/CherryStudio/Data/Files/b84f2c4c-415f-47b7-b7d8-d7f79a051eab.html",
+                "created_at": "2025-12-26T16:15:04.887Z",
+                "size": 7817,
+                "ext": ".html",
+                "type": "text",
+                "count": 1
+              },
+              "created_at": 1766840408845,
+              "updated_at": 1766840408845,
+              "uniqueId": "WebLoader_831d712650d94eafa602bf34310d6538",
+              "uniqueIds": [
+                "WebLoader_831d712650d94eafa602bf34310d6538"
+              ],
+              "isPreprocessed": false
+            },
+            {
+              "id": "724b47cb-74b2-4c93-805b-2c1fc5f3f2ef",
+              "type": "file",
+              "content": {
+                "id": "2fc2eee5-caa0-44fe-a956-bab6d4aacea6",
+                "origin_name": "sidebar-04-search-header.html",
+                "name": "2fc2eee5-caa0-44fe-a956-bab6d4aacea6.html",
+                "path": "/Users/gqadonis/Library/Application Support/CherryStudio/Data/Files/2fc2eee5-caa0-44fe-a956-bab6d4aacea6.html",
+                "created_at": "2025-12-26T16:15:04.887Z",
+                "size": 8401,
+                "ext": ".html",
+                "type": "text",
+                "count": 1
+              },
+              "created_at": 1766840408845,
+              "updated_at": 1766840408845,
+              "uniqueId": "WebLoader_82bd2e3062256e30c4dcd7a59fe86495",
+              "uniqueIds": [
+                "WebLoader_82bd2e3062256e30c4dcd7a59fe86495"
+              ],
+              "isPreprocessed": false
+            },
+            {
+              "id": "9d13dd3c-fbad-4c7d-b123-718557df7807",
+              "type": "file",
+              "content": {
+                "id": "ab7c8792-e09e-46c4-8ddf-2a8e2290c602",
+                "origin_name": "sidebar-05-compact.html",
+                "name": "ab7c8792-e09e-46c4-8ddf-2a8e2290c602.html",
+                "path": "/Users/gqadonis/Library/Application Support/CherryStudio/Data/Files/ab7c8792-e09e-46c4-8ddf-2a8e2290c602.html",
+                "created_at": "2025-12-26T16:15:04.887Z",
+                "size": 7215,
+                "ext": ".html",
+                "type": "text",
+                "count": 1
+              },
+              "created_at": 1766840408845,
+              "updated_at": 1766840408845,
+              "uniqueId": "WebLoader_d1ef1ec65023efb85ab2381f6e735948",
+              "uniqueIds": [
+                "WebLoader_d1ef1ec65023efb85ab2381f6e735948"
+              ],
+              "isPreprocessed": false
+            },
+            {
+              "id": "f74aa569-9855-48e2-a665-8857d225fe1c",
+              "type": "file",
+              "content": {
+                "id": "637c900a-a7f4-40a8-8a9c-0af3c3160451",
+                "origin_name": "sidebar-06-grouped-sections.html",
+                "name": "637c900a-a7f4-40a8-8a9c-0af3c3160451.html",
+                "path": "/Users/gqadonis/Library/Application Support/CherryStudio/Data/Files/637c900a-a7f4-40a8-8a9c-0af3c3160451.html",
+                "created_at": "2025-12-26T16:15:04.887Z",
+                "size": 7964,
+                "ext": ".html",
+                "type": "text",
+                "count": 1
+              },
+              "created_at": 1766840408845,
+              "updated_at": 1766840408845,
+              "uniqueId": "WebLoader_7f2fe98e4a66ac29004d11ba9adc326a",
+              "uniqueIds": [
+                "WebLoader_7f2fe98e4a66ac29004d11ba9adc326a"
+              ],
+              "isPreprocessed": false
+            },
+            {
+              "id": "856a465c-273a-4f9f-a268-19158532f7d4",
+              "type": "file",
+              "content": {
+                "id": "83831032-61c4-41e4-90f4-f18b26baa1eb",
+                "origin_name": "sidebar-07-badges.html",
+                "name": "83831032-61c4-41e4-90f4-f18b26baa1eb.html",
+                "path": "/Users/gqadonis/Library/Application Support/CherryStudio/Data/Files/83831032-61c4-41e4-90f4-f18b26baa1eb.html",
+                "created_at": "2025-12-26T16:15:04.888Z",
+                "size": 8215,
+                "ext": ".html",
+                "type": "text",
+                "count": 1
+              },
+              "created_at": 1766840408845,
+              "updated_at": 1766840408845,
+              "uniqueId": "WebLoader_e77e3f90613e262fb3ea113fe6870aed",
+              "uniqueIds": [
+                "WebLoader_e77e3f90613e262fb3ea113fe6870aed"
+              ],
+              "isPreprocessed": false
+            },
+            {
+              "id": "b95de3bd-89c2-4505-b0d0-0e2f0337418a",
+              "type": "file",
+              "content": {
+                "id": "b473f7db-93de-4eb7-8b3b-660cb2cf047d",
+                "origin_name": "sidebar-08-user-footer.html",
+                "name": "b473f7db-93de-4eb7-8b3b-660cb2cf047d.html",
+                "path": "/Users/gqadonis/Library/Application Support/CherryStudio/Data/Files/b473f7db-93de-4eb7-8b3b-660cb2cf047d.html",
+                "created_at": "2025-12-26T16:15:04.888Z",
+                "size": 8256,
+                "ext": ".html",
+                "type": "text",
+                "count": 1
+              },
+              "created_at": 1766840408845,
+              "updated_at": 1766840408845,
+              "uniqueId": "WebLoader_2249458d01e5f999508631dac54d8b5b",
+              "uniqueIds": [
+                "WebLoader_2249458d01e5f999508631dac54d8b5b"
+              ],
+              "isPreprocessed": false
+            },
+            {
+              "id": "6dfb8308-fe4e-4732-be4d-5c1ebd67fde1",
+              "type": "file",
+              "content": {
+                "id": "105b76f2-65cc-4989-86dd-6bf6cd96f7a8",
+                "origin_name": "sidebar-09-mini-rail.html",
+                "name": "105b76f2-65cc-4989-86dd-6bf6cd96f7a8.html",
+                "path": "/Users/gqadonis/Library/Application Support/CherryStudio/Data/Files/105b76f2-65cc-4989-86dd-6bf6cd96f7a8.html",
+                "created_at": "2025-12-26T16:15:04.888Z",
+                "size": 9854,
+                "ext": ".html",
+                "type": "text",
+                "count": 1
+              },
+              "created_at": 1766840408845,
+              "updated_at": 1766840408845,
+              "uniqueId": "WebLoader_4e76b6d203d208aba5ea5ac3908c7e35",
+              "uniqueIds": [
+                "WebLoader_4e76b6d203d208aba5ea5ac3908c7e35"
+              ],
+              "isPreprocessed": false
+            },
+            {
+              "id": "c1516625-2b2c-45f0-a749-66543f49a614",
+              "type": "file",
+              "content": {
+                "id": "68e1421f-d713-439c-8208-bab1361fd612",
+                "origin_name": "sidebar-10-floating.html",
+                "name": "68e1421f-d713-439c-8208-bab1361fd612.html",
+                "path": "/Users/gqadonis/Library/Application Support/CherryStudio/Data/Files/68e1421f-d713-439c-8208-bab1361fd612.html",
+                "created_at": "2025-12-26T16:15:04.888Z",
+                "size": 8081,
+                "ext": ".html",
+                "type": "text",
+                "count": 1
+              },
+              "created_at": 1766840408845,
+              "updated_at": 1766840408845,
+              "uniqueId": "WebLoader_b12ee3997eb3404104984ebbd49a9018",
+              "uniqueIds": [
+                "WebLoader_b12ee3997eb3404104984ebbd49a9018"
+              ],
+              "isPreprocessed": false
+            },
+            {
+              "id": "ffc7d622-0be1-4454-882c-953bdb0f69e4",
+              "type": "file",
+              "content": {
+                "id": "c6b4e9bd-e3a3-43dd-80f1-49ca0316dbcf",
+                "origin_name": "sidebar-11-inset.html",
+                "name": "c6b4e9bd-e3a3-43dd-80f1-49ca0316dbcf.html",
+                "path": "/Users/gqadonis/Library/Application Support/CherryStudio/Data/Files/c6b4e9bd-e3a3-43dd-80f1-49ca0316dbcf.html",
+                "created_at": "2025-12-26T16:15:04.889Z",
+                "size": 7404,
+                "ext": ".html",
+                "type": "text",
+                "count": 1
+              },
+              "created_at": 1766840408845,
+              "updated_at": 1766840408845,
+              "uniqueId": "WebLoader_408add895ecbf0edb909e59f84888519",
+              "uniqueIds": [
+                "WebLoader_408add895ecbf0edb909e59f84888519"
+              ],
+              "isPreprocessed": false
+            },
+            {
+              "id": "126e4e5e-5250-4236-ab6f-92fac75d8de6",
+              "type": "file",
+              "content": {
+                "id": "8ae4ce37-acc7-4c21-a5f8-520984382157",
+                "origin_name": "sidebar-12-collapsible-sections.html",
+                "name": "8ae4ce37-acc7-4c21-a5f8-520984382157.html",
+                "path": "/Users/gqadonis/Library/Application Support/CherryStudio/Data/Files/8ae4ce37-acc7-4c21-a5f8-520984382157.html",
+                "created_at": "2025-12-26T16:15:04.889Z",
+                "size": 9268,
+                "ext": ".html",
+                "type": "text",
+                "count": 1
+              },
+              "created_at": 1766840408845,
+              "updated_at": 1766840408845,
+              "uniqueId": "WebLoader_0babed111bb7af57fa7f17e533716fd2",
+              "uniqueIds": [
+                "WebLoader_0babed111bb7af57fa7f17e533716fd2"
+              ],
+              "isPreprocessed": false
+            },
+            {
+              "id": "00446a54-45f6-4e80-aa46-77c29c4d00b9",
+              "type": "file",
+              "content": {
+                "id": "13fbcbd3-09ab-43ca-ac43-10f670de8379",
+                "origin_name": "sidebar-13-secondary-panel.html",
+                "name": "13fbcbd3-09ab-43ca-ac43-10f670de8379.html",
+                "path": "/Users/gqadonis/Library/Application Support/CherryStudio/Data/Files/13fbcbd3-09ab-43ca-ac43-10f670de8379.html",
+                "created_at": "2025-12-26T16:15:04.889Z",
+                "size": 10074,
+                "ext": ".html",
+                "type": "text",
+                "count": 1
+              },
+              "created_at": 1766840408845,
+              "updated_at": 1766840408845,
+              "uniqueId": "WebLoader_1797a73d125f219b355545aece88759f",
+              "uniqueIds": [
+                "WebLoader_1797a73d125f219b355545aece88759f"
+              ],
+              "isPreprocessed": false
+            },
+            {
+              "id": "70144601-141d-4161-8dbe-56ff4e7b07da",
+              "type": "file",
+              "content": {
+                "id": "819975cc-8da2-4da0-bc2a-73a00112217e",
+                "origin_name": "sidebar-14-right-sidebar.html",
+                "name": "819975cc-8da2-4da0-bc2a-73a00112217e.html",
+                "path": "/Users/gqadonis/Library/Application Support/CherryStudio/Data/Files/819975cc-8da2-4da0-bc2a-73a00112217e.html",
+                "created_at": "2025-12-26T16:15:04.889Z",
+                "size": 7429,
+                "ext": ".html",
+                "type": "text",
+                "count": 1
+              },
+              "created_at": 1766840408845,
+              "updated_at": 1766840408845,
+              "uniqueId": "WebLoader_78346c49cbc0b0c416c7fc59ea1b314b",
+              "uniqueIds": [
+                "WebLoader_78346c49cbc0b0c416c7fc59ea1b314b"
+              ],
+              "isPreprocessed": false
+            },
+            {
+              "id": "5c2af5d9-bf24-401f-9c03-4fdfcbb88baf",
+              "type": "file",
+              "content": {
+                "id": "3caa55b0-2147-44b6-98b9-f188e2d7a269",
+                "origin_name": "sidebar-14-wc-htmx-right-sidebar.html",
+                "name": "3caa55b0-2147-44b6-98b9-f188e2d7a269.html",
+                "path": "/Users/gqadonis/Library/Application Support/CherryStudio/Data/Files/3caa55b0-2147-44b6-98b9-f188e2d7a269.html",
+                "created_at": "2025-12-26T16:15:04.890Z",
+                "size": 7318,
+                "ext": ".html",
+                "type": "text",
+                "count": 1
+              },
+              "created_at": 1766840408845,
+              "updated_at": 1766840408845,
+              "uniqueId": "WebLoader_37d5897970483df921354ec5a32a1433",
+              "uniqueIds": [
+                "WebLoader_37d5897970483df921354ec5a32a1433"
+              ],
+              "isPreprocessed": false
+            },
+            {
+              "id": "615cb8a8-7cf3-43c5-ae69-a11a03616f7c",
+              "type": "file",
+              "content": {
+                "id": "21dacd0c-db54-46c0-89dd-4539b106395c",
+                "origin_name": "sidebar-15-dual-sidebars.html",
+                "name": "21dacd0c-db54-46c0-89dd-4539b106395c.html",
+                "path": "/Users/gqadonis/Library/Application Support/CherryStudio/Data/Files/21dacd0c-db54-46c0-89dd-4539b106395c.html",
+                "created_at": "2025-12-26T16:15:04.890Z",
+                "size": 8935,
+                "ext": ".html",
+                "type": "text",
+                "count": 1
+              },
+              "created_at": 1766840408845,
+              "updated_at": 1766840408845,
+              "uniqueId": "WebLoader_c3a0d2b4e75816853022f5ecd38d255e",
+              "uniqueIds": [
+                "WebLoader_c3a0d2b4e75816853022f5ecd38d255e"
+              ],
+              "isPreprocessed": false
+            },
+            {
+              "id": "c6ac2242-e57f-4eaa-a07b-6971b6fbfded",
+              "type": "file",
+              "content": {
+                "id": "3a76a9b2-0def-4ab0-b7a3-5bacd98fd80b",
+                "origin_name": "sidebar-15-wc-htmx-dual-sidebars.html",
+                "name": "3a76a9b2-0def-4ab0-b7a3-5bacd98fd80b.html",
+                "path": "/Users/gqadonis/Library/Application Support/CherryStudio/Data/Files/3a76a9b2-0def-4ab0-b7a3-5bacd98fd80b.html",
+                "created_at": "2025-12-26T16:15:04.890Z",
+                "size": 7793,
+                "ext": ".html",
+                "type": "text",
+                "count": 1
+              },
+              "created_at": 1766840408845,
+              "updated_at": 1766840408845,
+              "uniqueId": "WebLoader_06e009580858e56ef2f031ae3844f23d",
+              "uniqueIds": [
+                "WebLoader_06e009580858e56ef2f031ae3844f23d"
+              ],
+              "isPreprocessed": false
+            },
+            {
+              "id": "c0904822-d95c-4f81-9e12-23ffdaeee129",
+              "type": "file",
+              "content": {
+                "id": "e299e8f7-5c08-4615-8114-a78d98afbca0",
+                "origin_name": "sidebar-16-minimal.html",
+                "name": "e299e8f7-5c08-4615-8114-a78d98afbca0.html",
+                "path": "/Users/gqadonis/Library/Application Support/CherryStudio/Data/Files/e299e8f7-5c08-4615-8114-a78d98afbca0.html",
+                "created_at": "2025-12-26T16:15:04.890Z",
+                "size": 6370,
+                "ext": ".html",
+                "type": "text",
+                "count": 1
+              },
+              "created_at": 1766840408845,
+              "updated_at": 1766840408845,
+              "uniqueId": "WebLoader_3b59ec1384717cdf484d58882c5340fb",
+              "uniqueIds": [
+                "WebLoader_3b59ec1384717cdf484d58882c5340fb"
+              ],
+              "isPreprocessed": false
+            }
+          ],
+          "created_at": 1764614623981,
+          "updated_at": 1766840408845,
+          "version": 1,
+          "dimensions": 1536
+        },
+        {
+          "id": "SyayLqu65GwIP2JetZviR",
+          "name": "Planet",
+          "model": {
+            "id": "text-embedding-3-small",
+            "name": "text-embedding-3-small",
+            "provider": "openai",
+            "group": "text-embedding",
+            "description": "",
+            "owned_by": "system",
+            "supported_text_delta": true
+          },
+          "items": [
+            {
+              "id": "fde05fab-a330-4f04-8c86-03016db11b9a",
+              "type": "file",
+              "content": {
+                "id": "63235bec-28f7-4f47-bad9-f5ceab67d757",
+                "origin_name": "PLANET_BUSINESS_MODEL.md",
+                "name": "63235bec-28f7-4f47-bad9-f5ceab67d757.md",
+                "path": "/Users/gqadonis/Library/Application Support/CherryStudio/Data/Files/63235bec-28f7-4f47-bad9-f5ceab67d757.md",
+                "created_at": "2026-01-13T14:16:38.996Z",
+                "size": 10071,
+                "ext": ".md",
+                "type": "text",
+                "count": 1
+              },
+              "created_at": 1768313897263,
+              "updated_at": 1768313897263,
+              "uniqueId": "LocalPathLoader_735247be60d6db3508d72eaf36b15602",
+              "uniqueIds": [
+                "LocalPathLoader_735247be60d6db3508d72eaf36b15602"
+              ],
+              "isPreprocessed": false
+            }
+          ],
+          "created_at": 1768313885783,
+          "updated_at": 1768313897263,
+          "version": 1,
+          "dimensions": 1536
+        }
+      ],
+      "emoji": "🈺",

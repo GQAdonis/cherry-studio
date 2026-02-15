@@ -3283,6 +3283,33 @@ const migrateConfig = {
       logger.error('migrate 198 error', error as Error)
       return state
     }
+  },
+  '199': (state: RootState) => {
+    try {
+      // Initialize MCP exposure settings
+      if (state.settings?.apiServer) {
+        state.settings.apiServer.mcpExposureEnabled = false
+      }
+      // Initialize exposedViaMcp=false on all existing MCP servers
+      if (state?.mcp?.servers) {
+        state.mcp.servers = state.mcp.servers.map((server: any) => ({
+          ...server,
+          exposedViaMcp: false
+        }))
+      }
+      // Initialize exposedViaMcp=false on all existing knowledge bases
+      if (state?.knowledge?.bases) {
+        state.knowledge.bases = state.knowledge.bases.map((base: any) => ({
+          ...base,
+          exposedViaMcp: false
+        }))
+      }
+      logger.info('migrate 199 success')
+      return state
+    } catch (error) {
+      logger.error('migrate 199 error', error as Error)
+      return state
+    }
   }
 }
 

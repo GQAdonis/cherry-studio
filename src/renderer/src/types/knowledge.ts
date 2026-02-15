@@ -100,6 +100,8 @@ export interface KnowledgeBase {
     type: 'preprocess'
     provider: PreprocessProvider
   }
+  /** Whether this knowledge base is exposed as an MCP resource for external AI tools */
+  exposedViaMcp?: boolean
 }
 
 export type ProcessingStatus = 'pending' | 'processing' | 'completed' | 'failed'

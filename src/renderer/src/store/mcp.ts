@@ -56,6 +56,12 @@ const mcpSlice = createSlice({
     },
     setIsBunInstalled: (state, action: PayloadAction<boolean>) => {
       state.isBunInstalled = action.payload
+    },
+    setMcpServerExposed: (state, action: PayloadAction<{ id: string; exposed: boolean }>) => {
+      const index = state.servers.findIndex((server) => server.id === action.payload.id)
+      if (index !== -1) {
+        state.servers[index].exposedViaMcp = action.payload.exposed
+      }
     }
   },
   selectors: {
@@ -73,7 +79,8 @@ export const {
   deleteMCPServer,
   setMCPServerActive,
   setIsBunInstalled,
-  setIsUvInstalled
+  setIsUvInstalled,
+  setMcpServerExposed
 } = mcpSlice.actions
 
 // Export the generated selectors from the slice

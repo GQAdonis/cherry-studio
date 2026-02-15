@@ -24,6 +24,7 @@ const logger = loggerService.withContext('AgentService')
 export class AgentService extends BaseService {
   private static instance: AgentService | null = null
   private readonly modelFields: AgentModelField[] = ['model', 'plan_model', 'small_model']
+  private readonly booleanTextFields = ['exposed_via_mcp'] as const
 
   static getInstance(): AgentService {
     if (!AgentService.instance) {
@@ -76,7 +77,7 @@ export class AgentService extends BaseService {
       throw new Error('Failed to create agent')
     }
 
-    const agent = this.deserializeJsonFields(result[0]) as AgentEntity
+    const agent = this.convertBooleanTextFields(this.deserializeJsonFields(result[0])) as AgentEntity
     return agent
   }
 
@@ -88,7 +89,7 @@ export class AgentService extends BaseService {
       return null
     }
 
-    const agent = this.deserializeJsonFields(result[0]) as GetAgentResponse
+    const agent = this.convertBooleanTextFields(this.deserializeJsonFields(result[0])) as GetAgentResponse
     const { tools, legacyIdMap } = await this.listMcpTools(agent.type, agent.mcps)
     agent.tools = tools
     agent.allowed_tools = this.normalizeAllowedTools(agent.allowed_tools, agent.tools, legacyIdMap)
@@ -133,7 +134,9 @@ export class AgentService extends BaseService {
           : await baseQuery.limit(options.limit)
         : await baseQuery
 
-    const agents = result.map((row) => this.deserializeJsonFields(row)) as GetAgentResponse[]
+    const agents = result.map((row) =>
+      this.convertBooleanTextFields(this.deserializeJsonFields(row))
+    ) as GetAgentResponse[]
 
     for (const agent of agents) {
       const { tools, legacyIdMap } = await this.listMcpTools(agent.type, agent.mcps)
@@ -191,6 +194,15 @@ export class AgentService extends BaseService {
       }
     }
 
+    // Handle exposed_via_mcp separately — it's on AgentEntitySchema, not AgentBaseSchema
+    if (Object.prototype.hasOwnProperty.call(updates, 'exposed_via_mcp')) {
+      ;(updateData as Record<string, unknown>)['exposed_via_mcp'] = (updates as Record<string, unknown>)[
+        'exposed_via_mcp'
+      ]
+        ? 'true'
+        : 'false'
+    }
+
     const database = await this.getDatabase()
     await database.update(agentsTable).set(updateData).where(eq(agentsTable.id, id))
     return await this.getAgent(id)
@@ -212,6 +224,21 @@ export class AgentService extends BaseService {
       .limit(1)
 
     return result.length > 0
+  }
+
+  /**
+   * Convert SQLite text boolean fields ('true'/'false') to JS booleans.
+   * SQLite does not have a native boolean type.
+   */
+  private convertBooleanTextFields(data: any): any {
+    if (!data) return data
+    const result = { ...data }
+    for (const field of this.booleanTextFields) {
+      if (typeof result[field] === 'string') {
+        result[field] = result[field] === 'true'
+      }
+    }
+    return result
   }
 }
 

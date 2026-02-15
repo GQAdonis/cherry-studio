@@ -3,6 +3,8 @@ export type ApiServerConfig = {
   host: string
   port: number
   apiKey: string
+  /** Whether to expose selected resources as MCP tool servers for external AI tools */
+  mcpExposureEnabled?: boolean
 }
 
 export type GetApiServerStatusResult = {

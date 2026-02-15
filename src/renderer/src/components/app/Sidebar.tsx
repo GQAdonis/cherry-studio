@@ -34,7 +34,7 @@ import { useTranslation } from 'react-i18next'
 import { useLocation, useNavigate } from 'react-router-dom'
 import styled from 'styled-components'
 
-import { OpenClawIcon } from '../Icons/SVGIcon'
+import { OpenClawSidebarIcon } from '../Icons/SVGIcon'
 import UserPopup from '../Popups/UserPopup'
 import { SidebarOpenedMinappTabs, SidebarPinnedApps } from './PinnedMinapps'
 
@@ -140,7 +140,7 @@ const MainMenus: FC = () => {
     notes: <NotepadText size={18} className="icon" />,
     code_tools: <Code size={18} className="icon" />,
     artifacts: <Sparkles size={18} className="icon" />,
-    openclaw: <OpenClawIcon style={{ width: 18, height: 18 }} className="icon" />
+    openclaw: <OpenClawSidebarIcon style={{ width: 18, height: 18 }} className="icon" />
   }
 
   const pathMap = {

@@ -976,6 +976,8 @@ export interface MCPServer {
   trustedAt?: number
   /** 安装时间戳 */
   installedAt?: number
+  /** Whether this server is exposed as an MCP endpoint for external AI tools */
+  exposedViaMcp?: boolean
 }
 
 export type BuiltinMCPServer = MCPServer & {

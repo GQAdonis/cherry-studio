@@ -1023,6 +1023,12 @@ const settingsSlice = createSlice({
         apiKey: action.payload
       }
     },
+    setMcpExposureEnabled: (state, action: PayloadAction<boolean>) => {
+      state.apiServer = {
+        ...state.apiServer,
+        mcpExposureEnabled: action.payload
+      }
+    },
     setShowMessageOutline: (state, action: PayloadAction<boolean>) => {
       state.showMessageOutline = action.payload
     },
@@ -1223,6 +1229,7 @@ export const {
   setApiServerEnabled,
   setApiServerPort,
   setApiServerApiKey,
+  setMcpExposureEnabled,
   // Context Management actions
   setContextStrategy,
   setContextStrategyPartial,

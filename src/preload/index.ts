@@ -12,6 +12,7 @@ import type {
   LanHandshakeAckMessage,
   LocalTransferConnectPayload,
   LocalTransferState,
+  NodeCheckResult,
   WebviewKeyEvent
 } from '@shared/config/types'
 import type { MCPServerLogEntry } from '@shared/config/types'
@@ -39,6 +40,8 @@ import type {
   RestartApiServerStatusResult,
   S3Config,
   Shortcut,
+  SkillMatchingConfig,
+  SkillStorageProviderConfig,
   StartApiServerStatusResult,
   StopApiServerStatusResult,
   SupportedOcrFile,
@@ -737,8 +740,7 @@ const api = {
   openclaw: {
     checkInstalled: (): Promise<{ installed: boolean; path: string | null }> =>
       ipcRenderer.invoke(IpcChannel.OpenClaw_CheckInstalled),
-    checkNpmAvailable: (): Promise<{ available: boolean; path: string | null }> =>
-      ipcRenderer.invoke(IpcChannel.OpenClaw_CheckNpmAvailable),
+    checkNodeVersion: (): Promise<NodeCheckResult> => ipcRenderer.invoke(IpcChannel.OpenClaw_CheckNodeVersion),
     checkGitAvailable: (): Promise<{ available: boolean; path: string | null }> =>
       ipcRenderer.invoke(IpcChannel.OpenClaw_CheckGitAvailable),
     getNodeDownloadUrl: (): Promise<string> => ipcRenderer.invoke(IpcChannel.OpenClaw_GetNodeDownloadUrl),
@@ -761,6 +763,33 @@ const api = {
   },
   analytics: {
     trackTokenUsage: (data: TokenUsageData) => ipcRenderer.invoke(IpcChannel.Analytics_TrackTokenUsage, data)
+  },
+  skill: {
+    getList: () => ipcRenderer.invoke(IpcChannel.Skill_GetList),
+    toggle: (id: string, enabled: boolean) => ipcRenderer.invoke(IpcChannel.Skill_Toggle, id, enabled),
+    refresh: () => ipcRenderer.invoke(IpcChannel.Skill_Refresh),
+    getMatchingConfig: () => ipcRenderer.invoke(IpcChannel.Skill_GetMatchingConfig),
+    setMatchingConfig: (config: Partial<SkillMatchingConfig>) =>
+      ipcRenderer.invoke(IpcChannel.Skill_SetMatchingConfig, config),
+    initializeMatching: () => ipcRenderer.invoke(IpcChannel.Skill_InitializeMatching),
+    getAgentSkills: (agentId: string) => ipcRenderer.invoke(IpcChannel.Skill_GetAgentSkills, agentId),
+    setAgentSkills: (agentId: string, skillIds: string[]) =>
+      ipcRenderer.invoke(IpcChannel.Skill_SetAgentSkills, agentId, skillIds),
+    addToAgent: (agentId: string, skillId: string) => ipcRenderer.invoke(IpcChannel.Skill_AddToAgent, agentId, skillId),
+    removeFromAgent: (agentId: string, skillId: string) =>
+      ipcRenderer.invoke(IpcChannel.Skill_RemoveFromAgent, agentId, skillId),
+    getEnabledForAgent: (agentId: string) => ipcRenderer.invoke(IpcChannel.Skill_GetEnabledForAgent, agentId)
+  },
+  skillStorage: {
+    getProviders: () => ipcRenderer.invoke(IpcChannel.SkillStorage_GetProviders),
+    addProvider: (config: SkillStorageProviderConfig) =>
+      ipcRenderer.invoke(IpcChannel.SkillStorage_AddProvider, config),
+    updateProvider: (id: string, config: Partial<SkillStorageProviderConfig>) =>
+      ipcRenderer.invoke(IpcChannel.SkillStorage_UpdateProvider, id, config),
+    removeProvider: (id: string) => ipcRenderer.invoke(IpcChannel.SkillStorage_RemoveProvider, id),
+    testConnection: (config: SkillStorageProviderConfig) =>
+      ipcRenderer.invoke(IpcChannel.SkillStorage_TestConnection, config),
+    selectDirectory: () => ipcRenderer.invoke(IpcChannel.SkillStorage_SelectDirectory)
   }
 }
 

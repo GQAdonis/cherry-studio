@@ -153,6 +153,10 @@
         "title": "進階設定"
       },
       "essential": "必要設定",
+      "permissionMode": {
+        "tab": "權限模式",
+        "title": "權限模式"
+      },
       "plugins": {
         "available": {
           "title": "可用外掛"
@@ -223,17 +227,16 @@
         "mcp": {
           "description": "連線 MCP 伺服器即可解鎖更多可在上方預先授權的工具。",
           "empty": "尚未偵測到 MCP 伺服器，請前往 MCP 設定頁新增。",
+          "inactiveTooltip": "此 MCP 伺服器未啟用，請先啟動它。",
           "manageHint": "需要進階設定？前往 設定 → MCP 伺服器。",
           "toggle": "切換 {{name}}"
         },
         "permissionMode": {
           "acceptEdits": {
-            "behavior": "預先授權受信任的檔案系統工具，允許即時執行。",
             "description": "檔案編輯與檔案系統操作會自動核准。",
             "title": "自動接受檔案編輯"
           },
           "bypassPermissions": {
-            "behavior": "所有工具都會被自動預先授權。",
             "description": "所有權限提示都會被略過，請務必謹慎使用。",
             "title": "略過所有權限檢查",
             "warning": "警告：所有工具都會在無核准情況下執行。"
@@ -243,14 +246,12 @@
             "title": "確認切換權限模式？"
           },
           "default": {
-            "behavior": "唯讀工具會自動預先授權。",
             "description": "唯讀工具會自動預先授權，其它操作仍需核准。",
             "title": "預設（繼續前先詢問）"
           },
           "helper": "指定助手如何處理工具使用授權",
           "placeholder": "選擇權限模式",
           "plan": {
-            "behavior": "預設的唯讀工具會自動預先授權，但執行仍被停用。",
             "description": "沿用預設的唯讀工具集，並會在執行前先呈現計畫。",
             "title": "規劃模式"
           },
@@ -259,38 +260,13 @@
         "preapproved": {
           "autoBadge": "模式自動新增",
           "autoDescription": "此工具由目前的權限模式自動預先授權。",
+          "autoDisabledTooltip": "由「{{mode}}」自動授權，無法停用。",
           "empty": "沒有符合篩選條件的工具。",
           "mcpBadge": "MCP 工具",
           "requiresApproval": "停用時需要人工核准",
           "search": "搜尋工具",
-          "toggle": "切換 {{name}}",
-          "warning": {
-            "description": "僅啟用你信任的工具。模式預設值會自動標示。",
-            "title": "預先授權的工具將在無人工審查下執行。"
-          }
-        },
-        "review": {
-          "autoTools": "自動：{{count}}",
-          "customTools": "自訂：{{count}}",
-          "helper": "設定會自動儲存，可隨時回到上方步驟調整。",
-          "mcp": "MCP:{{count}}",
-          "mode": "模式：{{mode}}"
-        },
-        "steps": {
-          "mcp": {
-            "title": "MCP 伺服器"
-          },
-          "permissionMode": {
-            "title": "步驟 1 · 權限模式"
-          },
-          "preapproved": {
-            "title": "步驟 2 · 預先授權工具"
-          },
-          "review": {
-            "title": "步驟 3 · 檢視"
-          }
-        },
-        "tab": "工具與權限"
+          "toggle": "切換 {{name}}"
+        }
       },
       "tools": {
         "approved": "已授權",
@@ -300,6 +276,15 @@
         "tab": "預先授權工具",
         "title": "預先授權工具",
         "toggle": "{{defaultValue}}"
+      },
+      "toolsMcp": {
+        "mcp": {
+          "title": "MCP 伺服器"
+        },
+        "tab": "工具",
+        "tools": {
+          "title": "工具"
+        }
       }
     },
     "todo": {
@@ -348,6 +333,49 @@
       },
       "toolPendingFallback": "工具",
       "waiting": "等待工具權限決定..."
+    },
+    "tools": {
+      "builtin": {
+        "Bash": {
+          "description": "在你的環境中執行 Shell 命令"
+        },
+        "Edit": {
+          "description": "對特定檔案進行精確編輯"
+        },
+        "Glob": {
+          "description": "根據模式匹配尋找檔案"
+        },
+        "Grep": {
+          "description": "在檔案內容中搜尋模式"
+        },
+        "MultiEdit": {
+          "description": "在單一檔案上原子性地執行多次編輯"
+        },
+        "NotebookEdit": {
+          "description": "修改 Jupyter notebook 儲存格"
+        },
+        "NotebookRead": {
+          "description": "讀取並顯示 Jupyter notebook 內容"
+        },
+        "Read": {
+          "description": "讀取檔案內容"
+        },
+        "Task": {
+          "description": "執行子代理來處理複雜的多步驟任務"
+        },
+        "TodoWrite": {
+          "description": "建立和管理結構化任務清單"
+        },
+        "WebFetch": {
+          "description": "從指定 URL 取得內容"
+        },
+        "WebSearch": {
+          "description": "執行帶有網域過濾的網路搜尋"
+        },
+        "Write": {
+          "description": "建立或覆寫檔案"
+        }
+      }
     },
     "type": {
       "label": "Agent 類型",
@@ -398,6 +426,49 @@
         "copyTooltip": "複製 URL",
         "label": "URL"
       }
+    },
+    "mcpExposure": {
+      "agents": {
+        "description": "可用作外部客戶的 MCP 工具的代理商",
+        "empty": "沒有代理被標記為 MCP 曝露",
+        "title": "暴露的特工",
+        "toggle": "透過 MCP 暴露"
+      },
+      "description": "將代理、知識庫和 MCP 伺服器作為 MCP 端點公開給外部 AI 工具（Claude Desktop、Gemini CLI 等）。",
+      "enabled": "啟用 MCP 曝光",
+      "enabledDescription": "啟用時，選定的資源可通過 SSE 傳輸作為 MCP 工具伺服器訪問。",
+      "endpoint": {
+        "copied": "MCP 端點 URL 已複製到剪貼簿",
+        "copyTooltip": "複製 MCP 端點 URL",
+        "description": "[to be translated]:Discovery and proxy endpoint for exposed MCP resources",
+        "title": "MCP 端點",
+        "url": "SSE 端點 URL"
+      },
+      "knowledgeBases": {
+        "description": "可供外部客戶使用的 MCP 資源知識庫",
+        "empty": "沒有知識庫標記為MCP暴露。",
+        "title": "暴露的知識庫",
+        "toggle": "透過MCP公開"
+      },
+      "mcpServers": {
+        "description": "MCP 伺服器已配置為外部訪問",
+        "empty": "沒有MCP伺服器被標記為暴露。",
+        "title": "暴露的MCP伺服器",
+        "toggle": "透過MCP暴露"
+      },
+      "status": {
+        "active": "MCP 曝露已啟用",
+        "inactive": "MCP 暴露為非活動狀態",
+        "requiresApiServer": "API 伺服器必須運行以使用 MCP 曝露。"
+      },
+      "title": "MCP 曝露"
+    },
+    "mcpGuide": {
+      "configPath": "[to be translated]:Config File",
+      "copied": "[to be translated]:Copied!",
+      "copy": "[to be translated]:Copy",
+      "description": "[to be translated]:Configure external AI tools to connect to your exposed MCP servers. Each snippet uses your current server URL and API key.",
+      "title": "[to be translated]:Connection Guide"
     },
     "messages": {
       "apiKeyCopied": "API 金鑰已複製到剪貼簿",
@@ -455,46 +526,46 @@
     "zoomOut": "縮小"
   },
   "artifacts": {
-    "attach_image": "[to be translated]:Attach image",
-    "change_model": "[to be translated]:Click to change model",
-    "click_to_open": "[to be translated]:Click to open artifact",
-    "code": "[to be translated]:Code",
-    "console": "[to be translated]:Console",
-    "description_help": "[to be translated]:Used for searching artifacts in your library",
-    "description_placeholder": "[to be translated]:What does this artifact do?",
-    "generating": "[to be translated]:Generating artifact...",
-    "library": "[to be translated]:Artifact Library",
-    "model_locked": "[to be translated]:Model selection is locked",
-    "new_artifact": "[to be translated]:New Artifact",
-    "no_artifacts": "[to be translated]:No artifacts found",
-    "open_artifact": "[to be translated]:Open Artifact",
-    "preview": "[to be translated]:Preview",
-    "preview_type": "[to be translated]:Type",
-    "refinement": "[to be translated]:Refinement Chat",
-    "refinement_empty": "[to be translated]:No messages yet",
-    "refinement_hint": "[to be translated]:Ask the AI to modify this artifact",
-    "refinement_placeholder": "[to be translated]:Describe the changes you want...",
-    "save_from_modal": "[to be translated]:Open the artifact to save it",
-    "save_to_library": "[to be translated]:Save to Library",
-    "saved": "[to be translated]:Artifact saved to library",
-    "split": "[to be translated]:Split",
-    "tags_placeholder": "[to be translated]:Add tags...",
-    "title": "[to be translated]:Artifacts",
-    "title_placeholder": "[to be translated]:Enter artifact title",
+    "attach_image": "附加圖片",
+    "change_model": "點擊以更改模型",
+    "click_to_open": "點擊以打開文物",
+    "code": "代碼",
+    "console": "控制台",
+    "description_help": "用於在您的圖書館中搜索文物",
+    "description_placeholder": "這件文物有什麼作用？",
+    "generating": "生成工件...",
+    "library": "文物圖書館",
+    "model_locked": "模型選擇已鎖定",
+    "new_artifact": "新神器",
+    "no_artifacts": "未找到任何文物",
+    "open_artifact": "開啟文物",
+    "preview": "預覽",
+    "preview_type": "類型",
+    "refinement": "精緻聊天",
+    "refinement_empty": "尚未收到任何消息",
+    "refinement_hint": "請求 AI 修改這個文物",
+    "refinement_placeholder": "描述您想要的變更...",
+    "save_from_modal": "打開文物以保存它",
+    "save_to_library": "保存到資料庫",
+    "saved": "文物已保存至資料庫",
+    "split": "分裂",
+    "tags_placeholder": "添加標籤...",
+    "title": "文物",
+    "title_placeholder": "輸入文物標題",
     "type": {
-      "code": "[to be translated]:Code",
-      "html": "[to be translated]:HTML",
-      "htmx": "[to be translated]:HTMX",
-      "markdown": "[to be translated]:Markdown",
-      "mermaid": "[to be translated]:Mermaid",
-      "react": "[to be translated]:React",
-      "svg": "[to be translated]:SVG"
+      "code": "代碼",
+      "html": "HTML",
+      "htmx": "HTMX",
+      "markdown": "Markdown",
+      "mermaid": "美人魚",
+      "react": "React",
+      "svg": "SVG"
     },
-    "version": "[to be translated]:Version",
+    "version": "版本",
     "view": {
-      "code": "[to be translated]:Code",
-      "preview": "[to be translated]:Preview",
-      "split": "[to be translated]:Split"
+      "code": "代碼",
+      "preview": "預覽",
+      "split": "分裂"
     }
   },
   "assistants": {
@@ -1323,7 +1394,7 @@
     "copy_failed": "複製失敗",
     "current": "目前",
     "cut": "剪下",
-    "dark_mode": "[to be translated]:Dark Mode",
+    "dark_mode": "深色模式",
     "default": "預設",
     "delete": "刪除",
     "delete_confirm": "確定要刪除嗎？",
@@ -1416,8 +1487,8 @@
     "subscribe": "訂閱",
     "success": "成功",
     "swap": "交換",
-    "tags": "[to be translated]:Tags",
-    "title": "[to be translated]:Title",
+    "tags": "標籤",
+    "title": "標題",
     "topics": "話題",
     "translate_text": "翻譯文字",
     "unknown": "未知",
@@ -1432,13 +1503,13 @@
   },
   "conversation": {
     "contextStrategy": {
-      "button": "[to be translated]:Context",
-      "customActive": "[to be translated]:Custom context strategy active",
-      "customInfo": "[to be translated]:Custom context strategy will override the assistant's setting for this conversation only.",
-      "description": "[to be translated]:Configure how this conversation manages context. You can use the assistant's default or customize for this conversation.",
-      "title": "[to be translated]:Conversation Context Strategy",
-      "useAssistantDefault": "[to be translated]:Use Assistant Default",
-      "usingDefault": "[to be translated]:Using assistant default"
+      "button": "背景",
+      "customActive": "自訂上下文策略啟用",
+      "customInfo": "自訂的上下文策略將僅在本次對話中覆蓋助手的設定。",
+      "description": "配置此對話如何管理上下文。你可以使用助理的默認設置或為此對話進行自定義。",
+      "title": "對話上下文策略",
+      "useAssistantDefault": "使用助手默認設定",
+      "usingDefault": "使用助手預設值"
     }
   },
   "dialog": {
@@ -1983,8 +2054,8 @@
     "citation": "{{count}} 個引用內容",
     "citations": "引用內容",
     "context_action": {
-      "pruned": "[to be translated]:Context was adjusted to fit limits ({{count}} items removed).",
-      "title": "[to be translated]:Context Management"
+      "pruned": "上下文已調整以符合限制（刪除 {{count}} 項目）。",
+      "title": "上下文管理"
     },
     "copied": "已複製！",
     "copy": {
@@ -2281,29 +2352,29 @@
     "add_to_launchpad": "新增到啟動台",
     "add_to_sidebar": "新增到側邊欄",
     "automation": {
-      "contentScript": "[to be translated]:Content script injection",
-      "contentScriptDescription": "[to be translated]:Enable communication bridge with mini-apps",
-      "contextMenu": "[to be translated]:Enhanced context menu",
-      "contextMenuDescription": "[to be translated]:Add 'Send to Chat' and 'Send to KB' options to right-click menu",
-      "conversationExtraction": "[to be translated]:Conversation extraction",
-      "conversationExtractionDescription": "[to be translated]:Extract conversations from AI chat apps (ChatGPT, Claude, etc.)",
-      "description": "[to be translated]:Control and extract data from embedded mini-apps",
-      "enabled": "[to be translated]:Enable automation features",
-      "enabledDescription": "[to be translated]:Allow AI assistants to control mini-apps via MCP tools",
-      "title": "[to be translated]:Mini-App Automation"
+      "contentScript": "內容腳本注入",
+      "contentScriptDescription": "啟用與迷你應用程式的通訊橋接",
+      "contextMenu": "增強的上下文菜單",
+      "contextMenuDescription": "新增「發送到聊天」和「發送到知識庫」選項到右鍵選單",
+      "conversationExtraction": "對話提取",
+      "conversationExtractionDescription": "從 AI 聊天應用程式（ChatGPT、Claude 等）中提取對話",
+      "description": "控制和提取嵌入式迷你應用程序的數據",
+      "enabled": "啟用自動化功能",
+      "enabledDescription": "允許AI助手通過MCP工具控制迷你應用程式",
+      "title": "小程序自動化"
     },
     "context": {
-      "allConversations": "[to be translated]:All Recent Conversations",
-      "askAbout": "[to be translated]:Ask about this...",
-      "contentPreview": "[to be translated]:Content Preview",
-      "currentConversation": "[to be translated]:Current Conversation",
-      "extractConversations": "[to be translated]:Extract Conversations",
-      "extractPage": "[to be translated]:Extract Page Content",
-      "noKnowledgeBases": "[to be translated]:No knowledge bases yet",
-      "saveAsNote": "[to be translated]:Save as Note",
-      "selectKnowledgeBase": "[to be translated]:Select Knowledge Base",
-      "sendToChat": "[to be translated]:Send to Chat",
-      "sendToKB": "[to be translated]:Send to Knowledge Base..."
+      "allConversations": "所有近期對話",
+      "askAbout": "詢問這個...",
+      "contentPreview": "內容預覽",
+      "currentConversation": "當前對話",
+      "extractConversations": "提取對話",
+      "extractPage": "提取頁面內容",
+      "noKnowledgeBases": "尚未建立知識庫",
+      "saveAsNote": "儲存為備註",
+      "selectKnowledgeBase": "選擇知識庫",
+      "sendToChat": "發送到聊天",
+      "sendToKB": "發送至知識庫..."
     },
     "popup": {
       "close": "關閉小工具",
@@ -2320,16 +2391,16 @@
     "remove_from_launchpad": "從啟動台移除",
     "remove_from_sidebar": "從側邊欄移除",
     "sdk": {
-      "autoStart": "[to be translated]:Auto-start server",
-      "autoStartDescription": "[to be translated]:Start SDK server when Cherry Studio launches",
-      "description": "[to be translated]:Allow external apps to integrate with Cherry Studio",
-      "enableServer": "[to be translated]:Enable SDK server",
-      "enableServerDescription": "[to be translated]:Start WebSocket server for external app connections",
-      "port": "[to be translated]:Server port",
-      "portDescription": "[to be translated]:Port for the SDK WebSocket server",
-      "requireApproval": "[to be translated]:Require approval",
-      "requireApprovalDescription": "[to be translated]:Ask for permission when new apps connect",
-      "title": "[to be translated]:Developer SDK"
+      "autoStart": "自動啟動伺服器",
+      "autoStartDescription": "啟動 Cherry Studio 時開始 SDK 伺服器",
+      "description": "允許外部應用程式與 Cherry Studio 整合",
+      "enableServer": "啟用 SDK 伺服器",
+      "enableServerDescription": "啟動 WebSocket 伺服器以供外部應用程式連接",
+      "port": "伺服器埠",
+      "portDescription": "SDK WebSocket 伺服器的端口",
+      "requireApproval": "需要批准",
+      "requireApprovalDescription": "在新應用程式連接時請求許可",
+      "title": "開發者 SDK"
     },
     "sidebar": {
       "close": {
@@ -2347,36 +2418,36 @@
     },
     "title": "小工具",
     "trust": {
-      "approve": "[to be translated]:Allow",
+      "approve": "允許",
       "capabilities": {
-        "ai": "[to be translated]:AI Completion",
-        "aiDescription": "[to be translated]:Access AI chat completion services",
-        "clipboard": "[to be translated]:Clipboard",
-        "clipboardDescription": "[to be translated]:Read and write clipboard",
-        "files": "[to be translated]:File Access",
-        "filesDescription": "[to be translated]:Sandboxed file system access",
-        "knowledge": "[to be translated]:Knowledge Bases",
-        "knowledgeDescription": "[to be translated]:Search and add to knowledge bases",
-        "mcp": "[to be translated]:MCP Tools",
-        "mcpDescription": "[to be translated]:Call available MCP tools",
-        "memory": "[to be translated]:Memory Storage",
-        "memoryDescription": "[to be translated]:Store and retrieve persistent data",
-        "notifications": "[to be translated]:Notifications",
-        "notificationsDescription": "[to be translated]:Show system notifications",
-        "settings": "[to be translated]:Settings",
-        "settingsDescription": "[to be translated]:Read app settings",
-        "tools": "[to be translated]:Tool Registration",
-        "toolsDescription": "[to be translated]:Register as an MCP tool"
+        "ai": "AI 完成",
+        "aiDescription": "訪問AI聊天完成服務",
+        "clipboard": "剪貼簿",
+        "clipboardDescription": "讀取和寫入剪貼板",
+        "files": "檔案存取",
+        "filesDescription": "沙盒文件系統訪問",
+        "knowledge": "知識庫",
+        "knowledgeDescription": "搜尋並添加到知識庫",
+        "mcp": "MCP 工具",
+        "mcpDescription": "呼叫可用的MCP工具",
+        "memory": "記憶儲存",
+        "memoryDescription": "儲存和檢索持久數據",
+        "notifications": "通知",
+        "notificationsDescription": "顯示系統通知",
+        "settings": "設定",
+        "settingsDescription": "讀取應用程式設定",
+        "tools": "工具註冊",
+        "toolsDescription": "註冊為 MCP 工具"
       },
-      "deny": "[to be translated]:Deny",
-      "description": "[to be translated]:{{appName}} wants to connect to Cherry Studio",
-      "noTrustedApps": "[to be translated]:No trusted apps",
-      "remember": "[to be translated]:Remember this choice",
-      "requestedCapabilities": "[to be translated]:Requested permissions:",
-      "revoke": "[to be translated]:Revoke",
-      "revokeConfirm": "[to be translated]:Are you sure you want to revoke trust for {{appName}}?",
-      "title": "[to be translated]:App Trust Request",
-      "trustedApps": "[to be translated]:Trusted Apps"
+      "deny": "拒絕",
+      "description": "{{appName}} 希望連接到 Cherry Studio",
+      "noTrustedApps": "沒有可信的應用程式",
+      "remember": "記住這個選擇",
+      "requestedCapabilities": "請求的權限：",
+      "revoke": "撤銷",
+      "revokeConfirm": "您確定要撤銷對{{appName}}的信任嗎？",
+      "title": "應用程式信任請求",
+      "trustedApps": "受信任的應用程式"
     }
   },
   "minapps": {
@@ -2715,6 +2786,17 @@
       "sync_hint": "選擇的服務商和模型將同步到 OpenClaw 設定檔",
       "title": "模型設定"
     },
+    "node_missing": {
+      "description": "OpenClaw 需要 Node.js/npm。請先安裝 Node.js，然後重新啟動 Cherry Studio。",
+      "download_button": "下載 Node.js",
+      "hint": "macOS：brew install node | Windows：從 nodejs.org 下載 LTS 版本",
+      "title": "需要 Node.js"
+    },
+    "node_version_low": {
+      "description": "OpenClaw 需要 Node.js 22.0 或以上版本。您目前的版本是 v{{version}}。請先升級 Node.js。",
+      "hint": "nvm: nvm install 22 && nvm use 22 | mise: mise use node@22",
+      "title": "Node.js 版本過低"
+    },
     "not_installed": {
       "description": "OpenClaw 尚未安裝在您的系統上。請先安裝它以使用此功能。",
       "install_button": "安裝 OpenClaw",
@@ -2725,12 +2807,6 @@
       "step2_title": "第二步：驗證安裝",
       "title": "OpenClaw 未安裝",
       "windows_title": "Windows"
-    },
-    "npm_missing": {
-      "description": "OpenClaw 需要 Node.js/npm。請先安裝 Node.js，然後重新啟動 Cherry Studio。",
-      "download_button": "下載 Node.js",
-      "hint": "macOS：brew install node | Windows：從 nodejs.org 下載 LTS 版本",
-      "title": "需要 Node.js"
     },
     "quick_actions": {
       "open_dashboard": "開啟控制面板",
@@ -3129,7 +3205,7 @@
     "alayanew": "Alaya NeW",
     "anthropic": "Anthropic",
     "aws-bedrock": "AWS Bedrock",
-    "azure-foundry": "[to be translated]:Azure AI Foundry",
+    "azure-foundry": "Azure AI Foundry",
     "azure-openai": "Azure OpenAI",
     "baichuan": "百川",
     "baidu-cloud": "百度雲千帆",
@@ -3662,38 +3738,38 @@
       "title": "進階設定"
     },
     "artifacts": {
-      "auto_open": "[to be translated]:Auto-open Artifacts",
-      "auto_open_help": "[to be translated]:Automatically open the artifact viewer when a new artifact is created.",
-      "enable": "[to be translated]:Enable Artifact Support",
-      "enable_help": "[to be translated]:When enabled, AI-generated interactive content will be detected and rendered as artifacts.",
-      "enabled_types": "[to be translated]:Enabled Artifact Types",
-      "items": "[to be translated]:items",
+      "auto_open": "自動打開工件",
+      "auto_open_help": "自動在創建新文物時打開文物查看器。",
+      "enable": "啟用工藝品支持",
+      "enable_help": "啟用後，將檢測和渲染AI生成的互動內容作為人工製品。",
+      "enabled_types": "啟用的文物類型",
+      "items": "物品",
       "react": {
-        "add_dep": "[to be translated]:Add",
-        "custom_bundler_url": "[to be translated]:Custom Bundler URL",
-        "custom_bundler_url_help": "[to be translated]:Optional: URL for a self-hosted Sandpack bundler. Leave empty to use the default CodeSandbox bundler.",
-        "dep_actions": "[to be translated]:Actions",
-        "dep_name": "[to be translated]:Package",
-        "dep_name_placeholder": "[to be translated]:Package name (e.g., framer-motion)",
-        "dep_version": "[to be translated]:Version",
-        "dependencies_help": "[to be translated]:These packages will be available in Sandpack React artifacts. Add commonly used packages here.",
-        "dependencies_title": "[to be translated]:Available Dependencies",
-        "no_deps": "[to be translated]:No dependencies configured",
-        "show_console": "[to be translated]:Show Console",
-        "show_console_help": "[to be translated]:Show the console output panel for debugging React artifacts.",
-        "show_editor": "[to be translated]:Show Code Editor",
-        "show_editor_help": "[to be translated]:Show the code editor panel alongside the preview in Sandpack mode.",
-        "title": "[to be translated]:React Artifact Settings",
-        "use_sandpack": "[to be translated]:Use Sandpack Runtime",
-        "use_sandpack_help": "[to be translated]:Use CodeSandbox Sandpack for React artifacts. Enables NPM dependencies, hot reload, and better error handling. Disable for simple Babel-only transpilation."
+        "add_dep": "添加",
+        "custom_bundler_url": "自訂捆綁器網址",
+        "custom_bundler_url_help": "可選：自我托管的 Sandpack 打包器的 URL。如果留空，則使用默認的 CodeSandbox 打包器。",
+        "dep_actions": "行動",
+        "dep_name": "包裝",
+        "dep_name_placeholder": "套件名稱（例如，framer-motion）",
+        "dep_version": "版本",
+        "dependencies_help": "這些套件將在 Sandpack React 藝術品中提供。在這裡添加常用的套件。",
+        "dependencies_title": "可用的依賴項",
+        "no_deps": "未配置任何依賴項",
+        "show_console": "顯示控制台",
+        "show_console_help": "顯示控制台輸出面板以調試 React 藝術品。",
+        "show_editor": "顯示代碼編輯器",
+        "show_editor_help": "在 Sandpack 模式下顯示代碼編輯器面板與預覽並排。",
+        "title": "React 藝術品設定",
+        "use_sandpack": "使用 Sandpack 運行時",
+        "use_sandpack_help": "使用 CodeSandbox Sandpack 來處理 React 藝術品。啟用 NPM 依賴、熱重載和更好的錯誤處理。對於簡單的僅 Babel 轉譯，請禁用此功能。"
       },
-      "required": "[to be translated]:Required",
-      "storage_limit": "[to be translated]:Storage Limit",
-      "storage_limit_help": "[to be translated]:Maximum number of artifacts to store. Older artifacts will be automatically removed.",
-      "storage_title": "[to be translated]:Storage",
-      "title": "[to be translated]:Artifacts",
-      "types_help": "[to be translated]:Select which types of artifacts should be generated. HTMX is always enabled.",
-      "types_title": "[to be translated]:Artifact Types"
+      "required": "必要",
+      "storage_limit": "儲存限制",
+      "storage_limit_help": "可存儲的最大工件數量。舊的工件將被自動移除。",
+      "storage_title": "儲存",
+      "title": "文物",
+      "types_help": "選擇應該生成哪種類型的工件。HTMX始終啟用。",
+      "types_title": "文物類型"
     },
     "assistant": {
       "icon": {
@@ -4560,21 +4636,21 @@
       "builtinServersDescriptions": {
         "brave_search": "一個整合了 Brave 搜尋 API 的 MCP 伺服器實做，提供網頁與本機搜尋雙重功能。需要設定 BRAVE_API_KEY 環境變數",
         "browser": "透過 Chrome DevTools Protocol 控制 headless Electron 視窗。工具：開啟 URL、執行單行 JS、重設工作階段。",
-        "browser_automation": "[to be translated]:Vision-optimized browser automation for embedded mini-apps. Provides high-level tools for AI models to interact with web content using screenshots and element detection.",
+        "browser_automation": "為嵌入式迷你應用程序優化的瀏覽器自動化。提供高級工具，讓AI模型可以通過截圖和元素檢測與網頁內容互動。",
         "didi_mcp": "一個整合了滴滴 MCP 伺服器實做，提供網約車服務包括地圖搜尋、價格預估、訂單管理和司機追蹤。僅支援中國大陸地區。需要設定 DIDI_API_KEY 環境變數",
         "dify_knowledge": "Dify 的 MCP 伺服器實做，提供了一個簡單的 API 來與 Dify 進行互動。需要設定 Dify Key",
-        "e2b": "[to be translated]:Execute Python code in secure E2B cloud sandboxes with full file operations support. Provides persistent Jupyter-like environments with common data science libraries pre-installed. Requires configuring the E2B_API_KEY environment variable. Supports both hosted and self-hosted deployments via E2B_API_URL.",
+        "e2b": "在安全的 E2B 雲端沙盒中執行 Python 代碼，支持完整的文件操作。提供持久的類 Jupyter 環境，預先安裝了常用的數據科學庫。需要配置 E2B_API_KEY 環境變數。通過 E2B_API_URL 同時支持託管和自託管的部署。",
         "fetch": "用於取得 URL 網頁內容的 MCP 伺服器",
         "filesystem": "實做文件系統操作的模型上下文協議（MCP）的 Node.js 伺服器。需要設定允許存取的目錄",
         "mcp_auto_install": "自動安裝 MCP 服務（測試版）",
         "memory": "基於本機知識圖譜的持久性記憶基礎實做。這使得模型能夠在不同對話間記住使用者的相關資訊。需要設定 MEMORY_FILE_PATH 環境變數。",
-        "minapp_controller": "[to be translated]:Control and extract data from embedded mini-apps. Provides tools for conversation extraction, page content scraping, and automated interaction with ChatGPT, Claude, Perplexity, and other web apps.",
+        "minapp_controller": "控制和提取嵌入式迷你應用程序中的數據。提供對話提取、頁面內容抓取和與 ChatGPT、Claude、Perplexity 以及其他網頁應用程序的自動互動的工具。",
         "no": "無描述",
         "nowledge_mem": "需要本機執行 Nowledge Mem 應用程式。將 AI 對話、工具、筆記、代理和檔案保存在電腦上的私人記憶體中。請從 https://mem.nowledge.co/ 下載",
         "python": "在安全的沙盒環境中執行 Python 程式碼。使用 Pyodide 執行 Python，支援大多數標準函式庫和科學計算套件",
-        "sdk_bridge": "[to be translated]:Bridge for dynamically registered tools from mini-apps using the @theboss/sdk. Enables third-party apps to register custom MCP tools at runtime.",
+        "sdk_bridge": "從 mini-apps 使用 @theboss/sdk 動態註冊工具的橋樑。使第三方應用能夠在運行時註冊自定義 MCP 工具。",
         "sequentialthinking": "一個 MCP 伺服器實做，提供了透過結構化思維過程進行動態和反思性問題解決的工具",
-        "unstructured": "[to be translated]:Process and extract content from 50+ document formats including PDF, Word, Excel, PowerPoint, images (with OCR), HTML, and more. Returns structured text that can be analyzed or summarized. Requires configuring the UNSTRUCTURED_API_KEY environment variable. Supports both hosted and self-hosted deployments via UNSTRUCTURED_API_URL."
+        "unstructured": "處理並提取來自 50 多種文檔格式的內容，包括 PDF、Word、Excel、PowerPoint、圖像（具有 OCR 功能）、HTML 等。返回可供分析或總結的結構化文本。需要配置 UNSTRUCTURED_API_KEY 環境變量。通過 UNSTRUCTURED_API_URL 支持托管和自托管的部署。"
       },
       "command": "指令",
       "config_description": "設定模型上下文協議伺服器",
@@ -5160,15 +5236,15 @@
         }
       },
       "azure-foundry": {
-        "description": "[to be translated]:Universal access to 10+ model providers",
-        "help": "[to be translated]:Supports OpenAI, Anthropic, Meta, Mistral, Cohere, DeepSeek, xAI, Microsoft, AI21, and other models through a single endpoint",
-        "openai_host_help": "[to be translated]:Required for GPT/o/Embedding deployments hosted at https://{resource}.openai.azure.com",
-        "openai_host_label": "[to be translated]:OpenAI deployment endpoint",
-        "openai_host_placeholder": "[to be translated]:https://<resource>.openai.azure.com",
-        "openai_host_preview": "[to be translated]:Current OpenAI endpoint: {{url}}",
-        "openai_host_warning": "[to be translated]:OpenAI endpoint should use https://{resource}.openai.azure.com. You entered a project or legacy Cognitive Services host.",
-        "project_host_help": "[to be translated]:Project base URL must be https://{resource}.services.ai.azure.com/api/projects/<project>",
-        "project_host_warning": "[to be translated]:Project endpoints should use https://{resource}.services.ai.azure.com/api/projects/<project>. You entered an OpenAI/Cognitive Services host."
+        "description": "對10多個模型供應商的普遍訪問",
+        "help": "支持 OpenAI、Anthropic、Meta、Mistral、Cohere、DeepSeek、xAI、Microsoft、AI21 及其他模型，通過單一端點進行訪問。",
+        "openai_host_help": "在 https://{resource}.openai.azure.com 上託管的 GPT/o/嵌入部屬所需。",
+        "openai_host_label": "OpenAI 部署端點",
+        "openai_host_placeholder": "https://<resource>.openai.azure.com",
+        "openai_host_preview": "當前 OpenAI 端點：{{url}}",
+        "openai_host_warning": "OpenAI 端點應使用 https://{resource}.openai.azure.com。您輸入的是一個項目或舊版的認知服務主機。",
+        "project_host_help": "專案基本 URL 必須是 https://{resource}.services.ai.azure.com/api/projects/<project>",
+        "project_host_warning": "專案端點應使用 https://{resource}.services.ai.azure.com/api/projects/<project>。您輸入了一個 OpenAI/認知服務主機。"
       },
       "balance": "餘額",
       "basic_auth": {
@@ -5425,41 +5501,41 @@
       },
       "preprocess": {
         "e2b": {
-          "api_key": "[to be translated]:API Key",
-          "api_key_placeholder": "[to be translated]:Enter your E2B API key",
-          "api_url": "[to be translated]:API URL",
-          "api_url_placeholder": "[to be translated]:https://api.e2b.dev or self-hosted URL",
+          "api_key": "API 密鑰",
+          "api_key_placeholder": "輸入您的 E2B API 金鑰",
+          "api_url": "API 網址",
+          "api_url_placeholder": "https://api.e2b.dev 或自我託管的 URL",
           "chat_tool": {
-            "description": "[to be translated]:When enabled, AI can run Python code in E2B sandboxes",
-            "label": "[to be translated]:Enable Chat Tool",
-            "requires_api_key": "[to be translated]:Requires valid API key to enable",
-            "tool_name": "[to be translated]:Tool name: execute_code_in_e2b",
-            "tooltip": "[to be translated]:Allow AI to execute code during conversations"
+            "description": "啟用後，AI可以在E2B沙盒中運行Python代碼",
+            "label": "啟用聊天工具",
+            "requires_api_key": "需要有效的 API 密鑰來啟用",
+            "tool_name": "工具名稱：execute_code_in_e2b",
+            "tooltip": "允許人工智慧在對話中執行代碼"
           },
-          "description": "[to be translated]:Run AI-generated code in secure cloud sandboxes",
+          "description": "在安全的雲端沙盒中運行人工智能生成的代碼",
           "health_check": {
-            "button": "[to be translated]:Test Connection",
-            "failed": "[to be translated]:E2B connection failed. Check your API key and URL.",
-            "success": "[to be translated]:E2B connection successful!"
+            "button": "測試連接",
+            "failed": "E2B 連接失敗。請檢查您的 API 密鑰和 URL。",
+            "success": "E2B 連接成功！"
           },
           "options": {
             "sandbox_mode": {
-              "label": "[to be translated]:Sandbox Mode",
-              "per_session": "[to be translated]:Per Session - New sandbox each chat",
-              "persistent": "[to be translated]:Persistent - Reuse sandbox",
-              "tooltip": "[to be translated]:Per-session creates fresh sandboxes; persistent reuses them for better performance"
+              "label": "沙盒模式",
+              "per_session": "每次會話 - 每次聊天新的沙盒",
+              "persistent": "持久 - 重新使用沙盒",
+              "tooltip": "每個會話創建新的沙盒；持久性則重用它們以獲得更好的性能"
             },
             "template": {
-              "label": "[to be translated]:Custom Template ID",
-              "placeholder": "[to be translated]:Optional: custom E2B template",
-              "tooltip": "[to be translated]:Use a custom E2B template for specialized environments"
+              "label": "自訂範本ID",
+              "placeholder": "可選：自定義 E2B 模板",
+              "tooltip": "在專門環境中使用自訂的E2B模板"
             },
             "timeout": {
-              "label": "[to be translated]:Execution Timeout",
-              "tooltip": "[to be translated]:Maximum time for code execution (seconds)"
+              "label": "執行超時",
+              "tooltip": "程式碼執行的最大時間（秒）"
             }
           },
-          "title": "[to be translated]:E2B Code Interpreter"
+          "title": "E2B 代碼解釋器"
         },
         "paddleocr": {
           "aistudio_access_token": "星河社區訪問令牌",
@@ -5472,63 +5548,63 @@
         "title": "文件處理",
         "tooltip": "在「設定」->「工具」中設定文件處理服務供應商。文件處理可有效提升複雜格式文件及掃描文件的檢索效能",
         "unstructured": {
-          "api_host": "[to be translated]:API Host",
-          "api_host_placeholder": "[to be translated]:https://api.unstructured.io or self-hosted URL",
-          "api_key": "[to be translated]:API Key",
-          "api_key_placeholder": "[to be translated]:Enter your Unstructured API key",
+          "api_host": "API 主機",
+          "api_host_placeholder": "https://api.unstructured.io 或自託管網址",
+          "api_key": "API 金鑰",
+          "api_key_placeholder": "輸入您的非結構化 API 金鑰",
           "chat_tool": {
-            "description": "[to be translated]:Allow AI to process documents during conversations",
-            "label": "[to be translated]:Enable Chat Tool",
-            "requires_api_key": "[to be translated]:Requires valid API key to enable",
-            "tool_name": "[to be translated]:Tool name: process_document_with_unstructured",
-            "tooltip": "[to be translated]:When enabled, the AI can use the 'process_document_with_unstructured' tool to extract content from documents"
+            "description": "允許AI在對話中處理文件",
+            "label": "啟用聊天工具",
+            "requires_api_key": "需要有效的API金鑰才能啟用",
+            "tool_name": "工具名稱：process_document_with_unstructured",
+            "tooltip": "啟用後，AI可以使用 'process_document_with_unstructured' 工具從文檔中提取內容。"
           },
-          "description": "[to be translated]:Enterprise-grade document processing supporting 50+ file types",
+          "description": "企業級文件處理，支持50多種文件類型",
           "health_check": {
-            "button": "[to be translated]:Test Connection",
-            "failed": "[to be translated]:Connection failed",
-            "success": "[to be translated]:Connection successful"
+            "button": "測試連接",
+            "failed": "連接失敗",
+            "success": "連接成功"
           },
           "options": {
             "chunking_strategy": {
-              "basic": "[to be translated]:Basic - Simple chunking",
-              "by_title": "[to be translated]:By Title - Semantic chunking",
-              "label": "[to be translated]:Chunking Strategy"
+              "basic": "基本 - 簡單的分塊",
+              "by_title": "按標題 - 語義分塊",
+              "label": " chunking 策略"
             },
             "concurrency": {
-              "label": "[to be translated]:Concurrency Level",
-              "tooltip": "[to be translated]:Number of parallel requests (1-15)"
+              "label": "並發級別",
+              "tooltip": "平行請求數量（1-15）"
             },
             "mime_types": {
               "categories": {
-                "document": "[to be translated]:Documents",
-                "image": "[to be translated]:Images (OCR)",
-                "other": "[to be translated]:Other Formats",
-                "presentation": "[to be translated]:Presentations",
-                "spreadsheet": "[to be translated]:Spreadsheets",
-                "text": "[to be translated]:Text Files",
-                "web": "[to be translated]:Web Pages"
+                "document": "文件",
+                "image": "影像 (光學字符識別)",
+                "other": "其他格式",
+                "presentation": "簡報",
+                "spreadsheet": "電子表格",
+                "text": "文本檔案",
+                "web": "網頁"
               },
-              "description": "[to be translated]:Select which file types should be processed by Unstructured.io",
-              "deselect_all": "[to be translated]:Deselect All",
-              "label": "[to be translated]:Supported File Types",
-              "search_placeholder": "[to be translated]:Search file types...",
-              "select_all": "[to be translated]:Select All",
-              "selected_count": "[to be translated]:{{count}} file type(s) selected"
+              "description": "選擇應由 Unstructured.io 處理的文件類型。",
+              "deselect_all": "取消全選",
+              "label": "支援的檔案類型",
+              "search_placeholder": "搜索檔案類型…",
+              "select_all": "全選",
+              "selected_count": "已選擇 {{count}} 種文件類型"
             },
             "split_pdf": {
-              "label": "[to be translated]:Split PDF Pages",
-              "tooltip": "[to be translated]:Process PDF pages in parallel for faster processing"
+              "label": "分割 PDF 頁面",
+              "tooltip": "平行處理PDF頁面以加快處理速度"
             },
             "strategy": {
-              "auto": "[to be translated]:Auto - Automatic detection",
-              "fast": "[to be translated]:Fast - Quick processing",
-              "hi_res": "[to be translated]:High Resolution - Best quality",
-              "label": "[to be translated]:Processing Strategy",
-              "ocr_only": "[to be translated]:OCR Only - Text extraction"
+              "auto": "自動 - 自動檢測",
+              "fast": "快速 - 快捷處理",
+              "hi_res": "高解析度 - 最佳品質",
+              "label": "處理策略",
+              "ocr_only": "OCR 只限 - 文本提取"
             }
           },
-          "title": "[to be translated]:Unstructured.io"
+          "title": "Unstructured.io"
         }
       },
       "skills": {
@@ -5913,8 +5989,8 @@
     "show_window": "顯示視窗"
   },
   "update": {
-    "download": "[to be translated]:Download",
-    "downloadStarted": "[to be translated]:Download started...",
+    "download": "下載",
+    "downloadStarted": "下載已開始...",
     "install": "立即安裝",
     "later": "稍後",
     "message": "新版本 {{version}} 已準備就緒，是否立即安裝？",

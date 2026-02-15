@@ -14,6 +14,8 @@ import styled from 'styled-components'
 import { v4 as uuidv4 } from 'uuid'
 
 import { SettingContainer } from '../..'
+import McpConnectionGuide from './McpConnectionGuide'
+import McpExposureSection from './McpExposureSection'
 
 const { Text, Title } = Typography
 
@@ -186,6 +188,12 @@ const ApiServerSettings: FC = () => {
           />
         </AuthHeaderSection>
       </ConfigurationField>
+
+      {/* MCP Exposure Configuration */}
+      <McpExposureSection />
+
+      {/* MCP Connection Guide for External Tools */}
+      <McpConnectionGuide />
     </Container>
   )
 }

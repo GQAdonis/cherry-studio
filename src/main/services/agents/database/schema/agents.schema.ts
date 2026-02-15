@@ -23,6 +23,8 @@ export const agentsTable = sqliteTable('agents', {
 
   configuration: text('configuration'), // JSON, extensible settings
 
+  exposed_via_mcp: text('exposed_via_mcp').default('false'), // Whether this agent is exposed as an MCP endpoint
+
   created_at: text('created_at').notNull(),
   updated_at: text('updated_at').notNull()
 })
