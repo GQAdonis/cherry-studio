@@ -246,6 +246,7 @@ export enum terminalApps {
   wezterm = 'WezTerm',
   ghostty = 'Ghostty',
   tabby = 'Tabby',
+  warp = 'Warp',
   // Windows terminals
   windowsTerminal = 'WindowsTerminal',
   powershell = 'PowerShell',
@@ -299,6 +300,11 @@ export const MACOS_TERMINALS: TerminalConfig[] = [
     id: terminalApps.tabby,
     name: 'Tabby',
     bundleId: 'org.tabby'
+  },
+  {
+    id: terminalApps.warp,
+    name: 'Warp',
+    bundleId: 'dev.warp.Warp-Stable'
   }
 ]
 
@@ -483,6 +489,18 @@ export const MACOS_TERMINALS_WITH_COMMANDS: TerminalConfigWithCommand[] = [
         else
           open -na Tabby --args open && sleep 2
         fi && osascript -e 'tell application "Tabby" to activate' -e 'set the clipboard to "${escapeForAppleScript(fullCommand)}"' -e 'tell application "System Events" to tell process "Tabby" to keystroke "v" using {command down}' -e 'tell application "System Events" to key code 36'`
+      ]
+    })
+  },
+  {
+    id: terminalApps.warp,
+    name: 'Warp',
+    bundleId: 'dev.warp.Warp-Stable',
+    command: (_directory: string, fullCommand: string) => ({
+      command: 'sh',
+      args: [
+        '-c',
+        `open "warp://action/new_tab?path=${_directory}" && sleep 1.0 && osascript -e 'tell application "Warp" to activate' -e 'set the clipboard to "${escapeForAppleScript(fullCommand)}"' -e 'tell application "System Events" to tell process "Warp" to keystroke "v" using {command down}' -e 'delay 0.3' -e 'tell application "System Events" to key code 36'`
       ]
     })
   }

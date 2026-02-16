@@ -375,7 +375,9 @@ async function handleSseRequest(
   let transport: SSEServerTransport
 
   if (sseTransports[transportKey]) {
+    // Reuse existing transport - do NOT call start() again
     transport = sseTransports[transportKey]
+    logger.debug('MCP SSE session reused', { key: transportKey })
   } else {
     // New SSE session → fresh Server + Transport pair
     const server = serverFactory()
@@ -392,10 +394,10 @@ async function handleSseRequest(
 
     await server.connect(transport)
     logger.debug('MCP SSE session initialized', { key: transportKey, transport: 'sse' })
-  }
 
-  // Start the SSE stream (this handles the GET request)
-  await transport.start()
+    // Start the SSE stream ONLY for new transports (this handles the GET request)
+    await transport.start()
+  }
 }
 
 /**

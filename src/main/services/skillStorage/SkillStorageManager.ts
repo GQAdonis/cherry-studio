@@ -5,13 +5,16 @@ import { app } from 'electron'
 import path from 'path'
 import { v4 as uuidv4 } from 'uuid'
 
-import type { SkillStorageProvider } from './SkillStorageProvider'
+import type { SkillRecord, SkillStorageProvider } from './SkillStorageProvider'
 import { skillRecordToSkill } from './SkillStorageProvider'
 
 const logger = loggerService.withContext('SkillStorageManager')
 
 const CONFIG_KEY = 'skillStorageProviders'
 const DEFAULT_PROVIDER_ID = 'local-skills-default'
+
+/** Well-known ID for the read-only built-in skills provider */
+export const BUILT_IN_PROVIDER_ID = 'built-in-skills'
 
 /**
  * Singleton manager for skill storage providers.
@@ -40,6 +43,26 @@ export class SkillStorageManager {
    * Called once on app startup.
    */
   public async bootstrap(): Promise<void> {
+    // Always initialise the built-in skills provider first (read-only, bundled)
+    try {
+      const { BuiltInStorageProvider, BUILT_IN_PROVIDER_ID: builtInId } = await import(
+        './providers/BuiltInStorageProvider'
+      )
+      const builtInProvider = new BuiltInStorageProvider()
+      await builtInProvider.initialize()
+      this.providers.set(builtInId, builtInProvider)
+      // Add a synthetic config so it shows in getProviderConfigs()
+      this.configs.set(builtInId, {
+        id: builtInId,
+        name: builtInProvider.name,
+        type: 'built-in',
+        enabled: true
+      })
+      logger.info('Built-in skills provider initialised')
+    } catch (error) {
+      logger.error('Failed to initialise built-in skills provider', error as Error)
+    }
+
     const stored = (configManager.get<SkillStorageProviderConfig[]>(CONFIG_KEY) ?? []) as SkillStorageProviderConfig[]
 
     // Ensure the default local filesystem provider exists
@@ -109,8 +132,8 @@ export class SkillStorageManager {
    * Remove a provider entirely.
    */
   public async removeProvider(id: string): Promise<void> {
-    if (id === DEFAULT_PROVIDER_ID) {
-      throw new Error('Cannot remove the default local skills provider')
+    if (id === DEFAULT_PROVIDER_ID || id === BUILT_IN_PROVIDER_ID) {
+      throw new Error('Cannot remove default or built-in providers')
     }
 
     await this.disposeProvider(id)
@@ -151,6 +174,7 @@ export class SkillStorageManager {
       try {
         const records = await provider.listSkills()
         logger.info(`Provider "${config.name}" (${id}) returned ${records.length} skill(s)`)
+        const isBuiltIn = id === BUILT_IN_PROVIDER_ID
         for (const record of records) {
           results.push(
             skillRecordToSkill(
@@ -159,7 +183,8 @@ export class SkillStorageManager {
               config.name,
               config.type,
               this.getBasePath(config),
-              enabledSkillIds.has(record.id)
+              enabledSkillIds.has(record.id),
+              isBuiltIn
             )
           )
         }
@@ -181,8 +206,17 @@ export class SkillStorageManager {
     if (!provider || !config) return []
 
     const records = await provider.listSkills()
+    const isBuiltIn = providerId === BUILT_IN_PROVIDER_ID
     return records.map((r) =>
-      skillRecordToSkill(r, providerId, config.name, config.type, this.getBasePath(config), enabledSkillIds.has(r.id))
+      skillRecordToSkill(
+        r,
+        providerId,
+        config.name,
+        config.type,
+        this.getBasePath(config),
+        enabledSkillIds.has(r.id),
+        isBuiltIn
+      )
     )
   }
 
@@ -207,10 +241,7 @@ export class SkillStorageManager {
   /**
    * Save a skill to a specific provider.
    */
-  public async saveSkillToProvider(
-    providerId: string,
-    skill: import('./SkillStorageProvider').SkillRecord
-  ): Promise<void> {
+  public async saveSkillToProvider(providerId: string, skill: SkillRecord): Promise<void> {
     const provider = this.providers.get(providerId)
     if (!provider) {
       throw new Error(`Provider ${providerId} is not active`)
@@ -260,6 +291,10 @@ export class SkillStorageManager {
         const { IPFSStorageProvider } = await import('./providers/IPFSStorageProvider')
         return new IPFSStorageProvider(config.id, config.name, config.ipfs!)
       }
+      case 'built-in': {
+        const { BuiltInStorageProvider } = await import('./providers/BuiltInStorageProvider')
+        return new BuiltInStorageProvider()
+      }
       default: {
         throw new Error(`Unknown provider type: ${config.type}`)
       }
@@ -281,6 +316,10 @@ export class SkillStorageManager {
   private getBasePath(config: SkillStorageProviderConfig): string {
     if (config.type === 'filesystem' && config.filesystem) {
       return config.filesystem.directoryPath
+    }
+    if (config.type === 'built-in') {
+      const isPackaged = !!process.resourcesPath && !process.resourcesPath.includes('node_modules')
+      return isPackaged ? path.join(process.resourcesPath, 'skills') : path.join(process.cwd(), 'resources', 'skills')
     }
     return ''
   }

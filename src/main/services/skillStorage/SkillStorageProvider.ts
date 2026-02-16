@@ -27,6 +27,8 @@ export interface SkillRecord {
   metadata?: Record<string, string>
   /** Pre-approved tools (`allowed-tools` frontmatter) */
   allowedTools?: string[]
+  /** Slash commands declared by the skill (from frontmatter `commands`) */
+  commands?: Array<{ command: string; description?: string }>
   // Bundled resource manifests
   scripts?: SkillScript[]
   references?: SkillReference[]
@@ -110,7 +112,9 @@ export function skillRecordToSkill(
   storageType: SkillStorageType,
   /** Absolute path (filesystem providers) or empty string */
   basePath: string,
-  enabled: boolean
+  enabled: boolean,
+  /** Whether this skill comes from the built-in provider */
+  builtIn?: boolean
 ): Skill {
   return {
     id: record.id,
@@ -120,6 +124,7 @@ export function skillRecordToSkill(
     instructions: record.instructions,
     tools: record.tools,
     enabled,
+    builtIn,
     examples: record.examples,
     tags: record.tags,
     triggerPatterns: record.triggerPatterns,
@@ -130,6 +135,7 @@ export function skillRecordToSkill(
     compatibility: record.compatibility,
     metadata: record.metadata,
     allowedTools: record.allowedTools,
+    commands: record.commands,
     scripts: record.scripts,
     references: record.references,
     assets: record.assets

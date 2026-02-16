@@ -31,7 +31,7 @@ export class SessionService extends BaseService {
   }
 
   /**
-   * Override BaseService.listSlashCommands to merge builtin and plugin commands
+   * Override BaseService.listSlashCommands to merge builtin, plugin, and skill commands
    */
   async listSlashCommands(agentType: string, agentId?: string): Promise<SlashCommand[]> {
     const commands: SlashCommand[] = []
@@ -57,14 +57,6 @@ export class SessionService extends BaseService {
             description: plugin.metadata.description
           })
         }
-
-        logger.info('Listed slash commands', {
-          agentType,
-          agentId,
-          builtinCount: builtinSlashCommands.length,
-          localCount: commandPlugins.length,
-          totalCount: commands.length
-        })
       } catch (error) {
         logger.warn('Failed to list local command plugins', {
           agentId,
@@ -72,6 +64,39 @@ export class SessionService extends BaseService {
         })
       }
     }
+
+    // Add commands from enabled skills
+    try {
+      const { skillService } = await import('../../SkillService')
+      const enabledSkills = await skillService.getSkills()
+      let skillCommandCount = 0
+
+      for (const skill of enabledSkills) {
+        if (skill.enabled && skill.commands) {
+          for (const cmd of skill.commands) {
+            commands.push({
+              command: cmd.command.startsWith('/') ? cmd.command : `/${cmd.command}`,
+              description: cmd.description ?? `[${skill.name}] ${cmd.command}`
+            })
+            skillCommandCount++
+          }
+        }
+      }
+
+      if (skillCommandCount > 0) {
+        logger.info(`Added ${skillCommandCount} slash command(s) from enabled skills`)
+      }
+    } catch (error) {
+      logger.warn('Failed to load skill commands', {
+        error: error instanceof Error ? error.message : String(error)
+      })
+    }
+
+    logger.info('Listed slash commands', {
+      agentType,
+      agentId,
+      totalCount: commands.length
+    })
 
     return commands
   }

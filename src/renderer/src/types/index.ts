@@ -671,7 +671,7 @@ export interface TranslateHistory {
 /**
  * Supported skill storage backend types.
  */
-export type SkillStorageType = 'filesystem' | 'ipfs' | 'sqlite' | 'postgres'
+export type SkillStorageType = 'filesystem' | 'ipfs' | 'sqlite' | 'postgres' | 'built-in'
 
 /**
  * Configuration for a named skill storage provider instance.
@@ -744,6 +744,8 @@ export interface Skill {
   instructions: string // Content of SKILL.md
   tools?: string[] // List of tools defined in the skill
   enabled?: boolean // Whether the skill is globally enabled
+  /** Whether this is a built-in skill (read-only, non-deletable) */
+  builtIn?: boolean
   // Matching metadata
   examples?: string[] // Example utterances for semantic routing
   tags?: string[] // Categorical tags for clustering
@@ -758,6 +760,8 @@ export interface Skill {
   metadata?: Record<string, string>
   /** Pre-approved tools (maps to `allowed-tools` YAML frontmatter) */
   allowedTools?: string[]
+  /** Slash commands declared by the skill (from frontmatter `commands`) */
+  commands?: Array<{ command: string; description?: string }>
   // Bundled resource manifests
   /** Declared scripts in scripts/ directory */
   scripts?: SkillScript[]

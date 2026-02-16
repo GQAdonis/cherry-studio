@@ -382,7 +382,7 @@ export default function SkillSettings() {
                     <Button type="text" size="small" onClick={() => openProviderModal(p)}>
                       {t('common.edit', 'Edit')}
                     </Button>
-                    {p.id !== 'local-skills-default' && (
+                    {p.id !== 'local-skills-default' && p.id !== 'built-in-skills' && (
                       <Button type="text" size="small" danger onClick={() => handleRemoveProvider(p.id)}>
                         {t('common.delete', 'Delete')}
                       </Button>
@@ -522,6 +522,7 @@ export default function SkillSettings() {
                 title={
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                     <span style={{ color: 'inherit' }}>{skill.name}</span>
+                    {skill.builtIn && <Tag color="gold">Built-in</Tag>}
                     {skill.enabled && <Tag color="success">Active</Tag>}
                     {skill.providerName && (
                       <Tag color="processing" style={{ fontSize: 10 }}>

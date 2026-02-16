@@ -221,6 +221,15 @@ export class FileSystemStorageProvider implements SkillStorageProvider {
       const references = await this.discoverReferences(skillDir)
       const assets = await this.discoverAssets(skillDir)
 
+      // Parse commands (slash commands declared by the skill)
+      let commands: Array<{ command: string; description?: string }> | undefined
+      if (Array.isArray(data.commands)) {
+        commands = data.commands.map((cmd: any) => ({
+          command: typeof cmd === 'string' ? cmd : cmd.command,
+          description: typeof cmd === 'object' ? cmd.description : undefined
+        }))
+      }
+
       return {
         id: dirName,
         name: data.name || dirName,
@@ -234,6 +243,7 @@ export class FileSystemStorageProvider implements SkillStorageProvider {
         compatibility: data.compatibility,
         metadata: typeof data.metadata === 'object' && data.metadata !== null ? data.metadata : undefined,
         allowedTools,
+        commands,
         scripts: scripts.length ? scripts : undefined,
         references: references.length ? references : undefined,
         assets: assets.length ? assets : undefined

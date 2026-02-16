@@ -36,8 +36,36 @@ export class SkillService {
       await fs.mkdir(this.skillsPath, { recursive: true })
       // Bootstrap storage providers (registers default local provider if needed)
       await this.storageManager.bootstrap()
+
+      // Auto-enable built-in skills on first launch
+      await this.autoEnableBuiltInSkills()
     } catch (error) {
       logger.error('Failed to initialise SkillService', error as Error)
+    }
+  }
+
+  /**
+   * On first launch, automatically enable all skills from the built-in provider.
+   * Subsequent launches skip this — users can disable built-in skills manually.
+   */
+  private async autoEnableBuiltInSkills(): Promise<void> {
+    const alreadyDone = configManager.get('builtInSkillsInitialized') as boolean | undefined
+    if (alreadyDone) return
+
+    try {
+      const { BUILT_IN_PROVIDER_ID } = await import('./skillStorage/providers/BuiltInStorageProvider')
+      const enabledSkills = new Set((configManager.get('enabledSkills') as string[]) || [])
+      const builtInSkills = await this.storageManager.getSkillsByProvider(BUILT_IN_PROVIDER_ID, enabledSkills)
+
+      for (const skill of builtInSkills) {
+        enabledSkills.add(skill.id)
+      }
+
+      configManager.set('enabledSkills', Array.from(enabledSkills))
+      configManager.set('builtInSkillsInitialized', true)
+      logger.info(`Auto-enabled ${builtInSkills.length} built-in skill(s)`)
+    } catch (error) {
+      logger.error('Failed to auto-enable built-in skills', error as Error)
     }
   }
 
