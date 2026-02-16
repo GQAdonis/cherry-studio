@@ -122,6 +122,29 @@ export default class ModernAiProvider {
       throw new Error('Model is required for completions. Please use constructor with model parameter.')
     }
 
+    // Normalize params: handle simplified { system, prompt } format
+    // Convert to proper StreamTextParams with messages array for Responses API compatibility
+    if ('prompt' in params && typeof params.prompt === 'string' && !params.messages) {
+      const promptContent = params.prompt
+      // Destructure to exclude 'prompt' from the spread
+      const { prompt, ...restParams } = params as any
+      // Create a new params object with messages array
+      params = {
+        ...restParams,
+        messages: [
+          {
+            role: 'user',
+            content: promptContent
+          }
+        ]
+      } as StreamTextParams
+
+      logger.debug('Normalized params from { system, prompt } to { system, messages }', {
+        hasSystem: !!params.system,
+        messageCount: params.messages!.length
+      })
+    }
+
     // Config is now set in constructor, ApiService handles key rotation before passing provider
     if (!this.config) {
       // If config wasn't set in constructor (when provider only), generate it now

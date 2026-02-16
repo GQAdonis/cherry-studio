@@ -126,22 +126,28 @@ export const createSkillPlugin = (config: SkillPluginConfig) => {
       }
 
       const skillInstructions = activeSkills.map((s) => `### Skill: ${s.name}\n${s.instructions}`).join('\n\n')
-
-      const systemPrompt = params.messages?.find((m: any) => m.role === 'system')?.content || ''
-
-      const newSystemPrompt = systemPrompt
-        ? `${systemPrompt}\n\n## Active Skills\n${skillInstructions}`
-        : `## Active Skills\n${skillInstructions}`
+      const skillsSection = `\n\n## Active Skills\n${skillInstructions}`
 
       if (params.messages) {
         const systemMessageIndex = params.messages.findIndex((m: any) => m.role === 'system')
         if (systemMessageIndex !== -1) {
-          params.messages[systemMessageIndex].content = newSystemPrompt
+          // Handle existing system message
+          const existingContent = params.messages[systemMessageIndex].content
+
+          if (Array.isArray(existingContent)) {
+            // Multi-part content: add new text part
+            params.messages[systemMessageIndex].content = [...existingContent, { type: 'text', text: skillsSection }]
+          } else {
+            // String content: append
+            params.messages[systemMessageIndex].content = `${existingContent}${skillsSection}`
+          }
         } else {
-          params.messages.unshift({ role: 'system', content: newSystemPrompt })
+          // No existing system message: create one
+          params.messages.unshift({ role: 'system', content: `## Active Skills\n${skillInstructions}` })
         }
       } else {
-        params.system = newSystemPrompt
+        // Using prompt format (messages not available)
+        params.system = `## Active Skills\n${skillInstructions}`
       }
 
       if (config.getTools) {
