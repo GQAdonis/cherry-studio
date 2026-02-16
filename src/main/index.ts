@@ -6,15 +6,14 @@ import './bootstrap'
 import '@main/config'
 
 import { loggerService } from '@logger'
-import { electronApp, optimizer } from '@electron-toolkit/utils'
+
 import { replaceDevtoolsFont } from '@main/utils/windowUtil'
 import { app, crashReporter, session } from 'electron'
 import { existsSync } from 'node:fs'
 import { join } from 'node:path'
-import { isDev, isLinux, isWin } from './constant'
-
 import process from 'node:process'
 
+import { isDev, isLinux, isWin } from './constant'
 import { registerIpc } from './ipc'
 import { agentService } from './services/agents'
 import { analyticsService } from './services/AnalyticsService'
@@ -22,10 +21,11 @@ import { apiServerService } from './services/ApiServerService'
 import { appMenuService } from './services/AppMenuService'
 import { configManager } from './services/ConfigManager'
 import { lanTransferClientService } from './services/lanTransfer'
-import mcpService from './services/MCPService'
 import { localTransferService } from './services/LocalTransferService'
-import { openClawService } from './services/OpenClawService'
+import mcpService from './services/MCPService'
 import { nodeTraceService } from './services/NodeTraceService'
+import { openClawService } from './services/OpenClawService'
+import { isOvmsSupported } from './services/OvmsManager'
 import powerMonitorService from './services/PowerMonitorService'
 import {
   CHERRY_STUDIO_PROTOCOL,
@@ -37,10 +37,9 @@ import selectionService, { initSelectionService } from './services/SelectionServ
 import { registerShortcuts } from './services/ShortcutService'
 import { TrayService } from './services/TrayService'
 import { versionService } from './services/VersionService'
-import { windowService } from './services/WindowService'
 import { initWebviewHotkeys } from './services/WebviewService'
+import { windowService } from './services/WindowService'
 import { runAsyncFunction } from './utils'
-import { isOvmsSupported } from './services/OvmsManager'
 
 const logger = loggerService.withContext('MainEntry')
 
@@ -166,13 +165,40 @@ if (!app.requestSingleInstanceLock()) {
   // Some APIs can only be used after this event occurs.
 
   app.whenReady().then(async () => {
+    // Initialize file logging - MUST be first to ensure logs are captured
+    loggerService.initialize()
+
+    // Initialize theme service - MUST be after app is ready to access nativeTheme
+    const { themeService } = await import('./services/ThemeService')
+    themeService.initialize()
+
+    // Initialize trace-aware IPC handling - MUST be before other ipcMain.handle registrations
+    const { initializeTraceIpcHandling } = await import('./services/NodeTraceService')
+    initializeTraceIpcHandling()
+
+    // Initialize Redux service - MUST be after app is ready to access ipcMain
+    const { reduxService } = await import('./services/ReduxService')
+    reduxService.initialize()
+
+    // Initialize WebView registry service - MUST be after app is ready to access app.on()
+    const { webViewRegistryService } = await import('./services/WebViewRegistryService')
+    webViewRegistryService.initialize()
+
+    // Initialize Python service - MUST be after app is ready to access ipcMain
+    const { pythonService } = await import('./services/PythonService')
+    pythonService.initialize()
+
+    // Initialize Skill service - MUST be after app is ready to access app.getPath()
+    const { skillService } = await import('./services/SkillService')
+    await skillService.initialize()
+
     // Record current version for tracking
     // A preparation for v2 data refactoring
     versionService.recordCurrentVersion()
 
     initWebviewHotkeys()
     // Set app user model id for windows
-    electronApp.setAppUserModelId(import.meta.env.VITE_MAIN_BUNDLE_ID || 'com.kangfenmao.CherryStudio')
+    app.setAppUserModelId(import.meta.env.VITE_MAIN_BUNDLE_ID || 'com.kangfenmao.CherryStudio')
 
     // Mac: Hide dock icon before window creation when launch to tray is set
     const isLaunchToTray = configManager.getLaunchToTray()
@@ -276,8 +302,8 @@ if (!app.requestSingleInstanceLock()) {
     handleOpenUrl(argv)
   })
 
-  app.on('browser-window-created', (_, window) => {
-    optimizer.watchWindowShortcuts(window)
+  app.on('browser-window-created', (_, _window) => {
+    // Note: optimizer.watchWindowShortcuts() removed - dev shortcuts handled by Electron
   })
 
   app.on('before-quit', () => {

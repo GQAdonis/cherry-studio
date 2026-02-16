@@ -23,10 +23,10 @@ interface PythonExecutionResponse {
 export class PythonService {
   private static instance: PythonService | null = null
   private pendingRequests = new Map<string, { resolve: (value: string) => void; reject: (error: Error) => void }>()
+  private isInitialized = false
 
   private constructor() {
-    // Private constructor for singleton pattern
-    this.setupIpcHandlers()
+    // Defer ipcMain access until initialize() is called
   }
 
   public static getInstance(): PythonService {
@@ -34,6 +34,19 @@ export class PythonService {
       PythonService.instance = new PythonService()
     }
     return PythonService.instance
+  }
+
+  /**
+   * Initialize Python service after app is ready
+   * MUST be called after app.whenReady() to access ipcMain
+   */
+  public initialize(): void {
+    if (this.isInitialized) {
+      return
+    }
+
+    this.setupIpcHandlers()
+    this.isInitialized = true
   }
 
   private setupIpcHandlers() {

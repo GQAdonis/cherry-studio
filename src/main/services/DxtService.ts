@@ -253,26 +253,25 @@ export interface ResolvedMcpConfig {
 }
 
 class DxtService {
-  private tempDir = path.join(getTempDir(), 'dxt_uploads')
-  private mcpDir = getMcpDir()
+  private _tempDir?: string
+  private _mcpDir?: string
 
-  constructor() {
-    this.ensureDirectories()
+  private get tempDir(): string {
+    if (!this._tempDir) {
+      this._tempDir = path.join(getTempDir(), 'dxt_uploads')
+    }
+    return this._tempDir
   }
 
-  private ensureDirectories() {
-    try {
-      // Create temp directory
-      if (!fs.existsSync(this.tempDir)) {
-        fs.mkdirSync(this.tempDir, { recursive: true })
-      }
-      // Create MCP directory
-      if (!fs.existsSync(this.mcpDir)) {
-        fs.mkdirSync(this.mcpDir, { recursive: true })
-      }
-    } catch (error) {
-      logger.error('Failed to create directories:', error as Error)
+  private get mcpDir(): string {
+    if (!this._mcpDir) {
+      this._mcpDir = getMcpDir()
     }
+    return this._mcpDir
+  }
+
+  constructor() {
+    // Directories will be ensured lazily when first used
   }
 
   private async moveDirectory(source: string, destination: string): Promise<void> {

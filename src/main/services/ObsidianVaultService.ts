@@ -16,25 +16,31 @@ interface FileInfo {
 }
 
 class ObsidianVaultService {
-  private obsidianConfigPath: string
+  private _obsidianConfigPath?: string
+
+  private get obsidianConfigPath(): string {
+    if (!this._obsidianConfigPath) {
+      if (process.platform === 'win32') {
+        this._obsidianConfigPath = path.join(app.getPath('appData'), 'obsidian', 'obsidian.json')
+      } else if (process.platform === 'darwin') {
+        this._obsidianConfigPath = path.join(
+          app.getPath('home'),
+          'Library',
+          'Application Support',
+          'obsidian',
+          'obsidian.json'
+        )
+      } else {
+        // Linux
+        this._obsidianConfigPath = this.resolveLinuxObsidianConfigPath()
+        logger.debug(`Resolved Obsidian config path (linux): ${this._obsidianConfigPath}`)
+      }
+    }
+    return this._obsidianConfigPath
+  }
 
   constructor() {
-    // 根据操作系统获取Obsidian配置文件路径
-    if (process.platform === 'win32') {
-      this.obsidianConfigPath = path.join(app.getPath('appData'), 'obsidian', 'obsidian.json')
-    } else if (process.platform === 'darwin') {
-      this.obsidianConfigPath = path.join(
-        app.getPath('home'),
-        'Library',
-        'Application Support',
-        'obsidian',
-        'obsidian.json'
-      )
-    } else {
-      // Linux
-      this.obsidianConfigPath = this.resolveLinuxObsidianConfigPath()
-      logger.debug(`Resolved Obsidian config path (linux): ${this.obsidianConfigPath}`)
-    }
+    // Defer app.getPath() access until first use
   }
 
   /**

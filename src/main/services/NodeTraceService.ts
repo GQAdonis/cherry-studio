@@ -30,19 +30,26 @@ export class NodeTraceService {
   }
 }
 
-const originalHandle = ipcMain.handle
-ipcMain.handle = (channel: string, handler: (...args: any[]) => Promise<any>) => {
-  return originalHandle.call(ipcMain, channel, async (event, ...args) => {
-    const carray = args && args.length > 0 ? args[args.length - 1] : {}
-    let ctx = context.active()
-    let newArgs = args
-    if (carray && typeof carray === 'object' && 'type' in carray && carray.type === 'trace') {
-      const span = trace.wrapSpanContext(carray.context as SpanContext)
-      ctx = trace.setSpan(context.active(), span)
-      newArgs = args.slice(0, args.length - 1)
-    }
-    return context.with(ctx, () => handler(event, ...newArgs))
-  })
+/**
+ * Initialize trace-aware IPC handling.
+ * MUST be called after app.whenReady() to access ipcMain.
+ * This wraps ipcMain.handle to propagate trace context from renderer.
+ */
+export function initializeTraceIpcHandling(): void {
+  const originalHandle = ipcMain.handle
+  ipcMain.handle = (channel: string, handler: (...args: any[]) => Promise<any>) => {
+    return originalHandle.call(ipcMain, channel, async (event, ...args) => {
+      const carray = args && args.length > 0 ? args[args.length - 1] : {}
+      let ctx = context.active()
+      let newArgs = args
+      if (carray && typeof carray === 'object' && 'type' in carray && carray.type === 'trace') {
+        const span = trace.wrapSpanContext(carray.context as SpanContext)
+        ctx = trace.setSpan(context.active(), span)
+        newArgs = args.slice(0, args.length - 1)
+      }
+      return context.with(ctx, () => handler(event, ...newArgs))
+    })
+  }
 }
 
 export const nodeTraceService = new NodeTraceService()

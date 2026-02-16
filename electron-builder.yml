@@ -103,6 +103,9 @@ files:
 extraResources:
   - from: "./node_modules/claude-code-plugins/plugins/"
     to: "claude-code-plugins"
+  # Copy built-in skills to Resources folder for proper file system access
+  - from: "./resources/skills/"
+    to: "skills"
 
 win:
   executableName: The Boss

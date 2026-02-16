@@ -28,24 +28,39 @@ function getDbPath() {
   if (process.env.NODE_ENV === 'development') {
     return path.join(os.homedir(), '.cherrystudio', 'data', 'agents.db')
   }
-  return path.join(app.getPath('userData'), 'Data', 'agents.db')
+  try {
+    return path.join(app.getPath('userData'), 'Data', 'agents.db')
+  } catch {
+    // Fallback if app is not ready yet (e.g., during drizzle-kit CLI usage)
+    return path.join(os.homedir(), '.cherrystudio', 'data', 'agents.db')
+  }
 }
 
 export function getOldDbPath() {
   // production
-  return path.join(app.getPath('userData'), 'agents.db')
+  try {
+    return path.join(app.getPath('userData'), 'agents.db')
+  } catch {
+    return path.join(os.homedir(), '.cherrystudio', 'agents.db')
+  }
 }
 
-const resolvedDbPath = getDbPath()
+let _dbPath: string | undefined
+export function getResolvedDbPath(): string {
+  if (!_dbPath) {
+    _dbPath = getDbPath()
+  }
+  return _dbPath
+}
 
-export const dbPath = resolvedDbPath
+export const dbPath = getDbPath()
 
 export default defineConfig({
   dialect: 'sqlite',
   schema: './src/main/services/agents/database/schema/index.ts',
   out: './resources/database/drizzle',
   dbCredentials: {
-    url: `file:${resolvedDbPath}`
+    url: `file:${dbPath}`
   },
   verbose: true,
   strict: true

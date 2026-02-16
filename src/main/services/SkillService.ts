@@ -3,7 +3,6 @@ import { configManager } from '@main/services/ConfigManager'
 import type { Skill, SkillMatchingConfig } from '@types'
 import { spawn } from 'child_process'
 import { app, dialog } from 'electron'
-import { promises as fs } from 'fs'
 import path from 'path'
 
 import { createSkillMatchingProvider, DEFAULT_SKILL_MATCHING_CONFIG, type SkillMatchingProvider } from './skillMatching'
@@ -14,14 +13,20 @@ const logger = loggerService.withContext('SkillService')
 
 export class SkillService {
   private static instance: SkillService
-  private skillsPath: string
+  private _skillsPath?: string
   private matchingProvider: SkillMatchingProvider | null = null
   private storageManager: SkillStorageManager
 
+  private get skillsPath(): string {
+    if (!this._skillsPath) {
+      this._skillsPath = path.join(app.getPath('userData'), 'skills')
+    }
+    return this._skillsPath
+  }
+
   private constructor() {
-    this.skillsPath = path.join(app.getPath('userData'), 'skills')
     this.storageManager = SkillStorageManager.getInstance()
-    this.init()
+    // Defer init to avoid accessing app.getPath before app is ready
   }
 
   public static getInstance(): SkillService {
@@ -31,41 +36,17 @@ export class SkillService {
     return SkillService.instance
   }
 
-  private async init() {
-    try {
-      await fs.mkdir(this.skillsPath, { recursive: true })
-      // Bootstrap storage providers (registers default local provider if needed)
-      await this.storageManager.bootstrap()
-
-      // Auto-enable built-in skills on first launch
-      await this.autoEnableBuiltInSkills()
-    } catch (error) {
-      logger.error('Failed to initialise SkillService', error as Error)
-    }
-  }
-
   /**
-   * On first launch, automatically enable all skills from the built-in provider.
-   * Subsequent launches skip this — users can disable built-in skills manually.
+   * Initialize the skill service.
+   * MUST be called after app.whenReady() to ensure app.getPath() is available.
    */
-  private async autoEnableBuiltInSkills(): Promise<void> {
-    const alreadyDone = configManager.get('builtInSkillsInitialized') as boolean | undefined
-    if (alreadyDone) return
-
+  public async initialize(): Promise<void> {
     try {
-      const { BUILT_IN_PROVIDER_ID } = await import('./skillStorage/providers/BuiltInStorageProvider')
-      const enabledSkills = new Set((configManager.get('enabledSkills') as string[]) || [])
-      const builtInSkills = await this.storageManager.getSkillsByProvider(BUILT_IN_PROVIDER_ID, enabledSkills)
-
-      for (const skill of builtInSkills) {
-        enabledSkills.add(skill.id)
-      }
-
-      configManager.set('enabledSkills', Array.from(enabledSkills))
-      configManager.set('builtInSkillsInitialized', true)
-      logger.info(`Auto-enabled ${builtInSkills.length} built-in skill(s)`)
+      // Bootstrap storage providers (registers built-in provider and loads configs)
+      await this.storageManager.bootstrap()
+      logger.info('SkillService initialized')
     } catch (error) {
-      logger.error('Failed to auto-enable built-in skills', error as Error)
+      logger.error('Failed to initialize SkillService:', error as Error)
     }
   }
 

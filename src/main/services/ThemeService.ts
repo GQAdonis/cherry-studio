@@ -7,7 +7,21 @@ import { configManager } from './ConfigManager'
 
 class ThemeService {
   private theme: ThemeMode = ThemeMode.system
+  private isInitialized = false
+
   constructor() {
+    // Defer nativeTheme access until initialize() is called
+  }
+
+  /**
+   * Initialize theme service after app is ready
+   * MUST be called after app.whenReady() to access nativeTheme
+   */
+  public initialize(): void {
+    if (this.isInitialized) {
+      return
+    }
+
     this.theme = configManager.getTheme()
 
     if (this.theme === ThemeMode.dark || this.theme === ThemeMode.light || this.theme === ThemeMode.system) {
@@ -18,6 +32,8 @@ class ThemeService {
       nativeTheme.themeSource = ThemeMode.system
     }
     nativeTheme.on('updated', this.themeUpdatadHandler.bind(this))
+
+    this.isInitialized = true
   }
 
   themeUpdatadHandler() {

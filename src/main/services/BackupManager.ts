@@ -35,8 +35,22 @@ import { windowService } from './WindowService'
 const logger = loggerService.withContext('BackupManager')
 
 class BackupManager {
-  private tempDir = path.join(app.getPath('temp'), 'cherry-studio', 'backup', 'temp')
-  private backupDir = path.join(app.getPath('temp'), 'cherry-studio', 'backup')
+  private _tempDir?: string
+  private _backupDir?: string
+
+  private get tempDir(): string {
+    if (!this._tempDir) {
+      this._tempDir = path.join(app.getPath('temp'), 'cherry-studio', 'backup', 'temp')
+    }
+    return this._tempDir
+  }
+
+  private get backupDir(): string {
+    if (!this._backupDir) {
+      this._backupDir = path.join(app.getPath('temp'), 'cherry-studio', 'backup')
+    }
+    return this._backupDir
+  }
 
   // 缓存实例，避免重复创建
   private s3Storage: S3Storage | null = null

@@ -64,14 +64,20 @@ class ClaudeCodeStream extends EventEmitter implements AgentStream {
 }
 
 class ClaudeCodeService implements AgentServiceInterface {
-  private claudeExecutablePath: string
+  private _claudeExecutablePath?: string
+
+  private get claudeExecutablePath(): string {
+    if (!this._claudeExecutablePath) {
+      this._claudeExecutablePath = require_.resolve('@anthropic-ai/claude-agent-sdk/cli.js')
+      if (app?.isPackaged) {
+        this._claudeExecutablePath = this._claudeExecutablePath.replace(/\.asar([/\\])/, '.asar.unpacked$1')
+      }
+    }
+    return this._claudeExecutablePath
+  }
 
   constructor() {
-    // Resolve Claude Code CLI robustly (works in dev and in asar)
-    this.claudeExecutablePath = require_.resolve('@anthropic-ai/claude-agent-sdk/cli.js')
-    if (app.isPackaged) {
-      this.claudeExecutablePath = this.claudeExecutablePath.replace(/\.asar([\\/])/, '.asar.unpacked$1')
-    }
+    // Defer app.isPackaged access - resolved lazily on first use
   }
 
   async invoke(

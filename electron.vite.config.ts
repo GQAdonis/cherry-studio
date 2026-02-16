@@ -16,9 +16,46 @@ const visualizerPlugin = (type: 'renderer' | 'main') => {
 const isDev = process.env.NODE_ENV === 'development'
 const isProd = process.env.NODE_ENV === 'production'
 
+/**
+ * Vite plugin that fixes `require('electron')` resolving to the npm package
+ * (which exports the executable path string) instead of Electron's internal API.
+ *
+ * When the bundled output is in a subdirectory of the project root,
+ * Node.js module resolution finds `node_modules/electron/index.js` before
+ * Electron's `Module._resolveFilename` patch can intercept the call.
+ * This plugin injects a shim at the top of the bundle that:
+ * 1. Removes any cached npm `electron` entry from require.cache
+ * 2. Patches `Module._resolveFilename` to bypass npm resolution for 'electron'
+ */
+function electronResolvePlugin() {
+  const banner = `
+;(function() {
+  // Fix: ELECTRON_RUN_AS_NODE in the environment prevents Electron from loading
+  // its internal module system, causing require("electron") to resolve to the
+  // npm package (which returns the executable path string instead of the API).
+  // Remove it so Electron can provide app, crashReporter, session, etc.
+  if (process.env.ELECTRON_RUN_AS_NODE) {
+    delete process.env.ELECTRON_RUN_AS_NODE;
+  }
+})();
+`
+
+  return {
+    name: 'vite:electron-resolve-fix',
+    apply: 'build' as const,
+    enforce: 'post' as const,
+    renderChunk(code: string, chunk: { isEntry: boolean }, options: { format?: string }) {
+      if (chunk.isEntry && options.format === 'cjs') {
+        return { code: banner + code, map: null }
+      }
+      return null
+    }
+  }
+}
+
 export default defineConfig({
   main: {
-    plugins: [...visualizerPlugin('main')],
+    plugins: [electronResolvePlugin(), ...visualizerPlugin('main')],
     resolve: {
       alias: {
         '@main': resolve('src/main'),

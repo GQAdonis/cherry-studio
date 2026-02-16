@@ -23,12 +23,11 @@ export class BuiltInStorageProvider implements SkillStorageProvider {
   private directoryPath: string
 
   constructor() {
-    // In packaged app, unpacked resources are in process.resourcesPath/app.asar.unpacked/
-    // because electron-builder's asarUnpack extracts to app.asar.unpacked/ directory
-    // In dev, they are in the project root's resources/ directory
+    // In packaged app, skills are copied to process.resourcesPath/skills via extraResources
+    // In dev, they are in the project root's resources/skills directory
     const isPackaged = !!process.resourcesPath && !process.resourcesPath.includes('node_modules')
     this.directoryPath = isPackaged
-      ? path.join(process.resourcesPath, 'app.asar.unpacked', 'resources', 'skills')
+      ? path.join(process.resourcesPath, 'skills')
       : path.join(process.cwd(), 'resources', 'skills')
 
     logger.info('BuiltInStorageProvider constructor', {

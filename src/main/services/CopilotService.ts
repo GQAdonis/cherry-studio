@@ -65,11 +65,17 @@ class CopilotServiceError extends Error {
 }
 
 class CopilotService {
-  private readonly tokenFilePath: string
+  private _tokenFilePath?: string
   private headers: Record<string, string>
 
+  private get tokenFilePath(): string {
+    if (!this._tokenFilePath) {
+      this._tokenFilePath = this.getTokenFilePath()
+    }
+    return this._tokenFilePath
+  }
+
   constructor() {
-    this.tokenFilePath = this.getTokenFilePath()
     this.headers = {
       ...CONFIG.DEFAULT_HEADERS,
       accept: 'application/json',

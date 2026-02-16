@@ -11,10 +11,10 @@
     "node": ">=22.0.0"
   },
   "scripts": {
-    "start": "electron-vite preview",
-    "dev": "dotenv electron-vite dev",
-    "dev:watch": "dotenv electron-vite dev -- -w",
-    "debug": "electron-vite -- --inspect --sourcemap --remote-debugging-port=9222",
+    "start": "ELECTRON_RUN_AS_NODE= electron-vite preview",
+    "dev": "ELECTRON_RUN_AS_NODE= dotenv electron-vite dev",
+    "dev:watch": "ELECTRON_RUN_AS_NODE= dotenv electron-vite dev -- -w",
+    "debug": "ELECTRON_RUN_AS_NODE= electron-vite -- --inspect --sourcemap --remote-debugging-port=9222",
     "build": "npm run typecheck && electron-vite build",
     "build:check": "pnpm lint && pnpm test",
     "build:unpack": "dotenv npm run build && electron-builder --dir",

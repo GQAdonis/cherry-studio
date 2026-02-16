@@ -5,7 +5,7 @@ import path from 'node:path'
 import type { Client } from '@libsql/client'
 import { createClient } from '@libsql/client'
 import { loggerService } from '@logger'
-import { DATA_PATH } from '@main/config'
+import { getDataPathLazy } from '@main/config'
 import Embeddings from '@main/knowledge/embedjs/embeddings/Embeddings'
 import { makeSureDirExists } from '@main/utils'
 import type {
@@ -81,7 +81,7 @@ export class MemoryService {
    */
   public migrateMemoryDb(): void {
     const oldMemoryDbPath = path.join(app.getPath('userData'), 'memories.db')
-    const memoryDbPath = path.join(DATA_PATH, 'Memory', 'memories.db')
+    const memoryDbPath = path.join(getDataPathLazy(), 'Memory', 'memories.db')
 
     makeSureDirExists(path.dirname(memoryDbPath))
 
@@ -99,7 +99,7 @@ export class MemoryService {
     }
 
     try {
-      const memoryDbPath = path.join(DATA_PATH, 'Memory', 'memories.db')
+      const memoryDbPath = path.join(getDataPathLazy(), 'Memory', 'memories.db')
 
       makeSureDirExists(path.dirname(memoryDbPath))
 

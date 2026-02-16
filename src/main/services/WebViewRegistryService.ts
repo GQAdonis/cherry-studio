@@ -32,11 +32,26 @@ export interface WebViewUpdatePayload {
 class WebViewRegistryService extends EventEmitter {
   private registry: Map<number, WebViewInfo> = new Map()
   private appIdToWebContentsId: Map<string, number> = new Map()
+  private isInitialized = false
 
   constructor() {
     super()
+    // Defer app.on() access until initialize() is called
+  }
+
+  /**
+   * Initialize WebView registry service after app is ready
+   * MUST be called after app.whenReady() to access app.on()
+   */
+  public initialize(): void {
+    if (this.isInitialized) {
+      return
+    }
+
     this.setupCleanupHandlers()
     logger.info('WebViewRegistryService initialized')
+
+    this.isInitialized = true
   }
 
   /**

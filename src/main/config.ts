@@ -11,7 +11,13 @@ if (isDev && app) {
   app.setPath('userData', app.getPath('userData') + 'Dev')
 }
 
-export const DATA_PATH = getDataPath()
+/**
+ * Get the data path - lazy evaluation to avoid calling app.getPath() before app is ready
+ * @returns The data path
+ */
+export function getDataPathLazy() {
+  return getDataPath()
+}
 
 export const titleBarOverlayDark = {
   height: 42,

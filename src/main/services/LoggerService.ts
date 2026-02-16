@@ -66,9 +66,6 @@ class LoggerService {
       throw new Error('[LoggerService] NOT support worker thread yet, can only be instantiated in main process.')
     }
 
-    // Create logs directory path
-    this.logsDir = path.join(app.getPath('userData'), 'logs')
-
     // env variables, only used in dev mode
     // only affect console output, not affect file output
     if (isDev) {
@@ -97,33 +94,8 @@ class LoggerService {
       }
     }
 
-    // Configure transports based on environment
-    const transports: winston.transport[] = []
-
-    // Daily rotate file transport for general logs
-    transports.push(
-      new DailyRotateFile({
-        filename: path.join(this.logsDir, 'app.%DATE%.log'),
-        datePattern: 'YYYY-MM-DD',
-        maxSize: '10m',
-        maxFiles: '30d'
-      })
-    )
-
-    // Daily rotate file transport for error logs
-    transports.push(
-      new DailyRotateFile({
-        level: 'warn',
-        filename: path.join(this.logsDir, 'app-error.%DATE%.log'),
-        datePattern: 'YYYY-MM-DD',
-        maxSize: '10m',
-        maxFiles: '60d'
-      })
-    )
-
-    // Configure Winston logger
+    // Initialize with console-only logger until initialize() is called
     this.logger = winston.createLogger({
-      // Development: all levels, Production: info and above
       level: DEFAULT_LEVEL,
       format: winston.format.combine(
         winston.format.timestamp({
@@ -133,7 +105,7 @@ class LoggerService {
         winston.format.json()
       ),
       exitOnError: false,
-      transports
+      transports: [] // No file transports yet - will be added in initialize()
     })
 
     // Handle transport events
@@ -141,8 +113,55 @@ class LoggerService {
       console.error('LoggerService fatal error:', error)
     })
 
-    //register ipc handler, for renderer process to log to main process
+    // IPC handler registration will be done in initialize() after app is ready
+  }
+
+  /**
+   * Initialize file logging after app is ready
+   * MUST be called after app.whenReady() to access app.getPath('userData')
+   */
+  public initialize(): void {
+    if (this.logsDir) {
+      // Already initialized
+      return
+    }
+
+    // Create logs directory path - safe to call app.getPath() now
+    this.logsDir = path.join(app.getPath('userData'), 'logs')
+
+    // Add file transports now that we have the logs directory
+    const fileTransports: winston.transport[] = []
+
+    // Daily rotate file transport for general logs
+    fileTransports.push(
+      new DailyRotateFile({
+        filename: path.join(this.logsDir, 'app.%DATE%.log'),
+        datePattern: 'YYYY-MM-DD',
+        maxSize: '10m',
+        maxFiles: '30d'
+      })
+    )
+
+    // Daily rotate file transport for error logs
+    fileTransports.push(
+      new DailyRotateFile({
+        level: 'warn',
+        filename: path.join(this.logsDir, 'app-error.%DATE%.log'),
+        datePattern: 'YYYY-MM-DD',
+        maxSize: '10m',
+        maxFiles: '60d'
+      })
+    )
+
+    // Add file transports to existing logger
+    fileTransports.forEach((transport) => {
+      this.logger.add(transport)
+    })
+
+    // Register IPC handler for renderer process logging
     this.registerIpcHandler()
+
+    console.log(colorText(`[LoggerService] File logging initialized at ${this.logsDir}`, 'GREEN'))
   }
 
   /**

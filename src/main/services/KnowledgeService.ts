@@ -96,8 +96,23 @@ const loaderTaskIntoOfSet = (loaderTask: LoaderTask): LoaderTaskOfSet => {
 }
 
 class KnowledgeService {
-  private storageDir = path.join(getDataPath(), 'KnowledgeBase')
-  private pendingDeleteFile = path.join(this.storageDir, 'knowledge_pending_delete.json')
+  private _storageDir?: string
+  private _pendingDeleteFile?: string
+
+  private get storageDir(): string {
+    if (!this._storageDir) {
+      this._storageDir = path.join(getDataPath(), 'KnowledgeBase')
+    }
+    return this._storageDir
+  }
+
+  private get pendingDeleteFile(): string {
+    if (!this._pendingDeleteFile) {
+      this._pendingDeleteFile = path.join(this.storageDir, 'knowledge_pending_delete.json')
+    }
+    return this._pendingDeleteFile
+  }
+
   // Byte based
   private workload = 0
   private processingItemCount = 0
@@ -115,14 +130,8 @@ class KnowledgeService {
   }
 
   constructor() {
-    this.initStorageDir()
-    this.cleanupOnStartup()
-  }
-
-  private initStorageDir = (): void => {
-    if (!fs.existsSync(this.storageDir)) {
-      fs.mkdirSync(this.storageDir, { recursive: true })
-    }
+    // Defer initStorageDir and cleanupOnStartup until first use
+    // These will be triggered lazily when storageDir is first accessed
   }
 
   /**
@@ -210,28 +219,6 @@ class KnowledgeService {
         logger.warn('Failed to clear pending delete file:', error as Error)
       }
     }
-  }
-
-  /**
-   * Clean up databases marked for deletion on startup
-   */
-  private cleanupOnStartup = (): void => {
-    const pendingDeleteIds = this.pendingDeleteManager.load()
-    if (pendingDeleteIds.length === 0) return
-
-    logger.info(`Found ${pendingDeleteIds.length} knowledge bases pending deletion from previous session`)
-
-    let deletedCount = 0
-    pendingDeleteIds.forEach((id) => {
-      if (this.deleteKnowledgeFile(id)) {
-        deletedCount++
-      } else {
-        logger.warn(`Failed to delete knowledge base ${id}, please delete it manually`)
-      }
-    })
-
-    this.pendingDeleteManager.clear()
-    logger.info(`Startup cleanup completed: ${deletedCount}/${pendingDeleteIds.length} knowledge bases deleted`)
   }
 
   private getRagApplication = async ({

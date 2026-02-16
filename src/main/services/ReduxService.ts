@@ -29,12 +29,27 @@ export class ReduxService {
   private isReady = false
   private resolveReady!: () => void
   private readyPromise = new Promise<void>((r) => (this.resolveReady = r))
+  private isInitialized = false
 
   constructor() {
+    // Defer ipcMain access until initialize() is called
+  }
+
+  /**
+   * Initialize Redux service after app is ready
+   * MUST be called after app.whenReady() to access ipcMain
+   */
+  public initialize(): void {
+    if (this.isInitialized) {
+      return
+    }
+
     ipcMain.handle(IpcChannel.ReduxStoreReady, () => {
       this.isReady = true
       this.resolveReady()
     })
+
+    this.isInitialized = true
   }
 
   private async waitForStoreReady(): Promise<void> {

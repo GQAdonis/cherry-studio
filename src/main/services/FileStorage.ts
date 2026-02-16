@@ -45,7 +45,7 @@ const getRipgrepBinaryPath = (): string | null => {
       process.platform === 'win32' ? 'rg.exe' : 'rg'
     )
 
-    if (app.isPackaged) {
+    if (app?.isPackaged) {
       ripgrepBinaryPath = ripgrepBinaryPath.replace(/\.asar([\\/])/, '.asar.unpacked$1')
     }
 
@@ -147,9 +147,9 @@ const DEFAULT_DIRECTORY_LIST_OPTIONS: Required<DirectoryListOptions> = {
 }
 
 class FileStorage {
-  private storageDir = getFilesDir()
-  private notesDir = getNotesDir()
-  private tempDir = getTempDir()
+  private _storageDir?: string
+  private _notesDir?: string
+  private _tempDir?: string
   private watcher?: FSWatcher
   private watcherSender?: Electron.WebContents
   private currentWatchPath?: string
@@ -157,8 +157,30 @@ class FileStorage {
   private watcherConfig: Required<FileWatcherConfig> = DEFAULT_WATCHER_CONFIG
   private isPaused = false
 
+  private get storageDir(): string {
+    if (!this._storageDir) {
+      this._storageDir = getFilesDir()
+    }
+    return this._storageDir
+  }
+
+  private get notesDir(): string {
+    if (!this._notesDir) {
+      this._notesDir = getNotesDir()
+    }
+    return this._notesDir
+  }
+
+  private get tempDir(): string {
+    if (!this._tempDir) {
+      this._tempDir = getTempDir()
+    }
+    return this._tempDir
+  }
+
   constructor() {
-    this.initStorageDir()
+    // Defer directory initialization until after app is ready
+    // Directories will be created on first use
   }
 
   private initStorageDir = (): void => {
