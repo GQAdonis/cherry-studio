@@ -64,7 +64,7 @@ const SkillCreator: FC = () => {
   // Fetch providers for save destination
   const fetchProviders = useCallback(async () => {
     try {
-      const list = await (window.api as any).invoke('skill-storage:get-providers')
+      const list = await window.api.skillStorage.getProviders()
       const active = (list ?? []).filter((p: SkillStorageProviderConfig) => p.enabled)
       setProviders(active)
       if (active.length > 0 && !selectedProviderId) {
@@ -88,7 +88,7 @@ const SkillCreator: FC = () => {
     const timer = setTimeout(async () => {
       if (!formData.name && !formData.description) return
       try {
-        const result = await (window.api as any).invoke('skill-creator:validate', {
+        const result = await window.api.skillCreator.validate({
           id: formData.name,
           name: formData.name,
           description: formData.description,
@@ -96,7 +96,7 @@ const SkillCreator: FC = () => {
           compatibility: formData.compatibility,
           metadata: undefined
         })
-        setValidation(result)
+        setValidation(result as ValidationResult)
       } catch {
         // Ignore
       }
@@ -134,16 +134,16 @@ const SkillCreator: FC = () => {
 
     // Validate first
     try {
-      const result = await (window.api as any).invoke('skill-creator:validate', {
+      const result = (await window.api.skillCreator.validate({
         id: formData.name,
         name: formData.name,
         description: formData.description,
         instructions: formData.instructions,
         compatibility: formData.compatibility
-      })
+      })) as ValidationResult
 
       if (!result.valid) {
-        message.error(`Validation failed: ${result.errors.map((e: any) => e.message).join(', ')}`)
+        message.error(`Validation failed: ${result.errors.map((e) => e.message).join(', ')}`)
         return
       }
     } catch {
@@ -169,7 +169,7 @@ const SkillCreator: FC = () => {
         assets: formData.assets.length ? formData.assets : undefined
       }
 
-      await (window.api as any).invoke('skill-creator:save-to-provider', selectedProviderId, skillRecord)
+      await window.api.skillCreator.saveToProvider(selectedProviderId, skillRecord)
       message.success(`Skill "${formData.name}" saved successfully!`)
       setSaveModalVisible(false)
       navigate('/settings/skills')
@@ -182,7 +182,7 @@ const SkillCreator: FC = () => {
 
   const handleLoadTemplate = async () => {
     try {
-      const template = await (window.api as any).invoke('skill-creator:init-template', formData.name || 'new-skill')
+      const template = await window.api.skillCreator.initTemplate(formData.name || 'new-skill')
       updateFormData({
         name: template.name,
         description: template.description,

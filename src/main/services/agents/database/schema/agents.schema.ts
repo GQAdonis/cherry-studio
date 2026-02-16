@@ -19,7 +19,6 @@ export const agentsTable = sqliteTable('agents', {
 
   mcps: text('mcps'), // JSON array of MCP tool IDs
   allowed_tools: text('allowed_tools'), // JSON array of allowed tool IDs (whitelist)
-  skills: text('skills'), // JSON array of skill IDs associated with this agent
 
   configuration: text('configuration'), // JSON, extensible settings
 

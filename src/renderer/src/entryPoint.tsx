@@ -1,7 +1,7 @@
+import './loggerBootstrap'
 import './assets/styles/index.css'
 import './assets/styles/tailwind.css'
 import '@ant-design/v5-patch-for-react-19'
-import './loggerBootstrap'
 import './init'
 
 import { createRoot } from 'react-dom/client'

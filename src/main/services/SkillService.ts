@@ -223,10 +223,15 @@ export class SkillService {
    * @returns Array of Skill objects that are both associated with the agent and globally enabled
    */
   public async getEnabledSkillsForAgent(agentId: string): Promise<Skill[]> {
-    const agentSkillIds = await this.getAgentSkills(agentId)
     const allSkills = await this.getSkills()
+    const configuredAgentSkills = configManager.get(`agentSkills.${agentId}`) as string[] | undefined
 
-    return allSkills.filter((skill) => agentSkillIds.includes(skill.id) && skill.enabled)
+    // Backward-compatibility: if no per-agent mapping exists yet, use all globally enabled skills.
+    if (!Array.isArray(configuredAgentSkills)) {
+      return allSkills.filter((skill) => skill.enabled)
+    }
+
+    return allSkills.filter((skill) => configuredAgentSkills.includes(skill.id) && skill.enabled)
   }
 
   public async executeScript(skillId: string, scriptName: string, args: string[]): Promise<string> {

@@ -144,6 +144,28 @@ export class AiSdkToChunkAdapter {
     final: { text: string; reasoningContent: string; webSearchResults: AISDKWebSearchResult[]; reasoningId: string }
   ) {
     logger.silly(`AI SDK chunk type: ${chunk.type}`, chunk)
+    const dataPayload = (chunk as any).value ?? (chunk as any).data
+    if ((chunk as any).type === 'data') {
+      if (dataPayload?.type === ChunkType.SKILL_ACTIVATION) {
+        this.onChunk({
+          type: ChunkType.SKILL_ACTIVATION,
+          skillName: dataPayload.skillName,
+          action: dataPayload.action,
+          toolName: dataPayload.toolName,
+          result: dataPayload.result,
+          error: dataPayload.error
+        })
+      } else if (dataPayload?.type === ChunkType.CONTEXT_ACTION) {
+        this.onChunk({
+          type: ChunkType.CONTEXT_ACTION,
+          action: dataPayload.action,
+          summary: dataPayload.summary,
+          removedCount: dataPayload.removedCount
+        })
+      }
+      return
+    }
+
     switch (chunk.type) {
       case 'raw': {
         const agentRawMessage = chunk.rawValue as ClaudeCodeRawValue

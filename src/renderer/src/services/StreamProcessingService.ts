@@ -6,7 +6,7 @@ import type {
   NormalToolResponse,
   WebSearchResponse
 } from '@renderer/types'
-import type { Chunk } from '@renderer/types/chunk'
+import type { Chunk, ContextActionChunk, SkillActivationChunk } from '@renderer/types/chunk'
 import { ChunkType } from '@renderer/types/chunk'
 import type { Response } from '@renderer/types/newMessage'
 import { AssistantMessageStatus } from '@renderer/types/newMessage'
@@ -60,6 +60,8 @@ export interface StreamProcessorCallbacks {
   onBlockCreated?: () => void
   // Called when raw data is received (e.g., session_id updates from Agent SDK)
   onRawData?: (content: unknown, metadata?: Record<string, any>) => void
+  onContextAction?: (chunk: ContextActionChunk) => void
+  onSkillActivation?: (chunk: SkillActivationChunk) => void
 }
 
 // Function to create a stream processor instance
@@ -169,6 +171,14 @@ export function createStreamProcessor(callbacks: StreamProcessorCallbacks = {}) 
         }
         case ChunkType.RAW: {
           if (callbacks.onRawData) callbacks.onRawData(data.content, data.metadata)
+          break
+        }
+        case ChunkType.CONTEXT_ACTION: {
+          if (callbacks.onContextAction) callbacks.onContextAction(data)
+          break
+        }
+        case ChunkType.SKILL_ACTIVATION: {
+          if (callbacks.onSkillActivation) callbacks.onSkillActivation(data)
           break
         }
         default: {

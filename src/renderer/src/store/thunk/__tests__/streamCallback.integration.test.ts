@@ -586,6 +586,31 @@ describe('streamCallback Integration Tests', () => {
     expect(citationBlock?.status).toBe(MessageBlockStatus.SUCCESS)
   })
 
+  it('should render skill activation chunks as skill blocks', async () => {
+    const callbacks = createMockCallbacks(mockAssistantMsgId, mockTopicId, mockAssistant, dispatch, getState)
+
+    const chunks: Chunk[] = [
+      { type: ChunkType.LLM_RESPONSE_CREATED },
+      {
+        type: ChunkType.SKILL_ACTIVATION,
+        skillName: 'ui-ux-pro-max',
+        action: 'activated'
+      },
+      { type: ChunkType.BLOCK_COMPLETE }
+    ]
+
+    await processChunks(chunks, callbacks)
+
+    const state = getState()
+    const blocks = Object.values(state.messageBlocks.entities)
+    const skillBlock = blocks.find((block) => block.type === MessageBlockType.SKILL)
+
+    expect(skillBlock).toBeDefined()
+    expect((skillBlock as any)?.skillName).toBe('ui-ux-pro-max')
+    expect((skillBlock as any)?.action).toBe('activated')
+    expect(skillBlock?.status).toBe(MessageBlockStatus.SUCCESS)
+  })
+
   it('should handle mixed content flow (thinking + tool + text)', async () => {
     const callbacks = createMockCallbacks(mockAssistantMsgId, mockTopicId, mockAssistant, dispatch, getState)
 

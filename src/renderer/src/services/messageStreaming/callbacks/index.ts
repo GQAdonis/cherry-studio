@@ -6,6 +6,7 @@ import { createCitationCallbacks } from './citationCallbacks'
 import { createCompactCallbacks } from './compactCallbacks'
 import { createContextActionCallbacks } from './contextActionCallbacks'
 import { createImageCallbacks } from './imageCallbacks'
+import { createSkillCallbacks } from './skillCallbacks'
 import { createTextCallbacks } from './textCallbacks'
 import { createThinkingCallbacks } from './thinkingCallbacks'
 import { createToolCallbacks } from './toolCallbacks'
@@ -65,6 +66,10 @@ export const createCallbacks = (deps: CallbacksDependencies) => {
     blockManager,
     assistantMsgId
   })
+  const skillCallbacks = createSkillCallbacks({
+    blockManager,
+    assistantMsgId
+  })
 
   const compactCallbacks = createCompactCallbacks({
     blockManager,
@@ -96,6 +101,7 @@ export const createCallbacks = (deps: CallbacksDependencies) => {
     ...videoCallbacks,
     ...compactCallbacks,
     ...contextActionCallbacks,
+    ...skillCallbacks,
 
     // 清理资源的方法
     cleanup: () => {

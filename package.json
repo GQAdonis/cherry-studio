@@ -54,6 +54,7 @@
     "test:aicore": "vitest run --project aiCore",
     "test:shared": "vitest run --project shared",
     "test:update": "pnpm test:renderer --update",
+    "test:skills:incident": "vitest run --project main --project renderer src/main/__tests__/ipc.skills.integration.test.ts src/main/__tests__/skillMatching.test.ts src/renderer/src/aiCore/middleware/__tests__/skillsPromptTransform.test.ts src/renderer/src/aiCore/middleware/__tests__/AiSdkMiddlewareBuilder.skills.test.ts src/renderer/src/aiCore/tools/__tests__/ScriptExecutionTool.integration.test.ts src/renderer/src/__tests__/preload.skills.contract.test.ts src/renderer/src/__tests__/entryPoint.bootstrap.test.ts --coverage --coverage.provider=v8 --coverage.reporter=text-summary --coverage.include=src/renderer/src/aiCore/middleware/skillsPromptTransform.ts --coverage.include=src/renderer/src/aiCore/tools/ScriptExecutionTool.ts --coverage.thresholds.lines=100 --coverage.thresholds.branches=100 --coverage.thresholds.functions=100 --coverage.thresholds.statements=100 --silent",
     "test:coverage": "vitest run --coverage --silent",
     "test:ui": "vitest --ui",
     "test:watch": "vitest",

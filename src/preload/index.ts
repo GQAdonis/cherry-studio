@@ -767,6 +767,8 @@ const api = {
   skill: {
     getList: () => ipcRenderer.invoke(IpcChannel.Skill_GetList),
     toggle: (id: string, enabled: boolean) => ipcRenderer.invoke(IpcChannel.Skill_Toggle, id, enabled),
+    executeScript: (skillId: string, scriptName: string, args: string[] = []) =>
+      ipcRenderer.invoke(IpcChannel.Skill_ExecuteScript, skillId, scriptName, args),
     refresh: () => ipcRenderer.invoke(IpcChannel.Skill_Refresh),
     getMatchingConfig: () => ipcRenderer.invoke(IpcChannel.Skill_GetMatchingConfig),
     setMatchingConfig: (config: Partial<SkillMatchingConfig>) =>
@@ -790,6 +792,14 @@ const api = {
     testConnection: (config: SkillStorageProviderConfig) =>
       ipcRenderer.invoke(IpcChannel.SkillStorage_TestConnection, config),
     selectDirectory: () => ipcRenderer.invoke(IpcChannel.SkillStorage_SelectDirectory)
+  },
+  skillCreator: {
+    validate: (skillData: Record<string, unknown>) => ipcRenderer.invoke(IpcChannel.SkillCreator_Validate, skillData),
+    initTemplate: (skillName: string) => ipcRenderer.invoke(IpcChannel.SkillCreator_InitTemplate, skillName),
+    saveToProvider: (providerId: string, skillRecord: Record<string, unknown>) =>
+      ipcRenderer.invoke(IpcChannel.SkillCreator_SaveToProvider, providerId, skillRecord),
+    testScript: (skillId: string, scriptName: string, args: string[] = []) =>
+      ipcRenderer.invoke(IpcChannel.SkillCreator_TestScript, skillId, scriptName, args)
   }
 }
 

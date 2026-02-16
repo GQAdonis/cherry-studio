@@ -13,6 +13,7 @@ import type {
   ImageMessageBlock,
   MainTextMessageBlock,
   Message,
+  SkillMessageBlock,
   ThinkingMessageBlock,
   ToolMessageBlock,
   TranslationMessageBlock,
@@ -334,6 +335,29 @@ export function createContextActionBlock(
     action: overrides.action || 'pruned',
     summary: overrides.summary,
     removedCount: overrides.removedCount
+  }
+}
+
+/**
+ * Creates a Skill Message Block.
+ * @param messageId - The ID of the parent message.
+ * @param overrides - Optional properties to override the defaults.
+ * @returns A SkillMessageBlock object.
+ */
+export function createSkillBlock(
+  messageId: string,
+  overrides: Partial<Omit<SkillMessageBlock, 'id' | 'messageId' | 'type'>> = {}
+): SkillMessageBlock {
+  const baseBlock = createBaseMessageBlock(messageId, MessageBlockType.SKILL, {
+    status: MessageBlockStatus.SUCCESS,
+    ...overrides
+  })
+  return {
+    ...baseBlock,
+    skillName: overrides.skillName || 'Skill',
+    action: overrides.action || 'activated',
+    toolName: overrides.toolName,
+    result: overrides.result
   }
 }
 

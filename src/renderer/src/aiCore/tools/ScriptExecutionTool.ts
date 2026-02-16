@@ -1,4 +1,3 @@
-import { IpcChannel } from '@shared/IpcChannel'
 import { tool } from 'ai'
 import * as z from 'zod'
 
@@ -11,7 +10,7 @@ export const createScriptExecutionTool = (skillId: string) => {
     }),
     execute: async ({ scriptName, args }) => {
       try {
-        const result = await (window.api as any).invoke(IpcChannel.Skill_ExecuteScript, skillId, scriptName, args || [])
+        const result = await window.api.skill.executeScript(skillId, scriptName, args || [])
         return {
           success: true,
           output: result

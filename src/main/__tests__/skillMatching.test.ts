@@ -1,6 +1,14 @@
 import type { Skill, SkillMatchResult } from '@types'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
+import { createSkillPlugin } from '../../../packages/aiCore/src/core/plugins/built-in/skillPlugin'
+import type { createSkillMatchingProvider as CreateSkillMatchingProviderType } from '../services/skillMatching'
+import type { HybridSkillMatcher as HybridSkillMatcherType } from '../services/skillMatching/HybridSkillMatcher'
+import type { KeywordSkillMatcher as KeywordSkillMatcherType } from '../services/skillMatching/KeywordSkillMatcher'
+import type { LLMSkillMatcher as LLMSkillMatcherType } from '../services/skillMatching/LLMSkillMatcher'
+import type * as cacheUtils from '../services/skillMatching/utils/cache'
+import type * as cosineUtils from '../services/skillMatching/utils/cosine'
+
 // Mock logger
 vi.mock('@logger', () => ({
   loggerService: {
@@ -53,7 +61,7 @@ function makeSkill(overrides: Partial<Skill> = {}): Skill {
 
 describe('cosine utilities', () => {
   // Dynamic import to avoid hoisting issues with mocks
-  let cosine: typeof import('../services/skillMatching/utils/cosine')
+  let cosine: typeof cosineUtils
 
   beforeEach(async () => {
     cosine = await import('../services/skillMatching/utils/cosine')
@@ -176,7 +184,7 @@ describe('cosine utilities', () => {
 // =============================================================================
 
 describe('SkillEmbeddingCache', () => {
-  let cache: typeof import('../services/skillMatching/utils/cache')
+  let cache: typeof cacheUtils
 
   beforeEach(async () => {
     cache = await import('../services/skillMatching/utils/cache')
@@ -210,7 +218,7 @@ describe('SkillEmbeddingCache', () => {
 // =============================================================================
 
 describe('KeywordSkillMatcher', () => {
-  let KeywordSkillMatcher: typeof import('../services/skillMatching/KeywordSkillMatcher').KeywordSkillMatcher
+  let KeywordSkillMatcher: typeof KeywordSkillMatcherType
 
   beforeEach(async () => {
     const mod = await import('../services/skillMatching/KeywordSkillMatcher')
@@ -366,7 +374,7 @@ describe('KeywordSkillMatcher', () => {
 // =============================================================================
 
 describe('HybridSkillMatcher', () => {
-  let HybridSkillMatcher: typeof import('../services/skillMatching/HybridSkillMatcher').HybridSkillMatcher
+  let HybridSkillMatcher: typeof HybridSkillMatcherType
 
   beforeEach(async () => {
     const mod = await import('../services/skillMatching/HybridSkillMatcher')
@@ -565,7 +573,7 @@ describe('HybridSkillMatcher', () => {
 // =============================================================================
 
 describe('LLMSkillMatcher', () => {
-  let LLMSkillMatcher: typeof import('../services/skillMatching/LLMSkillMatcher').LLMSkillMatcher
+  let LLMSkillMatcher: typeof LLMSkillMatcherType
 
   beforeEach(async () => {
     const mod = await import('../services/skillMatching/LLMSkillMatcher')
@@ -589,72 +597,6 @@ describe('LLMSkillMatcher', () => {
   })
 })
 
-// =============================================================================
-// SkillPlugin integration tests (using inline reimplementation since
-// the aiCore package cannot be imported from main process tests)
-// =============================================================================
-
-/**
- * Minimal reimplementation of the skill plugin logic for testing.
- * Mirrors the logic in packages/aiCore/src/core/plugins/built-in/skillPlugin.ts.
- */
-function createSkillPluginForTest(config: {
-  getSkills: () => Promise<Skill[]>
-  matchingProvider?: { name: string; match: (q: string, s: Skill[], k?: number) => Promise<SkillMatchResult[]> }
-  matchThreshold?: number
-  maxMatchedSkills?: number
-  minSkillsForMatching?: number
-}) {
-  const matchThreshold = config.matchThreshold ?? 0.5
-  const maxMatchedSkills = config.maxMatchedSkills ?? 3
-  const minSkillsForMatching = config.minSkillsForMatching ?? 3
-
-  return {
-    transformParams: async (params: any) => {
-      const skills = await config.getSkills()
-      const enabledSkills = skills.filter((s) => s.enabled)
-      if (enabledSkills.length === 0) return params
-
-      let activeSkills: Skill[]
-
-      if (config.matchingProvider && enabledSkills.length >= minSkillsForMatching) {
-        const userMsg = params.messages?.findLast?.((m: any) => m.role === 'user')
-        const userQuery = typeof userMsg?.content === 'string' ? userMsg.content : null
-
-        if (userQuery) {
-          try {
-            const matches = await config.matchingProvider.match(userQuery, enabledSkills, maxMatchedSkills)
-            activeSkills = matches.filter((m) => m.score >= matchThreshold).map((m) => m.skill)
-            if (activeSkills.length === 0) activeSkills = enabledSkills
-          } catch {
-            activeSkills = enabledSkills
-          }
-        } else {
-          activeSkills = enabledSkills
-        }
-      } else {
-        activeSkills = enabledSkills
-      }
-
-      const skillInstructions = activeSkills.map((s) => `### Skill: ${s.name}\n${s.instructions}`).join('\n\n')
-      const systemPrompt = params.messages?.find((m: any) => m.role === 'system')?.content || ''
-      const newSystemPrompt = systemPrompt
-        ? `${systemPrompt}\n\n## Active Skills\n${skillInstructions}`
-        : `## Active Skills\n${skillInstructions}`
-
-      if (params.messages) {
-        const idx = params.messages.findIndex((m: any) => m.role === 'system')
-        if (idx !== -1) {
-          params.messages[idx].content = newSystemPrompt
-        } else {
-          params.messages.unshift({ role: 'system', content: newSystemPrompt })
-        }
-      }
-      return params
-    }
-  }
-}
-
 describe('createSkillPlugin with matching', () => {
   it('should inject all skills when no matching provider is set', async () => {
     const skills = [
@@ -662,9 +604,9 @@ describe('createSkillPlugin with matching', () => {
       makeSkill({ id: 'b', name: 'Skill B', instructions: 'Do B' })
     ]
 
-    const plugin = createSkillPluginForTest({
-      getSkills: async () => skills
-    })
+    const plugin = createSkillPlugin({
+      getSkills: async () => skills as any
+    } as any)
 
     const params = {
       messages: [
@@ -673,7 +615,7 @@ describe('createSkillPlugin with matching', () => {
       ]
     }
 
-    const result = await plugin.transformParams(params)
+    const result = await plugin.transformParams(params, undefined)
     const systemMsg = result.messages.find((m: any) => m.role === 'system')
     expect(systemMsg.content).toContain('### Skill: Skill A')
     expect(systemMsg.content).toContain('### Skill: Skill B')
@@ -693,13 +635,13 @@ describe('createSkillPlugin with matching', () => {
       match: vi.fn().mockResolvedValue([{ skill: skills[1], score: 0.9, method: 'mock' }] as SkillMatchResult[])
     }
 
-    const plugin = createSkillPluginForTest({
-      getSkills: async () => skills,
+    const plugin = createSkillPlugin({
+      getSkills: async () => skills as any,
       matchingProvider: mockMatcher,
       matchThreshold: 0.5,
       maxMatchedSkills: 3,
       minSkillsForMatching: 3
-    })
+    } as any)
 
     const params = {
       messages: [
@@ -708,7 +650,7 @@ describe('createSkillPlugin with matching', () => {
       ]
     }
 
-    const result = await plugin.transformParams(params)
+    const result = await plugin.transformParams(params, undefined)
     const systemMsg = result.messages.find((m: any) => m.role === 'system')
 
     expect(systemMsg.content).toContain('### Skill: Skill B')
@@ -730,12 +672,12 @@ describe('createSkillPlugin with matching', () => {
       match: vi.fn().mockResolvedValue([{ skill: skills[0], score: 0.2, method: 'mock' }] as SkillMatchResult[])
     }
 
-    const plugin = createSkillPluginForTest({
-      getSkills: async () => skills,
+    const plugin = createSkillPlugin({
+      getSkills: async () => skills as any,
       matchingProvider: mockMatcher,
       matchThreshold: 0.5,
       minSkillsForMatching: 2
-    })
+    } as any)
 
     const params = {
       messages: [
@@ -744,7 +686,7 @@ describe('createSkillPlugin with matching', () => {
       ]
     }
 
-    const result = await plugin.transformParams(params)
+    const result = await plugin.transformParams(params, undefined)
     const systemMsg = result.messages.find((m: any) => m.role === 'system')
 
     expect(systemMsg.content).toContain('### Skill: Skill A')
@@ -764,11 +706,11 @@ describe('createSkillPlugin with matching', () => {
       match: vi.fn()
     }
 
-    const plugin = createSkillPluginForTest({
-      getSkills: async () => skills,
+    const plugin = createSkillPlugin({
+      getSkills: async () => skills as any,
       matchingProvider: mockMatcher,
       minSkillsForMatching: 5
-    })
+    } as any)
 
     const params = {
       messages: [
@@ -777,7 +719,7 @@ describe('createSkillPlugin with matching', () => {
       ]
     }
 
-    const result = await plugin.transformParams(params)
+    const result = await plugin.transformParams(params, undefined)
     const systemMsg = result.messages.find((m: any) => m.role === 'system')
 
     expect(systemMsg.content).toContain('### Skill: Skill A')
@@ -798,11 +740,11 @@ describe('createSkillPlugin with matching', () => {
       match: vi.fn().mockRejectedValue(new Error('Matcher crashed'))
     }
 
-    const plugin = createSkillPluginForTest({
-      getSkills: async () => skills,
+    const plugin = createSkillPlugin({
+      getSkills: async () => skills as any,
       matchingProvider: mockMatcher,
       minSkillsForMatching: 2
-    })
+    } as any)
 
     const params = {
       messages: [
@@ -811,7 +753,7 @@ describe('createSkillPlugin with matching', () => {
       ]
     }
 
-    const result = await plugin.transformParams(params)
+    const result = await plugin.transformParams(params, undefined)
     const systemMsg = result.messages.find((m: any) => m.role === 'system')
 
     expect(systemMsg.content).toContain('### Skill: Skill A')
@@ -825,7 +767,7 @@ describe('createSkillPlugin with matching', () => {
 // =============================================================================
 
 describe('createSkillMatchingProvider factory', () => {
-  let createSkillMatchingProvider: typeof import('../services/skillMatching').createSkillMatchingProvider
+  let createSkillMatchingProvider: typeof CreateSkillMatchingProviderType
 
   beforeEach(async () => {
     const mod = await import('../services/skillMatching')

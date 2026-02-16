@@ -89,7 +89,14 @@ export const createSkillPlugin = (config: SkillPluginConfig) => {
     enforce: 'pre',
 
     transformParams: async (params: any, _context: any) => {
-      const skills = await config.getSkills()
+      let skills: Skill[]
+      try {
+        skills = await config.getSkills()
+      } catch (error) {
+        // If skills can't be fetched, return params unchanged
+        return params
+      }
+
       const enabledSkills = skills.filter((s) => s.enabled)
 
       if (enabledSkills.length === 0) {

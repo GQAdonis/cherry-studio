@@ -124,25 +124,50 @@ export default class ModernAiProvider {
 
     // Normalize params: handle simplified { system, prompt } format
     // Convert to proper StreamTextParams with messages array for Responses API compatibility
-    if ('prompt' in params && typeof params.prompt === 'string' && !params.messages) {
-      const promptContent = params.prompt
-      // Destructure to exclude 'prompt' from the spread
-      const { prompt, ...restParams } = params as any
-      // Create a new params object with messages array
-      params = {
-        ...restParams,
-        messages: [
-          {
-            role: 'user',
-            content: promptContent
-          }
-        ]
-      } as StreamTextParams
+    if ('prompt' in params && !params.messages) {
+      const promptValue = (params as any).prompt
 
-      logger.debug('Normalized params from { system, prompt } to { system, messages }', {
-        hasSystem: !!params.system,
-        messageCount: params.messages!.length
-      })
+      if (typeof promptValue === 'string') {
+        // Case 1: prompt is a string, convert to messages array
+        // Create a new object without 'prompt' to satisfy the discriminated union type
+
+        const { prompt, ...restParams } = params as any
+        void prompt // Mark as intentionally unused
+        params = {
+          ...restParams,
+          messages: [
+            {
+              role: 'user',
+              content: promptValue
+            }
+          ]
+        } as StreamTextParams
+
+        logger.debug('Normalized params from { prompt: string } to { messages }', {
+          hasSystem: !!params.system,
+          messageCount: params.messages!.length
+        })
+      } else if (Array.isArray(promptValue)) {
+        // Case 2: prompt is Array<ModelMessage>, rename to messages
+        // Create a new object without 'prompt' to satisfy the discriminated union type
+
+        const { prompt, ...restParams } = params as any
+        void prompt // Mark as intentionally unused
+        params = {
+          ...restParams,
+          messages: promptValue
+        } as StreamTextParams
+
+        logger.debug('Normalized params from { prompt: Array<ModelMessage> } to { messages }', {
+          hasSystem: !!params.system,
+          messageCount: params.messages!.length
+        })
+      } else {
+        logger.warn('Unexpected prompt type, leaving params unchanged', {
+          promptType: typeof promptValue,
+          isArray: Array.isArray(promptValue)
+        })
+      }
     }
 
     // Config is now set in constructor, ApiService handles key rotation before passing provider

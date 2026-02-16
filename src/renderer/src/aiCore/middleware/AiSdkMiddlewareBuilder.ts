@@ -1,5 +1,4 @@
 import type { WebSearchPluginConfig } from '@cherrystudio/ai-core/built-in/plugins'
-import { createSkillPlugin } from '@cherrystudio/ai-core/built-in/plugins'
 import { loggerService } from '@logger'
 import { isAnthropicModel, isGemini3Model, isSupportedThinkingTokenQwenModel } from '@renderer/config/models'
 import type { McpMode, MCPTool } from '@renderer/types'
@@ -17,18 +16,38 @@ import { noThinkMiddleware } from './noThinkMiddleware'
 import { openrouterGenerateImageMiddleware } from './openrouterGenerateImageMiddleware'
 import { openrouterReasoningMiddleware } from './openrouterReasoningMiddleware'
 import { qwenThinkingMiddleware } from './qwenThinkingMiddleware'
+import { injectSkillsIntoPrompt } from './skillsPromptTransform'
 import { skipGeminiThoughtSignatureMiddleware } from './skipGeminiThoughtSignatureMiddleware'
 
 const logger = loggerService.withContext('AiSdkMiddlewareBuilder')
 
 /**
- * Create skill middleware from skillPlugin
+ * Create AI SDK compatible skill middleware.
+ * NOTE: This middleware runs in AI SDK layer and must read/write `params.prompt`,
+ * not ai-core plugin layer fields like `params.messages`.
  */
 function createSkillMiddleware(config: AiSdkMiddlewareConfig): LanguageModelMiddleware {
-  const skillPlugin = createSkillPlugin as any
-  return skillPlugin({
-    getSkills: config.getSkills || (() => Promise.resolve([]))
-  })
+  return {
+    specificationVersion: 'v3',
+    transformParams: async ({ params }) => {
+      const getSkills = config.getSkills
+      if (!getSkills) {
+        return params
+      }
+
+      let skills: any[]
+      try {
+        skills = await getSkills()
+      } catch (error) {
+        logger.warn('Failed to fetch skills for middleware injection; continuing without skills', {
+          error
+        })
+        return params
+      }
+
+      return injectSkillsIntoPrompt(params, skills)
+    }
+  }
 }
 
 /**

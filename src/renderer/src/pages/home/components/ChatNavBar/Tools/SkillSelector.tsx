@@ -16,7 +16,7 @@ export const SkillSelector = () => {
   const fetchSkills = async () => {
     setLoading(true)
     try {
-      const list = await (window.api as any).invoke('skill:get-list')
+      const list = await window.api.skill.getList()
       setSkills(list)
     } catch (e) {
       if (e instanceof Error) {
@@ -35,7 +35,7 @@ export const SkillSelector = () => {
 
   const handleToggle = async (id: string, enabled: boolean) => {
     try {
-      await (window.api as any).invoke('skill:toggle', id, enabled)
+      await window.api.skill.toggle(id, enabled)
       setSkills((prev) => prev.map((s) => (s.id === id ? { ...s, enabled } : s)))
     } catch (error) {
       if (error instanceof Error) {

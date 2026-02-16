@@ -25,22 +25,22 @@ export class MockRendererLoggerService {
   }
   public resetLevel(): void {}
   public error(...args: any[]): void {
-    console.error(...args)
+    void args
   }
   public warn(...args: any[]): void {
-    console.warn(...args)
+    void args
   }
   public info(...args: any[]): void {
-    console.info(...args)
+    void args
   }
   public verbose(...args: any[]): void {
-    console.log(...args)
+    void args
   }
   public debug(...args: any[]): void {
-    console.debug(...args)
+    void args
   }
   public silly(...args: any[]): void {
-    console.log(...args)
+    void args
   }
 }
 

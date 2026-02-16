@@ -1,5 +1,5 @@
 import type { AiPlugin } from '@cherrystudio/ai-core'
-import { createPromptToolUsePlugin, webSearchPlugin } from '@cherrystudio/ai-core/built-in/plugins'
+import { createPromptToolUsePlugin, createSkillPlugin, webSearchPlugin } from '@cherrystudio/ai-core/built-in/plugins'
 import { loggerService } from '@logger'
 import { getEnableDeveloperMode } from '@renderer/hooks/useSettings'
 import type { Assistant } from '@renderer/types'
@@ -16,6 +16,14 @@ export function buildPlugins(
   middlewareConfig: AiSdkMiddlewareConfig & { assistant: Assistant; topicId?: string }
 ): AiPlugin[] {
   const plugins: AiPlugin[] = []
+
+  if (middlewareConfig.getSkills) {
+    plugins.push(
+      createSkillPlugin({
+        getSkills: middlewareConfig.getSkills
+      }) as AiPlugin
+    )
+  }
 
   if (middlewareConfig.topicId && getEnableDeveloperMode()) {
     // 0. 添加 telemetry 插件

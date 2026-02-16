@@ -37,7 +37,7 @@ describe('Skills Integration', () => {
         model: 'test-model'
       }
 
-      await plugin.transformParams({ params } as any)
+      await plugin.transformParams(params as any)
 
       // Assert
       expect(mockGetSkills).toHaveBeenCalled()
@@ -59,10 +59,10 @@ describe('Skills Integration', () => {
       }
 
       // Act
-      const result = await plugin.transformParams({ params } as any)
+      const result = await plugin.transformParams(params as any)
 
       // Assert
-      expect(result.params.messages).toEqual(originalMessages)
+      expect(result.messages).toEqual(originalMessages)
     })
 
     it('should inject system prompt with enabled skills', async () => {
@@ -82,8 +82,8 @@ describe('Skills Integration', () => {
       }
 
       // Act
-      const result = await plugin.transformParams({ params } as any)
-      const systemMsg = result.params.messages.find((m: any) => m.role === 'system')
+      const result = await plugin.transformParams(params as any)
+      const systemMsg = result.messages.find((m: any) => m.role === 'system')
 
       // Assert
       expect(systemMsg).toBeDefined()
@@ -107,9 +107,44 @@ describe('Skills Integration', () => {
       }
 
       // Act & Assert - should not throw
-      const result = await plugin.transformParams({ params } as any)
+      const result = await plugin.transformParams(params as any)
 
       expect(result).toBeDefined()
+    })
+
+    it('should emit skill.activation stream chunks for enabled skills', async () => {
+      const skillPlugin = await import('@cherrystudio/ai-core/built-in/plugins')
+      const plugin = (skillPlugin.createSkillPlugin as any)({
+        getSkills: vi.fn().mockResolvedValue([
+          { id: 'skill-1', name: 'UI/UX Pro Max', enabled: true, instructions: 'Design guidance' },
+          { id: 'skill-2', name: 'Artifact Refiner', enabled: true, instructions: 'Artifact guidance' }
+        ])
+      })
+
+      const streamTransformFactory = plugin.transformStream({}, {})
+      const transformStream = streamTransformFactory({})
+      const reader = transformStream.readable.getReader()
+
+      const first = await reader.read()
+      const second = await reader.read()
+      await reader.cancel()
+
+      expect(first.value).toEqual({
+        type: 'data',
+        value: {
+          type: 'skill.activation',
+          skillName: 'UI/UX Pro Max',
+          action: 'activated'
+        }
+      })
+      expect(second.value).toEqual({
+        type: 'data',
+        value: {
+          type: 'skill.activation',
+          skillName: 'Artifact Refiner',
+          action: 'activated'
+        }
+      })
     })
   })
 
@@ -126,10 +161,19 @@ describe('Skills Integration', () => {
       // Assert
       expect(window.api.skill.getList).toBeDefined()
       expect(window.api.skill.toggle).toBeDefined()
+      expect(window.api.skill.executeScript).toBeDefined()
       expect(window.api.skill.refresh).toBeDefined()
       expect(window.api.skill.getMatchingConfig).toBeDefined()
       expect(window.api.skill.setMatchingConfig).toBeDefined()
       expect(window.api.skill.setAgentSkills).toBeDefined()
+    })
+
+    it('should expose skill creator APIs through preload', () => {
+      expect(window.api.skillCreator).toBeDefined()
+      expect(window.api.skillCreator.validate).toBeDefined()
+      expect(window.api.skillCreator.initTemplate).toBeDefined()
+      expect(window.api.skillCreator.saveToProvider).toBeDefined()
+      expect(window.api.skillCreator.testScript).toBeDefined()
     })
   })
 
@@ -140,6 +184,11 @@ describe('Skills Integration', () => {
       expect(IpcChannel?.Skill_GetList).toBe('skill:get-list')
       expect(IpcChannel?.Skill_GetAgentSkills).toBe('skill:get-agent-skills')
       expect(IpcChannel?.Skill_SetAgentSkills).toBe('skill:set-agent-skills')
+      expect(IpcChannel?.Skill_ExecuteScript).toBe('skill:execute-script')
+      expect(IpcChannel?.SkillCreator_Validate).toBe('skill-creator:validate')
+      expect(IpcChannel?.SkillCreator_InitTemplate).toBe('skill-creator:init-template')
+      expect(IpcChannel?.SkillCreator_SaveToProvider).toBe('skill-creator:save-to-provider')
+      expect(IpcChannel?.SkillCreator_TestScript).toBe('skill-creator:test-script')
       expect(IpcChannel?.Skill_AddToAgent).toBe('skill:add-to-agent')
       expect(IpcChannel?.Skill_RemoveFromAgent).toBe('skill:remove-from-agent')
       expect(IpcChannel?.Skill_GetEnabledForAgent).toBe('skill:get-enabled-for-agent')
