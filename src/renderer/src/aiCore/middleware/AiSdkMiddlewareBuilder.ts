@@ -1,4 +1,5 @@
 import type { WebSearchPluginConfig } from '@cherrystudio/ai-core/built-in/plugins'
+import { createSkillPlugin } from '@cherrystudio/ai-core/built-in/plugins'
 import { loggerService } from '@logger'
 import { isAnthropicModel, isGemini3Model, isSupportedThinkingTokenQwenModel } from '@renderer/config/models'
 import type { McpMode, MCPTool } from '@renderer/types'
@@ -19,6 +20,16 @@ import { qwenThinkingMiddleware } from './qwenThinkingMiddleware'
 import { skipGeminiThoughtSignatureMiddleware } from './skipGeminiThoughtSignatureMiddleware'
 
 const logger = loggerService.withContext('AiSdkMiddlewareBuilder')
+
+/**
+ * Create skill middleware from skillPlugin
+ */
+function createSkillMiddleware(config: AiSdkMiddlewareConfig): LanguageModelMiddleware {
+  const skillPlugin = createSkillPlugin as any
+  return skillPlugin({
+    getSkills: config.getSkills || (() => Promise.resolve([]))
+  })
+}
 
 /**
  * AI SDK 中间件配置项
@@ -47,6 +58,8 @@ export interface AiSdkMiddlewareConfig {
   webSearchPluginConfig?: WebSearchPluginConfig
   // 知识库识别开关，默认开启
   knowledgeRecognition?: 'off' | 'on'
+  // Skills integration
+  getSkills?: () => Promise<any[]>
 }
 
 /**
@@ -137,7 +150,16 @@ export class AiSdkMiddlewareBuilder {
 export function buildAiSdkMiddlewares(config: AiSdkMiddlewareConfig): LanguageModelMiddleware[] {
   const builder = new AiSdkMiddlewareBuilder()
 
-  // 0. CRITICAL: Add token validation middleware FIRST
+  // 0. SKILL PLUGIN - Add skills middleware FIRST
+  // This injects skill instructions before any other middleware
+  if (config.getSkills) {
+    builder.add({
+      name: 'skill-plugin',
+      middleware: createSkillMiddleware(config)
+    })
+  }
+
+  // 1. CRITICAL: Add token validation middleware
   // This runs LAST in the middleware chain (right before LLM call)
   // to validate final payload size and apply emergency context reduction if needed
   if (config.model) {
@@ -147,17 +169,17 @@ export function buildAiSdkMiddlewares(config: AiSdkMiddlewareConfig): LanguageMo
     })
   }
 
-  // 1. 根据provider添加特定中间件
+  // 2. 根据provider添加特定中间件
   if (config.provider) {
     addProviderSpecificMiddlewares(builder, config)
   }
 
-  // 2. 根据模型类型添加特定中间件
+  // 3. 根据模型类型添加特定中间件
   if (config.model) {
     addModelSpecificMiddlewares(builder, config)
   }
 
-  // 3. 非流式输出时添加模拟流中间件
+  // 4. 非流式输出时添加模拟流中间件
   if (config.streamOutput === false) {
     builder.add({
       name: 'simulate-streaming',

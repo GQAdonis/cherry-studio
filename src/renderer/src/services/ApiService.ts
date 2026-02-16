@@ -269,6 +269,18 @@ export async function fetchChatCompletion({
     isPromptToolUse(assistant) || (isToolUseModeFunction(assistant) && !isFunctionCallingModel(assistant.model))
 
   const mcpMode = getEffectiveMcpMode(assistant)
+
+  // Fetch skills for this assistant
+  const getEnabledSkills = async () => {
+    try {
+      const skills = await window.api.skill.getEnabledForAgent(assistant.id)
+      return skills || []
+    } catch (error) {
+      logger.error('Failed to fetch enabled skills for agent', { agentId: assistant.id, error })
+      return []
+    }
+  }
+
   const middlewareConfig: AiSdkMiddlewareConfig = {
     streamOutput: assistant.settings?.streamOutput ?? true,
     onChunk: onChunkReceived,
@@ -284,7 +296,8 @@ export async function fetchChatCompletion({
     mcpMode,
     mcpTools,
     uiMessages,
-    knowledgeRecognition: assistant.knowledgeRecognition
+    knowledgeRecognition: assistant.knowledgeRecognition,
+    getSkills: getEnabledSkills
   }
 
   // --- Call AI Completions ---

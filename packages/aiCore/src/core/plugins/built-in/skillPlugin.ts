@@ -1,4 +1,36 @@
-import type { Skill, SkillMatchResult } from '@types'
+/**
+ * Skill interface for skill plugin
+ * Duplicated here to avoid coupling the aiCore package to main process imports.
+ */
+export interface Skill {
+  id: string
+  name: string
+  description: string
+  path?: string
+  instructions: string
+  tools?: string[]
+  enabled: boolean
+  builtIn?: boolean
+  examples?: string[]
+  tags?: string[]
+  triggerPatterns?: string[]
+  providerId?: string
+  providerName?: string
+  storageType?: string
+  license?: string
+  compatibility?: string
+  metadata?: Record<string, string>
+  allowedTools?: string[]
+  commands?: Array<{ command: string; description?: string }>
+  scripts?: any[]
+  references?: any[]
+  assets?: any[]
+}
+
+export interface SkillMatchResult {
+  skill: Skill
+  score: number
+}
 
 /**
  * Interface for skill matching providers.
