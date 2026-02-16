@@ -23,20 +23,34 @@ export class BuiltInStorageProvider implements SkillStorageProvider {
   private directoryPath: string
 
   constructor() {
-    // In packaged app, resources are in process.resourcesPath
+    // In packaged app, unpacked resources are in process.resourcesPath/app.asar.unpacked/
+    // because electron-builder's asarUnpack extracts to app.asar.unpacked/ directory
     // In dev, they are in the project root's resources/ directory
     const isPackaged = !!process.resourcesPath && !process.resourcesPath.includes('node_modules')
     this.directoryPath = isPackaged
-      ? path.join(process.resourcesPath, 'skills')
+      ? path.join(process.resourcesPath, 'app.asar.unpacked', 'resources', 'skills')
       : path.join(process.cwd(), 'resources', 'skills')
+
+    logger.info('BuiltInStorageProvider constructor', {
+      isPackaged,
+      resourcesPath: process.resourcesPath,
+      cwd: process.cwd(),
+      resolvedPath: this.directoryPath
+    })
   }
 
   async initialize(): Promise<void> {
     try {
       await fs.access(this.directoryPath)
-      logger.info(`Initialised built-in provider at ${this.directoryPath}`)
-    } catch {
-      logger.warn(`Built-in skills directory not found at ${this.directoryPath}`)
+      const entries = await fs.readdir(this.directoryPath)
+      logger.info(`Initialised built-in provider at ${this.directoryPath}`, {
+        entries: entries.length,
+        skillDirs: entries
+      })
+    } catch (error) {
+      logger.warn(`Built-in skills directory not found at ${this.directoryPath}`, {
+        error: error instanceof Error ? error.message : String(error)
+      })
     }
   }
 

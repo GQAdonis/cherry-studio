@@ -10,7 +10,7 @@ const electron = require('electron')
 const app = electron.app
 
 // Guard against app being undefined during bundling
-if (app?.isPackaged) {
+if (app && app.isPackaged) {
   initAppDataDir()
 }
 

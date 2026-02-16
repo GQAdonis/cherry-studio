@@ -1,5 +1,5 @@
-import { is } from '@electron-toolkit/utils'
 import { loggerService } from '@logger'
+import { isDev } from '@main/constant'
 import { BrowserWindow } from 'electron'
 
 const logger = loggerService.withContext('SearchService')
@@ -26,7 +26,7 @@ export class SearchService {
       webPreferences: {
         nodeIntegration: true,
         contextIsolation: false,
-        devTools: is.dev
+        devTools: isDev
       }
     })
     newWindow.webContents.session.webRequest.onBeforeSendHeaders({ urls: ['*://*/*'] }, (details, callback) => {

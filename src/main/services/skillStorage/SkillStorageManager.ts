@@ -319,7 +319,9 @@ export class SkillStorageManager {
     }
     if (config.type === 'built-in') {
       const isPackaged = !!process.resourcesPath && !process.resourcesPath.includes('node_modules')
-      return isPackaged ? path.join(process.resourcesPath, 'skills') : path.join(process.cwd(), 'resources', 'skills')
+      return isPackaged
+        ? path.join(process.resourcesPath, 'app.asar.unpacked', 'resources', 'skills')
+        : path.join(process.cwd(), 'resources', 'skills')
     }
     return ''
   }
