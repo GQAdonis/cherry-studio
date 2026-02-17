@@ -259,6 +259,38 @@ export interface RefinementMessage {
   mcpTools?: (MCPToolResponse | NormalToolResponse)[]
   /** Whether MCP tools are currently being called */
   isMcpToolRunning?: boolean
+
+  // Skill activation diagnostics
+  /** Skill activation events emitted during refinement */
+  skillActivations?: RefinementSkillActivation[]
+
+  // Context management diagnostics
+  /** Context management actions emitted during refinement */
+  contextActions?: RefinementContextAction[]
+
+  // Artifact lifecycle diagnostics
+  /** Artifact refinement lifecycle events */
+  artifactLifecycle?: ArtifactLifecycleEvent[]
+}
+
+export interface RefinementSkillActivation {
+  skillName: string
+  action: 'activated' | 'completed' | 'failed'
+  toolName?: string
+  result?: string
+  error?: string
+}
+
+export interface RefinementContextAction {
+  action: 'pruned' | 'summarized' | 'cleared'
+  summary?: string
+  removedCount?: number
+}
+
+export interface ArtifactLifecycleEvent {
+  stage: 'started' | 'completed' | 'failed'
+  summary?: string
+  timestamp: string
 }
 
 /**

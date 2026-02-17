@@ -7,8 +7,10 @@
 import type { ModelMessage, TextStreamPart } from 'ai'
 import * as z from 'zod'
 
+import type { ContextStrategyConfig } from './contextStrategy'
 import type { Message, MessageBlock } from './newMessage'
 import { InstalledPluginSchema, PluginMetadataSchema } from './plugin'
+import type { SkillScopeConfig } from './skillScope'
 
 // ------------------ Core enums and helper types ------------------
 export const PermissionModeSchema = z.enum(['default', 'acceptEdits', 'bypassPermissions', 'plan'])
@@ -58,11 +60,19 @@ export const AgentConfigurationSchema = z
 
     // https://docs.claude.com/en/docs/claude-code/sdk/sdk-permissions#mode-specific-behaviors
     permission_mode: PermissionModeSchema.optional().default('default'), // Permission mode, default to 'default'
-    max_turns: z.number().optional().default(100) // Maximum number of interaction turns, default to 100
+    max_turns: z.number().optional().default(100), // Maximum number of interaction turns, default to 100
+    // Agent/session scoped skill policy and context strategy are persisted in this loose configuration blob.
+    // Use `any` here so downstream merged configuration objects remain assignable while
+    // specific UI surfaces enforce stronger types.
+    skillScope: z.any().optional(),
+    contextStrategy: z.any().optional()
   })
   .loose()
 
-export type AgentConfiguration = z.infer<typeof AgentConfigurationSchema>
+export type AgentConfiguration = z.infer<typeof AgentConfigurationSchema> & {
+  skillScope?: SkillScopeConfig
+  contextStrategy?: ContextStrategyConfig
+}
 
 // Shared configuration interface for both agents and sessions
 export const AgentBaseSchema = z.object({

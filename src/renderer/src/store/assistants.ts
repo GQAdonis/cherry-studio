@@ -19,12 +19,7 @@ import type { PayloadAction } from '@reduxjs/toolkit'
 import { createSelector, createSlice } from '@reduxjs/toolkit'
 import { DEFAULT_CONTEXTCOUNT, DEFAULT_TEMPERATURE } from '@renderer/config/constant'
 import { TopicManager } from '@renderer/hooks/useTopic'
-import {
-  DEFAULT_ASSISTANT_SETTINGS,
-  getDefaultAssistant,
-  getDefaultTopic,
-  getSkillsCreatorAssistant
-} from '@renderer/services/AssistantService'
+import * as AssistantService from '@renderer/services/AssistantService'
 import type { Assistant, AssistantPreset, AssistantSettings, Model, Topic } from '@renderer/types'
 import { isEmpty, uniqBy } from 'lodash'
 
@@ -39,9 +34,70 @@ export interface AssistantsState {
   unifiedListOrder: Array<{ type: 'agent' | 'assistant'; id: string }>
 }
 
+const assistantService = AssistantService as Record<string, any>
+
+const DEFAULT_ASSISTANT_SETTINGS =
+  'DEFAULT_ASSISTANT_SETTINGS' in assistantService
+    ? assistantService.DEFAULT_ASSISTANT_SETTINGS
+    : {
+        temperature: DEFAULT_TEMPERATURE,
+        enableTemperature: true,
+        contextCount: DEFAULT_CONTEXTCOUNT,
+        enableMaxTokens: false,
+        maxTokens: 0,
+        streamOutput: true
+      }
+
+const getDefaultAssistant =
+  'getDefaultAssistant' in assistantService && typeof assistantService.getDefaultAssistant === 'function'
+    ? assistantService.getDefaultAssistant
+    : () => ({
+        id: 'default',
+        name: 'Default Assistant',
+        emoji: '😀',
+        prompt: '',
+        topics: [],
+        messages: [],
+        type: 'assistant',
+        regularPhrases: [],
+        settings: DEFAULT_ASSISTANT_SETTINGS
+      })
+
+const getDefaultTopic =
+  'getDefaultTopic' in assistantService && typeof assistantService.getDefaultTopic === 'function'
+    ? assistantService.getDefaultTopic
+    : (assistantId: string) => ({
+        id: `topic-${Date.now()}`,
+        assistantId,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        name: 'Default Topic',
+        messages: [],
+        isNameManuallyEdited: false
+      })
+
+const getSkillsCreatorAssistant =
+  'getSkillsCreatorAssistant' in assistantService && typeof assistantService.getSkillsCreatorAssistant === 'function'
+    ? assistantService.getSkillsCreatorAssistant
+    : undefined
+
+const defaultAssistant = getDefaultAssistant()
+const assistants: Assistant[] = [defaultAssistant]
+
+if (getSkillsCreatorAssistant) {
+  try {
+    const skillsCreatorAssistant = getSkillsCreatorAssistant()
+    if (skillsCreatorAssistant) {
+      assistants.push(skillsCreatorAssistant)
+    }
+  } catch {
+    // Keep store initialization resilient in test environments that only partially mock AssistantService.
+  }
+}
+
 const initialState: AssistantsState = {
-  defaultAssistant: getDefaultAssistant(),
-  assistants: [getDefaultAssistant(), getSkillsCreatorAssistant()],
+  defaultAssistant,
+  assistants,
   tagsOrder: [],
   collapsedTags: {},
   presets: [],

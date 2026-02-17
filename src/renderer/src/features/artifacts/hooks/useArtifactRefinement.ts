@@ -12,6 +12,7 @@
  * - Displays AI explanations, thinking, citations in chat panel
  */
 
+import { loggerService } from '@logger'
 import { fetchChatCompletion } from '@renderer/services/ApiService'
 import { getDefaultAssistant, getDefaultModel } from '@renderer/services/AssistantService'
 import { useAppDispatch, useAppSelector } from '@renderer/store'
@@ -33,7 +34,14 @@ import { ChunkType } from '@renderer/types/chunk'
 import { useCallback, useRef } from 'react'
 
 import { getArtifactRefinementPrompt } from '../agent/refinementPrompt'
-import type { Artifact, ContextMessage, RefinementMessage } from '../types'
+import type {
+  Artifact,
+  ArtifactLifecycleEvent,
+  ContextMessage,
+  RefinementContextAction,
+  RefinementMessage,
+  RefinementSkillActivation
+} from '../types'
 import { extractArtifactContent, separateTextAndArtifact } from '../utils/artifactParser'
 
 interface UseArtifactRefinementOptions {
@@ -59,6 +67,8 @@ interface UseArtifactRefinementResult {
   /** Clear refinement messages */
   clearMessages: () => void
 }
+
+const logger = loggerService.withContext('useArtifactRefinement')
 
 /**
  * Build system prompt for artifact refinement
@@ -149,6 +159,9 @@ export function useArtifactRefinement(options: UseArtifactRefinementOptions): Us
   const responseContentRef = useRef<string>('')
   const thinkingContentRef = useRef<string>('')
   const assistantMessageIdRef = useRef<string>('')
+  const skillActivationsRef = useRef<RefinementSkillActivation[]>([])
+  const contextActionsRef = useRef<RefinementContextAction[]>([])
+  const artifactLifecycleRef = useRef<ArtifactLifecycleEvent[]>([])
 
   // Send refinement request
   const sendRefinement = useCallback(
@@ -175,13 +188,24 @@ export function useArtifactRefinement(options: UseArtifactRefinementOptions): Us
       responseContentRef.current = ''
       thinkingContentRef.current = ''
       assistantMessageIdRef.current = `assistant-${Date.now()}`
+      skillActivationsRef.current = []
+      contextActionsRef.current = []
+      artifactLifecycleRef.current = [
+        {
+          stage: 'started',
+          summary: 'Artifact refinement started',
+          timestamp: new Date().toISOString()
+        }
+      ]
 
       // Add placeholder assistant message
       dispatch(
         addRefinementMessage({
+          id: assistantMessageIdRef.current,
           role: 'assistant',
           content: '',
-          isStreaming: true
+          isStreaming: true,
+          artifactLifecycle: artifactLifecycleRef.current
         })
       )
 
@@ -353,6 +377,60 @@ export function useArtifactRefinement(options: UseArtifactRefinementOptions): Us
                 )
                 break
 
+              // ========== SKILLS / CONTEXT / LIFECYCLE CHUNKS ==========
+              case ChunkType.SKILL_ACTIVATION:
+                skillActivationsRef.current = [
+                  ...skillActivationsRef.current,
+                  {
+                    skillName: chunk.skillName,
+                    action: chunk.action,
+                    toolName: chunk.toolName,
+                    result: chunk.result,
+                    error: chunk.error
+                  }
+                ]
+                dispatch(
+                  updateRefinementMessage({
+                    id: msgId,
+                    skillActivations: skillActivationsRef.current
+                  })
+                )
+                break
+
+              case ChunkType.CONTEXT_ACTION:
+                contextActionsRef.current = [
+                  ...contextActionsRef.current,
+                  {
+                    action: chunk.action,
+                    summary: chunk.summary,
+                    removedCount: chunk.removedCount
+                  }
+                ]
+                dispatch(
+                  updateRefinementMessage({
+                    id: msgId,
+                    contextActions: contextActionsRef.current
+                  })
+                )
+                break
+
+              case ChunkType.ARTIFACT_LIFECYCLE:
+                artifactLifecycleRef.current = [
+                  ...artifactLifecycleRef.current,
+                  {
+                    stage: chunk.stage,
+                    summary: chunk.summary,
+                    timestamp: new Date().toISOString()
+                  }
+                ]
+                dispatch(
+                  updateRefinementMessage({
+                    id: msgId,
+                    artifactLifecycle: artifactLifecycleRef.current
+                  })
+                )
+                break
+
               // ========== COMPLETION CHUNKS ==========
               case ChunkType.BLOCK_COMPLETE:
               case ChunkType.LLM_RESPONSE_COMPLETE:
@@ -382,6 +460,14 @@ export function useArtifactRefinement(options: UseArtifactRefinementOptions): Us
 
         // Final processing after streaming completes
         const { textContent, artifactContent } = separateTextAndArtifact(responseContentRef.current)
+        artifactLifecycleRef.current = [
+          ...artifactLifecycleRef.current,
+          {
+            stage: 'completed',
+            summary: 'Artifact refinement completed',
+            timestamp: new Date().toISOString()
+          }
+        ]
 
         // Mark message as complete
         dispatch(
@@ -392,7 +478,10 @@ export function useArtifactRefinement(options: UseArtifactRefinementOptions): Us
             isThinking: false,
             isSearching: false,
             isKnowledgeSearching: false,
-            isMcpToolRunning: false
+            isMcpToolRunning: false,
+            skillActivations: skillActivationsRef.current,
+            contextActions: contextActionsRef.current,
+            artifactLifecycle: artifactLifecycleRef.current
           })
         )
 
@@ -419,10 +508,17 @@ export function useArtifactRefinement(options: UseArtifactRefinementOptions): Us
           onComplete?.(finalContent)
         }
       } catch (error) {
-        // eslint-disable-next-line no-restricted-syntax
-        console.error('Refinement error:', error)
+        logger.error('Refinement error', error as Error)
         dispatch(setIsArtifactStreaming(false))
         dispatch(updateStreamingArtifactContent(null))
+        artifactLifecycleRef.current = [
+          ...artifactLifecycleRef.current,
+          {
+            stage: 'failed',
+            summary: (error as Error).message || 'Artifact refinement failed',
+            timestamp: new Date().toISOString()
+          }
+        ]
 
         // Get current text content for error display
         const { textContent } = separateTextAndArtifact(responseContentRef.current)
@@ -435,7 +531,10 @@ export function useArtifactRefinement(options: UseArtifactRefinementOptions): Us
             isThinking: false,
             isSearching: false,
             isKnowledgeSearching: false,
-            isMcpToolRunning: false
+            isMcpToolRunning: false,
+            skillActivations: skillActivationsRef.current,
+            contextActions: contextActionsRef.current,
+            artifactLifecycle: artifactLifecycleRef.current
           })
         )
         onError?.(error as Error)

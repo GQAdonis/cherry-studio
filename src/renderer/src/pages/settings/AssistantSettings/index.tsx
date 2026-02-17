@@ -16,6 +16,7 @@ import AssistantMemorySettings from './AssistantMemorySettings'
 import AssistantModelSettings from './AssistantModelSettings'
 import AssistantPromptSettings from './AssistantPromptSettings'
 import AssistantRegularPromptsSettings from './AssistantRegularPromptsSettings'
+import AssistantSkillSettings from './AssistantSkillSettings'
 
 interface AssistantSettingPopupShowParams {
   assistant: Assistant
@@ -26,6 +27,7 @@ type AssistantSettingPopupTab =
   | 'prompt'
   | 'model'
   | 'context'
+  | 'skills'
   | 'messages'
   | 'knowledge_base'
   | 'mcp'
@@ -73,6 +75,10 @@ const AssistantSettingPopupContainer: React.FC<Props> = ({ resolve, tab, ...prop
     {
       key: 'context',
       label: t('assistants.settings.context.label', { defaultValue: 'Context' })
+    },
+    {
+      key: 'skills',
+      label: t('assistants.settings.skills.title', { defaultValue: 'Skills' })
     },
     {
       key: 'prompt',
@@ -145,6 +151,13 @@ const AssistantSettingPopupContainer: React.FC<Props> = ({ resolve, tab, ...prop
           )}
           {menu === 'context' && (
             <AssistantContextSettings
+              assistant={assistant}
+              updateAssistant={updateAssistant}
+              updateAssistantSettings={updateAssistantSettings}
+            />
+          )}
+          {menu === 'skills' && (
+            <AssistantSkillSettings
               assistant={assistant}
               updateAssistant={updateAssistant}
               updateAssistantSettings={updateAssistantSettings}

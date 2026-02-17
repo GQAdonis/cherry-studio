@@ -51,6 +51,7 @@ export enum ChunkType {
   IMAGE_SEARCHED = 'image.searched',
   SKILL_ACTIVATION = 'skill.activation',
   CONTEXT_ACTION = 'context.action',
+  ARTIFACT_LIFECYCLE = 'artifact.lifecycle',
 
   RAW = 'raw'
 }
@@ -449,6 +450,12 @@ export interface SkillActivationChunk {
   error?: string
 }
 
+export interface ArtifactLifecycleChunk {
+  type: ChunkType.ARTIFACT_LIFECYCLE
+  stage: 'started' | 'completed' | 'failed'
+  summary?: string
+}
+
 export interface RawChunk {
   /**
    * The type of the chunk
@@ -499,4 +506,5 @@ export type Chunk =
   | ImageSearchedChunk // 知识库检索图片
   | SkillActivationChunk // 技能激活
   | ContextActionChunk // 上下文管理动作
+  | ArtifactLifecycleChunk // Artifact 生命周期事件
   | RawChunk

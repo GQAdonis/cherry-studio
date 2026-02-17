@@ -38,6 +38,7 @@ import {
 } from './AssistantService'
 import { ConversationService } from './ConversationService'
 import type { BlockManager } from './messageStreaming'
+import { filterSkillsForScope, findTopicById, resolveEffectiveSkillScope } from './skills/scopePolicy'
 import type { StreamProcessorCallbacks } from './StreamProcessingService'
 // import { processKnowledgeSearch } from './KnowledgeService'
 // import {
@@ -270,13 +271,28 @@ export async function fetchChatCompletion({
 
   const mcpMode = getEffectiveMcpMode(assistant)
 
-  // Fetch skills for this assistant
+  const activeTopic = findTopicById(topicId)
+  const effectiveSkillScope = resolveEffectiveSkillScope(activeTopic, assistant)
+
+  // Fetch skills for this assistant/topic scope.
   const getEnabledSkills = async () => {
     try {
-      const skills = await window.api.skill.getEnabledForAgent(assistant.id)
-      return skills || []
+      const skills = await window.api.skill.getList()
+      const scopedSkills = filterSkillsForScope(skills || [], effectiveSkillScope)
+      logger.debug('Resolved scoped skills for assistant request', {
+        assistantId: assistant.id,
+        topicId,
+        mode: effectiveSkillScope.mode,
+        selectedSkillIds: effectiveSkillScope.selectedSkillIds,
+        resolvedCount: scopedSkills.length
+      })
+      return scopedSkills
     } catch (error) {
-      logger.error('Failed to fetch enabled skills for agent', { agentId: assistant.id, error })
+      logger.error('Failed to fetch scoped skills for assistant', {
+        assistantId: assistant.id,
+        topicId,
+        error
+      })
       return []
     }
   }

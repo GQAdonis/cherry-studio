@@ -288,11 +288,19 @@ const artifactsSlice = createSlice({
     /**
      * Add a refinement message
      */
-    addRefinementMessage: (state, action: PayloadAction<Omit<RefinementMessage, 'id' | 'timestamp'>>) => {
+    addRefinementMessage: (
+      state,
+      action: PayloadAction<
+        Omit<RefinementMessage, 'id' | 'timestamp'> & {
+          id?: string
+          timestamp?: string
+        }
+      >
+    ) => {
       const newMessage = {
         ...action.payload,
-        id: nanoid(),
-        timestamp: new Date().toISOString()
+        id: action.payload.id || nanoid(),
+        timestamp: action.payload.timestamp || new Date().toISOString()
       } as RefinementMessage
       ;(state.refinementMessages as RefinementMessage[]).push(newMessage)
     },
@@ -319,11 +327,18 @@ const artifactsSlice = createSlice({
         // MCP tools
         mcpTools?: RefinementMessage['mcpTools']
         isMcpToolRunning?: boolean
+        // Skill activations
+        skillActivations?: RefinementMessage['skillActivations']
+        // Context actions
+        contextActions?: RefinementMessage['contextActions']
+        // Artifact lifecycle
+        artifactLifecycle?: RefinementMessage['artifactLifecycle']
       }>
     ) => {
       const message = state.refinementMessages.find((m) => m.id === action.payload.id)
       if (message) {
-        const { id: _, ...updates } = action.payload
+        const updates = { ...action.payload } as Record<string, unknown>
+        delete updates.id
         // Only update fields that are explicitly provided
         Object.entries(updates).forEach(([key, value]) => {
           if (value !== undefined) {

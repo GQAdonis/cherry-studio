@@ -242,6 +242,17 @@ export function getAssistantById(id: string) {
 }
 
 export async function createAssistantFromAgent(agent: AssistantPreset) {
+  return createAssistantFromAgentWithOptions(agent)
+}
+
+interface CreateAssistantFromAgentOptions {
+  settings?: Partial<AssistantSettings>
+}
+
+export async function createAssistantFromAgentWithOptions(
+  agent: AssistantPreset,
+  options?: CreateAssistantFromAgentOptions
+) {
   const assistantId = uuid()
   const topic = getDefaultTopic(assistantId)
 
@@ -254,7 +265,7 @@ export async function createAssistantFromAgent(agent: AssistantPreset) {
     model: agent.defaultModel,
     type: 'assistant',
     regularPhrases: agent.regularPhrases || [], // Ensured regularPhrases
-    settings: agent.settings || DEFAULT_ASSISTANT_SETTINGS
+    settings: options?.settings ?? agent.settings ?? DEFAULT_ASSISTANT_SETTINGS
   }
 
   const { addAssistant } = await import('@renderer/store/assistants')

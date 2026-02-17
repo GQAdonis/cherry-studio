@@ -181,7 +181,7 @@ describe('Claude → AiSDK transform', () => {
       { type: 'finish-step' }
     >
     expect(finishStep.finishReason).toBe('tool-calls')
-    expect(finishStep.usage).toEqual({ inputTokens: 1, outputTokens: 5, totalTokens: 6 })
+    expect(finishStep.usage).toMatchObject({ inputTokens: 1, outputTokens: 5, totalTokens: 6 })
 
     const toolResult = parts.find((part) => part.type === 'tool-result') as Extract<
       (typeof parts)[number],
@@ -408,7 +408,7 @@ describe('Claude → AiSDK transform', () => {
       { type: 'finish-step' }
     >
     expect(finishStep.finishReason).toBe('stop')
-    expect(finishStep.usage).toEqual({ inputTokens: 2, outputTokens: 4, totalTokens: 6 })
+    expect(finishStep.usage).toMatchObject({ inputTokens: 2, outputTokens: 4, totalTokens: 6 })
   })
 
   it('emits fallback text when Claude sends a snapshot instead of deltas', () => {
@@ -490,7 +490,68 @@ describe('Claude → AiSDK transform', () => {
       (typeof parts)[number],
       { type: 'finish-step' }
     >
-    expect(finish.usage).toEqual({ inputTokens: 3, outputTokens: 7, totalTokens: 10 })
+    expect(finish.usage).toMatchObject({ inputTokens: 3, outputTokens: 7, totalTokens: 10 })
     expect(finish.finishReason).toBe('stop')
+  })
+
+  it('emits skill.activation data chunks for skill tool results', () => {
+    const state = new ClaudeStreamState({ agentSessionId: baseStreamMetadata.session_id })
+
+    const skillToolResultMessage = {
+      ...baseStreamMetadata,
+      type: 'user',
+      uuid: uuid(40),
+      tool_use_result: {
+        commandName: '/ui-ux-pro-max'
+      },
+      message: {
+        role: 'user',
+        content: [
+          {
+            type: 'tool_result',
+            tool_use_id: 'tool-1',
+            content: 'ok',
+            is_error: false
+          }
+        ]
+      }
+    } as unknown as SDKMessage
+
+    const parts = transformSDKMessageToStreamParts(skillToolResultMessage, state) as Array<Record<string, any>>
+    const dataParts = parts.filter((part) => part.type === 'data')
+
+    expect(dataParts).toHaveLength(2)
+    expect(dataParts[0].data).toMatchObject({
+      type: 'skill.activation',
+      skillName: 'ui-ux-pro-max',
+      action: 'activated'
+    })
+    expect(dataParts[1].data).toMatchObject({
+      type: 'skill.activation',
+      skillName: 'ui-ux-pro-max',
+      action: 'completed',
+      result: 'ok'
+    })
+  })
+
+  it('emits context.action data chunk for compact boundary system messages', () => {
+    const state = new ClaudeStreamState({ agentSessionId: baseStreamMetadata.session_id })
+
+    const compactBoundaryMessage = {
+      ...baseStreamMetadata,
+      type: 'system',
+      uuid: uuid(41),
+      subtype: 'compact_boundary',
+      session_id: baseStreamMetadata.session_id
+    } as unknown as SDKMessage
+
+    const parts = transformSDKMessageToStreamParts(compactBoundaryMessage, state) as Array<Record<string, any>>
+    const dataPart = parts.find((part) => part.type === 'data')
+
+    expect(dataPart).toBeDefined()
+    expect(dataPart?.data).toMatchObject({
+      type: 'context.action',
+      action: 'summarized'
+    })
   })
 })

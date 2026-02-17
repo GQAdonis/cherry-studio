@@ -47,6 +47,18 @@ type ToolResultContent = {
   is_error?: boolean
 }
 
+const normalizeSkillName = (commandName: string): string => commandName.replace(/^\//, '').trim()
+
+const toChunkText = (value: unknown): string => {
+  if (typeof value === 'string') return value
+  if (value == null) return ''
+  try {
+    return JSON.stringify(value)
+  } catch {
+    return String(value)
+  }
+}
+
 /**
  * Maps Anthropic stop reasons to the AiSDK equivalents so higher level
  * consumers can treat completion states uniformly across providers.
@@ -337,6 +349,16 @@ function handleUserMessage(
     // skill content that should be suppressed from the UI
     const toolUseResult = message.tool_use_result as { commandName?: string } | undefined
     if (toolUseResult?.commandName) {
+      const skillName = normalizeSkillName(toolUseResult.commandName)
+      chunks.push({
+        type: 'data',
+        data: {
+          type: 'skill.activation',
+          skillName,
+          action: 'activated',
+          toolName: toolUseResult.commandName
+        }
+      } as unknown as AgentStreamPart)
       state.setExpectingSkillContent(true)
     }
 
@@ -349,6 +371,18 @@ function handleUserMessage(
         const pendingCall = state.consumePendingToolCall(toolResult.tool_use_id)
         const toolCallId = pendingCall?.toolCallId ?? state.getNamespacedToolCallId(toolResult.tool_use_id)
         if (toolResult.is_error) {
+          if (toolUseResult?.commandName) {
+            chunks.push({
+              type: 'data',
+              data: {
+                type: 'skill.activation',
+                skillName: normalizeSkillName(toolUseResult.commandName),
+                action: 'failed',
+                toolName: pendingCall?.toolName ?? toolUseResult.commandName,
+                error: toChunkText(toolResult.content)
+              }
+            } as unknown as AgentStreamPart)
+          }
           chunks.push({
             type: 'tool-error',
             toolCallId,
@@ -358,6 +392,18 @@ function handleUserMessage(
             providerExecuted: true
           } as AgentStreamPart)
         } else {
+          if (toolUseResult?.commandName) {
+            chunks.push({
+              type: 'data',
+              data: {
+                type: 'skill.activation',
+                skillName: normalizeSkillName(toolUseResult.commandName),
+                action: 'completed',
+                toolName: pendingCall?.toolName ?? toolUseResult.commandName,
+                result: toChunkText(toolResult.content)
+              }
+            } as unknown as AgentStreamPart)
+          }
           chunks.push({
             type: 'tool-result',
             toolCallId,
@@ -694,6 +740,14 @@ function handleSystemMessage(message: Extract<SDKMessage, { type: 'system' }>): 
       }
     })
   } else if (message.subtype === 'compact_boundary') {
+    chunks.push({
+      type: 'data',
+      data: {
+        type: 'context.action',
+        action: 'summarized',
+        summary: 'Context compacted by agent runtime.'
+      }
+    } as unknown as AgentStreamPart)
     chunks.push({
       type: 'raw',
       rawValue: {

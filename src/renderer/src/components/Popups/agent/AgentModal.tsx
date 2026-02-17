@@ -1,4 +1,5 @@
 import { loggerService } from '@logger'
+import ContextStrategySelector from '@renderer/components/ContextStrategySelector'
 import { ErrorBoundary } from '@renderer/components/ErrorBoundary'
 import { HelpTooltip } from '@renderer/components/TooltipIcons'
 import { TopView } from '@renderer/components/TopView'
@@ -6,6 +7,7 @@ import { permissionModeCards } from '@renderer/config/agent'
 import { isWin } from '@renderer/config/constant'
 import { useAgents } from '@renderer/hooks/agents/useAgents'
 import { useUpdateAgent } from '@renderer/hooks/agents/useUpdateAgent'
+import { useSettings } from '@renderer/hooks/useSettings'
 import SelectAgentBaseModelButton from '@renderer/pages/home/components/SelectAgentBaseModelButton'
 import type {
   AddAgentForm,
@@ -13,10 +15,14 @@ import type {
   ApiModel,
   BaseAgentForm,
   PermissionMode,
+  Skill,
   Tool,
   UpdateAgentForm
 } from '@renderer/types'
 import { AgentConfigurationSchema, isAgentType } from '@renderer/types'
+import type { ContextStrategyConfig } from '@renderer/types/contextStrategy'
+import { DEFAULT_CONTEXT_STRATEGY_CONFIG } from '@renderer/types/contextStrategy'
+import type { SkillAvailabilityMode, SkillScopeConfig } from '@renderer/types/skillScope'
 import type { GitBashPathInfo } from '@shared/config/constant'
 import { Button, Input, Modal, Select } from 'antd'
 import type { ChangeEvent, FormEvent } from 'react'
@@ -42,6 +48,27 @@ const buildAgentForm = (existing?: AgentWithTools): BaseAgentForm => ({
   configuration: AgentConfigurationSchema.parse(existing?.configuration ?? {})
 })
 
+const DEFAULT_SKILL_SCOPE: SkillScopeConfig = {
+  mode: 'inherit'
+}
+
+const SKILL_MODE_OPTIONS: Array<{ value: SkillAvailabilityMode; label: string }> = [
+  { value: 'inherit', label: 'Inherit Global' },
+  { value: 'all', label: 'All Skills' },
+  { value: 'selected', label: 'Selected Skills' },
+  { value: 'none', label: 'No Skills' }
+]
+
+const SKILL_STRATEGY_OPTIONS: Array<{ value: string; label: string }> = [
+  { value: '__inherit__', label: 'Inherit Global' },
+  { value: 'none', label: 'None (Inject All)' },
+  { value: 'keyword', label: 'Keyword' },
+  { value: 'embedding', label: 'Embedding (API)' },
+  { value: 'local-embedding', label: 'Local Embedding' },
+  { value: 'llm', label: 'LLM Classification' },
+  { value: 'hybrid', label: 'Hybrid' }
+]
+
 interface ShowParams {
   agent?: AgentWithTools
   afterSubmit?: (a: AgentEntity) => void
@@ -53,6 +80,7 @@ interface Props extends ShowParams {
 
 const PopupContainer: React.FC<Props> = ({ agent, afterSubmit, resolve }) => {
   const { t } = useTranslation()
+  const { contextStrategy: globalContextStrategy } = useSettings()
   const [open, setOpen] = useState(true)
   const loadingRef = useRef(false)
   const { addAgent } = useAgents()
@@ -61,12 +89,34 @@ const PopupContainer: React.FC<Props> = ({ agent, afterSubmit, resolve }) => {
 
   const [form, setForm] = useState<BaseAgentForm>(() => buildAgentForm(agent))
   const [gitBashPathInfo, setGitBashPathInfo] = useState<GitBashPathInfo>({ path: null, source: null })
+  const [allSkills, setAllSkills] = useState<Skill[]>([])
+  const [useGlobalContextStrategy, setUseGlobalContextStrategy] = useState(() => {
+    const config = AgentConfigurationSchema.parse(agent?.configuration ?? {})
+    return (config as { contextStrategy?: unknown }).contextStrategy === undefined
+  })
 
   useEffect(() => {
     if (open) {
       setForm(buildAgentForm(agent))
     }
   }, [agent, open])
+
+  useEffect(() => {
+    const config = AgentConfigurationSchema.parse(form.configuration ?? {})
+    setUseGlobalContextStrategy((config as { contextStrategy?: unknown }).contextStrategy === undefined)
+  }, [form.configuration])
+
+  useEffect(() => {
+    const fetchSkills = async () => {
+      try {
+        const skills = await window.api.skill.getList()
+        setAllSkills(skills || [])
+      } catch (error) {
+        logger.error('Failed to fetch skills for agent modal', error as Error)
+      }
+    }
+    fetchSkills()
+  }, [])
 
   const checkGitBash = useCallback(async () => {
     if (!isWin) return
@@ -83,6 +133,81 @@ const PopupContainer: React.FC<Props> = ({ agent, afterSubmit, resolve }) => {
   }, [checkGitBash])
 
   const selectedPermissionMode = form.configuration?.permission_mode ?? 'default'
+  const currentSkillScope = ((form.configuration as { skillScope?: SkillScopeConfig } | undefined)?.skillScope ??
+    DEFAULT_SKILL_SCOPE) as SkillScopeConfig
+  const currentContextStrategy =
+    (form.configuration as { contextStrategy?: ContextStrategyConfig } | undefined)?.contextStrategy ??
+    globalContextStrategy ??
+    DEFAULT_CONTEXT_STRATEGY_CONFIG
+
+  const updateConfiguration = useCallback((updates: Record<string, unknown>) => {
+    setForm((prev) => {
+      const parsed = AgentConfigurationSchema.parse(prev.configuration ?? {})
+      return {
+        ...prev,
+        configuration: AgentConfigurationSchema.parse({
+          ...parsed,
+          ...updates
+        })
+      }
+    })
+  }, [])
+
+  const onSkillModeChange = useCallback(
+    (mode: SkillAvailabilityMode) => {
+      const nextScope: SkillScopeConfig = {
+        ...currentSkillScope,
+        mode,
+        selectedSkillIds: mode === 'selected' ? (currentSkillScope.selectedSkillIds ?? []) : undefined
+      }
+      updateConfiguration({ skillScope: nextScope })
+    },
+    [currentSkillScope, updateConfiguration]
+  )
+
+  const onSkillSelectionChange = useCallback(
+    (selectedSkillIds: string[]) => {
+      updateConfiguration({
+        skillScope: {
+          ...currentSkillScope,
+          mode: 'selected',
+          selectedSkillIds
+        } satisfies SkillScopeConfig
+      })
+    },
+    [currentSkillScope, updateConfiguration]
+  )
+
+  const onSkillStrategyChange = useCallback(
+    (value: string) => {
+      updateConfiguration({
+        skillScope: {
+          ...currentSkillScope,
+          strategy: value === '__inherit__' ? undefined : (value as SkillScopeConfig['strategy'])
+        } satisfies SkillScopeConfig
+      })
+    },
+    [currentSkillScope, updateConfiguration]
+  )
+
+  const onContextStrategyChange = useCallback(
+    (strategy: ContextStrategyConfig) => {
+      updateConfiguration({ contextStrategy: strategy })
+    },
+    [updateConfiguration]
+  )
+
+  const onContextInheritChange = useCallback(
+    (useGlobal: boolean) => {
+      setUseGlobalContextStrategy(useGlobal)
+      if (useGlobal) {
+        updateConfiguration({ contextStrategy: undefined })
+      } else {
+        updateConfiguration({ contextStrategy: currentContextStrategy })
+      }
+    },
+    [currentContextStrategy, updateConfiguration]
+  )
 
   const handlePickGitBash = useCallback(async () => {
     try {
@@ -137,10 +262,10 @@ const PopupContainer: React.FC<Props> = ({ agent, afterSubmit, resolve }) => {
 
       return {
         ...prev,
-        configuration: {
+        configuration: AgentConfigurationSchema.parse({
           ...parsedConfiguration,
           permission_mode: value
-        }
+        })
       }
     })
   }, [])
@@ -426,6 +551,51 @@ const PopupContainer: React.FC<Props> = ({ agent, afterSubmit, resolve }) => {
               <HelpText>
                 {t('agent.settings.tooling.permissionMode.helper', 'Choose how the agent handles tool approvals.')}
               </HelpText>
+            </FormItem>
+
+            <FormItem>
+              <Label>{t('agent.settings.skills.title', 'Skills')}</Label>
+              <div className="flex flex-col gap-2">
+                <Select
+                  value={currentSkillScope.mode}
+                  options={SKILL_MODE_OPTIONS}
+                  onChange={onSkillModeChange}
+                  placeholder={t('agent.settings.skills.mode', 'Availability')}
+                />
+
+                {currentSkillScope.mode === 'selected' && (
+                  <Select
+                    mode="multiple"
+                    value={currentSkillScope.selectedSkillIds ?? []}
+                    onChange={onSkillSelectionChange}
+                    options={allSkills.map((skill) => ({ value: skill.id, label: skill.name }))}
+                    placeholder={t('agent.settings.skills.selectedPlaceholder', 'Choose skills for this scope')}
+                  />
+                )}
+
+                <Select
+                  value={currentSkillScope.strategy ?? '__inherit__'}
+                  options={SKILL_STRATEGY_OPTIONS}
+                  onChange={onSkillStrategyChange}
+                  placeholder={t('agent.settings.skills.strategy', 'Intent Strategy')}
+                />
+              </div>
+              <HelpText>
+                {t('agent.settings.skills.helper', 'Set scoped skill availability and intent strategy for this agent.')}
+              </HelpText>
+            </FormItem>
+
+            <FormItem>
+              <Label>{t('agent.settings.context.title', 'Context Management')}</Label>
+              <ContextStrategySelector
+                value={currentContextStrategy}
+                onChange={onContextStrategyChange}
+                showInheritOption
+                inheritedStrategyType={globalContextStrategy?.type}
+                inheritLabel={t('agent.settings.context.useGlobal', 'Use Global Default')}
+                useInherited={useGlobalContextStrategy}
+                onInheritedChange={onContextInheritChange}
+              />
             </FormItem>
 
             <FormItem>

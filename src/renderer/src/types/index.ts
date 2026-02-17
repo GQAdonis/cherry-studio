@@ -16,6 +16,7 @@ import type { FileMetadata } from './file'
 import type { KnowledgeBase, KnowledgeReference } from './knowledge'
 import type { MCPConfigSample, MCPServerInstallSource, McpServerType } from './mcp'
 import type { Message } from './newMessage'
+import type { SkillScopeConfig } from './skillScope'
 import type { BaseTool, MCPTool } from './tool'
 
 export * from './agent'
@@ -29,6 +30,7 @@ export * from './notification'
 export * from './ocr'
 export * from './plugin'
 export * from './provider'
+export * from './skillScope'
 
 export type McpMode = 'disabled' | 'auto' | 'manual'
 
@@ -193,6 +195,10 @@ export type AssistantSettings = {
    * Overrides global settings if specified.
    */
   contextStrategy?: ContextStrategyConfig
+  /**
+   * Per-assistant skill availability + matching policy configuration.
+   */
+  skillScope?: SkillScopeConfig
 }
 
 export type AssistantPreset = Omit<Assistant, 'model'> & {
@@ -280,6 +286,11 @@ export type Topic = {
    * Overrides assistant and global settings if specified.
    */
   contextStrategy?: ContextStrategyConfig
+  /**
+   * Per-conversation skill availability + matching policy configuration.
+   * Overrides assistant and global settings if specified.
+   */
+  skillScope?: SkillScopeConfig
   /**
    * Metadata for context management persistence (summaries, extracted facts, etc.)
    */

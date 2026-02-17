@@ -6,10 +6,12 @@ import { useTranslation } from 'react-i18next'
 
 import { BaseSettingsPopup, type SettingsMenuItem, type SettingsPopupTab } from './BaseSettingsPopup'
 import AdvancedSettings from './components/AdvancedSettings'
+import ContextSettings from './components/ContextSettings'
 import EssentialSettings from './components/EssentialSettings'
 import PermissionModeSettings from './components/PermissionModeSettings'
 import { InstalledPluginsSettings, PluginBrowserSettings } from './components/PluginsSettings/PluginsSettings'
 import PromptSettings from './components/PromptSettings'
+import SkillSettings from './components/SkillSettings'
 import ToolsSettings from './components/ToolsSettings'
 import { AgentLabel } from './shared'
 
@@ -33,6 +35,8 @@ const AgentSettingPopupContainer: React.FC<AgentSettingPopupParams> = ({ tab, ag
       { key: 'prompt', label: t('agent.settings.prompt') },
       { key: 'permission-mode', label: t('agent.settings.permissionMode.tab', 'Permission Mode') },
       { key: 'tools-mcp', label: t('agent.settings.toolsMcp.tab', 'Tools & MCP') },
+      { key: 'skills', label: t('agent.settings.skills.title', 'Skills') },
+      { key: 'context', label: t('agent.settings.context.title', 'Context') },
       { key: 'plugins', label: t('agent.settings.plugins.available.title', 'Available Plugins') },
       { key: 'installed', label: t('agent.settings.plugins.installed.title', 'Installed Plugins') },
       { key: 'advanced', label: t('agent.settings.advance.title', 'Advanced Settings') }
@@ -52,6 +56,10 @@ const AgentSettingPopupContainer: React.FC<AgentSettingPopupParams> = ({ tab, ag
         return <PermissionModeSettings agentBase={agent} update={updateAgent} />
       case 'tools-mcp':
         return <ToolsSettings agentBase={agent} update={updateAgent} />
+      case 'skills':
+        return <SkillSettings agentBase={agent} update={updateAgent} />
+      case 'context':
+        return <ContextSettings agentBase={agent} update={updateAgent} />
       case 'plugins':
         return <PluginBrowserSettings agentBase={agent} update={updateAgent} />
       case 'installed':

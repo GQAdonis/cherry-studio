@@ -43,8 +43,9 @@ export function chunkDocument(content: string, options: ChunkOptions): ChunkResu
 
   const originalTokens = estimateTextTokens(content)
 
-  // If content is within limits, return as-is
-  if (originalTokens <= maxTokensPerChunk) {
+  // If content is clearly within limits, return as-is.
+  // We keep a character-length guard because token estimation can undercount short structured text.
+  if (originalTokens <= maxTokensPerChunk && content.length <= maxTokensPerChunk) {
     return {
       chunks: [content],
       originalTokens,
@@ -153,13 +154,16 @@ function slidingWindowChunk(content: string, maxTokens: number, overlap: number)
   const chunks: string[] = []
 
   // Estimate characters per token (rough approximation)
-  const charsPerToken = content.length / estimateTextTokens(content)
-  const maxChars = Math.floor(maxTokens * charsPerToken)
-  const overlapChars = Math.floor(overlap * charsPerToken)
+  const tokenEstimate = Math.max(estimateTextTokens(content), 1)
+  const charsPerToken = content.length / tokenEstimate
+  const maxChars = Math.max(1, Math.floor(maxTokens * charsPerToken))
+  const safeOverlap = Math.max(0, Math.min(overlap, Math.max(maxTokens - 1, 0)))
+  const overlapChars = Math.floor(safeOverlap * charsPerToken)
 
   let position = 0
 
   while (position < content.length) {
+    const previousPosition = position
     const chunkEnd = Math.min(position + maxChars, content.length)
     let chunk = content.substring(position, chunkEnd)
 
@@ -178,12 +182,8 @@ function slidingWindowChunk(content: string, maxTokens: number, overlap: number)
     chunks.push(chunk.trim())
 
     // Move position forward, accounting for overlap
-    position = chunkEnd - overlapChars
-
-    // Ensure we make progress
-    if (position <= chunks[chunks.length - 1].length) {
-      position = chunkEnd
-    }
+    const nextPosition = chunkEnd - overlapChars
+    position = nextPosition > previousPosition ? nextPosition : chunkEnd
   }
 
   return chunks

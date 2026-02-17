@@ -6,9 +6,11 @@ import { useTranslation } from 'react-i18next'
 
 import { BaseSettingsPopup, type SettingsMenuItem, type SettingsPopupTab } from './BaseSettingsPopup'
 import AdvancedSettings from './components/AdvancedSettings'
+import ContextSettings from './components/ContextSettings'
 import EssentialSettings from './components/EssentialSettings'
 import PermissionModeSettings from './components/PermissionModeSettings'
 import PromptSettings from './components/PromptSettings'
+import SkillSettings from './components/SkillSettings'
 import ToolsSettings from './components/ToolsSettings'
 import { SessionLabel } from './shared'
 
@@ -33,6 +35,8 @@ const SessionSettingPopupContainer: React.FC<SessionSettingPopupParams> = ({ tab
       { key: 'prompt', label: t('agent.settings.prompt') },
       { key: 'permission-mode', label: t('agent.settings.permissionMode.tab', 'Permission Mode') },
       { key: 'tools-mcp', label: t('agent.settings.toolsMcp.tab', 'Tools & MCP') },
+      { key: 'skills', label: t('agent.settings.skills.title', 'Skills') },
+      { key: 'context', label: t('agent.settings.context.title', 'Context') },
       { key: 'advanced', label: t('agent.settings.advance.title', 'Advanced Settings') }
     ],
     [t]
@@ -50,6 +54,10 @@ const SessionSettingPopupContainer: React.FC<SessionSettingPopupParams> = ({ tab
         return <PermissionModeSettings agentBase={session} update={updateSession} />
       case 'tools-mcp':
         return <ToolsSettings agentBase={session} update={updateSession} />
+      case 'skills':
+        return <SkillSettings agentBase={session} update={updateSession} />
+      case 'context':
+        return <ContextSettings agentBase={session} update={updateSession} />
       case 'advanced':
         return <AdvancedSettings agentBase={session} update={updateSession} />
       default:

@@ -9,11 +9,13 @@
  */
 
 import { DeleteOutlined, SendOutlined } from '@ant-design/icons'
+import { loggerService } from '@logger'
 import Spinner from '@renderer/components/Spinner'
 import ThinkingEffect from '@renderer/components/ThinkingEffect'
 import { useAppDispatch, useAppSelector } from '@renderer/store'
 import { clearRefinementMessages, selectIsRefining, selectRefinementMessages } from '@renderer/store/artifacts'
 import { Button, Input, Tooltip } from 'antd'
+import type { TFunction } from 'i18next'
 import { Brain, Database, Globe, Wrench } from 'lucide-react'
 import type { FC } from 'react'
 import { memo, useCallback, useEffect, useRef, useState } from 'react'
@@ -27,6 +29,8 @@ interface ArtifactChatPanelProps {
   /** The artifact being refined */
   artifact: Artifact
 }
+
+const logger = loggerService.withContext('ArtifactChatPanel')
 
 /**
  * Format timestamp for display
@@ -48,7 +52,7 @@ function formatThinkingTime(ms?: number): React.ReactNode {
 /**
  * Render a single message with all its rich content blocks
  */
-const MessageRenderer: FC<{ message: RefinementMessage; t: (key: string) => string }> = memo(({ message, t }) => {
+const MessageRenderer: FC<{ message: RefinementMessage; t: TFunction }> = memo(({ message, t }) => {
   // Determine if this message has any in-progress indicators
   const hasInProgressIndicator =
     message.isThinking || message.isSearching || message.isKnowledgeSearching || message.isMcpToolRunning
@@ -144,6 +148,71 @@ const MessageRenderer: FC<{ message: RefinementMessage; t: (key: string) => stri
         </McpToolsBlock>
       )}
 
+      {/* Skill Activation Diagnostics */}
+      {message.skillActivations && message.skillActivations.length > 0 && (
+        <McpToolsBlock>
+          <SearchResultsHeader>
+            <Wrench size={14} />
+            <span>{t('message.skill_activations') || 'Skill Activations'}</span>
+            <span className="count">({message.skillActivations.length})</span>
+          </SearchResultsHeader>
+          <ToolResultsList>
+            {message.skillActivations.map((activation, idx) => (
+              <ToolResultItem key={idx}>
+                <span className="tool-name">
+                  {activation.skillName} • {activation.action}
+                </span>
+                <span className="tool-status">{activation.error ? '✗' : '✓'}</span>
+              </ToolResultItem>
+            ))}
+          </ToolResultsList>
+        </McpToolsBlock>
+      )}
+
+      {/* Context Management Diagnostics */}
+      {message.contextActions && message.contextActions.length > 0 && (
+        <KnowledgeResultsBlock>
+          <SearchResultsHeader>
+            <Database size={14} />
+            <span>{t('message.context_action.title', 'Context Management')}</span>
+            <span className="count">({message.contextActions.length})</span>
+          </SearchResultsHeader>
+          <ToolResultsList>
+            {message.contextActions.map((contextAction, idx) => (
+              <ToolResultItem key={idx}>
+                <span className="tool-name">
+                  {contextAction.action}
+                  {contextAction.removedCount !== undefined ? ` • ${contextAction.removedCount}` : ''}
+                </span>
+                <span className="tool-status">✓</span>
+              </ToolResultItem>
+            ))}
+          </ToolResultsList>
+        </KnowledgeResultsBlock>
+      )}
+
+      {/* Artifact Lifecycle Diagnostics */}
+      {message.artifactLifecycle && message.artifactLifecycle.length > 0 && (
+        <ThinkingBlock>
+          <SearchResultsHeader>
+            <Brain size={14} />
+            <span>{t('artifacts.lifecycle', 'Artifact Lifecycle')}</span>
+            <span className="count">({message.artifactLifecycle.length})</span>
+          </SearchResultsHeader>
+          <ToolResultsList>
+            {message.artifactLifecycle.map((event, idx) => (
+              <ToolResultItem key={idx}>
+                <span className="tool-name">
+                  {event.stage}
+                  {event.summary ? ` • ${event.summary}` : ''}
+                </span>
+                <span className="tool-status">•</span>
+              </ToolResultItem>
+            ))}
+          </ToolResultsList>
+        </ThinkingBlock>
+      )}
+
       {/* Main Text Content */}
       <MessageContent>
         {message.content || (message.isStreaming && !hasInProgressIndicator && <TypingIndicator />)}
@@ -174,8 +243,7 @@ const ArtifactChatPanel: FC<ArtifactChatPanelProps> = ({ artifact }) => {
   const { sendRefinement } = useArtifactRefinement({
     artifact,
     onError: (error) => {
-      // eslint-disable-next-line no-restricted-syntax
-      console.error('Refinement error:', error)
+      logger.error('Refinement error', error)
     }
   })
 
