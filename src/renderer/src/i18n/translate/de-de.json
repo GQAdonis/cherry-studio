@@ -152,6 +152,11 @@
         },
         "title": "Erweiterte Einstellungen"
       },
+      "context": {
+        "description": "[to be translated]:Control how this agent/session manages long context windows before model limits are reached.",
+        "title": "[to be translated]:Context Management",
+        "useGlobal": "[to be translated]:Use Global Default"
+      },
       "essential": "Grundeinstellungen",
       "permissionMode": {
         "tab": "Berechtigungsmodus",
@@ -223,6 +228,15 @@
         "uninstalling": "Deinstallation läuft..."
       },
       "prompt": "Prompt-Einstellungen",
+      "skills": {
+        "description": "[to be translated]:Configure skill availability and intent strategy for this agent/session scope.",
+        "helper": "[to be translated]:Set scoped skill availability and intent strategy for this agent.",
+        "mode": "[to be translated]:Availability",
+        "selected": "[to be translated]:Selected Skills",
+        "selectedPlaceholder": "[to be translated]:Choose skills for this scope",
+        "strategy": "[to be translated]:Intent Strategy",
+        "title": "[to be translated]:Skills"
+      },
       "tooling": {
         "mcp": {
           "description": "Verbinden Sie MCP-Server, um weitere Tools freizuschalten, die oben vorab autorisiert werden können.",
@@ -526,6 +540,8 @@
     "zoomOut": "Herauszoomen"
   },
   "artifacts": {
+    "archive": "[to be translated]:Archive",
+    "artifact_chat": "[to be translated]:Artifact Chat",
     "attach_image": "Bild anhängen",
     "change_model": "Klicken Sie, um das Modell zu ändern",
     "click_to_open": "Klicken Sie, um das Artefakt zu öffnen",
@@ -533,14 +549,22 @@
     "console": "Konsole",
     "description_help": "Zum Suchen von Artefakten in Ihrer Bibliothek verwendet",
     "description_placeholder": "Was macht dieses Artefakt?",
+    "download_package": "[to be translated]:Download package",
     "generating": "Artefakt wird generiert...",
+    "hide_archived": "[to be translated]:Active",
+    "knowledge_bridge": "[to be translated]:Create knowledge bridge from chat history",
     "library": "Artefaktbibliothek",
     "model_locked": "Die Modellauswahl ist gesperrt.",
     "new_artifact": "Neues Artefakt",
+    "new_project_setup": "[to be translated]:New Artifact Studio Project",
     "no_artifacts": "Keine Artefakte gefunden",
     "open_artifact": "Öffnen Sie Artefakt",
+    "open_studio": "[to be translated]:Artifact Studio",
     "preview": "Vorschau",
     "preview_type": "Typ",
+    "project_name_placeholder": "[to be translated]:Marketing landing page",
+    "projects_title": "[to be translated]:Artifact Studio Projects",
+    "rebind_source": "[to be translated]:Rebind Source",
     "refinement": "Verfeinerung чат",
     "refinement_empty": "Noch keine Nachrichten.",
     "refinement_hint": "Bitte die KI, dieses Artefakt zu ändern.",
@@ -548,6 +572,8 @@
     "save_from_modal": "Öffnen Sie das Artefakt, um es zu speichern.",
     "save_to_library": "In die Bibliothek speichern",
     "saved": "Artefakt in der Bibliothek gespeichert",
+    "show_archived": "[to be translated]:Archived",
+    "source": "[to be translated]:Source",
     "split": "Split",
     "tags_placeholder": "Tags hinzufügen...",
     "title": "Artefakte",
@@ -561,6 +587,7 @@
       "react": "React",
       "svg": "SVG"
     },
+    "updated_at": "[to be translated]:Updated",
     "version": "Version",
     "view": {
       "code": "Code",
@@ -576,6 +603,12 @@
     },
     "copy": {
       "title": "Assistent kopieren"
+    },
+    "create": {
+      "settings": {
+        "description": "[to be translated]:Apply skill and context defaults before creating this assistant.",
+        "title": "[to be translated]:Creation Settings"
+      }
     },
     "delete": {
       "content": "Das Löschen des Assistenten löscht alle Themen und Dateien unter diesem Assistenten. Möchten Sie fortfahren?",
@@ -759,6 +792,17 @@
         "title": "Häufig verwendete Phrasen",
         "titleLabel": "Titel",
         "titlePlaceholder": "Titel eingeben"
+      },
+      "skills": {
+        "custom": "[to be translated]:Use Custom Policy",
+        "custom_info": "[to be translated]:Custom skill policy overrides global defaults for this assistant. Conversation settings can still override assistant scope.",
+        "description": "[to be translated]:Control skill availability and intent classification strategy for this assistant. Conversation-level settings can still override this.",
+        "mode": "[to be translated]:Availability",
+        "selected": "[to be translated]:Selected Skills",
+        "selected_placeholder": "[to be translated]:Choose skills available to this assistant",
+        "strategy": "[to be translated]:Intent Strategy",
+        "title": "[to be translated]:Skills",
+        "use_global": "[to be translated]:Use Global Default"
       },
       "title": "Assistenteneinstellungen",
       "tool_use_mode": {
@@ -1281,6 +1325,16 @@
         "placeholder": "Themen durchsuchen...",
         "title": "Suche"
       },
+      "skill_scope": {
+        "all": "[to be translated]:All Skills",
+        "label": "[to be translated]:Skill Scope",
+        "no_skills": "[to be translated]:No skills available",
+        "none": "[to be translated]:No Skills",
+        "selected": "[to be translated]:Selected Skills ({{count}})",
+        "strategy": "[to be translated]:Intent Strategy",
+        "strategy_inherit": "[to be translated]:Inherit Global",
+        "use_assistant": "[to be translated]:Use Assistant Default"
+      },
       "title": "Thema",
       "unpin": "Anheften aufheben"
     },
@@ -1373,6 +1427,7 @@
     "advanced_settings": "Erweiterte Einstellungen",
     "agent_one": "Agent",
     "agent_other": "Agenten",
+    "all": "[to be translated]:All",
     "and": "und",
     "assistant": "Assistent",
     "assistant_one": "Assistent",
@@ -1385,6 +1440,7 @@
     "clear": "Löschen",
     "clear_all": "Alles löschen",
     "click_to_replace": "Klicken zum Ersetzen",
+    "clone": "[to be translated]:Clone",
     "close": "Schließen",
     "collapse": "Einklappen",
     "completed": "Abgeschlossen",
@@ -1392,6 +1448,7 @@
     "copied": "Kopiert",
     "copy": "Kopieren",
     "copy_failed": "Kopieren fehlgeschlagen",
+    "create": "[to be translated]:Create",
     "current": "Aktuell",
     "cut": "Ausschneiden",
     "dark_mode": "Dunkelmodus",
@@ -3764,9 +3821,46 @@
         "use_sandpack_help": "Verwenden Sie CodeSandbox Sandpack für React-Artefakte. Ermöglicht NPM-Abhängigkeiten, Hot Reload und bessere Fehlerbehandlung. Deaktivieren Sie es für einfache Babel-Nur-Transpilation."
       },
       "required": "Erforderlich",
+      "runtime": {
+        "advanced": "[to be translated]:Advanced",
+        "allow_custom_bundler": "[to be translated]:Allow Custom Bundler URL",
+        "allow_dynamic_deps": "[to be translated]:Allow Dynamic Dependencies",
+        "allow_external_resources": "[to be translated]:Allow External Resources",
+        "basic": "[to be translated]:Basic",
+        "profile": "[to be translated]:Capability Profile",
+        "profile_help": "[to be translated]:Basic locks runtime controls, Standard enables managed controls, and Advanced enables full runtime configuration.",
+        "standard": "[to be translated]:Standard",
+        "title": "[to be translated]:Runtime Profile"
+      },
       "storage_limit": "Speicherlimit",
       "storage_limit_help": "Maximale Anzahl an Artefakten zum Speichern. Ältere Artefakte werden automatisch entfernt.",
       "storage_title": "Lagerung",
+      "studio": {
+        "allow_conversation_override": "[to be translated]:Allow Conversation Overrides",
+        "allow_project_override": "[to be translated]:Allow Project Overrides",
+        "auto_create_knowledge_bridge": "[to be translated]:Auto-create knowledge bridge",
+        "context_section": "[to be translated]:Context",
+        "default_context_strategy": "[to be translated]:Default Context Strategy",
+        "default_knowledge_bases": "[to be translated]:Default Knowledge Bases",
+        "default_max_tokens": "[to be translated]:Default Max Tokens",
+        "default_model": "[to be translated]:Default Model",
+        "default_model_placeholder": "[to be translated]:Select a model for Artifact Studio",
+        "default_model_seeded_hint": "[to be translated]:Detected app default model",
+        "default_skill_mode": "[to be translated]:Default Skill Mode",
+        "default_skill_strategy": "[to be translated]:Default Skill Strategy",
+        "default_stream_output": "[to be translated]:Default Stream Output",
+        "default_temperature": "[to be translated]:Default Temperature",
+        "default_top_p": "[to be translated]:Default Top P",
+        "description": "[to be translated]:Configure default behavior for Artifact Studio agent sessions. These settings apply globally unless overridden by project or conversation-level configuration.",
+        "knowledge_section": "[to be translated]:Knowledge",
+        "model_and_generation": "[to be translated]:Model & Generation",
+        "model_and_generation_desc": "[to be translated]:These defaults are used when the Artifact Studio agent or project context does not specify overrides.",
+        "open_agent_settings": "[to be translated]:Open Artifact Agent Settings",
+        "override_policy": "[to be translated]:Override Policy",
+        "override_policy_desc": "[to be translated]:Control whether conversation and project-level settings can override studio defaults.",
+        "skills_section": "[to be translated]:Skills",
+        "title": "[to be translated]:Artifact Studio Governance"
+      },
       "title": "Artefakte",
       "types_help": "Wählen Sie aus, welche Arten von Artefakten generiert werden sollen. HTMX ist immer aktiviert.",
       "types_title": "Artefaktarten"
@@ -3831,6 +3925,9 @@
         "truncate_middle": "Erster und Letzter behalten"
       },
       "useInherited": "Standard verwenden"
+    },
+    "context_strategy": {
+      "title": "[to be translated]:Context strategy"
     },
     "data": {
       "app_data": {
@@ -4600,6 +4697,9 @@
       },
       "title": "Mathematikformel-Einstellungen"
     },
+    "max_tokens": {
+      "label": "[to be translated]:Max Tokens"
+    },
     "mcp": {
       "actions": "Aktionen",
       "active": "Aktivieren",
@@ -5018,6 +5118,7 @@
       },
       "default_assistant_model": "Standard-Assistent-Modell",
       "default_assistant_model_description": "Modell für neue Assistenten. Wird verwendet, wenn Assistent kein Modell hat.",
+      "default_model": "[to be translated]:Model",
       "empty": "Kein Modell",
       "manage": {
         "add_listed": {
@@ -5451,6 +5552,21 @@
       "zoom_out": "Oberfläche verkleinern",
       "zoom_reset": "Zoom zurücksetzen"
     },
+    "skill": {
+      "manage": {
+        "active_skills": "[to be translated]:Selected skills"
+      },
+      "matching": {
+        "strategy": "[to be translated]:Skill strategy",
+        "title": "[to be translated]:Skill availability"
+      }
+    },
+    "stream_output": {
+      "label": "[to be translated]:Stream Output"
+    },
+    "temperature": {
+      "label": "[to be translated]:Temperature"
+    },
     "theme": {
       "color_primary": "Theme-Farbe",
       "dark": "Dunkel",
@@ -5747,6 +5863,9 @@
         "url_required": "URL eingeben"
       }
     },
+    "top_p": {
+      "label": "[to be translated]:Top P"
+    },
     "topic": {
       "pin_to_top": "Thema anpinnen",
       "position": {
@@ -5822,6 +5941,7 @@
   },
   "title": {
     "apps": "Mini-Apps",
+    "artifacts": "[to be translated]:Artifact Studio",
     "code": "Code",
     "files": "Datei",
     "home": "Startseite",

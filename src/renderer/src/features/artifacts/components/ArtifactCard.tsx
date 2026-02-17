@@ -14,8 +14,8 @@ import {
   Html5Outlined,
   RightOutlined
 } from '@ant-design/icons'
-import { TopicManager } from '@renderer/hooks/useTopic'
-import type { Message } from '@renderer/types/newMessage'
+import { loggerService } from '@logger'
+import { openArtifactStudioFromChat } from '@renderer/features/artifacts/utils/studioNavigation'
 import { message, Tooltip } from 'antd'
 import { Sparkles } from 'lucide-react'
 import type { FC } from 'react'
@@ -25,6 +25,8 @@ import { useNavigate } from 'react-router-dom'
 import styled from 'styled-components'
 
 import type { ArtifactType, ParsedArtifact } from '../types'
+
+const logger = loggerService.withContext('ArtifactCard')
 
 interface ArtifactCardProps {
   /** Parsed artifact data */
@@ -43,6 +45,7 @@ interface ArtifactCardProps {
 function getArtifactIcon(type: ArtifactType): React.ReactNode {
   switch (type) {
     case 'html':
+    case 'xhtml':
     case 'htmx':
       return <Html5Outlined />
     case 'react':
@@ -66,6 +69,7 @@ function getArtifactIcon(type: ArtifactType): React.ReactNode {
 function getArtifactColor(type: ArtifactType): string {
   switch (type) {
     case 'html':
+    case 'xhtml':
     case 'htmx':
       return '#e34c26' // HTML orange
     case 'react':
@@ -90,6 +94,8 @@ function getArtifactTypeLabel(type: ArtifactType): string {
   switch (type) {
     case 'html':
       return 'HTML'
+    case 'xhtml':
+      return 'XHTML'
     case 'htmx':
       return 'HTMX'
     case 'react':
@@ -118,38 +124,19 @@ const ArtifactCard: FC<ArtifactCardProps> = ({ artifact, conversationId, message
   const typeLabel = useMemo(() => getArtifactTypeLabel(artifact.type), [artifact.type])
   const typeIcon = useMemo(() => getArtifactIcon(artifact.type), [artifact.type])
 
-  // Generate artifact ID from identifier or create one
-  const artifactId = useMemo(() => {
-    return encodeURIComponent(artifact.identifier)
-  }, [artifact.identifier])
-
   // Handle opening the artifact in the mini-app page
   const handleOpen = useCallback(async () => {
-    // Fetch context messages from the conversation for refinement context
-    let contextMessages: Message[] = []
     try {
-      if (conversationId && !conversationId.startsWith('inline-')) {
-        // Fetch the last 5 messages from the conversation for context
-        const messages = await TopicManager.getTopicMessages(conversationId)
-        // Take the last 5 messages for context
-        contextMessages = messages.slice(-5)
-      }
+      await openArtifactStudioFromChat({
+        artifact,
+        conversationId,
+        messageId,
+        navigate
+      })
     } catch (error) {
-      console.warn('Failed to fetch context messages:', error)
+      logger.warn('Failed to open Artifact Studio from ArtifactCard', error as Error)
     }
-
-    // Store artifact data in sessionStorage for the artifact page to retrieve
-    const artifactData = {
-      artifact,
-      conversationId,
-      messageId,
-      contextMessages
-    }
-    sessionStorage.setItem(`artifact:${artifactId}`, JSON.stringify(artifactData))
-
-    // Navigate to artifact page
-    navigate(`/artifacts/${artifactId}`)
-  }, [navigate, artifactId, artifact, conversationId, messageId])
+  }, [artifact, conversationId, messageId, navigate])
 
   // Handle copying artifact content
   const handleCopy = useCallback(

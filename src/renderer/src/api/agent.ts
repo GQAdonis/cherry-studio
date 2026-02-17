@@ -144,6 +144,13 @@ export class AgentApiClient {
       }
       return data
     } catch (error) {
+      if (isAxiosError(error) && error.response?.status === 404) {
+        logger.warn(`Agent not found: ${id}`)
+        const result = AgentServerErrorSchema.safeParse(error.response?.data)
+        if (result.success) {
+          throw new Error(formatAgentServerError(result.data))
+        }
+      }
       throw processError(error, 'Failed to get agent.')
     }
   }
@@ -210,6 +217,13 @@ export class AgentApiClient {
       }
       return data
     } catch (error) {
+      if (isAxiosError(error) && error.response?.status === 404) {
+        logger.warn(`Session not found: ${agentId}/${sessionId}`)
+        const result = AgentServerErrorSchema.safeParse(error.response?.data)
+        if (result.success) {
+          throw new Error(formatAgentServerError(result.data))
+        }
+      }
       throw processError(error, 'Failed to get session.')
     }
   }

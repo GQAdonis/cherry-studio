@@ -87,6 +87,14 @@ function getTypeSpecificInstructions(type: Artifact['type']): string {
 - You have access to localStorage and sessionStorage
 - You can make fetch() requests to external APIs`
 
+    case 'xhtml':
+      return `### XHTML Specific Rules
+
+- Return a complete XHTML document with \`<html xmlns="http://www.w3.org/1999/xhtml">\`
+- Ensure tags are properly closed and XML well-formed
+- Use semantic markup and keep scripts/styles inline unless explicitly requested
+- Do not output malformed XML or duplicate root nodes`
+
     case 'htmx':
       return `### HTMX Specific Rules
 
@@ -102,10 +110,13 @@ function getTypeSpecificInstructions(type: Artifact['type']): string {
     case 'react':
       return `### React Specific Rules
 
+- Use **TypeScript (TSX)** as the default language for all React artifacts
 - Define a component named \`App\` as the entry point
 - Use React hooks (\`useState\`, \`useEffect\`, \`useMemo\`, \`useCallback\`, etc.)
 - Use Tailwind CSS className utilities for styling
 - The component is automatically rendered via \`ReactDOM.createRoot()\`
+- Add proper TypeScript types for props, state, and event handlers
+- Use \`React.FC\`, \`React.ChangeEvent\`, \`React.MouseEvent\`, etc. for typing
 
 #### Available NPM Packages (Pre-installed)
 
@@ -142,18 +153,24 @@ You can import and use these packages directly:
 - \`fetch()\` for API requests
 - \`navigator\` APIs (geolocation, clipboard, etc.)
 
-#### Example with Dependencies
-\`\`\`jsx
+#### Example with Dependencies (TypeScript/TSX)
+\`\`\`tsx
 import { useState } from 'react';
 import { Search } from 'lucide-react';
 import axios from 'axios';
 
-export default function App() {
-  const [query, setQuery] = useState('');
+interface SearchResult {
+  id: string;
+  title: string;
+}
 
-  const handleSearch = async () => {
-    const response = await axios.get(\`/api/search?q=\${query}\`);
-    // handle response
+export default function App(): React.JSX.Element {
+  const [query, setQuery] = useState<string>('');
+  const [results, setResults] = useState<SearchResult[]>([]);
+
+  const handleSearch = async (): Promise<void> => {
+    const response = await axios.get<SearchResult[]>(\`/api/search?q=\${query}\`);
+    setResults(response.data);
   };
 
   return (
@@ -161,7 +178,7 @@ export default function App() {
       <div className="flex gap-2">
         <input
           value={query}
-          onChange={(e) => setQuery(e.target.value)}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setQuery(e.target.value)}
           className="border rounded px-3 py-2"
         />
         <button onClick={handleSearch} className="bg-blue-500 text-white px-4 py-2 rounded">
@@ -233,10 +250,11 @@ ${artifact.content}
 function getLanguageFromType(type: Artifact['type']): string {
   switch (type) {
     case 'html':
+    case 'xhtml':
     case 'htmx':
       return 'html'
     case 'react':
-      return 'jsx'
+      return 'tsx'
     case 'svg':
       return 'xml'
     case 'mermaid':

@@ -152,6 +152,11 @@
         },
         "title": "進階設定"
       },
+      "context": {
+        "description": "[to be translated]:Control how this agent/session manages long context windows before model limits are reached.",
+        "title": "[to be translated]:Context Management",
+        "useGlobal": "[to be translated]:Use Global Default"
+      },
       "essential": "必要設定",
       "permissionMode": {
         "tab": "權限模式",
@@ -223,6 +228,15 @@
         "uninstalling": "解除安裝中..."
       },
       "prompt": "提示設定",
+      "skills": {
+        "description": "[to be translated]:Configure skill availability and intent strategy for this agent/session scope.",
+        "helper": "[to be translated]:Set scoped skill availability and intent strategy for this agent.",
+        "mode": "[to be translated]:Availability",
+        "selected": "[to be translated]:Selected Skills",
+        "selectedPlaceholder": "[to be translated]:Choose skills for this scope",
+        "strategy": "[to be translated]:Intent Strategy",
+        "title": "[to be translated]:Skills"
+      },
       "tooling": {
         "mcp": {
           "description": "連線 MCP 伺服器即可解鎖更多可在上方預先授權的工具。",
@@ -526,6 +540,8 @@
     "zoomOut": "縮小"
   },
   "artifacts": {
+    "archive": "[to be translated]:Archive",
+    "artifact_chat": "[to be translated]:Artifact Chat",
     "attach_image": "附加圖片",
     "change_model": "點擊以更改模型",
     "click_to_open": "點擊以打開文物",
@@ -533,14 +549,22 @@
     "console": "控制台",
     "description_help": "用於在您的圖書館中搜索文物",
     "description_placeholder": "這件文物有什麼作用？",
+    "download_package": "[to be translated]:Download package",
     "generating": "生成工件...",
+    "hide_archived": "[to be translated]:Active",
+    "knowledge_bridge": "[to be translated]:Create knowledge bridge from chat history",
     "library": "文物圖書館",
     "model_locked": "模型選擇已鎖定",
     "new_artifact": "新神器",
+    "new_project_setup": "[to be translated]:New Artifact Studio Project",
     "no_artifacts": "未找到任何文物",
     "open_artifact": "開啟文物",
+    "open_studio": "[to be translated]:Artifact Studio",
     "preview": "預覽",
     "preview_type": "類型",
+    "project_name_placeholder": "[to be translated]:Marketing landing page",
+    "projects_title": "[to be translated]:Artifact Studio Projects",
+    "rebind_source": "[to be translated]:Rebind Source",
     "refinement": "精緻聊天",
     "refinement_empty": "尚未收到任何消息",
     "refinement_hint": "請求 AI 修改這個文物",
@@ -548,6 +572,8 @@
     "save_from_modal": "打開文物以保存它",
     "save_to_library": "保存到資料庫",
     "saved": "文物已保存至資料庫",
+    "show_archived": "[to be translated]:Archived",
+    "source": "[to be translated]:Source",
     "split": "分裂",
     "tags_placeholder": "添加標籤...",
     "title": "文物",
@@ -561,6 +587,7 @@
       "react": "React",
       "svg": "SVG"
     },
+    "updated_at": "[to be translated]:Updated",
     "version": "版本",
     "view": {
       "code": "代碼",
@@ -576,6 +603,12 @@
     },
     "copy": {
       "title": "複製助手"
+    },
+    "create": {
+      "settings": {
+        "description": "[to be translated]:Apply skill and context defaults before creating this assistant.",
+        "title": "[to be translated]:Creation Settings"
+      }
     },
     "delete": {
       "content": "刪除助手會刪除所有該助手下的話題和檔案，確定要繼續嗎？",
@@ -759,6 +792,17 @@
         "title": "常用短語",
         "titleLabel": "標題",
         "titlePlaceholder": "輸入標題"
+      },
+      "skills": {
+        "custom": "[to be translated]:Use Custom Policy",
+        "custom_info": "[to be translated]:Custom skill policy overrides global defaults for this assistant. Conversation settings can still override assistant scope.",
+        "description": "[to be translated]:Control skill availability and intent classification strategy for this assistant. Conversation-level settings can still override this.",
+        "mode": "[to be translated]:Availability",
+        "selected": "[to be translated]:Selected Skills",
+        "selected_placeholder": "[to be translated]:Choose skills available to this assistant",
+        "strategy": "[to be translated]:Intent Strategy",
+        "title": "[to be translated]:Skills",
+        "use_global": "[to be translated]:Use Global Default"
       },
       "title": "助手設定",
       "tool_use_mode": {
@@ -1281,6 +1325,16 @@
         "placeholder": "搜尋話題...",
         "title": "搜尋"
       },
+      "skill_scope": {
+        "all": "全部技能",
+        "label": "技能範圍",
+        "no_skills": "目前沒有可用技能",
+        "none": "停用技能",
+        "selected": "已選技能（{{count}}）",
+        "strategy": "意圖策略",
+        "strategy_inherit": "繼承全域",
+        "use_assistant": "使用助手預設"
+      },
       "title": "話題",
       "unpin": "取消固定"
     },
@@ -1373,6 +1427,7 @@
     "advanced_settings": "進階設定",
     "agent_one": "智能體",
     "agent_other": "智能體",
+    "all": "[to be translated]:All",
     "and": "與",
     "assistant": "智慧智能體",
     "assistant_one": "助手",
@@ -1385,6 +1440,7 @@
     "clear": "清除",
     "clear_all": "全部清除",
     "click_to_replace": "點擊以替換",
+    "clone": "[to be translated]:Clone",
     "close": "關閉",
     "collapse": "收合",
     "completed": "已完成",
@@ -1392,6 +1448,7 @@
     "copied": "已複製",
     "copy": "複製",
     "copy_failed": "複製失敗",
+    "create": "[to be translated]:Create",
     "current": "目前",
     "cut": "剪下",
     "dark_mode": "深色模式",
@@ -3764,9 +3821,46 @@
         "use_sandpack_help": "使用 CodeSandbox Sandpack 來處理 React 藝術品。啟用 NPM 依賴、熱重載和更好的錯誤處理。對於簡單的僅 Babel 轉譯，請禁用此功能。"
       },
       "required": "必要",
+      "runtime": {
+        "advanced": "進階",
+        "allow_custom_bundler": "允許自訂 Bundler URL",
+        "allow_dynamic_deps": "允許動態相依套件",
+        "allow_external_resources": "允許外部資源",
+        "basic": "基礎",
+        "profile": "能力設定檔",
+        "profile_help": "基礎檔會鎖定執行階段控制，標準檔啟用受控設定，進階檔啟用完整執行階段設定。",
+        "standard": "標準",
+        "title": "執行階段設定"
+      },
       "storage_limit": "儲存限制",
       "storage_limit_help": "可存儲的最大工件數量。舊的工件將被自動移除。",
       "storage_title": "儲存",
+      "studio": {
+        "allow_conversation_override": "允許對話層級覆蓋",
+        "allow_project_override": "允許專案層級覆蓋",
+        "auto_create_knowledge_bridge": "自動建立知識橋接",
+        "context_section": "上下文",
+        "default_context_strategy": "預設上下文策略",
+        "default_knowledge_bases": "預設知識庫",
+        "default_max_tokens": "預設最大令牌數",
+        "default_model": "預設模型",
+        "default_model_placeholder": "選擇 Artifact Studio 的模型",
+        "default_model_seeded_hint": "偵測到應用程式預設模型",
+        "default_skill_mode": "預設技能模式",
+        "default_skill_strategy": "預設技能策略",
+        "default_stream_output": "預設串流輸出",
+        "default_temperature": "預設溫度",
+        "default_top_p": "預設 Top P",
+        "description": "配置 Artifact Studio 代理會話的預設行為。這些設定全域套用,除非被專案或對話層級配置覆蓋。",
+        "knowledge_section": "知識",
+        "model_and_generation": "模型與生成",
+        "model_and_generation_desc": "當 Artifact Studio 代理或專案上下文未指定覆蓋時,使用這些預設值。",
+        "open_agent_settings": "開啟 Artifact 代理設定",
+        "override_policy": "覆蓋策略",
+        "override_policy_desc": "控制對話和專案層級設定是否可以覆蓋工作室預設值。",
+        "skills_section": "技能",
+        "title": "Artifact Studio 治理"
+      },
       "title": "文物",
       "types_help": "選擇應該生成哪種類型的工件。HTMX始終啟用。",
       "types_title": "文物類型"
@@ -3831,6 +3925,9 @@
         "truncate_middle": "保留首尾"
       },
       "useInherited": "使用預設"
+    },
+    "context_strategy": {
+      "title": "[to be translated]:Context strategy"
     },
     "data": {
       "app_data": {
@@ -4600,6 +4697,9 @@
       },
       "title": "數學公式設定"
     },
+    "max_tokens": {
+      "label": "[to be translated]:Max Tokens"
+    },
     "mcp": {
       "actions": "操作",
       "active": "啟用",
@@ -5018,6 +5118,7 @@
       },
       "default_assistant_model": "預設助手模型",
       "default_assistant_model_description": "建立新助手時使用的模型，如果助手未設定模型，則使用此模型",
+      "default_model": "[to be translated]:Model",
       "empty": "找不到模型",
       "manage": {
         "add_listed": {
@@ -5451,6 +5552,21 @@
       "zoom_out": "縮小介面",
       "zoom_reset": "重設縮放"
     },
+    "skill": {
+      "manage": {
+        "active_skills": "[to be translated]:Selected skills"
+      },
+      "matching": {
+        "strategy": "[to be translated]:Skill strategy",
+        "title": "[to be translated]:Skill availability"
+      }
+    },
+    "stream_output": {
+      "label": "[to be translated]:Stream Output"
+    },
+    "temperature": {
+      "label": "[to be translated]:Temperature"
+    },
     "theme": {
       "color_primary": "主題顏色",
       "dark": "深色",
@@ -5747,6 +5863,9 @@
         "url_required": "需要輸入 URL"
       }
     },
+    "top_p": {
+      "label": "[to be translated]:Top P"
+    },
     "topic": {
       "pin_to_top": "固定話題置頂",
       "position": {
@@ -5822,6 +5941,7 @@
   },
   "title": {
     "apps": "小程式",
+    "artifacts": "[to be translated]:Artifact Studio",
     "code": "程式碼",
     "files": "檔案",
     "home": "首頁",

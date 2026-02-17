@@ -554,4 +554,50 @@ describe('Claude → AiSDK transform', () => {
       action: 'summarized'
     })
   })
+
+  it('emits artifact.lifecycle started chunk on system init', () => {
+    const state = new ClaudeStreamState({ agentSessionId: baseStreamMetadata.session_id })
+
+    const initMessage = {
+      ...baseStreamMetadata,
+      type: 'system',
+      uuid: uuid(42),
+      subtype: 'init',
+      session_id: baseStreamMetadata.session_id
+    } as unknown as SDKMessage
+
+    const parts = transformSDKMessageToStreamParts(initMessage, state) as Array<Record<string, any>>
+    const dataPart = parts.find((part) => part.type === 'data')
+
+    expect(dataPart?.data).toMatchObject({
+      type: 'artifact.lifecycle',
+      stage: 'started'
+    })
+  })
+
+  it('emits artifact.lifecycle completed chunk on success result', () => {
+    const state = new ClaudeStreamState({ agentSessionId: baseStreamMetadata.session_id })
+
+    const successMessage = {
+      ...baseStreamMetadata,
+      type: 'result',
+      uuid: uuid(43),
+      subtype: 'success',
+      num_turns: 1,
+      duration_ms: 20,
+      total_cost_usd: 0,
+      usage: {
+        input_tokens: 1,
+        output_tokens: 1
+      }
+    } as unknown as SDKMessage
+
+    const parts = transformSDKMessageToStreamParts(successMessage, state) as Array<Record<string, any>>
+    const dataPart = parts.find((part) => part.type === 'data')
+
+    expect(dataPart?.data).toMatchObject({
+      type: 'artifact.lifecycle',
+      stage: 'completed'
+    })
+  })
 })

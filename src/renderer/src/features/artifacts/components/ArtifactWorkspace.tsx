@@ -3,6 +3,8 @@
  *
  * Main workspace area for artifact viewing and editing with:
  * - Toolbar with view mode tabs (Preview | Code | Split)
+ * - Version timeline navigation
+ * - Compilation status indicator
  * - Theme toggle, refresh, copy, save buttons
  * - Main area with ArtifactRenderer or code editor based on view mode
  */
@@ -25,20 +27,26 @@ import {
   saveArtifactToLibrary,
   selectCanRedo,
   selectCanUndo,
+  selectCompilationError,
+  selectCompilationStatus,
+  selectIsCodeStreaming,
   setViewMode,
   undo,
   updateContent
 } from '@renderer/store/artifacts'
 import { message, Segmented, Space, Tooltip } from 'antd'
+import { AlertCircle, CheckCircle2, Loader2 } from 'lucide-react'
 import type { FC } from 'react'
 import { memo, useCallback, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import styled from 'styled-components'
+import styled, { keyframes } from 'styled-components'
 
+import { useCompilationErrorHandler } from '../hooks/useCompilationErrorHandler'
 import type { Artifact, ViewMode } from '../types'
 import { getArtifactExtension } from '../types'
 import ArtifactCodeEditor from './ArtifactCodeEditor'
 import ArtifactRenderer from './ArtifactRenderer'
+import VersionTimeline from './VersionTimeline'
 
 interface ArtifactWorkspaceProps {
   /** The artifact to display */
@@ -59,9 +67,16 @@ const ArtifactWorkspace: FC<ArtifactWorkspaceProps> = ({ artifact, viewMode, htm
 
   const canUndo = useAppSelector(selectCanUndo)
   const canRedo = useAppSelector(selectCanRedo)
+  const compilationStatus = useAppSelector(selectCompilationStatus)
+  const compilationError = useAppSelector(selectCompilationError)
+  const isCodeStreaming = useAppSelector(selectIsCodeStreaming)
 
   const [refreshKey, setRefreshKey] = useState(0)
   const codeEditorRef = useRef<{ getValue: () => string } | null>(null)
+
+  // Compilation error auto-fix handler
+  // Note: onSendAutoFix will be wired up when the refinement hook is accessible here
+  const { handleCompilationError, handleCompilationSuccess } = useCompilationErrorHandler()
 
   // Handle view mode change
   const handleViewModeChange = useCallback(
@@ -164,6 +179,8 @@ const ArtifactWorkspace: FC<ArtifactWorkspaceProps> = ({ artifact, viewMode, htm
         interactive={true}
         width="100%"
         height="100%"
+        onReady={handleCompilationSuccess}
+        onError={(error) => handleCompilationError({ message: error.message, line: error.line, column: error.column })}
       />
     </PreviewPane>
   )
@@ -198,6 +215,11 @@ const ArtifactWorkspace: FC<ArtifactWorkspaceProps> = ({ artifact, viewMode, htm
 
             <ToolbarDivider />
 
+            {/* Version Timeline */}
+            <VersionTimeline />
+
+            <ToolbarDivider />
+
             <Tooltip title={t('common.refresh')}>
               <ToolbarButton onClick={handleRefresh}>
                 <ReloadOutlined />
@@ -222,6 +244,30 @@ const ArtifactWorkspace: FC<ArtifactWorkspaceProps> = ({ artifact, viewMode, htm
         </ToolbarRight>
       </Toolbar>
 
+      {/* Compilation Status Bar */}
+      {compilationStatus !== 'idle' && !isCodeStreaming && (
+        <CompilationStatusBar $status={compilationStatus}>
+          {compilationStatus === 'compiling' && (
+            <>
+              <SpinningLoader size={14} />
+              <span>Compiling…</span>
+            </>
+          )}
+          {compilationStatus === 'success' && (
+            <>
+              <CheckCircle2 size={14} />
+              <span>Compiled successfully</span>
+            </>
+          )}
+          {compilationStatus === 'error' && (
+            <>
+              <AlertCircle size={14} />
+              <span>{compilationError || 'Compilation error'}</span>
+            </>
+          )}
+        </CompilationStatusBar>
+      )}
+
       {/* Main Content Area */}
       <ContentArea>
         {viewMode === 'preview' && renderPreview()}
@@ -238,7 +284,19 @@ const ArtifactWorkspace: FC<ArtifactWorkspaceProps> = ({ artifact, viewMode, htm
   )
 }
 
-// Styled components
+// ── Animations ──────────────────────────────────────────────────────────────
+
+const spin = keyframes`
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+`
+
+const SpinningLoader = styled(Loader2)`
+  animation: ${spin} 1s linear infinite;
+`
+
+// ── Styled Components ───────────────────────────────────────────────────────
+
 const Container = styled.div`
   display: flex;
   flex-direction: column;
@@ -296,6 +354,42 @@ const ToolbarDivider = styled.div`
   height: 20px;
   margin: 0 8px;
   background: var(--color-border);
+`
+
+const CompilationStatusBar = styled.div<{ $status: string }>`
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 16px;
+  font-size: 12px;
+  font-weight: 500;
+  flex-shrink: 0;
+  transition: all 0.2s ease;
+
+  ${(props) => {
+    switch (props.$status) {
+      case 'compiling':
+        return `
+          background: var(--color-info-soft, rgba(59, 130, 246, 0.08));
+          color: var(--color-info, #3b82f6);
+          border-bottom: 1px solid var(--color-info-border, rgba(59, 130, 246, 0.15));
+        `
+      case 'success':
+        return `
+          background: var(--color-success-soft, rgba(34, 197, 94, 0.08));
+          color: var(--color-success, #22c55e);
+          border-bottom: 1px solid var(--color-success-border, rgba(34, 197, 94, 0.15));
+        `
+      case 'error':
+        return `
+          background: var(--color-error-soft, rgba(239, 68, 68, 0.08));
+          color: var(--color-error, #ef4444);
+          border-bottom: 1px solid var(--color-error-border, rgba(239, 68, 68, 0.15));
+        `
+      default:
+        return ''
+    }
+  }}
 `
 
 const ContentArea = styled.div`

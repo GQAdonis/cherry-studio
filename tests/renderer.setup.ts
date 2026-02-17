@@ -1,4 +1,5 @@
 import '@testing-library/jest-dom/vitest'
+import 'fake-indexeddb/auto'
 
 import { createRequire } from 'node:module'
 import { styleSheetSerializer } from 'jest-styled-components/serializer'

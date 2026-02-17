@@ -26,8 +26,11 @@ import type {
   Artifact,
   ArtifactError,
   ArtifactMetadata,
+  ArtifactProjectContextEnvelope,
+  ArtifactProjectRuntimeResolvedContext,
   ArtifactsState,
   ArtifactStatus,
+  CompilationStatus,
   ContextMessage,
   ParsedArtifact,
   RefinementMessage,
@@ -47,13 +50,21 @@ const initialState: ArtifactsState = {
   isRefining: false,
   isArtifactStreaming: false, // Whether artifact content is currently being streamed
   streamingArtifactContent: null, // Partial artifact content during streaming for code view
+  isCodeStreaming: false, // Whether studio code is actively streaming via <cs-studio-code> protocol
+  compilationStatus: 'idle', // Current compilation status for the preview
+  compilationError: null, // Compilation error message
+  autoFixAttempts: 0, // Number of auto-fix attempts in current refinement turn
   versionHistory: [],
   currentVersionIndex: -1,
   isLoading: false,
   error: null,
   htmxServerPort: null,
   parentModelId: null, // Model ID from parent conversation for refinement
-  contextMessages: [] // Context from original conversation
+  contextMessages: [], // Context from original conversation
+  activeProjectId: null,
+  activeStudioSessionId: null,
+  activeProjectContextEnvelope: null,
+  activeProjectResolvedContext: null
 }
 
 /**
@@ -128,16 +139,19 @@ export const saveVersion = createAsyncThunk(
       newContent: string
       refinementPrompt?: string
     },
-    { rejectWithValue }
+    { rejectWithValue, getState }
   ) => {
     try {
+      const state = getState() as { artifacts: ArtifactsState }
+
       // Save current content as a version
       const version = createArtifactVersion({
         artifactId: artifact.id,
         version: artifact.version,
         content: artifact.content,
         refinementPrompt,
-        metadata: artifact.metadata
+        metadata: artifact.metadata,
+        chatSnapshot: state.artifacts.refinementMessages
       })
       await saveArtifactVersion(version)
 
@@ -176,10 +190,19 @@ const artifactsSlice = createSlice({
         parsedArtifact: ParsedArtifact
         conversationId: string
         messageId: string
+        artifactProjectId?: string
         contextMessages?: ContextMessage[]
+        contextEnvelope?: ArtifactProjectContextEnvelope
       }>
     ) => {
-      const { parsedArtifact, conversationId, messageId, contextMessages = [] } = action.payload
+      const {
+        parsedArtifact,
+        conversationId,
+        messageId,
+        artifactProjectId,
+        contextMessages = [],
+        contextEnvelope
+      } = action.payload
 
       // Create artifact from parsed data
       const artifact = createArtifactRecord({
@@ -189,6 +212,7 @@ const artifactsSlice = createSlice({
         content: parsedArtifact.content,
         conversationId,
         messageId,
+        artifactProjectId,
         metadata: {
           ...DEFAULT_ARTIFACT_METADATA,
           tailwind: parsedArtifact.attributes.tailwind !== 'false',
@@ -207,6 +231,9 @@ const artifactsSlice = createSlice({
       state.currentVersionIndex = -1
       state.error = null
       state.contextMessages = contextMessages
+      state.parentModelId = null
+      state.activeProjectId = artifactProjectId || null
+      state.activeProjectContextEnvelope = contextEnvelope || null
     },
 
     /**
@@ -218,6 +245,8 @@ const artifactsSlice = createSlice({
       state.viewMode = 'preview'
       state.refinementMessages = []
       state.error = null
+      state.parentModelId = null
+      state.activeProjectId = action.payload.artifactProjectId || action.payload.metadata?.artifactProjectId || null
     },
 
     /**
@@ -230,9 +259,18 @@ const artifactsSlice = createSlice({
       state.isRefining = false
       state.isArtifactStreaming = false
       state.streamingArtifactContent = null
+      state.isCodeStreaming = false
+      state.compilationStatus = 'idle'
+      state.compilationError = null
+      state.autoFixAttempts = 0
       state.versionHistory = []
       state.currentVersionIndex = -1
       state.error = null
+      state.parentModelId = null
+      state.activeProjectId = null
+      state.activeStudioSessionId = null
+      state.activeProjectContextEnvelope = null
+      state.activeProjectResolvedContext = null
     },
 
     /**
@@ -333,6 +371,11 @@ const artifactsSlice = createSlice({
         contextActions?: RefinementMessage['contextActions']
         // Artifact lifecycle
         artifactLifecycle?: RefinementMessage['artifactLifecycle']
+        // PMPO diagnostics
+        pmpoPhases?: RefinementMessage['pmpoPhases']
+        // Strategy diagnostics
+        contextStrategy?: RefinementMessage['contextStrategy']
+        skillStrategy?: RefinementMessage['skillStrategy']
       }>
     ) => {
       const message = state.refinementMessages.find((m) => m.id === action.payload.id)
@@ -353,6 +396,13 @@ const artifactsSlice = createSlice({
      */
     clearRefinementMessages: (state) => {
       state.refinementMessages = []
+    },
+
+    /**
+     * Hydrate persisted refinement messages for studio reopen.
+     */
+    setRefinementMessages: (state, action: PayloadAction<RefinementMessage[]>) => {
+      state.refinementMessages = action.payload
     },
 
     /**
@@ -421,6 +471,20 @@ const artifactsSlice = createSlice({
     },
 
     /**
+     * Hydrate persisted version navigation state for studio reopen.
+     */
+    setVersionHistoryState: (
+      state,
+      action: PayloadAction<{
+        versionHistory: ArtifactsState['versionHistory']
+        currentVersionIndex: number
+      }>
+    ) => {
+      state.versionHistory = action.payload.versionHistory
+      state.currentVersionIndex = action.payload.currentVersionIndex
+    },
+
+    /**
      * Set error state
      */
     setError: (state, action: PayloadAction<ArtifactError | null>) => {
@@ -455,6 +519,74 @@ const artifactsSlice = createSlice({
      */
     setParentModelId: (state, action: PayloadAction<string | null>) => {
       state.parentModelId = action.payload
+    },
+
+    setActiveProjectId: (state, action: PayloadAction<string | null>) => {
+      state.activeProjectId = action.payload
+      if (state.activeArtifact) {
+        state.activeArtifact.artifactProjectId = action.payload || undefined
+        state.activeArtifact.metadata = {
+          ...state.activeArtifact.metadata,
+          artifactProjectId: action.payload || undefined
+        }
+      }
+    },
+
+    setActiveStudioSessionId: (state, action: PayloadAction<string | null>) => {
+      state.activeStudioSessionId = action.payload
+    },
+
+    setActiveProjectContextEnvelope: (state, action: PayloadAction<ArtifactProjectContextEnvelope | null>) => {
+      state.activeProjectContextEnvelope = action.payload
+    },
+
+    setActiveProjectResolvedContext: (state, action: PayloadAction<ArtifactProjectRuntimeResolvedContext | null>) => {
+      state.activeProjectResolvedContext = action.payload
+    },
+
+    /**
+     * Set studio code streaming state (from <cs-studio-code> protocol)
+     */
+    setIsCodeStreaming: (state, action: PayloadAction<boolean>) => {
+      state.isCodeStreaming = action.payload
+      if (!action.payload) {
+        // When code streaming ends, reset auto-fix counter for next turn
+        state.autoFixAttempts = 0
+      }
+    },
+
+    /**
+     * Set compilation status from the preview iframe
+     */
+    setCompilationStatus: (state, action: PayloadAction<CompilationStatus>) => {
+      state.compilationStatus = action.payload
+      if (action.payload !== 'error') {
+        state.compilationError = null
+      }
+    },
+
+    /**
+     * Set compilation error message
+     */
+    setCompilationError: (state, action: PayloadAction<string | null>) => {
+      state.compilationError = action.payload
+      if (action.payload) {
+        state.compilationStatus = 'error'
+      }
+    },
+
+    /**
+     * Increment auto-fix attempt counter
+     */
+    incrementAutoFixAttempts: (state) => {
+      state.autoFixAttempts += 1
+    },
+
+    /**
+     * Reset auto-fix attempt counter
+     */
+    resetAutoFixAttempts: (state) => {
+      state.autoFixAttempts = 0
     }
   },
   extraReducers: (builder) => {
@@ -544,16 +676,27 @@ export const {
   addRefinementMessage,
   updateRefinementMessage,
   clearRefinementMessages,
+  setRefinementMessages,
   setIsRefining,
   setIsArtifactStreaming,
   updateStreamingArtifactContent,
+  setIsCodeStreaming,
+  setCompilationStatus,
+  setCompilationError,
+  incrementAutoFixAttempts,
+  resetAutoFixAttempts,
   undo,
   redo,
+  setVersionHistoryState,
   setError,
   setHtmxServerPort,
   setIsLoading,
   setArtifactStatus,
-  setParentModelId
+  setParentModelId,
+  setActiveProjectId,
+  setActiveStudioSessionId,
+  setActiveProjectContextEnvelope,
+  setActiveProjectResolvedContext
 } = artifactsSlice.actions
 
 export default artifactsSlice.reducer
@@ -578,3 +721,20 @@ export const selectHtmxServerPort = (state: { artifacts: ArtifactsState }) => st
 export const selectIsLoading = (state: { artifacts: ArtifactsState }) => state.artifacts.isLoading
 export const selectParentModelId = (state: { artifacts: ArtifactsState }) => state.artifacts.parentModelId
 export const selectContextMessages = (state: { artifacts: ArtifactsState }) => state.artifacts.contextMessages
+export const selectActiveProjectId = (state: { artifacts: ArtifactsState }) => state.artifacts.activeProjectId
+export const selectActiveStudioSessionId = (state: { artifacts: ArtifactsState }) =>
+  state.artifacts.activeStudioSessionId
+export const selectActiveProjectContextEnvelope = (state: { artifacts: ArtifactsState }) =>
+  state.artifacts.activeProjectContextEnvelope
+export const selectActiveProjectResolvedContext = (state: { artifacts: ArtifactsState }) =>
+  state.artifacts.activeProjectResolvedContext
+export const selectIsCodeStreaming = (state: { artifacts: ArtifactsState }) => state.artifacts.isCodeStreaming
+export const selectCompilationStatus = (state: { artifacts: ArtifactsState }) => state.artifacts.compilationStatus
+export const selectCompilationError = (state: { artifacts: ArtifactsState }) => state.artifacts.compilationError
+export const selectAutoFixAttempts = (state: { artifacts: ArtifactsState }) => state.artifacts.autoFixAttempts
+export const selectVersionNavigation = (state: { artifacts: ArtifactsState }) => ({
+  currentVersion: state.artifacts.currentVersionIndex + 1,
+  totalVersions: state.artifacts.versionHistory.length,
+  canGoBack: state.artifacts.currentVersionIndex > 0,
+  canGoForward: state.artifacts.currentVersionIndex < state.artifacts.versionHistory.length - 1
+})

@@ -1,3 +1,4 @@
+import { AppstoreOutlined } from '@ant-design/icons'
 import { loggerService } from '@logger'
 import SandpackReactRenderer from '@renderer/features/artifacts/components/SandpackReactRenderer'
 import { type Artifact, ArtifactStatus } from '@renderer/features/artifacts/types'
@@ -20,10 +21,11 @@ interface Props {
   title: string
   code: string
   onSave?: (code: string) => void
+  onOpenStudio?: () => void
   onClose: () => void
 }
 
-const ReactArtifactsPopup: FC<Props> = ({ open, title, code, onSave, onClose }) => {
+const ReactArtifactsPopup: FC<Props> = ({ open, title, code, onSave, onOpenStudio, onClose }) => {
   const { t } = useTranslation()
   const reactSettings = useAppSelector(selectArtifactReactSettings)
   const [viewMode, setViewMode] = useState<ViewMode>('split')
@@ -121,6 +123,11 @@ const ReactArtifactsPopup: FC<Props> = ({ open, title, code, onSave, onClose }) 
           <Tooltip title={t('chat.artifacts.button.openExternal')}>
             <Button type="text" icon={<Globe size={14} />} onClick={handleOpenExternal} size="small" />
           </Tooltip>
+          {onOpenStudio && (
+            <Button type="text" icon={<AppstoreOutlined />} onClick={onOpenStudio} size="small">
+              {t('artifacts.open_studio', 'Artifact Studio')}
+            </Button>
+          )}
           <Button
             type={showConsole ? 'primary' : 'text'}
             icon={<Terminal size={14} />}

@@ -33,6 +33,19 @@ interface ArtifactChatPanelProps {
 const logger = loggerService.withContext('ArtifactChatPanel')
 
 /**
+ * Strip `<cs-studio-code>` blocks from display text.
+ * The parser should already route code to the editor,
+ * but this is a safety net for fallback paths.
+ */
+function stripStudioCodeTags(text: string | undefined): string {
+  if (!text) return ''
+  return text
+    .replace(/<cs-studio-code[\s\S]*?<\/cs-studio-code>/gi, '')
+    .replace(/<cs-studio-code[^>]*>/gi, '') // unclosed opening tags during streaming
+    .trim()
+}
+
+/**
  * Format timestamp for display
  */
 function formatTime(timestamp: string): string {
@@ -213,10 +226,41 @@ const MessageRenderer: FC<{ message: RefinementMessage; t: TFunction }> = memo((
         </ThinkingBlock>
       )}
 
-      {/* Main Text Content */}
+      {/* PMPO Diagnostics */}
+      {message.pmpoPhases && message.pmpoPhases.length > 0 && (
+        <KnowledgeResultsBlock>
+          <SearchResultsHeader>
+            <Database size={14} />
+            <span>{t('artifacts.pmpo', 'PMPO Phases')}</span>
+            <span className="count">({message.pmpoPhases.length})</span>
+          </SearchResultsHeader>
+          <ToolResultsList>
+            {message.pmpoPhases.map((event, idx) => (
+              <ToolResultItem key={idx}>
+                <span className="tool-name">
+                  {event.phase} • {event.status}
+                  {event.summary ? ` • ${event.summary}` : ''}
+                </span>
+                <span className="tool-status">•</span>
+              </ToolResultItem>
+            ))}
+          </ToolResultsList>
+        </KnowledgeResultsBlock>
+      )}
+
+      {/* Main Text Content — strip any residual <cs-studio-code> blocks */}
       <MessageContent>
-        {message.content || (message.isStreaming && !hasInProgressIndicator && <TypingIndicator />)}
+        {stripStudioCodeTags(message.content) ||
+          (message.isStreaming && !hasInProgressIndicator && <TypingIndicator />)}
       </MessageContent>
+
+      {(message.contextStrategy || message.skillStrategy) && (
+        <MessageTime>
+          {message.contextStrategy ? `context: ${message.contextStrategy}` : ''}
+          {message.contextStrategy && message.skillStrategy ? ' • ' : ''}
+          {message.skillStrategy ? `skills: ${message.skillStrategy}` : ''}
+        </MessageTime>
+      )}
 
       <MessageTime>{formatTime(message.timestamp)}</MessageTime>
     </MessageBubble>
@@ -289,7 +333,7 @@ const ArtifactChatPanel: FC<ArtifactChatPanelProps> = ({ artifact }) => {
     <Container>
       {/* Header */}
       <PanelHeader>
-        <HeaderTitle>{t('artifacts.refinement')}</HeaderTitle>
+        <HeaderTitle>{t('artifacts.artifact_chat', 'Artifact Chat')}</HeaderTitle>
         <Tooltip title={t('common.clear')}>
           <ClearButton onClick={handleClear} disabled={messages.length === 0}>
             <DeleteOutlined />
@@ -500,7 +544,7 @@ const SendButton = styled(Button)`
 // Rich content block styles
 const ThinkingBlock = styled.div`
   margin-bottom: 8px;
-  
+
   /* Override ThinkingEffect styles for compact display */
   > div {
     background: var(--color-background-soft);
@@ -517,7 +561,7 @@ const StatusIndicator = styled.div`
   margin-bottom: 8px;
   font-size: 12px;
   color: var(--color-text-2);
-  
+
   svg {
     flex-shrink: 0;
   }
@@ -542,11 +586,11 @@ const SearchResultsHeader = styled.div`
   font-weight: 500;
   color: var(--color-text-2);
   margin-bottom: 6px;
-  
+
   svg {
     flex-shrink: 0;
   }
-  
+
   .count {
     color: var(--color-text-3);
     font-weight: normal;
@@ -564,15 +608,15 @@ const SearchResultItem = styled.div`
   color: var(--color-text-2);
   padding: 4px 0;
   border-bottom: 1px solid var(--color-border);
-  
+
   &:last-child {
     border-bottom: none;
   }
-  
+
   a {
     color: var(--color-link);
     text-decoration: none;
-    
+
     &:hover {
       text-decoration: underline;
     }
@@ -591,12 +635,12 @@ const ToolResultItem = styled.div`
   justify-content: space-between;
   font-size: 11px;
   padding: 4px 0;
-  
+
   .tool-name {
     color: var(--color-text);
     font-family: 'SF Mono', 'Fira Code', monospace;
   }
-  
+
   .tool-status {
     color: var(--color-success, #22c55e);
   }

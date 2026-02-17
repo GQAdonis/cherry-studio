@@ -1,3 +1,4 @@
+import { AppstoreOutlined } from '@ant-design/icons'
 import { loggerService } from '@logger'
 import type { CodeEditorHandles } from '@renderer/components/CodeEditor'
 import CodeEditor from '@renderer/components/CodeEditor'
@@ -20,12 +21,20 @@ interface HtmlArtifactsPopupProps {
   title: string
   html: string
   onSave?: (html: string) => void
+  onOpenStudio?: () => void
   onClose: () => void
 }
 
 type ViewMode = 'split' | 'code' | 'preview'
 
-const HtmlArtifactsPopup: React.FC<HtmlArtifactsPopupProps> = ({ open, title, html, onSave, onClose }) => {
+const HtmlArtifactsPopup: React.FC<HtmlArtifactsPopupProps> = ({
+  open,
+  title,
+  html,
+  onSave,
+  onOpenStudio,
+  onClose
+}) => {
   const { t } = useTranslation()
   const [viewMode, setViewMode] = useState<ViewMode>('split')
   const [isFullscreen, setIsFullscreen] = useState(true)
@@ -128,6 +137,11 @@ const HtmlArtifactsPopup: React.FC<HtmlArtifactsPopupProps> = ({ open, title, ht
         <Tooltip title={t('chat.artifacts.button.openExternal')} mouseLeaveDelay={0}>
           <Button type="text" icon={<Globe size={16} />} onClick={handleOpenExternal} className="nodrag" />
         </Tooltip>
+        {onOpenStudio && (
+          <Button type="text" icon={<AppstoreOutlined />} onClick={onOpenStudio} className="nodrag">
+            {t('artifacts.open_studio', 'Artifact Studio')}
+          </Button>
+        )}
         <Dropdown
           trigger={['click']}
           menu={{

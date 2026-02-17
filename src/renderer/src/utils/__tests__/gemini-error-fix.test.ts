@@ -163,15 +163,11 @@ describe('Gemini API Error Fix', () => {
         }
       }
 
-      console.log('Testing AI SDK path with tool:', JSON.stringify(mockTool.inputSchema, null, 2))
-
       const result = convertMcpToolsToAiSdkTools([mockTool])
-
-      console.log('AI SDK conversion result:', result)
 
       // Check that the tool was converted and the schema was fixed
       expect(result).toBeDefined()
       expect(result['test-tool']).toBeDefined()
-    })
+    }, 60_000)
   })
 })

@@ -10,4 +10,5 @@ export {
   createArtifactRefinementAgent,
   extractArtifactFromResponse
 } from './artifactAgent'
+export { runPMPOWorkflow } from './pmpoEngine'
 export { buildArtifactContextMessage, default as getArtifactRefinementPrompt } from './refinementPrompt'

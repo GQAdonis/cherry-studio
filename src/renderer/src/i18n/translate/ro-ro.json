@@ -152,6 +152,11 @@
         },
         "title": "Setări avansate"
       },
+      "context": {
+        "description": "[to be translated]:Control how this agent/session manages long context windows before model limits are reached.",
+        "title": "[to be translated]:Context Management",
+        "useGlobal": "[to be translated]:Use Global Default"
+      },
       "essential": "Setări esențiale",
       "permissionMode": {
         "tab": "Mod de permisiune",
@@ -223,6 +228,15 @@
         "uninstalling": "Se dezinstalează..."
       },
       "prompt": "Setări prompt",
+      "skills": {
+        "description": "[to be translated]:Configure skill availability and intent strategy for this agent/session scope.",
+        "helper": "[to be translated]:Set scoped skill availability and intent strategy for this agent.",
+        "mode": "[to be translated]:Availability",
+        "selected": "[to be translated]:Selected Skills",
+        "selectedPlaceholder": "[to be translated]:Choose skills for this scope",
+        "strategy": "[to be translated]:Intent Strategy",
+        "title": "[to be translated]:Skills"
+      },
       "tooling": {
         "mcp": {
           "description": "Conectează servere MCP pentru a debloca instrumente suplimentare pe care le poți aproba mai sus.",
@@ -526,6 +540,8 @@
     "zoomOut": "Micșorează"
   },
   "artifacts": {
+    "archive": "[to be translated]:Archive",
+    "artifact_chat": "[to be translated]:Artifact Chat",
     "attach_image": "Atașați imaginea",
     "change_model": "Faceți clic pentru a schimba modelul.",
     "click_to_open": "Fă clic pentru a deschide artefactul",
@@ -533,14 +549,22 @@
     "console": "Consolă",
     "description_help": "Folosite pentru a căuta artefacte în biblioteca ta",
     "description_placeholder": "Ce face acest artefact?",
+    "download_package": "[to be translated]:Download package",
     "generating": "Generarea artifactului...",
+    "hide_archived": "[to be translated]:Active",
+    "knowledge_bridge": "[to be translated]:Create knowledge bridge from chat history",
     "library": "Biblioteca de artefacte",
     "model_locked": "Selectarea modelului este blocată",
     "new_artifact": "Nouă Artifacțiune",
+    "new_project_setup": "[to be translated]:New Artifact Studio Project",
     "no_artifacts": "Nu s-au găsit artefacte.",
     "open_artifact": "Deschide Artifact",
+    "open_studio": "[to be translated]:Artifact Studio",
     "preview": "Previzualizare",
     "preview_type": "Tip",
+    "project_name_placeholder": "[to be translated]:Marketing landing page",
+    "projects_title": "[to be translated]:Artifact Studio Projects",
+    "rebind_source": "[to be translated]:Rebind Source",
     "refinement": "Refinement Chat",
     "refinement_empty": "Nu există mesaje încă",
     "refinement_hint": "Cere AI-ului să modifice acest artefact",
@@ -548,6 +572,8 @@
     "save_from_modal": "Deschide artefactul pentru a-l salva.",
     "save_to_library": "Salvează în bibliotecă",
     "saved": "Artifact salvat în bibliotecă",
+    "show_archived": "[to be translated]:Archived",
+    "source": "[to be translated]:Source",
     "split": "Split",
     "tags_placeholder": "Adăugați etichete...",
     "title": "Artefacte",
@@ -561,6 +587,7 @@
       "react": "React",
       "svg": "SVG"
     },
+    "updated_at": "[to be translated]:Updated",
     "version": "Versiune",
     "view": {
       "code": "Code",
@@ -576,6 +603,12 @@
     },
     "copy": {
       "title": "Copiază asistentul"
+    },
+    "create": {
+      "settings": {
+        "description": "[to be translated]:Apply skill and context defaults before creating this assistant.",
+        "title": "[to be translated]:Creation Settings"
+      }
     },
     "delete": {
       "content": "Ștergerea unui asistent va șterge toate subiectele și fișierele din cadrul asistentului. Ești sigur că vrei să-l ștergi?",
@@ -759,6 +792,17 @@
         "title": "Expresie uzuală",
         "titleLabel": "Titlu",
         "titlePlaceholder": "Introdu titlul"
+      },
+      "skills": {
+        "custom": "[to be translated]:Use Custom Policy",
+        "custom_info": "[to be translated]:Custom skill policy overrides global defaults for this assistant. Conversation settings can still override assistant scope.",
+        "description": "[to be translated]:Control skill availability and intent classification strategy for this assistant. Conversation-level settings can still override this.",
+        "mode": "[to be translated]:Availability",
+        "selected": "[to be translated]:Selected Skills",
+        "selected_placeholder": "[to be translated]:Choose skills available to this assistant",
+        "strategy": "[to be translated]:Intent Strategy",
+        "title": "[to be translated]:Skills",
+        "use_global": "[to be translated]:Use Global Default"
       },
       "title": "Setări asistent",
       "tool_use_mode": {
@@ -1281,6 +1325,16 @@
         "placeholder": "Caută subiecte...",
         "title": "Caută"
       },
+      "skill_scope": {
+        "all": "[to be translated]:All Skills",
+        "label": "[to be translated]:Skill Scope",
+        "no_skills": "[to be translated]:No skills available",
+        "none": "[to be translated]:No Skills",
+        "selected": "[to be translated]:Selected Skills ({{count}})",
+        "strategy": "[to be translated]:Intent Strategy",
+        "strategy_inherit": "[to be translated]:Inherit Global",
+        "use_assistant": "[to be translated]:Use Assistant Default"
+      },
       "title": "Subiecte",
       "unpin": "Detașează subiectul"
     },
@@ -1373,6 +1427,7 @@
     "advanced_settings": "Setări avansate",
     "agent_one": "Agent",
     "agent_other": "Agenți",
+    "all": "[to be translated]:All",
     "and": "și",
     "assistant": "Asistent",
     "assistant_one": "Asistent",
@@ -1385,6 +1440,7 @@
     "clear": "Golește",
     "clear_all": "Șterge tot",
     "click_to_replace": "Faceți clic pentru a înlocui",
+    "clone": "[to be translated]:Clone",
     "close": "Închide",
     "collapse": "Restrânge",
     "completed": "Finalizat",
@@ -1392,6 +1448,7 @@
     "copied": "Copiat",
     "copy": "Copiază",
     "copy_failed": "Copiere eșuată",
+    "create": "[to be translated]:Create",
     "current": "Curent",
     "cut": "Decupează",
     "dark_mode": "Mod întunecat",
@@ -3764,9 +3821,46 @@
         "use_sandpack_help": "Folosiți CodeSandbox Sandpack pentru artefactele React. Activează dependențele NPM, reîncărcarea rapidă și o gestionare mai bună a erorilor. Dezactivați pentru o transpirație simplă doar cu Babel."
       },
       "required": "Necesar",
+      "runtime": {
+        "advanced": "[to be translated]:Advanced",
+        "allow_custom_bundler": "[to be translated]:Allow Custom Bundler URL",
+        "allow_dynamic_deps": "[to be translated]:Allow Dynamic Dependencies",
+        "allow_external_resources": "[to be translated]:Allow External Resources",
+        "basic": "[to be translated]:Basic",
+        "profile": "[to be translated]:Capability Profile",
+        "profile_help": "[to be translated]:Basic locks runtime controls, Standard enables managed controls, and Advanced enables full runtime configuration.",
+        "standard": "[to be translated]:Standard",
+        "title": "[to be translated]:Runtime Profile"
+      },
       "storage_limit": "Limită de stocare",
       "storage_limit_help": "Numărul maxim de artefacte care pot fi stocate. Artefactele mai vechi vor fi eliminate automat.",
       "storage_title": "Depozitare",
+      "studio": {
+        "allow_conversation_override": "[to be translated]:Allow Conversation Overrides",
+        "allow_project_override": "[to be translated]:Allow Project Overrides",
+        "auto_create_knowledge_bridge": "[to be translated]:Auto-create knowledge bridge",
+        "context_section": "[to be translated]:Context",
+        "default_context_strategy": "[to be translated]:Default Context Strategy",
+        "default_knowledge_bases": "[to be translated]:Default Knowledge Bases",
+        "default_max_tokens": "[to be translated]:Default Max Tokens",
+        "default_model": "[to be translated]:Default Model",
+        "default_model_placeholder": "[to be translated]:Select a model for Artifact Studio",
+        "default_model_seeded_hint": "[to be translated]:Detected app default model",
+        "default_skill_mode": "[to be translated]:Default Skill Mode",
+        "default_skill_strategy": "[to be translated]:Default Skill Strategy",
+        "default_stream_output": "[to be translated]:Default Stream Output",
+        "default_temperature": "[to be translated]:Default Temperature",
+        "default_top_p": "[to be translated]:Default Top P",
+        "description": "[to be translated]:Configure default behavior for Artifact Studio agent sessions. These settings apply globally unless overridden by project or conversation-level configuration.",
+        "knowledge_section": "[to be translated]:Knowledge",
+        "model_and_generation": "[to be translated]:Model & Generation",
+        "model_and_generation_desc": "[to be translated]:These defaults are used when the Artifact Studio agent or project context does not specify overrides.",
+        "open_agent_settings": "[to be translated]:Open Artifact Agent Settings",
+        "override_policy": "[to be translated]:Override Policy",
+        "override_policy_desc": "[to be translated]:Control whether conversation and project-level settings can override studio defaults.",
+        "skills_section": "[to be translated]:Skills",
+        "title": "[to be translated]:Artifact Studio Governance"
+      },
       "title": "Artefacte",
       "types_help": "Selectați ce tipuri de artefacte ar trebui generate. HTMX este întotdeauna activat.",
       "types_title": "Tipuri de artefacte"
@@ -3831,6 +3925,9 @@
         "truncate_middle": "Păstrează Prima & Ultima"
       },
       "useInherited": "Utilizați implicit"
+    },
+    "context_strategy": {
+      "title": "[to be translated]:Context strategy"
     },
     "data": {
       "app_data": {
@@ -4600,6 +4697,9 @@
       },
       "title": "Setări matematice"
     },
+    "max_tokens": {
+      "label": "[to be translated]:Max Tokens"
+    },
     "mcp": {
       "actions": "Acțiuni",
       "active": "Activ",
@@ -5018,6 +5118,7 @@
       },
       "default_assistant_model": "Model asistent implicit",
       "default_assistant_model_description": "Model folosit la crearea unui nou asistent; dacă asistentul nu este setat, va fi folosit acest model",
+      "default_model": "[to be translated]:Model",
       "empty": "Nu s-au găsit modele",
       "manage": {
         "add_listed": {
@@ -5451,6 +5552,21 @@
       "zoom_out": "Micșorează",
       "zoom_reset": "Resetează zoom-ul"
     },
+    "skill": {
+      "manage": {
+        "active_skills": "[to be translated]:Selected skills"
+      },
+      "matching": {
+        "strategy": "[to be translated]:Skill strategy",
+        "title": "[to be translated]:Skill availability"
+      }
+    },
+    "stream_output": {
+      "label": "[to be translated]:Stream Output"
+    },
+    "temperature": {
+      "label": "[to be translated]:Temperature"
+    },
     "theme": {
       "color_primary": "Culoare primară",
       "dark": "Întunecată",
@@ -5747,6 +5863,9 @@
         "url_required": "Te rugăm să introduci un URL"
       }
     },
+    "top_p": {
+      "label": "[to be translated]:Top P"
+    },
     "topic": {
       "pin_to_top": "Fixează subiectele sus",
       "position": {
@@ -5822,6 +5941,7 @@
   },
   "title": {
     "apps": "Aplicații",
+    "artifacts": "[to be translated]:Artifact Studio",
     "code": "Cod",
     "files": "Fișiere",
     "home": "Acasă",

@@ -20,12 +20,13 @@ import {
 import { atomDark, githubLight } from '@codesandbox/sandpack-themes'
 import { useTheme } from '@renderer/context/ThemeProvider'
 import { useAppSelector } from '@renderer/store'
-import { selectArtifactReactSettings } from '@renderer/store/settings'
+import { selectArtifactReactSettings, selectArtifactRuntimeSettings } from '@renderer/store/settings'
 import type { FC } from 'react'
 import { memo, useMemo } from 'react'
 import styled from 'styled-components'
 
 import type { Artifact } from '../types'
+import { resolveArtifactRuntimePolicy } from '../utils/runtimeProfile'
 
 interface SandpackReactRendererProps {
   /** The artifact to render */
@@ -50,7 +51,10 @@ interface SandpackReactRendererProps {
 function parseArtifactContent(
   content: string,
   metadata: Artifact['metadata'],
-  configuredDependencies: Record<string, string>
+  configuredDependencies: Record<string, string>,
+  options: {
+    allowDynamicDependencies: boolean
+  }
 ) {
   const files: Record<string, string> = {}
   const dependencies: Record<string, string> = { ...configuredDependencies }
@@ -74,30 +78,32 @@ function parseArtifactContent(
   )
 
   // Extract npm imports and add to dependencies
-  const importRegex = /import\s+(?:(?:\{[^}]*\}|\*\s+as\s+\w+|\w+)\s+from\s+)?['"]([^'"./][^'"]*)['"]/g
-  let match
-  while ((match = importRegex.exec(processedContent)) !== null) {
-    const packageName = match[1]
-    // Skip react and react-dom as they're included by default
-    if (
-      packageName &&
-      !packageName.startsWith('react') &&
-      !packageName.startsWith('.') &&
-      !packageName.startsWith('@/')
-    ) {
-      // Extract base package name (handle scoped packages)
-      const baseName = packageName.startsWith('@')
-        ? packageName.split('/').slice(0, 2).join('/')
-        : packageName.split('/')[0]
-      // Only add if not already in configured dependencies
-      if (!dependencies[baseName]) {
-        dependencies[baseName] = 'latest'
+  if (options.allowDynamicDependencies) {
+    const importRegex = /import\s+(?:(?:\{[^}]*\}|\*\s+as\s+\w+|\w+)\s+from\s+)?['"]([^'"./][^'"]*)['"]/g
+    let match
+    while ((match = importRegex.exec(processedContent)) !== null) {
+      const packageName = match[1]
+      // Skip react and react-dom as they're included by default
+      if (
+        packageName &&
+        !packageName.startsWith('react') &&
+        !packageName.startsWith('.') &&
+        !packageName.startsWith('@/')
+      ) {
+        // Extract base package name (handle scoped packages)
+        const baseName = packageName.startsWith('@')
+          ? packageName.split('/').slice(0, 2).join('/')
+          : packageName.split('/')[0]
+        // Only add if not already in configured dependencies
+        if (!dependencies[baseName]) {
+          dependencies[baseName] = 'latest'
+        }
       }
     }
   }
 
   // Add dependencies from metadata (override configured ones)
-  if (metadata.dependencies) {
+  if (metadata.dependencies && options.allowDynamicDependencies) {
     for (const dep of metadata.dependencies) {
       const [name, version] = dep.split('@').filter(Boolean)
       if (name) {
@@ -152,20 +158,28 @@ const SandpackReactRenderer: FC<SandpackReactRendererProps> = ({
 }) => {
   const { theme } = useTheme()
   const reactSettings = useAppSelector(selectArtifactReactSettings)
+  const runtimeSettings = useAppSelector(selectArtifactRuntimeSettings)
 
   // Use props if provided, otherwise fall back to settings
   const showEditor = showEditorProp ?? reactSettings?.showEditor ?? false
   const showPreview = showPreviewProp
   const showConsole = showConsoleProp ?? reactSettings?.showConsole ?? false
-  const customBundlerUrl = reactSettings?.customBundlerUrl || ''
+  const runtimePolicy = resolveArtifactRuntimePolicy(runtimeSettings)
+  const allowCustomBundlerUrl = runtimePolicy.allowCustomBundlerUrl
+  const allowDynamicDependencies = runtimePolicy.allowDynamicDependencies
+  const allowExternalResources = runtimePolicy.allowExternalResources
+  const customBundlerUrl = allowCustomBundlerUrl ? reactSettings?.customBundlerUrl || '' : ''
 
   // Memoize configured dependencies to prevent unnecessary re-renders
   const configuredDependencies = useMemo(() => reactSettings?.dependencies || {}, [reactSettings?.dependencies])
 
   // Parse artifact content with configured dependencies
   const { files, dependencies } = useMemo(
-    () => parseArtifactContent(artifact.content, artifact.metadata, configuredDependencies),
-    [artifact.content, artifact.metadata, configuredDependencies]
+    () =>
+      parseArtifactContent(artifact.content, artifact.metadata, configuredDependencies, {
+        allowDynamicDependencies
+      }),
+    [artifact.content, artifact.metadata, configuredDependencies, allowDynamicDependencies]
   )
 
   // Determine Sandpack theme based on app theme
@@ -221,7 +235,8 @@ const SandpackReactRenderer: FC<SandpackReactRendererProps> = ({
         customSetup={customSetup}
         options={{
           ...options,
-          externalResources: artifact.metadata.tailwind ? ['https://cdn.tailwindcss.com'] : undefined
+          externalResources:
+            artifact.metadata.tailwind && allowExternalResources ? ['https://cdn.tailwindcss.com'] : undefined
         }}>
         <StyledSandpackLayout>
           {showEditor && (

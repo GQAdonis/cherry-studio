@@ -152,6 +152,11 @@
         },
         "title": "Ρυθμίσεις για προχωρημένους"
       },
+      "context": {
+        "description": "[to be translated]:Control how this agent/session manages long context windows before model limits are reached.",
+        "title": "[to be translated]:Context Management",
+        "useGlobal": "[to be translated]:Use Global Default"
+      },
       "essential": "Βασικές Ρυθμίσεις",
       "permissionMode": {
         "tab": "Λειτουργία Αδειών",
@@ -223,6 +228,15 @@
         "uninstalling": "Απεγκατάσταση..."
       },
       "prompt": "Ρυθμίσεις Προτροπής",
+      "skills": {
+        "description": "[to be translated]:Configure skill availability and intent strategy for this agent/session scope.",
+        "helper": "[to be translated]:Set scoped skill availability and intent strategy for this agent.",
+        "mode": "[to be translated]:Availability",
+        "selected": "[to be translated]:Selected Skills",
+        "selectedPlaceholder": "[to be translated]:Choose skills for this scope",
+        "strategy": "[to be translated]:Intent Strategy",
+        "title": "[to be translated]:Skills"
+      },
       "tooling": {
         "mcp": {
           "description": "Συνδέστε διακομιστές MCP για να ξεκλειδώσετε πρόσθετα εργαλεία που μπορείτε να εγκρίνετε παραπάνω.",
@@ -526,6 +540,8 @@
     "zoomOut": "Σμίκρυνση"
   },
   "artifacts": {
+    "archive": "[to be translated]:Archive",
+    "artifact_chat": "[to be translated]:Artifact Chat",
     "attach_image": "Συν Attach image",
     "change_model": "Κάντε κλικ για να αλλάξετε το μοντέλο",
     "click_to_open": "Κάντε κλικ για να ανοίξετε το αντικείμενο",
@@ -533,14 +549,22 @@
     "console": "Κονσόλα",
     "description_help": "Χρησιμοποιείται για την αναζήτηση αντικειμένων στη βιβλιοθήκη σας",
     "description_placeholder": "Τι κάνει αυτό το αντικείμενο;",
+    "download_package": "[to be translated]:Download package",
     "generating": "Δημιουργία αντικειμένου...",
+    "hide_archived": "[to be translated]:Active",
+    "knowledge_bridge": "[to be translated]:Create knowledge bridge from chat history",
     "library": "Βιβλιοθήκη Αντικειμένων",
     "model_locked": "Η επιλογή μοντέλου είναι κλειδωμένη",
     "new_artifact": "Νέο Άρτεφάκτ",
+    "new_project_setup": "[to be translated]:New Artifact Studio Project",
     "no_artifacts": "Δεν βρέθηκαν αντικείμενα",
     "open_artifact": "Άνοιγμα αντικειμένου",
+    "open_studio": "[to be translated]:Artifact Studio",
     "preview": "Προεπισκόπηση",
     "preview_type": "Τύπος",
+    "project_name_placeholder": "[to be translated]:Marketing landing page",
+    "projects_title": "[to be translated]:Artifact Studio Projects",
+    "rebind_source": "[to be translated]:Rebind Source",
     "refinement": "Συνομιλία Εξομάλυνσης",
     "refinement_empty": "Δεν υπάρχουν μηνύματα ακόμα",
     "refinement_hint": "Ζήτησε από την AI να τροποποιήσει αυτό το αντικείμενο",
@@ -548,6 +572,8 @@
     "save_from_modal": "Άνοιξε το αντικείμενο για να το αποθηκεύσεις",
     "save_to_library": "Αποθήκευση στη Βιβλιοθήκη",
     "saved": "Το αντικείμενο αποθηκεύτηκε στη βιβλιοθήκη.",
+    "show_archived": "[to be translated]:Archived",
+    "source": "[to be translated]:Source",
     "split": "Διαίρεση",
     "tags_placeholder": "Προσθέστε ετικέτες...",
     "title": "Αντικείμενα",
@@ -561,6 +587,7 @@
       "react": "React",
       "svg": "SVG"
     },
+    "updated_at": "[to be translated]:Updated",
     "version": "Έκδοση",
     "view": {
       "code": "Code",
@@ -576,6 +603,12 @@
     },
     "copy": {
       "title": "Αντιγραφή βοηθού"
+    },
+    "create": {
+      "settings": {
+        "description": "[to be translated]:Apply skill and context defaults before creating this assistant.",
+        "title": "[to be translated]:Creation Settings"
+      }
     },
     "delete": {
       "content": "Η διαγραφή του βοηθού θα διαγράψει όλα τα θέματα και τα αρχεία που είναι συνδεδεμένα με αυτόν. Είστε σίγουροι πως θέλετε να συνεχίσετε;",
@@ -759,6 +792,17 @@
         "title": "Δημοφιλείς φράσεις",
         "titleLabel": "Τίτλος",
         "titlePlaceholder": "Εισαγάγετε τίτλο"
+      },
+      "skills": {
+        "custom": "[to be translated]:Use Custom Policy",
+        "custom_info": "[to be translated]:Custom skill policy overrides global defaults for this assistant. Conversation settings can still override assistant scope.",
+        "description": "[to be translated]:Control skill availability and intent classification strategy for this assistant. Conversation-level settings can still override this.",
+        "mode": "[to be translated]:Availability",
+        "selected": "[to be translated]:Selected Skills",
+        "selected_placeholder": "[to be translated]:Choose skills available to this assistant",
+        "strategy": "[to be translated]:Intent Strategy",
+        "title": "[to be translated]:Skills",
+        "use_global": "[to be translated]:Use Global Default"
       },
       "title": "Ρυθμίσεις Βοηθού",
       "tool_use_mode": {
@@ -1281,6 +1325,16 @@
         "placeholder": "Αναζήτηση θεμάτων...",
         "title": "Αναζήτηση"
       },
+      "skill_scope": {
+        "all": "[to be translated]:All Skills",
+        "label": "[to be translated]:Skill Scope",
+        "no_skills": "[to be translated]:No skills available",
+        "none": "[to be translated]:No Skills",
+        "selected": "[to be translated]:Selected Skills ({{count}})",
+        "strategy": "[to be translated]:Intent Strategy",
+        "strategy_inherit": "[to be translated]:Inherit Global",
+        "use_assistant": "[to be translated]:Use Assistant Default"
+      },
       "title": "Θέματα",
       "unpin": "Ξεκαρφίτσωμα"
     },
@@ -1373,6 +1427,7 @@
     "advanced_settings": "Προχωρημένες ρυθμίσεις",
     "agent_one": "Πράκτορας",
     "agent_other": "Πράκτορες",
+    "all": "[to be translated]:All",
     "and": "και",
     "assistant": "Εξυπνιασμένη Ενότητα",
     "assistant_one": "βοηθός",
@@ -1385,6 +1440,7 @@
     "clear": "Καθαρισμός",
     "clear_all": "Εκκαθάριση Όλων",
     "click_to_replace": "Κάντε κλικ για αντικατάσταση",
+    "clone": "[to be translated]:Clone",
     "close": "Κλείσιμο",
     "collapse": "Σύμπτυξη",
     "completed": "Ολοκληρώθηκε",
@@ -1392,6 +1448,7 @@
     "copied": "Αντιγράφηκε",
     "copy": "Αντιγραφή",
     "copy_failed": "Αποτυχία αντιγραφής",
+    "create": "[to be translated]:Create",
     "current": "Τρέχων",
     "cut": "Κοπή",
     "dark_mode": "Σκοτεινή λειτουργία",
@@ -3764,9 +3821,46 @@
         "use_sandpack_help": "Χρησιμοποιήστε το CodeSandbox Sandpack για τα artifacts του React. Ενεργοποιεί εξαρτήσεις NPM, ζεστό επαναφόρτωμα και καλύτερη διαχείριση σφαλμάτων. Απενεργοποιήστε το για απλή μεταγλώττιση μόνο με Babel."
       },
       "required": "Απαιτείται",
+      "runtime": {
+        "advanced": "[to be translated]:Advanced",
+        "allow_custom_bundler": "[to be translated]:Allow Custom Bundler URL",
+        "allow_dynamic_deps": "[to be translated]:Allow Dynamic Dependencies",
+        "allow_external_resources": "[to be translated]:Allow External Resources",
+        "basic": "[to be translated]:Basic",
+        "profile": "[to be translated]:Capability Profile",
+        "profile_help": "[to be translated]:Basic locks runtime controls, Standard enables managed controls, and Advanced enables full runtime configuration.",
+        "standard": "[to be translated]:Standard",
+        "title": "[to be translated]:Runtime Profile"
+      },
       "storage_limit": "Όριο Αποθήκευσης",
       "storage_limit_help": "Μέγιστος αριθμός αντικειμένων για αποθήκευση. Τα παλαιότερα αντικείμενα θα αφαιρούνται αυτόματα.",
       "storage_title": "Αποθήκευση",
+      "studio": {
+        "allow_conversation_override": "[to be translated]:Allow Conversation Overrides",
+        "allow_project_override": "[to be translated]:Allow Project Overrides",
+        "auto_create_knowledge_bridge": "[to be translated]:Auto-create knowledge bridge",
+        "context_section": "[to be translated]:Context",
+        "default_context_strategy": "[to be translated]:Default Context Strategy",
+        "default_knowledge_bases": "[to be translated]:Default Knowledge Bases",
+        "default_max_tokens": "[to be translated]:Default Max Tokens",
+        "default_model": "[to be translated]:Default Model",
+        "default_model_placeholder": "[to be translated]:Select a model for Artifact Studio",
+        "default_model_seeded_hint": "[to be translated]:Detected app default model",
+        "default_skill_mode": "[to be translated]:Default Skill Mode",
+        "default_skill_strategy": "[to be translated]:Default Skill Strategy",
+        "default_stream_output": "[to be translated]:Default Stream Output",
+        "default_temperature": "[to be translated]:Default Temperature",
+        "default_top_p": "[to be translated]:Default Top P",
+        "description": "[to be translated]:Configure default behavior for Artifact Studio agent sessions. These settings apply globally unless overridden by project or conversation-level configuration.",
+        "knowledge_section": "[to be translated]:Knowledge",
+        "model_and_generation": "[to be translated]:Model & Generation",
+        "model_and_generation_desc": "[to be translated]:These defaults are used when the Artifact Studio agent or project context does not specify overrides.",
+        "open_agent_settings": "[to be translated]:Open Artifact Agent Settings",
+        "override_policy": "[to be translated]:Override Policy",
+        "override_policy_desc": "[to be translated]:Control whether conversation and project-level settings can override studio defaults.",
+        "skills_section": "[to be translated]:Skills",
+        "title": "[to be translated]:Artifact Studio Governance"
+      },
       "title": "Αντικείμενα",
       "types_help": "Επιλέξτε ποιοι τύποι αντικειμένων θα πρέπει να δημιουργηθούν. Το HTMX είναι πάντα ενεργοποιημένο.",
       "types_title": "Τύποι Αντικειμένων"
@@ -3831,6 +3925,9 @@
         "truncate_middle": "Διατήρηση Πρώτου & Τελευταίου"
       },
       "useInherited": "Χρησιμοποίησε την Προεπιλογή"
+    },
+    "context_strategy": {
+      "title": "[to be translated]:Context strategy"
     },
     "data": {
       "app_data": {
@@ -4600,6 +4697,9 @@
       },
       "title": "Ρύθμιση μαθηματικών τύπων"
     },
+    "max_tokens": {
+      "label": "[to be translated]:Max Tokens"
+    },
     "mcp": {
       "actions": "Ενέργειες",
       "active": "Ενεργοποίηση",
@@ -5018,6 +5118,7 @@
       },
       "default_assistant_model": "Πρόεδρος Υπηρεσίας προεπιλεγμένου μοντέλου",
       "default_assistant_model_description": "Το μοντέλο που χρησιμοποιείται όταν δημιουργείτε νέο υπάλληλο. Αν το υπάλληλο δεν έχει επιλεγμένο ένα μοντέλο, τότε θα χρησιμοποιεί αυτό το μοντέλο.",
+      "default_model": "[to be translated]:Model",
       "empty": "Δεν υπάρχουν μοντέλα",
       "manage": {
         "add_listed": {
@@ -5451,6 +5552,21 @@
       "zoom_out": "Σμικρύνση εμφάνισης",
       "zoom_reset": "Επαναφορά εμφάνισης"
     },
+    "skill": {
+      "manage": {
+        "active_skills": "[to be translated]:Selected skills"
+      },
+      "matching": {
+        "strategy": "[to be translated]:Skill strategy",
+        "title": "[to be translated]:Skill availability"
+      }
+    },
+    "stream_output": {
+      "label": "[to be translated]:Stream Output"
+    },
+    "temperature": {
+      "label": "[to be translated]:Temperature"
+    },
     "theme": {
       "color_primary": "Κύριο Χρώμα Θέματος",
       "dark": "Σκοτεινό",
@@ -5747,6 +5863,9 @@
         "url_required": "Απαιτείται εισαγωγή URL"
       }
     },
+    "top_p": {
+      "label": "[to be translated]:Top P"
+    },
     "topic": {
       "pin_to_top": "Καρφίτσωμα Θέματος στην Κορυφή",
       "position": {
@@ -5822,6 +5941,7 @@
   },
   "title": {
     "apps": "Εφαρμογές",
+    "artifacts": "[to be translated]:Artifact Studio",
     "code": "Κώδικας",
     "files": "Αρχεία",
     "home": "Αρχική Σελίδα",

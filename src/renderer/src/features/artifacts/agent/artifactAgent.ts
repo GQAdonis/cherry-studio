@@ -93,10 +93,11 @@ export function buildRefinementMessages(
 function getLanguageFromType(type: string): string {
   switch (type) {
     case 'html':
+    case 'xhtml':
     case 'htmx':
       return 'html'
     case 'react':
-      return 'jsx'
+      return 'tsx'
     case 'svg':
       return 'xml'
     case 'mermaid':

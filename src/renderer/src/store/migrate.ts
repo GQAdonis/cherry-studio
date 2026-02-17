@@ -3310,6 +3310,156 @@ const migrateConfig = {
       logger.error('migrate 199 error', error as Error)
       return state
     }
+  },
+  '200': (state: RootState) => {
+    try {
+      const defaultArtifacts = settingsInitialState.artifacts
+      const requiredTypes: Array<(typeof defaultArtifacts.enabledTypes)[number]> = ['htmx', 'xhtml']
+
+      if (!state.settings.artifacts) {
+        state.settings.artifacts = {
+          ...defaultArtifacts,
+          enabledTypes: [...defaultArtifacts.enabledTypes],
+          runtime: { ...defaultArtifacts.runtime },
+          react: {
+            ...defaultArtifacts.react,
+            dependencies: { ...defaultArtifacts.react.dependencies }
+          }
+        }
+        logger.info('migrate 200 success (initialized artifacts settings)')
+        return state
+      }
+
+      const artifacts = state.settings.artifacts
+      artifacts.enabled = artifacts.enabled ?? defaultArtifacts.enabled
+      artifacts.autoOpen = artifacts.autoOpen ?? defaultArtifacts.autoOpen
+      artifacts.storageLimit = artifacts.storageLimit ?? defaultArtifacts.storageLimit
+
+      const mergedTypes = new Set(Array.isArray(artifacts.enabledTypes) ? artifacts.enabledTypes : [])
+      for (const type of requiredTypes) {
+        mergedTypes.add(type)
+      }
+      artifacts.enabledTypes = Array.from(mergedTypes)
+
+      if (!artifacts.runtime) {
+        artifacts.runtime = { ...defaultArtifacts.runtime }
+      } else {
+        const validProfiles = new Set(['basic', 'standard', 'advanced'])
+        artifacts.runtime.profile = validProfiles.has(artifacts.runtime.profile)
+          ? artifacts.runtime.profile
+          : defaultArtifacts.runtime.profile
+        artifacts.runtime.allowCustomBundlerUrl =
+          artifacts.runtime.allowCustomBundlerUrl ?? defaultArtifacts.runtime.allowCustomBundlerUrl
+        artifacts.runtime.allowDynamicDependencies =
+          artifacts.runtime.allowDynamicDependencies ?? defaultArtifacts.runtime.allowDynamicDependencies
+        artifacts.runtime.allowExternalResources =
+          artifacts.runtime.allowExternalResources ?? defaultArtifacts.runtime.allowExternalResources
+
+        if (artifacts.runtime.profile === 'basic') {
+          artifacts.runtime.allowCustomBundlerUrl = false
+          artifacts.runtime.allowDynamicDependencies = false
+          artifacts.runtime.allowExternalResources = false
+        }
+      }
+
+      if (!artifacts.react) {
+        artifacts.react = {
+          ...defaultArtifacts.react,
+          dependencies: { ...defaultArtifacts.react.dependencies }
+        }
+      } else {
+        artifacts.react.useSandpack = artifacts.react.useSandpack ?? defaultArtifacts.react.useSandpack
+        artifacts.react.showEditor = artifacts.react.showEditor ?? defaultArtifacts.react.showEditor
+        artifacts.react.showConsole = artifacts.react.showConsole ?? defaultArtifacts.react.showConsole
+        artifacts.react.customBundlerUrl = artifacts.react.customBundlerUrl ?? defaultArtifacts.react.customBundlerUrl
+        artifacts.react.dependencies =
+          artifacts.react.dependencies && typeof artifacts.react.dependencies === 'object'
+            ? artifacts.react.dependencies
+            : { ...defaultArtifacts.react.dependencies }
+      }
+
+      logger.info('migrate 200 success')
+      return state
+    } catch (error) {
+      logger.error('migrate 200 error', error as Error)
+      return state
+    }
+  },
+  '201': (state: RootState) => {
+    try {
+      const defaultArtifacts = settingsInitialState.artifacts
+      if (!state.settings.artifacts) {
+        state.settings.artifacts = {
+          ...defaultArtifacts,
+          enabledTypes: [...defaultArtifacts.enabledTypes],
+          runtime: { ...defaultArtifacts.runtime },
+          react: {
+            ...defaultArtifacts.react,
+            dependencies: { ...defaultArtifacts.react.dependencies }
+          },
+          studio: {
+            ...defaultArtifacts.studio,
+            overridePolicy: { ...defaultArtifacts.studio.overridePolicy },
+            defaults: {
+              ...defaultArtifacts.studio.defaults,
+              llm: { ...defaultArtifacts.studio.defaults.llm },
+              skills: { ...defaultArtifacts.studio.defaults.skills },
+              contextManagement: { ...defaultArtifacts.studio.defaults.contextManagement },
+              knowledge: { ...defaultArtifacts.studio.defaults.knowledge }
+            }
+          }
+        }
+        logger.info('migrate 201 success (initialized artifacts studio settings)')
+        return state
+      }
+
+      const artifacts = state.settings.artifacts
+      if (!artifacts.studio) {
+        artifacts.studio = {
+          ...defaultArtifacts.studio,
+          overridePolicy: { ...defaultArtifacts.studio.overridePolicy },
+          defaults: {
+            ...defaultArtifacts.studio.defaults,
+            llm: { ...defaultArtifacts.studio.defaults.llm },
+            skills: { ...defaultArtifacts.studio.defaults.skills },
+            contextManagement: { ...defaultArtifacts.studio.defaults.contextManagement },
+            knowledge: { ...defaultArtifacts.studio.defaults.knowledge }
+          }
+        }
+      } else {
+        artifacts.studio.overridePolicy = {
+          ...defaultArtifacts.studio.overridePolicy,
+          ...artifacts.studio.overridePolicy
+        }
+
+        artifacts.studio.defaults = {
+          ...defaultArtifacts.studio.defaults,
+          ...artifacts.studio.defaults,
+          llm: {
+            ...defaultArtifacts.studio.defaults.llm,
+            ...artifacts.studio.defaults?.llm
+          },
+          skills: {
+            ...defaultArtifacts.studio.defaults.skills,
+            ...artifacts.studio.defaults?.skills
+          },
+          contextManagement: {
+            ...defaultArtifacts.studio.defaults.contextManagement,
+            ...artifacts.studio.defaults?.contextManagement
+          },
+          knowledge: {
+            ...defaultArtifacts.studio.defaults.knowledge,
+            ...artifacts.studio.defaults?.knowledge
+          }
+        }
+      }
+
+      logger.info('migrate 201 success')
+      return state
+    } catch (error) {
+      logger.error('migrate 201 error', error as Error)
+      return state
+    }
   }
 }
 

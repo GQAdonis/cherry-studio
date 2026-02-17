@@ -3,7 +3,7 @@ import App from '@renderer/components/MinApp/MinApp'
 import { useMinapps } from '@renderer/hooks/useMinapps'
 import { useRuntime } from '@renderer/hooks/useRuntime'
 import { useSettings } from '@renderer/hooks/useSettings'
-import { Code, FileSearch, Folder, Languages, LayoutGrid, NotepadText, Palette, Sparkle } from 'lucide-react'
+import { Code, FileSearch, Folder, Languages, Layers, LayoutGrid, NotepadText, Palette, Sparkle } from 'lucide-react'
 import type { FC } from 'react'
 import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -59,6 +59,12 @@ const LaunchpadPage: FC = () => {
       text: t('title.code'),
       path: '/code',
       bgColor: 'linear-gradient(135deg, #1F2937, #374151)' // Code CLI：高级暗黑色，代表专业和技术
+    },
+    {
+      icon: <Layers size={32} className="icon" />,
+      text: t('title.artifacts', 'Artifact Studio'),
+      path: '/artifacts',
+      bgColor: 'linear-gradient(135deg, #0EA5E9, #2563EB)' // Artifact Studio：蓝色渐变，代表构建和创作
     },
     {
       icon: <OpenClawIcon className="icon" />,

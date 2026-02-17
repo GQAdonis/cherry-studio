@@ -192,6 +192,16 @@ if (!app.requestSingleInstanceLock()) {
     const { skillService } = await import('./services/SkillService')
     await skillService.initialize()
 
+    // Initialize Artifact Studio agent - MUST be after app is ready
+    const { initializeArtifactStudioAgent } = await import('./services/agents/services/initializeArtifactStudioAgent')
+    runAsyncFunction(async () => {
+      try {
+        await initializeArtifactStudioAgent()
+      } catch (error) {
+        logger.warn('Failed to initialize Artifact Studio agent:', error as Error)
+      }
+    })
+
     // Record current version for tracking
     // A preparation for v2 data refactoring
     versionService.recordCurrentVersion()

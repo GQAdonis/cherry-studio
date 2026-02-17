@@ -39,6 +39,7 @@ import type {
   OpenAIVerbosity
 } from '@renderer/types/aiCoreTypes'
 import { DEFAULT_CONTEXT_STRATEGY_CONFIG } from '@renderer/types/contextStrategy'
+import type { SkillScopeConfig } from '@renderer/types/skillScope'
 import { uuid } from '@renderer/utils'
 import { API_SERVER_DEFAULTS, UpgradeChannel } from '@shared/config/constant'
 
@@ -296,6 +297,12 @@ export interface SettingsState {
     autoOpen: boolean
     enabledTypes: string[]
     storageLimit: number
+    runtime: {
+      profile: 'basic' | 'standard' | 'advanced'
+      allowCustomBundlerUrl: boolean
+      allowDynamicDependencies: boolean
+      allowExternalResources: boolean
+    }
     // React/Sandpack specific settings
     react: {
       /** Use Sandpack for React artifacts (vs simple Babel transpilation) */
@@ -308,6 +315,28 @@ export interface SettingsState {
       customBundlerUrl: string
       /** Pre-installed dependencies available in React artifacts */
       dependencies: Record<string, string>
+    }
+    studio: {
+      overridePolicy: {
+        allowConversationOverride: boolean
+        allowProjectOverride: boolean
+      }
+      defaults: {
+        llm: {
+          modelId?: string
+          providerId?: string
+          temperature?: number
+          topP?: number
+          maxTokens?: number
+          streamOutput?: boolean
+        }
+        skills: SkillScopeConfig
+        contextManagement: ContextStrategyConfig
+        knowledge: {
+          knowledgeBaseIds: string[]
+          autoCreateFromChatHistory: boolean
+        }
+      }
     }
   }
 }
@@ -539,8 +568,14 @@ export const initialState: SettingsState = {
   artifacts: {
     enabled: true,
     autoOpen: false,
-    enabledTypes: ['htmx', 'html', 'react', 'svg', 'mermaid', 'markdown', 'code'],
+    enabledTypes: ['htmx', 'html', 'xhtml', 'react', 'svg', 'mermaid', 'markdown', 'code'],
     storageLimit: 100,
+    runtime: {
+      profile: 'standard',
+      allowCustomBundlerUrl: true,
+      allowDynamicDependencies: true,
+      allowExternalResources: true
+    },
     // React/Sandpack specific settings
     react: {
       useSandpack: true,
@@ -569,6 +604,30 @@ export const initialState: SettingsState = {
         'date-fns': 'latest',
         'lodash-es': 'latest',
         uuid: 'latest'
+      }
+    },
+    studio: {
+      overridePolicy: {
+        allowConversationOverride: true,
+        allowProjectOverride: true
+      },
+      defaults: {
+        llm: {
+          modelId: undefined,
+          providerId: undefined,
+          temperature: 0.7,
+          topP: 1,
+          maxTokens: undefined,
+          streamOutput: true
+        },
+        skills: {
+          mode: 'inherit'
+        },
+        contextManagement: { ...DEFAULT_CONTEXT_STRATEGY_CONFIG },
+        knowledge: {
+          knowledgeBaseIds: [],
+          autoCreateFromChatHistory: false
+        }
       }
     }
   }
@@ -1071,6 +1130,36 @@ const settingsSlice = createSlice({
     setArtifactStorageLimit: (state, action: PayloadAction<number>) => {
       state.artifacts.storageLimit = action.payload
     },
+    setArtifactRuntimeProfile: (state, action: PayloadAction<'basic' | 'standard' | 'advanced'>) => {
+      state.artifacts.runtime.profile = action.payload
+
+      if (action.payload === 'basic') {
+        state.artifacts.runtime.allowCustomBundlerUrl = false
+        state.artifacts.runtime.allowDynamicDependencies = false
+        state.artifacts.runtime.allowExternalResources = false
+        state.artifacts.react.customBundlerUrl = ''
+      } else if (action.payload === 'standard') {
+        state.artifacts.runtime.allowCustomBundlerUrl = true
+        state.artifacts.runtime.allowDynamicDependencies = true
+        state.artifacts.runtime.allowExternalResources = true
+      } else {
+        state.artifacts.runtime.allowCustomBundlerUrl = true
+        state.artifacts.runtime.allowDynamicDependencies = true
+        state.artifacts.runtime.allowExternalResources = true
+      }
+    },
+    setArtifactRuntimeAllowCustomBundlerUrl: (state, action: PayloadAction<boolean>) => {
+      state.artifacts.runtime.allowCustomBundlerUrl = action.payload
+      if (!action.payload) {
+        state.artifacts.react.customBundlerUrl = ''
+      }
+    },
+    setArtifactRuntimeAllowDynamicDependencies: (state, action: PayloadAction<boolean>) => {
+      state.artifacts.runtime.allowDynamicDependencies = action.payload
+    },
+    setArtifactRuntimeAllowExternalResources: (state, action: PayloadAction<boolean>) => {
+      state.artifacts.runtime.allowExternalResources = action.payload
+    },
     // React/Sandpack settings
     setArtifactReactUseSandpack: (state, action: PayloadAction<boolean>) => {
       state.artifacts.react.useSandpack = action.payload
@@ -1092,6 +1181,45 @@ const settingsSlice = createSlice({
     },
     removeArtifactReactDependency: (state, action: PayloadAction<string>) => {
       delete state.artifacts.react.dependencies[action.payload]
+    },
+    setArtifactStudioOverridePolicy: (
+      state,
+      action: PayloadAction<Partial<SettingsState['artifacts']['studio']['overridePolicy']>>
+    ) => {
+      state.artifacts.studio.overridePolicy = {
+        ...state.artifacts.studio.overridePolicy,
+        ...action.payload
+      }
+    },
+    setArtifactStudioDefaultLlm: (
+      state,
+      action: PayloadAction<Partial<SettingsState['artifacts']['studio']['defaults']['llm']>>
+    ) => {
+      state.artifacts.studio.defaults.llm = {
+        ...state.artifacts.studio.defaults.llm,
+        ...action.payload
+      }
+    },
+    setArtifactStudioDefaultSkills: (
+      state,
+      action: PayloadAction<SettingsState['artifacts']['studio']['defaults']['skills']>
+    ) => {
+      state.artifacts.studio.defaults.skills = action.payload
+    },
+    setArtifactStudioDefaultContextManagement: (
+      state,
+      action: PayloadAction<SettingsState['artifacts']['studio']['defaults']['contextManagement']>
+    ) => {
+      state.artifacts.studio.defaults.contextManagement = action.payload
+    },
+    setArtifactStudioDefaultKnowledge: (
+      state,
+      action: PayloadAction<Partial<SettingsState['artifacts']['studio']['defaults']['knowledge']>>
+    ) => {
+      state.artifacts.studio.defaults.knowledge = {
+        ...state.artifacts.studio.defaults.knowledge,
+        ...action.payload
+      }
     }
   }
 })
@@ -1244,13 +1372,22 @@ export const {
   setArtifactAutoOpen,
   setArtifactTypes,
   setArtifactStorageLimit,
+  setArtifactRuntimeProfile,
+  setArtifactRuntimeAllowCustomBundlerUrl,
+  setArtifactRuntimeAllowDynamicDependencies,
+  setArtifactRuntimeAllowExternalResources,
   setArtifactReactUseSandpack,
   setArtifactReactShowEditor,
   setArtifactReactShowConsole,
   setArtifactReactCustomBundlerUrl,
   setArtifactReactDependencies,
   setArtifactReactDependency,
-  removeArtifactReactDependency
+  removeArtifactReactDependency,
+  setArtifactStudioOverridePolicy,
+  setArtifactStudioDefaultLlm,
+  setArtifactStudioDefaultSkills,
+  setArtifactStudioDefaultContextManagement,
+  setArtifactStudioDefaultKnowledge
 } = settingsSlice.actions
 
 export default settingsSlice.reducer
@@ -1258,3 +1395,5 @@ export default settingsSlice.reducer
 // Selectors
 export const selectArtifactSettings = (state: { settings: SettingsState }) => state.settings.artifacts
 export const selectArtifactReactSettings = (state: { settings: SettingsState }) => state.settings.artifacts?.react
+export const selectArtifactRuntimeSettings = (state: { settings: SettingsState }) => state.settings.artifacts?.runtime
+export const selectArtifactStudioSettings = (state: { settings: SettingsState }) => state.settings.artifacts?.studio

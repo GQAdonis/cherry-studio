@@ -58,6 +58,7 @@ function determineArtifactType(attributes: Record<string, string>): ArtifactType
   const language = attributes.language?.toLowerCase()
   if (language) {
     if (['html', 'htm'].includes(language)) return 'html'
+    if (language === 'xhtml') return 'xhtml'
     if (language === 'htmx') return 'htmx'
     if (['jsx', 'tsx', 'react'].includes(language)) return 'react'
     if (language === 'svg') return 'svg'

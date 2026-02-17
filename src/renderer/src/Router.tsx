@@ -42,6 +42,7 @@ const Router: FC = () => {
           <Route path="/apps/:appId" element={<MinAppPage />} />
           <Route path="/apps" element={<MinAppsPage />} />
           <Route path="/artifacts" element={<ArtifactLibraryPage />} />
+          <Route path="/artifacts/studio/:projectId" element={<ArtifactPage />} />
           <Route path="/artifacts/:artifactId" element={<ArtifactPage />} />
           <Route path="/code" element={<CodeToolsPage />} />
           <Route path="/openclaw" element={<OpenClawPage />} />

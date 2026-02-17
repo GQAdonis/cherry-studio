@@ -39,4 +39,20 @@ describe('scopePolicy', () => {
     )
     expect(result.mode).toBe('none')
   })
+
+  it('falls back to assistant scope when topic scope is absent', () => {
+    const result = resolveEffectiveSkillScope(
+      { id: 'topic' } as any,
+      { id: 'assistant', settings: { skillScope: { mode: 'selected', selectedSkillIds: ['a'] } } } as any
+    )
+    expect(result).toEqual({ mode: 'selected', selectedSkillIds: ['a'], strategy: undefined })
+  })
+
+  it('preserves selected ids and strategy on topic scope', () => {
+    const result = resolveEffectiveSkillScope(
+      { id: 'topic', skillScope: { mode: 'selected', selectedSkillIds: ['c'], strategy: 'hybrid' } } as any,
+      { id: 'assistant', settings: { skillScope: { mode: 'all', strategy: 'keyword' } } } as any
+    )
+    expect(result).toEqual({ mode: 'selected', selectedSkillIds: ['c'], strategy: 'hybrid' })
+  })
 })

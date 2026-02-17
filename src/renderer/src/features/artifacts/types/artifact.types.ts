@@ -7,13 +7,20 @@
  * Aligned with Prometheus Artifact Specification (PAS) 4.1
  */
 
-import type { KnowledgeReference, MCPToolResponse, NormalToolResponse, WebSearchResponse } from '@renderer/types'
+import type {
+  ContextStrategyConfig,
+  KnowledgeReference,
+  MCPToolResponse,
+  NormalToolResponse,
+  SkillScopeConfig,
+  WebSearchResponse
+} from '@renderer/types'
 import type { JSONSchema7 } from 'json-schema'
 
 /**
  * Supported artifact types for rendering (simple artifacts)
  */
-export type ArtifactType = 'html' | 'htmx' | 'react' | 'svg' | 'mermaid' | 'markdown' | 'code'
+export type ArtifactType = 'html' | 'xhtml' | 'htmx' | 'react' | 'svg' | 'mermaid' | 'markdown' | 'code'
 
 /**
  * PAS 4.1 Artifact kinds for rich application artifacts
@@ -24,6 +31,28 @@ export type ArtifactKind = 'application' | 'page' | 'fragment' | 'agent' | 'work
  * View modes for the artifact workspace
  */
 export type ViewMode = 'preview' | 'code' | 'split'
+
+/**
+ * Runtime capability profiles for artifact execution.
+ */
+export type ArtifactRuntimeProfile = 'basic' | 'standard' | 'advanced'
+
+/**
+ * PMPO orchestration phases for artifact creation/refinement.
+ */
+export type PMPOPhase = 'spec' | 'plan' | 'execute' | 'reflect'
+
+/**
+ * PMPO phase status lifecycle.
+ */
+export type PMPOPhaseStatus = 'pending' | 'in_progress' | 'completed' | 'failed'
+
+export interface PMPOPhaseEvent {
+  phase: PMPOPhase
+  status: PMPOPhaseStatus
+  summary?: string
+  timestamp: string
+}
 
 /**
  * Theme options for artifact rendering
@@ -38,6 +67,25 @@ export enum ArtifactStatus {
   STREAMING = 'streaming',
   COMPLETE = 'complete',
   ERROR = 'error'
+}
+
+/**
+ * Compilation status for the studio code preview
+ */
+export type CompilationStatus = 'idle' | 'compiling' | 'success' | 'error'
+
+/**
+ * Version navigation state for the studio workspace toolbar
+ */
+export interface ArtifactVersionNavigation {
+  /** Currently displayed version number */
+  currentVersion: number
+  /** Total number of versions */
+  totalVersions: number
+  /** Whether back navigation is available */
+  canGoBack: boolean
+  /** Whether forward navigation is available */
+  canGoForward: boolean
 }
 
 /**
@@ -88,6 +136,27 @@ export interface ArtifactMetadata {
   description?: string
   /** Author of the artifact (PAS 4.1) */
   author?: string
+  /** MIME type override for rendering/packaging */
+  mimeType?: string
+  /** Dedicated studio project that owns this artifact */
+  artifactProjectId?: string
+  /** XHTML validation snapshot */
+  validation?: ArtifactValidationState
+  /** Revision ancestry/provenance metadata */
+  provenance?: ArtifactProvenance
+}
+
+export interface ArtifactValidationState {
+  isValid: boolean
+  issues: string[]
+  validatedAt?: string
+}
+
+export interface ArtifactProvenance {
+  sourceArtifactId?: string
+  revisionParentId?: string
+  revisionNumber?: number
+  timestamp: string
 }
 
 /**
@@ -128,6 +197,8 @@ export interface Artifact {
   schema?: ArtifactSchema
   /** PAS 4.1 references to other artifacts */
   references?: ArtifactReference[]
+  /** Owning artifact project ID for standalone studio flow */
+  artifactProjectId?: string
 }
 
 /**
@@ -214,6 +285,10 @@ export interface ArtifactVersion {
   refinementPrompt?: string
   /** Metadata at this version */
   metadata?: Partial<ArtifactMetadata>
+  /** Chat message ID that triggered this version */
+  chatMessageId?: string
+  /** Chat messages snapshot at this version for navigation restore */
+  chatSnapshot?: RefinementMessage[]
 }
 
 /**
@@ -271,6 +346,16 @@ export interface RefinementMessage {
   // Artifact lifecycle diagnostics
   /** Artifact refinement lifecycle events */
   artifactLifecycle?: ArtifactLifecycleEvent[]
+
+  // PMPO orchestration diagnostics
+  /** PMPO phase events emitted during refinement */
+  pmpoPhases?: PMPOPhaseEvent[]
+
+  /** Context strategy used for this refinement */
+  contextStrategy?: string
+
+  /** Skill strategy used for this refinement */
+  skillStrategy?: string
 }
 
 export interface RefinementSkillActivation {
@@ -291,6 +376,126 @@ export interface ArtifactLifecycleEvent {
   stage: 'started' | 'completed' | 'failed'
   summary?: string
   timestamp: string
+}
+
+export type ArtifactProjectStatus = 'active' | 'archived'
+
+export type ArtifactProjectCreatedFrom = 'chat-seeded' | 'library-seeded' | 'template-seeded' | 'scratch' | 'legacy'
+
+export interface ArtifactProjectLlmConfig {
+  modelId?: string
+  providerId?: string
+  temperature?: number
+  topP?: number
+  maxTokens?: number
+  streamOutput?: boolean
+}
+
+export interface ArtifactProjectKnowledgeConfig {
+  knowledgeBaseIds?: string[]
+  /**
+   * Managed, project-linked knowledge bases derived from source context.
+   */
+  linkedKnowledgeBaseIds?: string[]
+  /**
+   * If present, this knowledge base was created from source chat history.
+   */
+  knowledgeBridgeBaseId?: string
+  knowledgeBridgeEnabled?: boolean
+}
+
+export interface ArtifactProjectSourceSnapshot {
+  sourceType: 'assistant' | 'agent' | 'conversation' | 'unknown'
+  assistantId?: string
+  topicId?: string
+  conversationId?: string
+  messageId?: string
+  capturedAt: string
+}
+
+export interface ArtifactProjectContextEnvelope {
+  llm?: ArtifactProjectLlmConfig
+  skills?: SkillScopeConfig
+  contextManagement?: ContextStrategyConfig
+  knowledge?: ArtifactProjectKnowledgeConfig
+  source: ArtifactProjectSourceSnapshot
+}
+
+export interface ArtifactProjectContextOverridePolicy {
+  allowConversationOverride: boolean
+  allowProjectOverride: boolean
+}
+
+export interface ArtifactProjectRuntimeResolvedContext {
+  llm?: ArtifactProjectLlmConfig
+  skills?: SkillScopeConfig
+  contextManagement?: ContextStrategyConfig
+  knowledge?: ArtifactProjectKnowledgeConfig
+  resolvedFrom: {
+    llm: 'conversation' | 'project' | 'source' | 'global'
+    skills: 'conversation' | 'project' | 'source' | 'global'
+    contextManagement: 'conversation' | 'project' | 'source' | 'global'
+    knowledge: 'conversation' | 'project' | 'source' | 'global'
+  }
+}
+
+/**
+ * Persistent studio project independent from conversation lifecycle.
+ */
+export interface ArtifactProject {
+  id: string
+  title: string
+  artifactType: ArtifactType
+  source: 'chat' | 'library' | 'template' | 'standalone' | 'scratch'
+  conversationId?: string
+  messageId?: string
+  artifactId?: string
+  runtimeProfile: ArtifactRuntimeProfile
+  createdAt: string
+  updatedAt: string
+  lastViewMode: ViewMode
+  lastArtifactVersion: number
+  status?: ArtifactProjectStatus
+  createdFrom?: ArtifactProjectCreatedFrom
+  contextEnvelope?: ArtifactProjectContextEnvelope
+  overridePolicy?: ArtifactProjectContextOverridePolicy
+  lastRunSummary?: string
+}
+
+/**
+ * Persisted session state for reopening a studio project.
+ */
+export interface ArtifactStudioSession {
+  id: string
+  projectId: string
+  artifactId: string
+  viewMode: ViewMode
+  content: string
+  revisionPointer: number
+  refinementMessages?: RefinementMessage[]
+  versionHistory?: ArtifactVersion[]
+  currentVersionIndex?: number
+  updatedAt: string
+}
+
+export interface ArtifactPackageManifest {
+  packageVersion: 1
+  artifactId: string
+  projectId?: string
+  title: string
+  type: ArtifactType
+  mimeType: string
+  runtimeProfile: ArtifactRuntimeProfile
+  dependencies: Record<string, string>
+  artifactVersion: number
+  createdAt: string
+  updatedAt: string
+  provenance?: ArtifactProvenance
+}
+
+export interface ArtifactPackagePayload {
+  manifest: ArtifactPackageManifest
+  files: Record<string, string>
 }
 
 /**
@@ -443,6 +648,14 @@ export interface ArtifactsState {
   isArtifactStreaming: boolean
   /** Streaming artifact content for real-time code view updates */
   streamingArtifactContent: string | null
+  /** Whether studio code is actively streaming via <cs-studio-code> protocol */
+  isCodeStreaming: boolean
+  /** Current compilation status for the preview */
+  compilationStatus: CompilationStatus
+  /** Compilation error message if status is 'error' */
+  compilationError: string | null
+  /** Number of auto-fix attempts in the current refinement turn */
+  autoFixAttempts: number
   /** Version history for active artifact */
   versionHistory: ArtifactVersion[]
   /** Current version index (for undo/redo) */
@@ -457,12 +670,31 @@ export interface ArtifactsState {
   parentModelId: string | null
   /** Context messages from the original conversation for refinement context */
   contextMessages: ContextMessage[]
+  /** Active standalone artifact project ID */
+  activeProjectId: string | null
+  /** Active studio session ID */
+  activeStudioSessionId: string | null
+  /** Active project context envelope used to resolve runtime behavior */
+  activeProjectContextEnvelope: ArtifactProjectContextEnvelope | null
+  /** Effective context after precedence resolution */
+  activeProjectResolvedContext: ArtifactProjectRuntimeResolvedContext | null
 }
 
 /** Context message for artifact refinement */
 export interface ContextMessage {
   role: 'user' | 'assistant' | 'system'
   content: string
+}
+
+export interface ArtifactProjectSeedPayload {
+  source?: 'chat' | 'library' | 'template'
+  artifactId?: string
+  artifact?: ParsedArtifact
+  conversationId?: string
+  messageId?: string
+  contextMessages?: Array<{ role: 'user' | 'assistant' | 'system'; content: string }>
+  contextEnvelope?: ArtifactProjectContextEnvelope
+  sourceKnowledgeBaseIds?: string[]
 }
 
 /**
@@ -485,7 +717,7 @@ export const DEFAULT_ARTIFACT_METADATA: ArtifactMetadata = {
  * Type guard to check if a string is a valid ArtifactType
  */
 export function isValidArtifactType(type: string): type is ArtifactType {
-  return ['html', 'htmx', 'react', 'svg', 'mermaid', 'markdown', 'code'].includes(type)
+  return ['html', 'xhtml', 'htmx', 'react', 'svg', 'mermaid', 'markdown', 'code'].includes(type)
 }
 
 /**
@@ -494,8 +726,9 @@ export function isValidArtifactType(type: string): type is ArtifactType {
 export function getArtifactExtension(type: ArtifactType, language?: string): string {
   switch (type) {
     case 'html':
+    case 'xhtml':
     case 'htmx':
-      return 'html'
+      return type === 'xhtml' ? 'xhtml' : 'html'
     case 'react':
       return 'tsx'
     case 'svg':
@@ -519,6 +752,8 @@ export function getArtifactMimeType(type: ArtifactType): string {
     case 'html':
     case 'htmx':
       return 'text/html'
+    case 'xhtml':
+      return 'application/xhtml+xml'
     case 'react':
       return 'text/javascript'
     case 'svg':

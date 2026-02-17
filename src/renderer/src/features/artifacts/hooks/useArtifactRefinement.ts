@@ -7,42 +7,54 @@
  *
  * Key features:
  * - Handles ALL chunk types (text, thinking, web search, knowledge, MCP tools)
- * - Separates conversational text from artifact content during streaming
- * - Streams artifact content to code view in real-time
+ * - Uses StudioStreamParser to separate code from chat text during streaming
+ * - Streams code blocks to code view in real-time via <cs-studio-code> protocol
  * - Displays AI explanations, thinking, citations in chat panel
+ * - Falls back to legacy <cs-artifact> parsing for backward compatibility
  */
 
 import { loggerService } from '@logger'
-import { fetchChatCompletion } from '@renderer/services/ApiService'
-import { getDefaultAssistant, getDefaultModel } from '@renderer/services/AssistantService'
 import { useAppDispatch, useAppSelector } from '@renderer/store'
 import {
   addRefinementMessage,
   saveVersion,
+  selectActiveProjectResolvedContext,
+  selectActiveStudioSessionId,
   selectContextMessages,
   selectIsRefining,
   selectParentModelId,
   selectRefinementMessages,
+  setActiveStudioSessionId,
   setIsArtifactStreaming,
+  setIsCodeStreaming,
   setIsRefining,
   updateContent,
   updateRefinementMessage,
   updateStreamingArtifactContent
 } from '@renderer/store/artifacts'
-import type { Assistant } from '@renderer/types'
+import type { Chunk } from '@renderer/types/chunk'
 import { ChunkType } from '@renderer/types/chunk'
-import { useCallback, useRef } from 'react'
+import { useCallback, useEffect, useRef } from 'react'
 
-import { getArtifactRefinementPrompt } from '../agent/refinementPrompt'
+import { buildArtifactStudioContext } from '../agent/artifactStudioPrompt'
+import { runPMPOWorkflow } from '../agent/pmpoEngine'
+import {
+  ARTIFACT_STUDIO_AGENT_ID,
+  ensureArtifactStudioSession,
+  streamArtifactStudioSessionMessage
+} from '../services/ArtifactStudioRuntimeService'
 import type {
   Artifact,
   ArtifactLifecycleEvent,
   ContextMessage,
+  PMPOPhaseEvent,
   RefinementContextAction,
   RefinementMessage,
   RefinementSkillActivation
 } from '../types'
 import { extractArtifactContent, separateTextAndArtifact } from '../utils/artifactParser'
+import { extractStudioCode, hasStudioCodeTag, StudioStreamParser } from '../utils/studioStreamParser'
+import { validateXhtmlContent } from '../utils/xhtmlValidation'
 
 interface UseArtifactRefinementOptions {
   /** The artifact being refined */
@@ -71,66 +83,20 @@ interface UseArtifactRefinementResult {
 const logger = loggerService.withContext('useArtifactRefinement')
 
 /**
- * Build system prompt for artifact refinement
- * Uses the locked-in artifact refinement agent prompt
- */
-function buildSystemPrompt(artifact: Artifact, contextMessages: ContextMessage[]): string {
-  // Get the base refinement prompt with artifact-specific instructions
-  const basePrompt = getArtifactRefinementPrompt(artifact)
-
-  // Build context section from original conversation
-  let contextSection = ''
-  if (contextMessages.length > 0) {
-    contextSection = `
-
-## Original Conversation Context
-
-The following is context from the original conversation where this artifact was created:
-
-${contextMessages.map((msg) => `**${msg.role.charAt(0).toUpperCase() + msg.role.slice(1)}**: ${msg.content}`).join('\n\n')}
-
----
-
-`
-  }
-
-  // Append context section to the base prompt
-  return `${basePrompt}
-${contextSection}`
-}
-
-/**
  * Build user prompt for artifact refinement
+ * Includes current artifact content and optional conversation context
  */
-function buildUserPrompt(request: string, artifact: Artifact): string {
-  return `Current artifact content:
-\`\`\`${artifact.type}
-${artifact.content}
-\`\`\`
+function buildUserPrompt(request: string, artifact: Artifact, contextMessages: ContextMessage[]): string {
+  const context = buildArtifactStudioContext(artifact)
+  const conversationContext =
+    contextMessages.length > 0
+      ? `\n\n## Conversation Context\n${contextMessages.map((msg) => `${msg.role.toUpperCase()}: ${msg.content}`).join('\n\n')}`
+      : ''
+
+  return `${context}
+${conversationContext}
 
 Please make the following changes: ${request}`
-}
-
-/**
- * Create a refinement assistant with the artifact-specific prompt
- */
-function createRefinementAssistant(artifact: Artifact, contextMessages: ContextMessage[], modelId?: string): Assistant {
-  const baseAssistant = getDefaultAssistant()
-  const model = modelId ? { ...getDefaultModel(), id: modelId } : getDefaultModel()
-  const systemPrompt = buildSystemPrompt(artifact, contextMessages)
-
-  return {
-    ...baseAssistant,
-    id: 'artifact-refinement-assistant',
-    name: 'Artifact Designer',
-    model,
-    prompt: systemPrompt,
-    settings: {
-      ...baseAssistant.settings,
-      temperature: 0.7,
-      streamOutput: true
-    }
-  }
 }
 
 /**
@@ -154,6 +120,11 @@ export function useArtifactRefinement(options: UseArtifactRefinementOptions): Us
   const isRefining = useAppSelector(selectIsRefining)
   const contextMessages = useAppSelector(selectContextMessages)
   const parentModelId = useAppSelector(selectParentModelId)
+  const resolvedProjectContext = useAppSelector(selectActiveProjectResolvedContext)
+  const defaultModel = useAppSelector((state) => state.llm.defaultModel)
+  const apiServer = useAppSelector((state) => state.settings.apiServer)
+  const activeStudioSessionId = useAppSelector(selectActiveStudioSessionId)
+  const contextStrategyType = useAppSelector((state) => state.settings?.contextStrategy?.type || 'sliding_window')
 
   // Track accumulated content
   const responseContentRef = useRef<string>('')
@@ -162,6 +133,15 @@ export function useArtifactRefinement(options: UseArtifactRefinementOptions): Us
   const skillActivationsRef = useRef<RefinementSkillActivation[]>([])
   const contextActionsRef = useRef<RefinementContextAction[]>([])
   const artifactLifecycleRef = useRef<ArtifactLifecycleEvent[]>([])
+  const pmpoPhaseEventsRef = useRef<PMPOPhaseEvent[]>([])
+  const runtimeSessionIdRef = useRef<string | null>(activeStudioSessionId)
+
+  // Studio stream parser instance (persists across re-renders)
+  const studioParserRef = useRef<StudioStreamParser | null>(null)
+
+  useEffect(() => {
+    runtimeSessionIdRef.current = activeStudioSessionId
+  }, [activeStudioSessionId])
 
   // Send refinement request
   const sendRefinement = useCallback(
@@ -190,13 +170,44 @@ export function useArtifactRefinement(options: UseArtifactRefinementOptions): Us
       assistantMessageIdRef.current = `assistant-${Date.now()}`
       skillActivationsRef.current = []
       contextActionsRef.current = []
-      artifactLifecycleRef.current = [
-        {
-          stage: 'started',
-          summary: 'Artifact refinement started',
-          timestamp: new Date().toISOString()
+      artifactLifecycleRef.current = []
+      pmpoPhaseEventsRef.current = []
+
+      // Initialize StudioStreamParser with callbacks that route to Redux
+      const messageId = assistantMessageIdRef.current
+      studioParserRef.current = new StudioStreamParser({
+        callbacks: {
+          onCodeStart: ({ metadata }) => {
+            dispatch(setIsCodeStreaming(true))
+            dispatch(setIsArtifactStreaming(true))
+            logger.info('Studio code streaming started', { metadata })
+          },
+          onCodeStream: ({ content }) => {
+            // Stream code content to the code editor in real-time
+            dispatch(updateStreamingArtifactContent(content))
+          },
+          onCodeComplete: ({ content, metadata }) => {
+            dispatch(setIsCodeStreaming(false))
+            dispatch(setIsArtifactStreaming(false))
+            // Final streaming content will be processed in the completion handler
+            dispatch(updateStreamingArtifactContent(content))
+            logger.info('Studio code streaming complete', {
+              contentLength: content.length,
+              metadata
+            })
+          },
+          onChatText: (text) => {
+            // Route chat text to the refinement message
+            dispatch(
+              updateRefinementMessage({
+                id: messageId,
+                content: text,
+                isStreaming: true
+              })
+            )
+          }
         }
-      ]
+      })
 
       // Add placeholder assistant message
       dispatch(
@@ -205,46 +216,57 @@ export function useArtifactRefinement(options: UseArtifactRefinementOptions): Us
           role: 'assistant',
           content: '',
           isStreaming: true,
-          artifactLifecycle: artifactLifecycleRef.current
+          artifactLifecycle: artifactLifecycleRef.current,
+          pmpoPhases: pmpoPhaseEventsRef.current
         })
       )
 
       try {
-        // Create assistant with refinement prompt
-        const assistant = createRefinementAssistant(artifact, contextMessages, parentModelId || undefined)
+        const skillStrategy = resolvedProjectContext?.skills?.strategy || 'inherit'
+        const resolvedContextStrategy = resolvedProjectContext?.contextManagement?.type || contextStrategyType
+        const fallbackModelId =
+          parentModelId ||
+          (defaultModel?.provider && defaultModel?.id ? `${defaultModel.provider}:${defaultModel.id}` : undefined)
+
+        const runtimeSession = await ensureArtifactStudioSession({
+          apiServer,
+          preferredSessionId: runtimeSessionIdRef.current,
+          sessionName: `Artifact Studio - ${artifact.title}`,
+          preferredModelId: parentModelId || undefined,
+          fallbackModelId,
+          skillScope: resolvedProjectContext?.skills,
+          contextStrategy: resolvedProjectContext?.contextManagement
+        })
+
+        runtimeSessionIdRef.current = runtimeSession.sessionId
+        if (activeStudioSessionId !== runtimeSession.sessionId) {
+          dispatch(setActiveStudioSessionId(runtimeSession.sessionId))
+        }
 
         // Build the user prompt with artifact content
-        const userPrompt = buildUserPrompt(prompt, artifact)
+        const userPrompt = buildUserPrompt(prompt, artifact, contextMessages)
 
-        // Call AI with streaming - handle ALL chunk types
-        await fetchChatCompletion({
-          prompt: userPrompt,
-          assistant,
-          requestOptions: {},
-          onChunkReceived: (chunk) => {
-            const msgId = assistantMessageIdRef.current
+        const handleChunk = (chunk: Chunk) => {
+          const msgId = assistantMessageIdRef.current
 
-            switch (chunk.type) {
-              // ========== TEXT CHUNKS ==========
-              case ChunkType.TEXT_DELTA:
-                if (chunk.text) {
-                  // Accumulate full response
-                  responseContentRef.current += chunk.text
+          switch (chunk.type) {
+            case ChunkType.TEXT_DELTA:
+              if (chunk.text) {
+                responseContentRef.current += chunk.text
 
-                  // Separate text from artifact content
+                // Use StudioStreamParser for <cs-studio-code> protocol
+                if (studioParserRef.current) {
+                  // The parser handles routing: code → code editor, text → chat panel
+                  studioParserRef.current.parse(msgId, responseContentRef.current)
+                } else {
+                  // Fallback to legacy <cs-artifact> parsing
                   const { textContent, artifactContent, isArtifactStreaming } = separateTextAndArtifact(
                     responseContentRef.current
                   )
-
-                  // Update streaming state
                   dispatch(setIsArtifactStreaming(isArtifactStreaming))
-
-                  // Stream artifact content to code view in real-time
                   if (artifactContent) {
                     dispatch(updateStreamingArtifactContent(artifactContent))
                   }
-
-                  // Update chat message with text content only
                   dispatch(
                     updateRefinementMessage({
                       id: msgId,
@@ -253,227 +275,223 @@ export function useArtifactRefinement(options: UseArtifactRefinementOptions): Us
                     })
                   )
                 }
-                break
-
-              case ChunkType.TEXT_COMPLETE:
-                // Text streaming complete
-                break
-
-              // ========== THINKING/REASONING CHUNKS ==========
-              case ChunkType.THINKING_START:
+              }
+              break
+            case ChunkType.THINKING_START:
+              dispatch(updateRefinementMessage({ id: msgId, isThinking: true }))
+              break
+            case ChunkType.THINKING_DELTA:
+              if (chunk.text) {
+                thinkingContentRef.current += chunk.text
                 dispatch(
                   updateRefinementMessage({
                     id: msgId,
+                    thinking: thinkingContentRef.current,
+                    thinkingTime: chunk.thinking_millsec,
                     isThinking: true
                   })
                 )
-                break
-
-              case ChunkType.THINKING_DELTA:
-                if (chunk.text) {
-                  thinkingContentRef.current += chunk.text
-                  dispatch(
-                    updateRefinementMessage({
-                      id: msgId,
-                      thinking: thinkingContentRef.current,
-                      thinkingTime: chunk.thinking_millsec,
-                      isThinking: true
-                    })
-                  )
+              }
+              break
+            case ChunkType.THINKING_COMPLETE:
+              dispatch(
+                updateRefinementMessage({
+                  id: msgId,
+                  thinking: chunk.text || thinkingContentRef.current,
+                  thinkingTime: chunk.thinking_millsec,
+                  isThinking: false
+                })
+              )
+              break
+            case ChunkType.WEB_SEARCH_IN_PROGRESS:
+            case ChunkType.LLM_WEB_SEARCH_IN_PROGRESS:
+            case ChunkType.SEARCH_IN_PROGRESS_UNION:
+              dispatch(updateRefinementMessage({ id: msgId, isSearching: true }))
+              break
+            case ChunkType.WEB_SEARCH_COMPLETE:
+              dispatch(updateRefinementMessage({ id: msgId, webSearchResults: chunk.web_search, isSearching: false }))
+              break
+            case ChunkType.LLM_WEB_SEARCH_COMPLETE:
+              dispatch(
+                updateRefinementMessage({
+                  id: msgId,
+                  webSearchResults: chunk.llm_web_search,
+                  isSearching: false
+                })
+              )
+              break
+            case ChunkType.SEARCH_COMPLETE_UNION:
+              dispatch(updateRefinementMessage({ id: msgId, isSearching: false }))
+              break
+            case ChunkType.KNOWLEDGE_SEARCH_IN_PROGRESS:
+              dispatch(updateRefinementMessage({ id: msgId, isKnowledgeSearching: true }))
+              break
+            case ChunkType.KNOWLEDGE_SEARCH_COMPLETE:
+              dispatch(
+                updateRefinementMessage({ id: msgId, knowledgeResults: chunk.knowledge, isKnowledgeSearching: false })
+              )
+              break
+            case ChunkType.MCP_TOOL_CREATED:
+            case ChunkType.MCP_TOOL_PENDING:
+            case ChunkType.MCP_TOOL_IN_PROGRESS:
+              dispatch(updateRefinementMessage({ id: msgId, isMcpToolRunning: true }))
+              break
+            case ChunkType.MCP_TOOL_COMPLETE:
+              dispatch(updateRefinementMessage({ id: msgId, mcpTools: chunk.responses, isMcpToolRunning: false }))
+              break
+            case ChunkType.SKILL_ACTIVATION:
+              skillActivationsRef.current = [
+                ...skillActivationsRef.current,
+                {
+                  skillName: chunk.skillName,
+                  action: chunk.action,
+                  toolName: chunk.toolName,
+                  result: chunk.result,
+                  error: chunk.error
                 }
-                break
+              ]
+              dispatch(updateRefinementMessage({ id: msgId, skillActivations: skillActivationsRef.current }))
+              break
+            case ChunkType.CONTEXT_ACTION:
+              contextActionsRef.current = [
+                ...contextActionsRef.current,
+                {
+                  action: chunk.action,
+                  summary: chunk.summary,
+                  removedCount: chunk.removedCount
+                }
+              ]
+              dispatch(updateRefinementMessage({ id: msgId, contextActions: contextActionsRef.current }))
+              break
+            case ChunkType.ARTIFACT_LIFECYCLE:
+              artifactLifecycleRef.current = [
+                ...artifactLifecycleRef.current,
+                {
+                  stage: chunk.stage,
+                  summary: chunk.summary,
+                  timestamp: new Date().toISOString()
+                }
+              ]
+              dispatch(updateRefinementMessage({ id: msgId, artifactLifecycle: artifactLifecycleRef.current }))
+              break
+            case ChunkType.BLOCK_COMPLETE:
+            case ChunkType.LLM_RESPONSE_COMPLETE:
+              dispatch(setIsArtifactStreaming(false))
+              dispatch(setIsCodeStreaming(false))
+              dispatch(updateStreamingArtifactContent(null))
+              break
+            case ChunkType.ERROR:
+              dispatch(setIsArtifactStreaming(false))
+              dispatch(setIsCodeStreaming(false))
+              dispatch(updateStreamingArtifactContent(null))
+              throw new Error(chunk.error?.message || 'Unknown error')
+            default:
+              break
+          }
+        }
 
-              case ChunkType.THINKING_COMPLETE:
-                dispatch(
-                  updateRefinementMessage({
-                    id: msgId,
-                    thinking: chunk.text || thinkingContentRef.current,
-                    thinkingTime: chunk.thinking_millsec,
-                    isThinking: false
-                  })
-                )
-                break
+        const emitLifecycle = (stage: 'started' | 'completed' | 'failed', summary: string) => {
+          handleChunk({
+            type: ChunkType.ARTIFACT_LIFECYCLE,
+            stage,
+            summary
+          })
+        }
 
-              // ========== WEB SEARCH CHUNKS ==========
-              case ChunkType.WEB_SEARCH_IN_PROGRESS:
-              case ChunkType.LLM_WEB_SEARCH_IN_PROGRESS:
-              case ChunkType.SEARCH_IN_PROGRESS_UNION:
-                dispatch(
-                  updateRefinementMessage({
-                    id: msgId,
-                    isSearching: true
-                  })
-                )
-                break
+        emitLifecycle(
+          'started',
+          `Artifact refinement started (agent: ${ARTIFACT_STUDIO_AGENT_ID}, session: ${runtimeSession.sessionId}, model: ${runtimeSession.modelId || 'agent-default'}, context: ${resolvedContextStrategy}, skills: ${resolvedProjectContext?.skills?.mode || 'inherit'})`
+        )
 
-              case ChunkType.WEB_SEARCH_COMPLETE:
-                dispatch(
-                  updateRefinementMessage({
-                    id: msgId,
-                    webSearchResults: chunk.web_search,
-                    isSearching: false
-                  })
-                )
-                break
+        await runPMPOWorkflow({
+          request: prompt,
+          maxCorrectiveLoops: 1,
+          onPhaseEvent: (event) => {
+            pmpoPhaseEventsRef.current = [...pmpoPhaseEventsRef.current, event]
+            dispatch(
+              updateRefinementMessage({
+                id: assistantMessageIdRef.current,
+                pmpoPhases: pmpoPhaseEventsRef.current
+              })
+            )
+          },
+          execute: async () => {
+            responseContentRef.current = ''
+            thinkingContentRef.current = ''
+            await streamArtifactStudioSessionMessage({
+              apiServer,
+              agentId: runtimeSession.agentId,
+              sessionId: runtimeSession.sessionId,
+              content: userPrompt,
+              onChunk: (chunk) => handleChunk(chunk),
+              onSessionUpdate: (sessionId) => {
+                if (!sessionId || sessionId === runtimeSessionIdRef.current) {
+                  return
+                }
+                runtimeSessionIdRef.current = sessionId
+                dispatch(setActiveStudioSessionId(sessionId))
+              }
+            })
+            return {
+              summary: 'Artifact execution stream completed'
+            }
+          },
+          reflect: () => {
+            const studioResult = extractStudioCode(responseContentRef.current)
+            const finalContent = studioResult?.code || extractArtifactContent(responseContentRef.current)
+            if (!finalContent) {
+              return {
+                pass: false,
+                summary: 'No artifact output generated in execute phase.'
+              }
+            }
 
-              case ChunkType.LLM_WEB_SEARCH_COMPLETE:
-                dispatch(
-                  updateRefinementMessage({
-                    id: msgId,
-                    webSearchResults: chunk.llm_web_search,
-                    isSearching: false
-                  })
-                )
-                break
+            if (artifact.type === 'xhtml') {
+              const validation = validateXhtmlContent(finalContent)
+              if (!validation.isValid) {
+                return {
+                  pass: false,
+                  summary: `XHTML validation failed: ${validation.issues[0] || 'Invalid XHTML'}`
+                }
+              }
+            }
 
-              case ChunkType.SEARCH_COMPLETE_UNION:
-                dispatch(
-                  updateRefinementMessage({
-                    id: msgId,
-                    isSearching: false
-                  })
-                )
-                break
-
-              // ========== KNOWLEDGE BASE CHUNKS ==========
-              case ChunkType.KNOWLEDGE_SEARCH_IN_PROGRESS:
-                dispatch(
-                  updateRefinementMessage({
-                    id: msgId,
-                    isKnowledgeSearching: true
-                  })
-                )
-                break
-
-              case ChunkType.KNOWLEDGE_SEARCH_COMPLETE:
-                dispatch(
-                  updateRefinementMessage({
-                    id: msgId,
-                    knowledgeResults: chunk.knowledge,
-                    isKnowledgeSearching: false
-                  })
-                )
-                break
-
-              // ========== MCP TOOL CHUNKS ==========
-              case ChunkType.MCP_TOOL_CREATED:
-              case ChunkType.MCP_TOOL_PENDING:
-              case ChunkType.MCP_TOOL_IN_PROGRESS:
-                dispatch(
-                  updateRefinementMessage({
-                    id: msgId,
-                    isMcpToolRunning: true
-                  })
-                )
-                break
-
-              case ChunkType.MCP_TOOL_COMPLETE:
-                dispatch(
-                  updateRefinementMessage({
-                    id: msgId,
-                    mcpTools: chunk.responses,
-                    isMcpToolRunning: false
-                  })
-                )
-                break
-
-              // ========== SKILLS / CONTEXT / LIFECYCLE CHUNKS ==========
-              case ChunkType.SKILL_ACTIVATION:
-                skillActivationsRef.current = [
-                  ...skillActivationsRef.current,
-                  {
-                    skillName: chunk.skillName,
-                    action: chunk.action,
-                    toolName: chunk.toolName,
-                    result: chunk.result,
-                    error: chunk.error
-                  }
-                ]
-                dispatch(
-                  updateRefinementMessage({
-                    id: msgId,
-                    skillActivations: skillActivationsRef.current
-                  })
-                )
-                break
-
-              case ChunkType.CONTEXT_ACTION:
-                contextActionsRef.current = [
-                  ...contextActionsRef.current,
-                  {
-                    action: chunk.action,
-                    summary: chunk.summary,
-                    removedCount: chunk.removedCount
-                  }
-                ]
-                dispatch(
-                  updateRefinementMessage({
-                    id: msgId,
-                    contextActions: contextActionsRef.current
-                  })
-                )
-                break
-
-              case ChunkType.ARTIFACT_LIFECYCLE:
-                artifactLifecycleRef.current = [
-                  ...artifactLifecycleRef.current,
-                  {
-                    stage: chunk.stage,
-                    summary: chunk.summary,
-                    timestamp: new Date().toISOString()
-                  }
-                ]
-                dispatch(
-                  updateRefinementMessage({
-                    id: msgId,
-                    artifactLifecycle: artifactLifecycleRef.current
-                  })
-                )
-                break
-
-              // ========== COMPLETION CHUNKS ==========
-              case ChunkType.BLOCK_COMPLETE:
-              case ChunkType.LLM_RESPONSE_COMPLETE:
-                dispatch(setIsArtifactStreaming(false))
-                dispatch(updateStreamingArtifactContent(null))
-                break
-
-              case ChunkType.LLM_RESPONSE_CREATED:
-              case ChunkType.LLM_RESPONSE_IN_PROGRESS:
-              case ChunkType.BLOCK_CREATED:
-              case ChunkType.BLOCK_IN_PROGRESS:
-                // Informational chunks, no action needed
-                break
-
-              // ========== ERROR CHUNK ==========
-              case ChunkType.ERROR:
-                dispatch(setIsArtifactStreaming(false))
-                dispatch(updateStreamingArtifactContent(null))
-                throw new Error(chunk.error?.message || 'Unknown error')
-
-              default:
-                // Handle any other chunk types gracefully
-                break
+            return {
+              pass: true,
+              summary: studioResult
+                ? 'Reflection checks passed (studio protocol)'
+                : 'Reflection checks passed (legacy fallback protocol)'
             }
           }
         })
 
         // Final processing after streaming completes
-        const { textContent, artifactContent } = separateTextAndArtifact(responseContentRef.current)
-        artifactLifecycleRef.current = [
-          ...artifactLifecycleRef.current,
-          {
-            stage: 'completed',
-            summary: 'Artifact refinement completed',
-            timestamp: new Date().toISOString()
+        // Try new <cs-studio-code> extraction first, fall back to legacy <cs-artifact>
+        let finalContent: string | null = null
+        let textContent: string = ''
+
+        if (hasStudioCodeTag(responseContentRef.current)) {
+          const studioResult = extractStudioCode(responseContentRef.current)
+          if (studioResult) {
+            finalContent = studioResult.code
+            textContent = studioResult.chatText
           }
-        ]
+        }
+
+        // Fallback to legacy <cs-artifact> parsing
+        if (!finalContent) {
+          const legacyResult = separateTextAndArtifact(responseContentRef.current)
+          textContent = legacyResult.textContent
+          finalContent = extractArtifactContent(responseContentRef.current)
+        }
+
+        emitLifecycle('completed', 'Artifact refinement completed')
 
         // Mark message as complete
         dispatch(
           updateRefinementMessage({
             id: assistantMessageIdRef.current,
-            content: textContent || (artifactContent ? '_Artifact has been updated._' : ''),
+            content: textContent || (finalContent ? '_Artifact has been updated._' : ''),
             isStreaming: false,
             isThinking: false,
             isSearching: false,
@@ -481,17 +499,20 @@ export function useArtifactRefinement(options: UseArtifactRefinementOptions): Us
             isMcpToolRunning: false,
             skillActivations: skillActivationsRef.current,
             contextActions: contextActionsRef.current,
-            artifactLifecycle: artifactLifecycleRef.current
+            artifactLifecycle: artifactLifecycleRef.current,
+            pmpoPhases: pmpoPhaseEventsRef.current,
+            contextStrategy: resolvedContextStrategy,
+            skillStrategy
           })
         )
 
-        // Clear streaming artifact content
+        // Clear streaming state
         dispatch(updateStreamingArtifactContent(null))
-
-        // Extract final artifact content and update
-        const finalContent = extractArtifactContent(responseContentRef.current)
+        dispatch(setIsCodeStreaming(false))
 
         if (finalContent && finalContent !== artifact.content) {
+          const validation = artifact.type === 'xhtml' ? validateXhtmlContent(finalContent) : undefined
+
           // Save current version before updating
           await dispatch(
             saveVersion({
@@ -504,13 +525,29 @@ export function useArtifactRefinement(options: UseArtifactRefinementOptions): Us
           // Update artifact content
           dispatch(updateContent(finalContent))
 
+          if (validation) {
+            dispatch(
+              updateRefinementMessage({
+                id: assistantMessageIdRef.current,
+                content: validation.isValid
+                  ? textContent || '_Artifact has been updated._'
+                  : `${textContent}\n\nXHTML validation issues:\n- ${validation.issues.join('\n- ')}`
+              })
+            )
+          }
+
           // Notify completion
           onComplete?.(finalContent)
         }
+
+        // Clean up parser
+        studioParserRef.current?.reset()
       } catch (error) {
         logger.error('Refinement error', error as Error)
         dispatch(setIsArtifactStreaming(false))
+        dispatch(setIsCodeStreaming(false))
         dispatch(updateStreamingArtifactContent(null))
+        studioParserRef.current?.reset()
         artifactLifecycleRef.current = [
           ...artifactLifecycleRef.current,
           {
@@ -534,16 +571,34 @@ export function useArtifactRefinement(options: UseArtifactRefinementOptions): Us
             isMcpToolRunning: false,
             skillActivations: skillActivationsRef.current,
             contextActions: contextActionsRef.current,
-            artifactLifecycle: artifactLifecycleRef.current
+            artifactLifecycle: artifactLifecycleRef.current,
+            pmpoPhases: pmpoPhaseEventsRef.current,
+            contextStrategy: resolvedProjectContext?.contextManagement?.type || contextStrategyType,
+            skillStrategy: 'inherit'
           })
         )
         onError?.(error as Error)
       } finally {
         dispatch(setIsRefining(false))
         dispatch(setIsArtifactStreaming(false))
+        dispatch(setIsCodeStreaming(false))
       }
     },
-    [artifact, isRefining, contextMessages, parentModelId, dispatch, onStart, onComplete, onError]
+    [
+      artifact,
+      isRefining,
+      contextMessages,
+      parentModelId,
+      resolvedProjectContext,
+      defaultModel,
+      apiServer,
+      activeStudioSessionId,
+      contextStrategyType,
+      dispatch,
+      onStart,
+      onComplete,
+      onError
+    ]
   )
 
   // Clear messages

@@ -1,8 +1,10 @@
 import { CodeBlockView, HtmlArtifactsCard, ReactArtifactsCard } from '@renderer/components/CodeBlockView'
 import { useSettings } from '@renderer/hooks/useSettings'
 import { EVENT_NAMES, EventEmitter } from '@renderer/services/EventService'
+import { useAppSelector } from '@renderer/store'
 import store from '@renderer/store'
 import { messageBlocksSelectors } from '@renderer/store/messageBlock'
+import { selectCurrentTopicId } from '@renderer/store/newMessage'
 import { MessageBlockStatus } from '@renderer/types/newMessage'
 import { getCodeBlockId, isOpenFenceBlock } from '@renderer/utils/markdown'
 import type { Node } from 'mdast'
@@ -21,6 +23,8 @@ const CodeBlock: React.FC<Props> = ({ children, className, node, blockId }) => {
   const isMultiline = children?.includes('\n')
   const language = languageMatch?.[1] ?? (isMultiline ? 'text' : null)
   const { codeFancyBlock } = useSettings()
+  const currentTopicId = useAppSelector(selectCurrentTopicId)
+  const conversationId = currentTopicId || `inline-${blockId}`
 
   // 代码块 id
   const id = useMemo(() => getCodeBlockId(node?.position?.start), [node?.position?.start])
@@ -47,7 +51,15 @@ const CodeBlock: React.FC<Props> = ({ children, className, node, blockId }) => {
     if (codeFancyBlock) {
       if (language === 'html') {
         const isOpenFence = isOpenFenceBlock(children?.length, languageMatch?.[1]?.length, node?.position)
-        return <HtmlArtifactsCard html={children} onSave={handleSave} isStreaming={isStreaming && isOpenFence} />
+        return (
+          <HtmlArtifactsCard
+            html={children}
+            onSave={handleSave}
+            isStreaming={isStreaming && isOpenFence}
+            conversationId={conversationId}
+            messageId={blockId}
+          />
+        )
       }
       if (language === 'tsx' || language === 'jsx') {
         const isOpenFence = isOpenFenceBlock(children?.length, languageMatch?.[1]?.length, node?.position)
@@ -57,6 +69,8 @@ const CodeBlock: React.FC<Props> = ({ children, className, node, blockId }) => {
             language={language}
             onSave={handleSave}
             isStreaming={isStreaming && isOpenFence}
+            conversationId={conversationId}
+            messageId={blockId}
           />
         )
       }

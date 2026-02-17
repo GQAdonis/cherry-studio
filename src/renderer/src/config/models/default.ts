@@ -26,7 +26,68 @@ export const SYSTEM_MODELS: Record<SystemProviderId | 'defaultModel', Model[]> =
     qwen3Next80BModel
   ],
   cherryin: [],
-  vertexai: [],
+  vertexai: [
+    {
+      id: 'gemini-2.0-flash',
+      name: 'Gemini 2.0 Flash',
+      provider: 'vertexai',
+      group: 'Gemini'
+    },
+    {
+      id: 'gemini-2.0-flash-exp',
+      name: 'Gemini 2.0 Flash Experimental',
+      provider: 'vertexai',
+      group: 'Gemini'
+    },
+    {
+      id: 'gemini-2.0-pro',
+      name: 'Gemini 2.0 Pro',
+      provider: 'vertexai',
+      group: 'Gemini'
+    },
+    {
+      id: 'gemini-1.5-pro',
+      name: 'Gemini 1.5 Pro',
+      provider: 'vertexai',
+      group: 'Gemini'
+    },
+    {
+      id: 'gemini-1.5-flash',
+      name: 'Gemini 1.5 Flash',
+      provider: 'vertexai',
+      group: 'Gemini'
+    },
+    {
+      id: 'claude-3-5-sonnet@20241022',
+      name: 'Claude 3.5 Sonnet',
+      provider: 'vertexai',
+      group: 'Anthropic'
+    },
+    {
+      id: 'claude-3-5-sonnet-v2@20241022',
+      name: 'Claude 3.5 Sonnet v2',
+      provider: 'vertexai',
+      group: 'Anthropic'
+    },
+    {
+      id: 'claude-3-7-sonnet@20250219',
+      name: 'Claude 3.7 Sonnet',
+      provider: 'vertexai',
+      group: 'Anthropic'
+    },
+    {
+      id: 'claude-3-opus@20240229',
+      name: 'Claude 3 Opus',
+      provider: 'vertexai',
+      group: 'Anthropic'
+    },
+    {
+      id: 'claude-3-haiku@20240307',
+      name: 'Claude 3 Haiku',
+      provider: 'vertexai',
+      group: 'Anthropic'
+    }
+  ],
   sophnet: [],
   '302ai': [
     {

@@ -17,9 +17,9 @@ export const extractAgentSessionIdFromTopicId = (topicId: string): string => {
 export const getModelFilterByAgentType = (type: AgentType): ApiModelsFilter => {
   switch (type) {
     case 'claude-code':
-      return {
-        providerType: 'anthropic'
-      }
+      // Claude Code sessions can run against any compatible provider/model exposed by the API server.
+      // Do not hard-filter to Anthropic so VertexAI and other compatible providers remain selectable.
+      return {}
     default:
       return {}
   }

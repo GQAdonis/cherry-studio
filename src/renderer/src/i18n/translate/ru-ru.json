@@ -152,6 +152,11 @@
         },
         "title": "Расширенные настройки"
       },
+      "context": {
+        "description": "[to be translated]:Control how this agent/session manages long context windows before model limits are reached.",
+        "title": "[to be translated]:Context Management",
+        "useGlobal": "[to be translated]:Use Global Default"
+      },
       "essential": "Основные настройки",
       "permissionMode": {
         "tab": "Режим разрешений",
@@ -223,6 +228,15 @@
         "uninstalling": "Удаление..."
       },
       "prompt": "Настройки подсказки",
+      "skills": {
+        "description": "[to be translated]:Configure skill availability and intent strategy for this agent/session scope.",
+        "helper": "[to be translated]:Set scoped skill availability and intent strategy for this agent.",
+        "mode": "[to be translated]:Availability",
+        "selected": "[to be translated]:Selected Skills",
+        "selectedPlaceholder": "[to be translated]:Choose skills for this scope",
+        "strategy": "[to be translated]:Intent Strategy",
+        "title": "[to be translated]:Skills"
+      },
       "tooling": {
         "mcp": {
           "description": "Подключите серверы MCP, чтобы разблокировать дополнительные инструменты, которые вы можете одобрить выше.",
@@ -526,6 +540,8 @@
     "zoomOut": "Отдалить"
   },
   "artifacts": {
+    "archive": "[to be translated]:Archive",
+    "artifact_chat": "[to be translated]:Artifact Chat",
     "attach_image": "Прикрепить изображение",
     "change_model": "Нажмите, чтобы изменить модель",
     "click_to_open": "Нажмите, чтобы открыть артефакт",
@@ -533,14 +549,22 @@
     "console": "Консоль",
     "description_help": "Используется для поиска артефактов в вашей библиотеке",
     "description_placeholder": "Что делает этот артефакт?",
+    "download_package": "[to be translated]:Download package",
     "generating": "Генерация артефакта...",
+    "hide_archived": "[to be translated]:Active",
+    "knowledge_bridge": "[to be translated]:Create knowledge bridge from chat history",
     "library": "Библиотека артефактов",
     "model_locked": "Выбор модели заблокирован",
     "new_artifact": "Новый артефакт",
+    "new_project_setup": "[to be translated]:New Artifact Studio Project",
     "no_artifacts": "Артефакты не найдены",
     "open_artifact": "Открыть артефакт",
+    "open_studio": "[to be translated]:Artifact Studio",
     "preview": "Предварительный просмотр",
     "preview_type": "Тип",
+    "project_name_placeholder": "[to be translated]:Marketing landing page",
+    "projects_title": "[to be translated]:Artifact Studio Projects",
+    "rebind_source": "[to be translated]:Rebind Source",
     "refinement": "Чат улучшений",
     "refinement_empty": "Пока нет сообщений",
     "refinement_hint": "Попросите ИИ изменить этот артефакт",
@@ -548,6 +572,8 @@
     "save_from_modal": "Откройте артефакт, чтобы сохранить его",
     "save_to_library": "Сохранить в библиотеку",
     "saved": "Артефакт сохранен в библиотеку",
+    "show_archived": "[to be translated]:Archived",
+    "source": "[to be translated]:Source",
     "split": "Разделить",
     "tags_placeholder": "Добавить теги...",
     "title": "Артефакты",
@@ -561,6 +587,7 @@
       "react": "React",
       "svg": "SVG"
     },
+    "updated_at": "[to be translated]:Updated",
     "version": "Версия",
     "view": {
       "code": "Код",
@@ -576,6 +603,12 @@
     },
     "copy": {
       "title": "Копировать ассистента"
+    },
+    "create": {
+      "settings": {
+        "description": "[to be translated]:Apply skill and context defaults before creating this assistant.",
+        "title": "[to be translated]:Creation Settings"
+      }
     },
     "delete": {
       "content": "Удаление ассистента удалит все топики и файлы под ассистентом. Вы уверены, что хотите удалить его?",
@@ -759,6 +792,17 @@
         "title": "Регулярные подсказки",
         "titleLabel": "Заголовок",
         "titlePlaceholder": "Введите заголовок"
+      },
+      "skills": {
+        "custom": "[to be translated]:Use Custom Policy",
+        "custom_info": "[to be translated]:Custom skill policy overrides global defaults for this assistant. Conversation settings can still override assistant scope.",
+        "description": "[to be translated]:Control skill availability and intent classification strategy for this assistant. Conversation-level settings can still override this.",
+        "mode": "[to be translated]:Availability",
+        "selected": "[to be translated]:Selected Skills",
+        "selected_placeholder": "[to be translated]:Choose skills available to this assistant",
+        "strategy": "[to be translated]:Intent Strategy",
+        "title": "[to be translated]:Skills",
+        "use_global": "[to be translated]:Use Global Default"
       },
       "title": "Настройки ассистента",
       "tool_use_mode": {
@@ -1281,6 +1325,16 @@
         "placeholder": "Искать темы...",
         "title": "Поиск"
       },
+      "skill_scope": {
+        "all": "[to be translated]:All Skills",
+        "label": "[to be translated]:Skill Scope",
+        "no_skills": "[to be translated]:No skills available",
+        "none": "[to be translated]:No Skills",
+        "selected": "[to be translated]:Selected Skills ({{count}})",
+        "strategy": "[to be translated]:Intent Strategy",
+        "strategy_inherit": "[to be translated]:Inherit Global",
+        "use_assistant": "[to be translated]:Use Assistant Default"
+      },
       "title": "Топики",
       "unpin": "Открепленные темы"
     },
@@ -1373,6 +1427,7 @@
     "advanced_settings": "Дополнительные настройки",
     "agent_one": "Агент",
     "agent_other": "Агенты",
+    "all": "[to be translated]:All",
     "and": "и",
     "assistant": "Ассистент",
     "assistant_one": "Помощник",
@@ -1385,6 +1440,7 @@
     "clear": "Очистить",
     "clear_all": "Очистить всё",
     "click_to_replace": "Щёлкните для замены",
+    "clone": "[to be translated]:Clone",
     "close": "Закрыть",
     "collapse": "Свернуть",
     "completed": "Завершено",
@@ -1392,6 +1448,7 @@
     "copied": "Скопировано",
     "copy": "Копировать",
     "copy_failed": "Не удалось скопировать",
+    "create": "[to be translated]:Create",
     "current": "Текущий",
     "cut": "Вырезать",
     "dark_mode": "Темный режим",
@@ -3764,9 +3821,46 @@
         "use_sandpack_help": "Используйте CodeSandbox Sandpack для артефактов React. Включает зависимости NPM, горячую перезагрузку и лучшее управление ошибками. Отключите для простой транспиляции только с Babel."
       },
       "required": "Требуется",
+      "runtime": {
+        "advanced": "[to be translated]:Advanced",
+        "allow_custom_bundler": "[to be translated]:Allow Custom Bundler URL",
+        "allow_dynamic_deps": "[to be translated]:Allow Dynamic Dependencies",
+        "allow_external_resources": "[to be translated]:Allow External Resources",
+        "basic": "[to be translated]:Basic",
+        "profile": "[to be translated]:Capability Profile",
+        "profile_help": "[to be translated]:Basic locks runtime controls, Standard enables managed controls, and Advanced enables full runtime configuration.",
+        "standard": "[to be translated]:Standard",
+        "title": "[to be translated]:Runtime Profile"
+      },
       "storage_limit": "Лимит хранилища",
       "storage_limit_help": "Максимальное количество артефактов для хранения. Старые артефакты будут автоматически удалены.",
       "storage_title": "Хранение",
+      "studio": {
+        "allow_conversation_override": "[to be translated]:Allow Conversation Overrides",
+        "allow_project_override": "[to be translated]:Allow Project Overrides",
+        "auto_create_knowledge_bridge": "[to be translated]:Auto-create knowledge bridge",
+        "context_section": "[to be translated]:Context",
+        "default_context_strategy": "[to be translated]:Default Context Strategy",
+        "default_knowledge_bases": "[to be translated]:Default Knowledge Bases",
+        "default_max_tokens": "[to be translated]:Default Max Tokens",
+        "default_model": "[to be translated]:Default Model",
+        "default_model_placeholder": "[to be translated]:Select a model for Artifact Studio",
+        "default_model_seeded_hint": "[to be translated]:Detected app default model",
+        "default_skill_mode": "[to be translated]:Default Skill Mode",
+        "default_skill_strategy": "[to be translated]:Default Skill Strategy",
+        "default_stream_output": "[to be translated]:Default Stream Output",
+        "default_temperature": "[to be translated]:Default Temperature",
+        "default_top_p": "[to be translated]:Default Top P",
+        "description": "[to be translated]:Configure default behavior for Artifact Studio agent sessions. These settings apply globally unless overridden by project or conversation-level configuration.",
+        "knowledge_section": "[to be translated]:Knowledge",
+        "model_and_generation": "[to be translated]:Model & Generation",
+        "model_and_generation_desc": "[to be translated]:These defaults are used when the Artifact Studio agent or project context does not specify overrides.",
+        "open_agent_settings": "[to be translated]:Open Artifact Agent Settings",
+        "override_policy": "[to be translated]:Override Policy",
+        "override_policy_desc": "[to be translated]:Control whether conversation and project-level settings can override studio defaults.",
+        "skills_section": "[to be translated]:Skills",
+        "title": "[to be translated]:Artifact Studio Governance"
+      },
       "title": "Артефакты",
       "types_help": "Выберите, какие типы артефактов должны быть созданы. HTMX всегда включен.",
       "types_title": "Типы артефактов"
@@ -3831,6 +3925,9 @@
         "truncate_middle": "Сохраняйте первый и последний"
       },
       "useInherited": "Использовать по умолчанию"
+    },
+    "context_strategy": {
+      "title": "[to be translated]:Context strategy"
     },
     "data": {
       "app_data": {
@@ -4600,6 +4697,9 @@
       },
       "title": "Настройки математических формул"
     },
+    "max_tokens": {
+      "label": "[to be translated]:Max Tokens"
+    },
     "mcp": {
       "actions": "Действия",
       "active": "Активен",
@@ -5018,6 +5118,7 @@
       },
       "default_assistant_model": "Модель ассистента по умолчанию",
       "default_assistant_model_description": "Модель, используемая при создании нового ассистента, если ассистент не имеет настроенной модели, будет использоваться эта модель",
+      "default_model": "[to be translated]:Model",
       "empty": "Модели не найдены",
       "manage": {
         "add_listed": {
@@ -5451,6 +5552,21 @@
       "zoom_out": "Уменьшить",
       "zoom_reset": "Сбросить масштаб"
     },
+    "skill": {
+      "manage": {
+        "active_skills": "[to be translated]:Selected skills"
+      },
+      "matching": {
+        "strategy": "[to be translated]:Skill strategy",
+        "title": "[to be translated]:Skill availability"
+      }
+    },
+    "stream_output": {
+      "label": "[to be translated]:Stream Output"
+    },
+    "temperature": {
+      "label": "[to be translated]:Temperature"
+    },
     "theme": {
       "color_primary": "Цвет темы",
       "dark": "Темная",
@@ -5747,6 +5863,9 @@
         "url_required": "требуется ввести URL"
       }
     },
+    "top_p": {
+      "label": "[to be translated]:Top P"
+    },
     "topic": {
       "pin_to_top": "Закрепленные топики сверху",
       "position": {
@@ -5822,6 +5941,7 @@
   },
   "title": {
     "apps": "Приложения",
+    "artifacts": "[to be translated]:Artifact Studio",
     "code": "Code",
     "files": "Файлы",
     "home": "Главная",

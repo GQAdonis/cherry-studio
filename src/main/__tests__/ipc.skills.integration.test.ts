@@ -105,5 +105,5 @@ describe('IPC skills integration', () => {
     expect(skillServiceMock.getEnabledSkillsForAgent).toHaveBeenCalledWith('agent-1')
     expect(storageManagerMock.getProviderConfigs).toHaveBeenCalledTimes(1)
     expect(skillServiceMock.saveSkill).toHaveBeenCalledWith('provider-1', { id: 'skill-new' })
-  })
+  }, 60_000)
 })

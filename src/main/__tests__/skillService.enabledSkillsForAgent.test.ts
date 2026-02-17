@@ -66,4 +66,13 @@ describe('SkillService.getEnabledSkillsForAgent', () => {
 
     expect(enabledSkills.map((skill) => skill.id)).toEqual(['artifact-refiner'])
   })
+
+  it('resolves artifact-studio default mapping with artifact-refiner', async () => {
+    configValues.set('agentSkills.artifact-studio', ['artifact-refiner'])
+    const { skillService } = await import('../services/SkillService')
+
+    const enabledSkills = await skillService.getEnabledSkillsForAgent('artifact-studio')
+
+    expect(enabledSkills.map((skill) => skill.id)).toContain('artifact-refiner')
+  })
 })

@@ -74,4 +74,28 @@ describe('AiSdkToChunkAdapter skill activation', () => {
       error: undefined
     })
   })
+
+  it('converts artifact lifecycle data parts into artifact lifecycle chunks', async () => {
+    const emitted: Chunk[] = []
+    const adapter = new AiSdkToChunkAdapter((chunk) => emitted.push(chunk))
+
+    await adapter.processStream(
+      createAiSdkResult([
+        {
+          type: 'data',
+          value: {
+            type: 'artifact.lifecycle',
+            stage: 'completed',
+            summary: 'Artifact was packaged'
+          }
+        }
+      ])
+    )
+
+    expect(emitted).toContainEqual({
+      type: ChunkType.ARTIFACT_LIFECYCLE,
+      stage: 'completed',
+      summary: 'Artifact was packaged'
+    })
+  })
 })

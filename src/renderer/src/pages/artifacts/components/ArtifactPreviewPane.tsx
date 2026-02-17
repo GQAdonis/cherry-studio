@@ -10,50 +10,66 @@
  * - Streaming indicator when artifact is being generated
  */
 
-import { CodeOutlined, EyeOutlined, GlobalOutlined, LoadingOutlined } from '@ant-design/icons'
+import { CodeOutlined, CopyOutlined, EyeOutlined, GlobalOutlined, LoadingOutlined } from '@ant-design/icons'
 import { loggerService } from '@logger'
 import type { Artifact } from '@renderer/features/artifacts'
-import SandpackReactRenderer from '@renderer/features/artifacts/components/SandpackReactRenderer'
+import VersionTimeline from '@renderer/features/artifacts/components/VersionTimeline'
+import { useCompilationErrorHandler } from '@renderer/features/artifacts/hooks/useCompilationErrorHandler'
 import { buildPreviewDocument } from '@renderer/features/artifacts/utils/documentBuilder'
 import { useAppDispatch, useAppSelector } from '@renderer/store'
-import { selectIsArtifactStreaming, selectStreamingArtifactContent, updateContent } from '@renderer/store/artifacts'
-import { selectArtifactReactSettings } from '@renderer/store/settings'
-import { Spin, Tooltip } from 'antd'
+import {
+  selectCompilationError,
+  selectCompilationStatus,
+  selectIsArtifactStreaming,
+  selectIsCodeStreaming,
+  selectStreamingArtifactContent,
+  updateContent
+} from '@renderer/store/artifacts'
+import { message, Spin, Tooltip } from 'antd'
 import type { FC } from 'react'
-import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { memo, useCallback, useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import styled from 'styled-components'
 
 const logger = loggerService.withContext('ArtifactPreviewPane')
 
+import ArtifactRenderer from '@renderer/features/artifacts/components/ArtifactRenderer'
+
 import ArtifactMonacoEditor from './ArtifactMonacoEditor'
 
 interface ArtifactPreviewPaneProps {
   artifact: Artifact
-  viewMode: 'preview' | 'code' | 'split'
+  viewMode: 'preview' | 'code'
+  onViewModeChange?: (mode: 'preview' | 'code') => void
+  onSendAutoFix?: (message: string) => void
 }
 
-const ArtifactPreviewPane: FC<ArtifactPreviewPaneProps> = ({ artifact, viewMode }) => {
+const ArtifactPreviewPane: FC<ArtifactPreviewPaneProps> = ({ artifact, viewMode, onViewModeChange, onSendAutoFix }) => {
   const { t } = useTranslation()
   const dispatch = useAppDispatch()
-  const iframeRef = useRef<HTMLIFrameElement>(null)
   const [refreshKey, setRefreshKey] = useState(0)
-
-  // Get React artifact settings for Sandpack
-  const reactSettings = useAppSelector(selectArtifactReactSettings)
 
   // Check if artifact content is currently being streamed
   const isArtifactStreaming = useAppSelector(selectIsArtifactStreaming)
+  const isCodeStreaming = useAppSelector(selectIsCodeStreaming)
+  const compilationStatus = useAppSelector(selectCompilationStatus)
+  const compilationError = useAppSelector(selectCompilationError)
 
   // Get streaming artifact content for real-time code view updates
   const streamingArtifactContent = useAppSelector(selectStreamingArtifactContent)
 
-  // Internal tab state for within-pane switching
-  const [activeTab, setActiveTab] = useState<'preview' | 'code'>('preview')
+  // Internal view mode tabs (Code | Preview)
+  const [activeViewMode, setActiveViewMode] = useState<'preview' | 'code'>(viewMode)
 
   // Track edited code and unsaved changes
   const [editedContent, setEditedContent] = useState(artifact.content)
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
+
+  const { handleCompilationError, handleCompilationSuccess, autoFixAttemptCount, maxAttemptsReached } =
+    useCompilationErrorHandler({
+      onSendAutoFix,
+      autoFixEnabled: !!onSendAutoFix
+    })
 
   // Determine what content to display in the editor
   // Priority: streaming content > edited content > artifact content
@@ -80,12 +96,9 @@ const ArtifactPreviewPane: FC<ArtifactPreviewPaneProps> = ({ artifact, viewMode 
     }
   }, [isArtifactStreaming, streamingArtifactContent, artifact.content, editedContent, hasUnsavedChanges])
 
-  // Generate iframe srcDoc using the edited content
-  const srcDoc = useMemo(() => {
-    const resolvedTheme = artifact.metadata?.theme === 'dark' ? 'dark' : 'light'
-    // Use editedContent for live preview
-    return buildPreviewDocument(editedContent, artifact.type, resolvedTheme)
-  }, [editedContent, artifact.type, artifact.metadata])
+  useEffect(() => {
+    setActiveViewMode(viewMode)
+  }, [viewMode])
 
   // Handle content change from editor
   const handleContentChange = useCallback((newContent: string) => {
@@ -149,12 +162,24 @@ const ArtifactPreviewPane: FC<ArtifactPreviewPaneProps> = ({ artifact, viewMode 
     }
   }, [editedContent, artifact.type, artifact.metadata, t])
 
-  // Check if this is a React artifact and Sandpack should be used
-  const isReactArtifact = artifact.type === 'react'
-  const useSandpackForReact = isReactArtifact && reactSettings?.useSandpack !== false
+  const handleCopyCode = useCallback(async () => {
+    try {
+      await navigator.clipboard.writeText(displayContent)
+      message.success(t('common.copied'))
+    } catch (_error) {
+      message.error(t('common.copy_failed'))
+    }
+  }, [displayContent, t])
 
-  // Create artifact with edited content for Sandpack
-  const sandpackArtifact = useMemo(
+  const handleModeSelect = useCallback(
+    (mode: 'preview' | 'code') => {
+      setActiveViewMode(mode)
+      onViewModeChange?.(mode)
+    },
+    [onViewModeChange]
+  )
+
+  const renderArtifact = useMemo(
     () => ({
       ...artifact,
       content: editedContent
@@ -176,37 +201,29 @@ const ArtifactPreviewPane: FC<ArtifactPreviewPaneProps> = ({ artifact, viewMode 
       )
     }
 
-    // Use SandpackReactRenderer for React artifacts
-    if (useSandpackForReact) {
-      return (
-        <PreviewContainer>
-          <SandpackReactRenderer
-            key={refreshKey}
-            artifact={sandpackArtifact}
-            showEditor={reactSettings?.showEditor ?? false}
-            showPreview={true}
-            showConsole={reactSettings?.showConsole ?? false}
-            width="100%"
-            height="100%"
-          />
-        </PreviewContainer>
-      )
-    }
-
-    // Use iframe for non-React artifacts
     return (
       <PreviewContainer>
-        <IframeWrapper>
-          <StyledIframe
-            key={refreshKey}
-            ref={iframeRef}
-            srcDoc={srcDoc}
-            // Note: allow-same-origin is needed for Tailwind CDN and some HTMX features
-            // The security warning is acknowledged but necessary for full functionality
-            sandbox="allow-scripts allow-forms allow-same-origin allow-popups allow-modals allow-downloads"
-            title={artifact.title}
-          />
-        </IframeWrapper>
+        <ArtifactRenderer
+          key={refreshKey}
+          artifact={renderArtifact}
+          width="100%"
+          height="100%"
+          onReady={handleCompilationSuccess}
+          onError={(error) =>
+            handleCompilationError({
+              message: error.message,
+              line: error.line,
+              column: error.column
+            })
+          }
+          onHtmxEvent={(event, payload) => {
+            if (event !== 'htmx:error') {
+              return
+            }
+            const rawMessage = typeof payload?.error === 'string' ? payload.error : 'HTMX rendering error'
+            handleCompilationError({ message: rawMessage })
+          }}
+        />
       </PreviewContainer>
     )
   }
@@ -231,54 +248,60 @@ const ArtifactPreviewPane: FC<ArtifactPreviewPaneProps> = ({ artifact, viewMode 
     </EditorContainer>
   )
 
-  // Render tabbed interface for non-split modes
+  // Render tabbed interface
   const renderTabbedView = () => (
     <TabbedContainer>
       <TabBar>
-        <TabButton $active={activeTab === 'preview'} onClick={() => setActiveTab('preview')}>
-          <EyeOutlined />
-          <span>Preview</span>
-        </TabButton>
-        <TabButton $active={activeTab === 'code'} onClick={() => setActiveTab('code')}>
+        <TabButton $active={activeViewMode === 'code'} onClick={() => handleModeSelect('code')}>
           <CodeOutlined />
-          <span>Code</span>
+          <span>{t('artifacts.code')}</span>
           {hasUnsavedChanges && <UnsavedDot />}
         </TabButton>
-        <Tooltip title={t('chat.artifacts.button.openExternal')}>
-          <OpenExternalButton onClick={handleOpenExternal}>
-            <GlobalOutlined />
-          </OpenExternalButton>
-        </Tooltip>
-        {hasUnsavedChanges && (
-          <SaveButton onClick={handleSaveChanges}>
-            Save <kbd>⌘S</kbd>
-          </SaveButton>
-        )}
+        <TabButton $active={activeViewMode === 'preview'} onClick={() => handleModeSelect('preview')}>
+          <EyeOutlined />
+          <span>{t('artifacts.preview')}</span>
+        </TabButton>
+        <TimelineWrap>
+          <VersionTimeline />
+        </TimelineWrap>
+        <TabActions>
+          <Tooltip title={t('chat.artifacts.button.openExternal')}>
+            <ToolbarIconButton onClick={handleOpenExternal}>
+              <GlobalOutlined />
+            </ToolbarIconButton>
+          </Tooltip>
+          <Tooltip title={t('common.copy')}>
+            <ToolbarIconButton onClick={handleCopyCode}>
+              <CopyOutlined />
+            </ToolbarIconButton>
+          </Tooltip>
+          {hasUnsavedChanges && (
+            <SaveButton onClick={handleSaveChanges}>
+              Save <kbd>⌘S</kbd>
+            </SaveButton>
+          )}
+        </TabActions>
       </TabBar>
-      <TabContent>{activeTab === 'preview' ? renderPreview() : renderEditor()}</TabContent>
+      {compilationStatus !== 'idle' && !isCodeStreaming && (
+        <CompilationStatusBar $status={compilationStatus}>
+          {compilationStatus === 'compiling' && <LoadingOutlined spin />}
+          {compilationStatus === 'success' && <span>{t('artifacts.preview_ready', 'Preview updated')}</span>}
+          {compilationStatus === 'error' && (
+            <span>
+              {compilationError || t('artifacts.preview_error', 'Preview failed to compile')}
+              {onSendAutoFix ? ` (${autoFixAttemptCount}${maxAttemptsReached ? ', max retries reached' : ''})` : ''}
+            </span>
+          )}
+        </CompilationStatusBar>
+      )}
+      <TabContent>
+        {activeViewMode === 'preview' && renderPreview()}
+        {activeViewMode === 'code' && renderEditor()}
+      </TabContent>
     </TabbedContainer>
   )
 
-  // Render based on view mode
-  switch (viewMode) {
-    case 'preview':
-      // Show tabs with preview as default
-      return renderTabbedView()
-    case 'code':
-      // Show tabs with code as default
-      if (activeTab === 'preview') setActiveTab('code')
-      return renderTabbedView()
-    case 'split':
-      return (
-        <SplitContainer>
-          <SplitPane>{renderEditor()}</SplitPane>
-          <SplitDivider />
-          <SplitPane>{renderPreview()}</SplitPane>
-        </SplitContainer>
-      )
-    default:
-      return renderTabbedView()
-  }
+  return renderTabbedView()
 }
 
 // Styled components
@@ -297,6 +320,19 @@ const TabBar = styled.div`
   padding: 8px 12px;
   background: var(--color-background);
   border-bottom: 1px solid var(--color-border);
+`
+
+const TimelineWrap = styled.div`
+  display: flex;
+  align-items: center;
+  margin-left: 12px;
+`
+
+const TabActions = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
 `
 
 const TabButton = styled.button<{ $active: boolean }>`
@@ -331,7 +367,7 @@ const UnsavedDot = styled.span`
   margin-left: 4px;
 `
 
-const OpenExternalButton = styled.button`
+const ToolbarIconButton = styled.button`
   display: flex;
   align-items: center;
   justify-content: center;
@@ -345,8 +381,6 @@ const OpenExternalButton = styled.button`
   background: transparent;
   color: var(--color-text-2);
   transition: all 0.15s ease;
-  margin-left: auto;
-
   &:hover {
     background: var(--color-background-mute);
     color: var(--color-primary);
@@ -391,20 +425,16 @@ const TabContent = styled.div`
   flex-direction: column;
 `
 
-const SplitContainer = styled.div`
+const CompilationStatusBar = styled.div<{ $status: string }>`
   display: flex;
-  height: 100%;
-  width: 100%;
-`
-
-const SplitPane = styled.div`
-  flex: 1;
-  overflow: hidden;
-`
-
-const SplitDivider = styled.div`
-  width: 1px;
-  background: var(--color-border);
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  font-size: 12px;
+  border-bottom: 1px solid var(--color-border);
+  color: ${(props) => (props.$status === 'error' ? 'var(--color-error)' : 'var(--color-text-2)')};
+  background: ${(props) =>
+    props.$status === 'error' ? 'var(--color-error-soft, rgba(239, 68, 68, 0.1))' : 'var(--color-background-soft)'};
 `
 
 const PreviewContainer = styled.div`
@@ -434,32 +464,19 @@ const StreamingText = styled.div`
   font-weight: 500;
 `
 
-const IframeWrapper = styled.div`
-  flex: 1;
-  padding: 16px;
-  overflow: auto;
-`
-
-const StyledIframe = styled.iframe`
-  width: 100%;
-  height: 100%;
-  min-height: 400px;
-  border: 1px solid var(--color-border);
-  border-radius: 8px;
-  background: white;
-`
-
 const EditorContainer = styled.div`
   flex: 1;
   display: flex;
   flex-direction: column;
-  overflow: hidden;
+  overflow: auto;
   min-height: 0; /* Critical for flex children to shrink below content size */
+  min-width: 0;
 
   /* Ensure the code editor can scroll */
   & > div:last-child {
     flex: 1;
     min-height: 0;
+    min-width: 0;
   }
 `
 

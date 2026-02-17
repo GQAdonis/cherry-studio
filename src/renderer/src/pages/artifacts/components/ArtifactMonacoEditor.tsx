@@ -30,6 +30,7 @@ function getLanguageFromArtifactType(type: Artifact['type'], language?: string):
 
   switch (type) {
     case 'html':
+    case 'xhtml':
     case 'htmx':
       return 'html'
     case 'react':
@@ -82,7 +83,7 @@ const ArtifactMonacoEditor: FC<ArtifactMonacoEditorProps> = ({
         readOnly={readOnly}
         editable={!readOnly}
         expanded={true}
-        wrapped={true}
+        wrapped={false}
         options={{
           lineNumbers: true,
           foldGutter: true,
@@ -127,6 +128,11 @@ const EditorWrapper = styled.div<{ $streaming?: boolean }>`
   .cm-content {
     padding: 16px 0;
     min-height: auto;
+    min-width: max-content;
+  }
+
+  .cm-line {
+    white-space: pre !important;
   }
 
   .cm-gutters {

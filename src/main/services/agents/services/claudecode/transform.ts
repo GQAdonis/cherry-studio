@@ -727,6 +727,14 @@ function handleSystemMessage(message: Extract<SDKMessage, { type: 'system' }>): 
   const chunks: AgentStreamPart[] = []
   if (message.subtype === 'init') {
     chunks.push({
+      type: 'data',
+      data: {
+        type: 'artifact.lifecycle',
+        stage: 'started',
+        summary: 'Agent artifact run started.'
+      }
+    } as unknown as AgentStreamPart)
+    chunks.push({
       type: 'start'
     })
     chunks.push({
@@ -781,6 +789,14 @@ function handleResultMessage(message: Extract<SDKMessage, { type: 'result' }>): 
 
   if (message.subtype === 'success') {
     chunks.push({
+      type: 'data',
+      data: {
+        type: 'artifact.lifecycle',
+        stage: 'completed',
+        summary: 'Agent artifact run completed.'
+      }
+    } as unknown as AgentStreamPart)
+    chunks.push({
       type: 'finish',
       totalUsage: usage ?? emptyUsage,
       finishReason: mapClaudeCodeFinishReason(message.subtype),
@@ -794,6 +810,14 @@ function handleResultMessage(message: Extract<SDKMessage, { type: 'result' }>): 
       }
     } as any)
   } else {
+    chunks.push({
+      type: 'data',
+      data: {
+        type: 'artifact.lifecycle',
+        stage: 'failed',
+        summary: `Agent artifact run failed (${message.subtype}).`
+      }
+    } as unknown as AgentStreamPart)
     chunks.push({
       type: 'error',
       error: {

@@ -8,8 +8,10 @@
  */
 
 import CodeEditor from '@renderer/components/CodeEditor'
+import { useAppSelector } from '@renderer/store'
+import { selectIsCodeStreaming, selectStreamingArtifactContent } from '@renderer/store/artifacts'
 import { memo, useCallback, useImperativeHandle, useMemo, useRef } from 'react'
-import styled from 'styled-components'
+import styled, { css, keyframes } from 'styled-components'
 
 import type { Artifact, ArtifactType } from '../types'
 
@@ -41,6 +43,7 @@ function getLanguageFromArtifactType(type: ArtifactType, language?: string): str
   // Map artifact type to language
   switch (type) {
     case 'html':
+    case 'xhtml':
     case 'htmx':
       return 'html'
     case 'react':
@@ -52,7 +55,7 @@ function getLanguageFromArtifactType(type: ArtifactType, language?: string): str
     case 'markdown':
       return 'markdown'
     case 'code':
-      return 'javascript' // Default to JS for generic code
+      return 'typescript' // Default to TypeScript for generic code
     default:
       return 'text'
   }
@@ -70,6 +73,16 @@ const ArtifactCodeEditor = ({
 }: ArtifactCodeEditorProps & { ref?: React.RefObject<ArtifactCodeEditorRef | null> }) => {
   const editorRef = useRef<{ save?: () => void } | null>(null)
   const contentRef = useRef(artifact.content)
+
+  // Subscribe to streaming state from Redux
+  const isCodeStreaming = useAppSelector(selectIsCodeStreaming)
+  const streamingContent = useAppSelector(selectStreamingArtifactContent)
+
+  // Display streaming content during code streaming, fallback to artifact content
+  const displayContent = isCodeStreaming && streamingContent ? streamingContent : artifact.content
+
+  // Lock editor to read-only during streaming
+  const effectiveReadOnly = readOnly || isCodeStreaming
 
   // Get the language for syntax highlighting
   const language = useMemo(
@@ -104,21 +117,27 @@ const ArtifactCodeEditor = ({
   )
 
   return (
-    <EditorContainer className={className}>
+    <EditorContainer className={className} $isStreaming={isCodeStreaming}>
+      {isCodeStreaming && (
+        <StreamingIndicator>
+          <StreamingDot />
+          <span>Streaming code…</span>
+        </StreamingIndicator>
+      )}
       <CodeEditor
         ref={editorRef}
-        value={artifact.content}
+        value={displayContent}
         language={language}
         onChange={handleChange}
         onSave={handleSave}
-        readOnly={readOnly}
+        readOnly={effectiveReadOnly}
         expanded={true}
         wrapped={true}
         options={{
           lineNumbers: true,
           foldGutter: true,
-          highlightActiveLine: true,
-          autocompletion: true
+          highlightActiveLine: !isCodeStreaming,
+          autocompletion: !isCodeStreaming
         }}
       />
     </EditorContainer>
@@ -127,11 +146,25 @@ const ArtifactCodeEditor = ({
 
 ArtifactCodeEditor.displayName = 'ArtifactCodeEditor'
 
-// Styled components
-const EditorContainer = styled.div`
+// ── Animations ──────────────────────────────────────────────────────────────
+
+const pulseAnimation = keyframes`
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+`
+
+const dotPulse = keyframes`
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.3); opacity: 0.6; }
+`
+
+// ── Styled Components ───────────────────────────────────────────────────────
+
+const EditorContainer = styled.div<{ $isStreaming?: boolean }>`
   width: 100%;
   height: 100%;
   overflow: hidden;
+  position: relative;
 
   .code-editor {
     height: 100%;
@@ -144,6 +177,45 @@ const EditorContainer = styled.div`
       overflow: auto;
     }
   }
+
+  ${(props) =>
+    props.$isStreaming &&
+    css`
+      .cm-editor {
+        opacity: 0.95;
+        animation: ${pulseAnimation} 2s ease-in-out infinite;
+      }
+
+      .cm-cursor {
+        display: none !important;
+      }
+    `}
+`
+
+const StreamingIndicator = styled.div`
+  position: absolute;
+  top: 8px;
+  right: 12px;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 6px;
+  background: var(--color-primary-soft, rgba(99, 102, 241, 0.12));
+  color: var(--color-primary, #6366f1);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  pointer-events: none;
+`
+
+const StreamingDot = styled.span`
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+  animation: ${dotPulse} 1.2s ease-in-out infinite;
 `
 
 export default memo(ArtifactCodeEditor)

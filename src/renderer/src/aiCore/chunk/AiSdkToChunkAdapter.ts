@@ -162,6 +162,12 @@ export class AiSdkToChunkAdapter {
           summary: dataPayload.summary,
           removedCount: dataPayload.removedCount
         })
+      } else if (dataPayload?.type === ChunkType.ARTIFACT_LIFECYCLE) {
+        this.onChunk({
+          type: ChunkType.ARTIFACT_LIFECYCLE,
+          stage: dataPayload.stage,
+          summary: dataPayload.summary
+        })
       }
       return
     }

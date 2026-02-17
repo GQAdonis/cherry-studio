@@ -10,15 +10,23 @@ import {
   CopyOutlined,
   DownloadOutlined,
   EyeOutlined,
+  FileZipOutlined,
   GlobalOutlined,
   ReloadOutlined,
-  SaveOutlined,
-  SplitCellsOutlined
+  SaveOutlined
 } from '@ant-design/icons'
 import { loggerService } from '@logger'
 import { Navbar, NavbarCenter } from '@renderer/components/app/Navbar'
 import { useTheme } from '@renderer/context/ThemeProvider'
 import type { Artifact } from '@renderer/features/artifacts'
+import {
+  buildArtifactPackagePayload,
+  serializeArtifactPackage,
+  validateArtifactForDelivery
+} from '@renderer/features/artifacts/services'
+import { resolveArtifactRuntimePolicy } from '@renderer/features/artifacts/utils/runtimeProfile'
+import { useAppSelector } from '@renderer/store'
+import { selectArtifactRuntimeSettings } from '@renderer/store/settings'
 import { Button, message, Segmented, Space, Tooltip } from 'antd'
 import { Moon, Sun } from 'lucide-react'
 import type { FC } from 'react'
@@ -32,8 +40,8 @@ const logger = loggerService.withContext('ArtifactHeader')
 
 interface ArtifactHeaderProps {
   title: string
-  viewMode: 'preview' | 'code' | 'split'
-  onViewModeChange: (mode: 'preview' | 'code' | 'split') => void
+  viewMode: 'preview' | 'code'
+  onViewModeChange: (mode: 'preview' | 'code') => void
   onClose: () => void
   artifact: Artifact
 }
@@ -41,6 +49,7 @@ interface ArtifactHeaderProps {
 const ArtifactHeader: FC<ArtifactHeaderProps> = ({ title, viewMode, onViewModeChange, onClose, artifact }) => {
   const { t } = useTranslation()
   const { theme, toggleTheme } = useTheme()
+  const runtimeSettings = useAppSelector(selectArtifactRuntimeSettings)
   const [showSaveModal, setShowSaveModal] = useState(false)
 
   const viewModeOptions = [
@@ -61,15 +70,6 @@ const ArtifactHeader: FC<ArtifactHeaderProps> = ({ title, viewMode, onViewModeCh
         </ViewModeLabel>
       ),
       value: 'code'
-    },
-    {
-      label: (
-        <ViewModeLabel>
-          <SplitCellsOutlined />
-          <span>{t('artifacts.split')}</span>
-        </ViewModeLabel>
-      ),
-      value: 'split'
     }
   ]
 
@@ -93,17 +93,59 @@ const ArtifactHeader: FC<ArtifactHeaderProps> = ({ title, viewMode, onViewModeCh
   }, [t])
 
   const handleDownload = useCallback(() => {
+    const validation = validateArtifactForDelivery(artifact)
+    if (!validation.isValid) {
+      message.error(validation.issues[0] || 'Artifact validation failed')
+      return
+    }
+
     const blob = new Blob([artifact.content], { type: 'text/html' })
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.href = url
-    a.download = `${artifact.title || 'artifact'}.html`
+    a.download = `${artifact.title || 'artifact'}.${artifact.type === 'xhtml' ? 'xhtml' : 'html'}`
     document.body.appendChild(a)
     a.click()
     document.body.removeChild(a)
     URL.revokeObjectURL(url)
     message.success(t('common.download_success', 'Downloaded successfully'))
   }, [artifact, t])
+
+  const handleDownloadPackage = useCallback(() => {
+    const validation = validateArtifactForDelivery(artifact)
+    if (!validation.isValid) {
+      message.error(validation.issues[0] || 'Artifact validation failed')
+      return
+    }
+
+    const runtimePolicy = resolveArtifactRuntimePolicy(runtimeSettings)
+    const dependencyMap = (artifact.metadata.dependencies || []).reduce<Record<string, string>>((acc, dependency) => {
+      const [name, version] = dependency.split('@').filter(Boolean)
+      if (!name) {
+        return acc
+      }
+      const normalizedName = dependency.startsWith('@') ? `@${name}` : name
+      acc[normalizedName] = version || 'latest'
+      return acc
+    }, {})
+
+    const payload = buildArtifactPackagePayload({
+      artifact,
+      runtimeProfile: runtimePolicy.profile,
+      dependencies: dependencyMap
+    })
+
+    const blob = new Blob([serializeArtifactPackage(payload)], { type: 'application/json;charset=utf-8' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `${artifact.title || 'artifact'}.csartifact.json`
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
+    URL.revokeObjectURL(url)
+    message.success(t('artifacts.package_downloaded', 'Artifact package downloaded'))
+  }, [artifact, runtimeSettings, t])
 
   const handleRefresh = useCallback(() => {
     // Trigger a refresh of the preview
@@ -142,7 +184,7 @@ const ArtifactHeader: FC<ArtifactHeaderProps> = ({ title, viewMode, onViewModeCh
             <Segmented
               options={viewModeOptions}
               value={viewMode}
-              onChange={(value) => onViewModeChange(value as 'preview' | 'code' | 'split')}
+              onChange={(value) => onViewModeChange(value as 'preview' | 'code')}
               size="small"
             />
           </CenterSection>
@@ -167,6 +209,11 @@ const ArtifactHeader: FC<ArtifactHeaderProps> = ({ title, viewMode, onViewModeCh
               <Tooltip title={t('common.download')}>
                 <ActionButton onClick={handleDownload}>
                   <DownloadOutlined />
+                </ActionButton>
+              </Tooltip>
+              <Tooltip title={t('artifacts.download_package', 'Download package')}>
+                <ActionButton onClick={handleDownloadPackage}>
+                  <FileZipOutlined />
                 </ActionButton>
               </Tooltip>
               <Tooltip title={t('chat.artifacts.button.openExternal')}>

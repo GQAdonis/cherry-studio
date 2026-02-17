@@ -9,12 +9,15 @@
  * - React/Sandpack configuration
  */
 
-import { DeleteOutlined, PlusOutlined } from '@ant-design/icons'
+import { DeleteOutlined, PlusOutlined, SettingOutlined } from '@ant-design/icons'
 import { useTheme } from '@renderer/context/ThemeProvider'
+import { ARTIFACT_STUDIO_AGENT_ID } from '@renderer/features/artifacts/services/ArtifactStudioRuntimeService'
+import { AgentSettingsPopup } from '@renderer/pages/settings/AgentSettings'
 import { useAppDispatch, useAppSelector } from '@renderer/store'
 import {
   removeArtifactReactDependency,
   selectArtifactSettings,
+  selectArtifactStudioSettings,
   setArtifactAutoOpen,
   setArtifactEnabled,
   setArtifactReactCustomBundlerUrl,
@@ -22,18 +25,28 @@ import {
   setArtifactReactShowConsole,
   setArtifactReactShowEditor,
   setArtifactReactUseSandpack,
+  setArtifactRuntimeAllowCustomBundlerUrl,
+  setArtifactRuntimeAllowDynamicDependencies,
+  setArtifactRuntimeAllowExternalResources,
+  setArtifactRuntimeProfile,
   setArtifactStorageLimit,
+  setArtifactStudioDefaultContextManagement,
+  setArtifactStudioDefaultKnowledge,
+  setArtifactStudioDefaultLlm,
+  setArtifactStudioDefaultSkills,
+  setArtifactStudioOverridePolicy,
   setArtifactTypes
 } from '@renderer/store/settings'
-import { Button, Checkbox, Input, InputNumber, Space, Switch, Table, Tag } from 'antd'
+import { Button, Checkbox, Input, InputNumber, Segmented, Select, Space, Switch, Table, Tag } from 'antd'
 import type { ColumnsType } from 'antd/es/table'
 import type { FC } from 'react'
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import styled from 'styled-components'
 
 import {
   SettingContainer,
+  SettingDescription,
   SettingDivider,
   SettingGroup,
   SettingHelpText,
@@ -45,6 +58,7 @@ import {
 const ARTIFACT_TYPE_OPTIONS = [
   { label: 'HTMX', value: 'htmx', disabled: true }, // HTMX is always on
   { label: 'HTML', value: 'html' },
+  { label: 'XHTML', value: 'xhtml' },
   { label: 'React', value: 'react' },
   { label: 'SVG', value: 'svg' },
   { label: 'Mermaid', value: 'mermaid' },
@@ -73,19 +87,54 @@ const ArtifactSettings: FC = () => {
   const { t } = useTranslation()
   const dispatch = useAppDispatch()
   const settings = useAppSelector(selectArtifactSettings)
+  const studioSettings = useAppSelector(selectArtifactStudioSettings)
+  const providers = useAppSelector((state) => state.llm.providers)
+  const appDefaultModel = useAppSelector((state) => state.llm.defaultModel)
+  const knowledgeBases = useAppSelector((state) => state.knowledge.bases)
 
   // Default values if settings is undefined
   const safeSettings = settings || {
     enabled: true,
     autoOpen: false,
-    enabledTypes: ['htmx', 'html', 'react', 'svg', 'mermaid', 'markdown', 'code'],
+    enabledTypes: ['htmx', 'html', 'xhtml', 'react', 'svg', 'mermaid', 'markdown', 'code'],
     storageLimit: 100,
+    runtime: {
+      profile: 'standard',
+      allowCustomBundlerUrl: true,
+      allowDynamicDependencies: true,
+      allowExternalResources: true
+    },
     react: {
       useSandpack: true,
       showEditor: false,
       showConsole: false,
       customBundlerUrl: '',
       dependencies: {}
+    },
+    studio: {
+      overridePolicy: {
+        allowConversationOverride: true,
+        allowProjectOverride: true
+      },
+      defaults: {
+        llm: {
+          modelId: undefined,
+          temperature: 0.7,
+          topP: 1,
+          maxTokens: undefined,
+          streamOutput: true
+        },
+        skills: {
+          mode: 'inherit'
+        },
+        contextManagement: {
+          type: 'sliding_window'
+        },
+        knowledge: {
+          knowledgeBaseIds: [],
+          autoCreateFromChatHistory: false
+        }
+      }
     }
   }
 
@@ -111,6 +160,10 @@ const ArtifactSettings: FC = () => {
     if (limit !== null) {
       dispatch(setArtifactStorageLimit(limit))
     }
+  }
+
+  const handleRuntimeProfileChange = (profile: string | number) => {
+    dispatch(setArtifactRuntimeProfile(profile as 'basic' | 'standard' | 'advanced'))
   }
 
   // React/Sandpack handlers
@@ -144,6 +197,52 @@ const ArtifactSettings: FC = () => {
     },
     [dispatch]
   )
+
+  const isReactEnabled = safeSettings.enabled && safeSettings.enabledTypes.includes('react')
+  const isSandpackEnabled = isReactEnabled && safeSettings.react?.useSandpack
+  const runtimeProfile = safeSettings.runtime?.profile ?? 'standard'
+  const allowCustomBundlerUrl = safeSettings.runtime?.allowCustomBundlerUrl ?? true
+  const allowDynamicDependencies = safeSettings.runtime?.allowDynamicDependencies ?? true
+  const allowExternalResources = safeSettings.runtime?.allowExternalResources ?? true
+  const safeStudioSettings = studioSettings || safeSettings.studio
+  const modelOptions = useMemo(
+    () =>
+      providers
+        .filter((provider) => provider.enabled)
+        .flatMap((provider) =>
+          provider.models.map((model) => ({
+            label: `${model.name || model.id} | ${provider.name}`,
+            value: `${provider.id}::${model.id}`
+          }))
+        ),
+    [providers]
+  )
+  const selectedModelValue = safeStudioSettings.defaults.llm.modelId
+    ? `${safeStudioSettings.defaults.llm.providerId || ''}::${safeStudioSettings.defaults.llm.modelId}`
+    : undefined
+  const appDefaultModelValue =
+    appDefaultModel?.provider && appDefaultModel?.id ? `${appDefaultModel.provider}::${appDefaultModel.id}` : undefined
+  const appDefaultModelLabel =
+    appDefaultModelValue && modelOptions.find((option) => option.value === appDefaultModelValue)?.label
+
+  useEffect(() => {
+    if (safeStudioSettings.defaults.llm.modelId) {
+      return
+    }
+
+    const providerId = appDefaultModel?.provider
+    const modelId = appDefaultModel?.id
+    if (!providerId || !modelId) {
+      return
+    }
+
+    const isSelectable = modelOptions.some((option) => option.value === `${providerId}::${modelId}`)
+    if (!isSelectable) {
+      return
+    }
+
+    dispatch(setArtifactStudioDefaultLlm({ providerId, modelId }))
+  }, [appDefaultModel?.id, appDefaultModel?.provider, dispatch, modelOptions, safeStudioSettings.defaults.llm.modelId])
 
   // Convert dependencies to table data
   const dependencyData: DependencyRow[] = useMemo(() => {
@@ -192,14 +291,11 @@ const ArtifactSettings: FC = () => {
           size="small"
           icon={<DeleteOutlined />}
           onClick={() => handleRemoveDependency(record.name)}
-          disabled={!safeSettings.enabled || !safeSettings.react?.useSandpack}
+          disabled={!safeSettings.enabled || !safeSettings.react?.useSandpack || !allowDynamicDependencies}
         />
       )
     }
   ]
-
-  const isReactEnabled = safeSettings.enabled && safeSettings.enabledTypes.includes('react')
-  const isSandpackEnabled = isReactEnabled && safeSettings.react?.useSandpack
 
   return (
     <SettingContainer theme={theme}>
@@ -260,6 +356,65 @@ const ArtifactSettings: FC = () => {
             'Select which types of artifacts should be generated. HTMX is always enabled.'
           )}
         </SettingHelpText>
+      </SettingGroup>
+
+      <SettingGroup theme={theme}>
+        <SettingTitle>{t('settings.artifacts.runtime.title', 'Runtime Profile')}</SettingTitle>
+        <SettingDivider />
+
+        <SettingRow>
+          <SettingRowTitle>{t('settings.artifacts.runtime.profile', 'Capability Profile')}</SettingRowTitle>
+        </SettingRow>
+        <Segmented
+          value={runtimeProfile}
+          options={[
+            { label: t('settings.artifacts.runtime.basic', 'Basic'), value: 'basic' },
+            { label: t('settings.artifacts.runtime.standard', 'Standard'), value: 'standard' },
+            { label: t('settings.artifacts.runtime.advanced', 'Advanced'), value: 'advanced' }
+          ]}
+          onChange={handleRuntimeProfileChange}
+          disabled={!safeSettings.enabled}
+          style={{ marginTop: 8 }}
+        />
+        <SettingHelpText>
+          {t(
+            'settings.artifacts.runtime.profile_help',
+            'Basic locks runtime controls, Standard enables managed controls, and Advanced enables full runtime configuration.'
+          )}
+        </SettingHelpText>
+
+        <SettingDivider />
+
+        <SettingRow>
+          <SettingRowTitle>
+            {t('settings.artifacts.runtime.allow_dynamic_deps', 'Allow Dynamic Dependencies')}
+          </SettingRowTitle>
+          <Switch
+            checked={allowDynamicDependencies}
+            onChange={(checked) => dispatch(setArtifactRuntimeAllowDynamicDependencies(checked))}
+            disabled={!safeSettings.enabled || runtimeProfile === 'basic'}
+          />
+        </SettingRow>
+        <SettingRow>
+          <SettingRowTitle>
+            {t('settings.artifacts.runtime.allow_external_resources', 'Allow External Resources')}
+          </SettingRowTitle>
+          <Switch
+            checked={allowExternalResources}
+            onChange={(checked) => dispatch(setArtifactRuntimeAllowExternalResources(checked))}
+            disabled={!safeSettings.enabled || runtimeProfile === 'basic'}
+          />
+        </SettingRow>
+        <SettingRow>
+          <SettingRowTitle>
+            {t('settings.artifacts.runtime.allow_custom_bundler', 'Allow Custom Bundler URL')}
+          </SettingRowTitle>
+          <Switch
+            checked={allowCustomBundlerUrl}
+            onChange={(checked) => dispatch(setArtifactRuntimeAllowCustomBundlerUrl(checked))}
+            disabled={!safeSettings.enabled || runtimeProfile !== 'advanced'}
+          />
+        </SettingRow>
       </SettingGroup>
 
       {/* React/Sandpack Settings */}
@@ -325,7 +480,7 @@ const ArtifactSettings: FC = () => {
           placeholder="https://your-sandpack-bundler.example.com"
           value={safeSettings.react?.customBundlerUrl || ''}
           onChange={handleCustomBundlerUrlChange}
-          disabled={!isSandpackEnabled}
+          disabled={!isSandpackEnabled || runtimeProfile !== 'advanced' || !allowCustomBundlerUrl}
           style={{ marginTop: 8, marginBottom: 8 }}
         />
         <SettingHelpText>
@@ -353,7 +508,7 @@ const ArtifactSettings: FC = () => {
             placeholder={t('settings.artifacts.react.dep_name_placeholder', 'Package name (e.g., framer-motion)')}
             value={newDepName}
             onChange={(e) => setNewDepName(e.target.value)}
-            disabled={!isSandpackEnabled}
+            disabled={!isSandpackEnabled || !allowDynamicDependencies}
             style={{ flex: 1 }}
             onPressEnter={handleAddDependency}
           />
@@ -361,7 +516,7 @@ const ArtifactSettings: FC = () => {
             placeholder="latest"
             value={newDepVersion}
             onChange={(e) => setNewDepVersion(e.target.value)}
-            disabled={!isSandpackEnabled}
+            disabled={!isSandpackEnabled || !allowDynamicDependencies}
             style={{ width: 100 }}
             onPressEnter={handleAddDependency}
           />
@@ -369,7 +524,7 @@ const ArtifactSettings: FC = () => {
             type="primary"
             icon={<PlusOutlined />}
             onClick={handleAddDependency}
-            disabled={!isSandpackEnabled || !newDepName.trim()}>
+            disabled={!isSandpackEnabled || !allowDynamicDependencies || !newDepName.trim()}>
             {t('settings.artifacts.react.add_dep', 'Add')}
           </Button>
         </AddDependencyRow>
@@ -382,6 +537,281 @@ const ArtifactSettings: FC = () => {
           style={{ marginTop: 12 }}
           locale={{ emptyText: t('settings.artifacts.react.no_deps', 'No dependencies configured') }}
         />
+      </SettingGroup>
+
+      <SettingGroup theme={theme}>
+        <SettingTitle>{t('settings.artifacts.studio.title', 'Artifact Studio Governance')}</SettingTitle>
+        <SettingDescription>
+          {t(
+            'settings.artifacts.studio.description',
+            'Configure the built-in Artifact Studio agent defaults. These values seed new projects and runtime sessions.'
+          )}
+        </SettingDescription>
+        <StudioHeaderActions>
+          <Button
+            icon={<SettingOutlined />}
+            onClick={() => {
+              void AgentSettingsPopup.show({ agentId: ARTIFACT_STUDIO_AGENT_ID, tab: 'essential' })
+            }}>
+            {t('settings.artifacts.studio.open_agent_settings', 'Open Artifact Agent Settings')}
+          </Button>
+        </StudioHeaderActions>
+        <SettingDivider />
+        <StudioSection>
+          <StudioSectionTitle>{t('settings.artifacts.studio.override_policy', 'Override Policy')}</StudioSectionTitle>
+          <StudioSectionDescription>
+            {t(
+              'settings.artifacts.studio.override_policy_desc',
+              'Control whether conversation and project-level settings can override studio defaults.'
+            )}
+          </StudioSectionDescription>
+          <StudioFields>
+            <SettingRow>
+              <SettingRowTitle>
+                {t('settings.artifacts.studio.allow_conversation_override', 'Allow Conversation Overrides')}
+              </SettingRowTitle>
+              <Switch
+                checked={safeStudioSettings.overridePolicy.allowConversationOverride}
+                onChange={(checked) =>
+                  dispatch(setArtifactStudioOverridePolicy({ allowConversationOverride: checked }))
+                }
+                disabled={!safeSettings.enabled}
+              />
+            </SettingRow>
+            <SettingRow>
+              <SettingRowTitle>
+                {t('settings.artifacts.studio.allow_project_override', 'Allow Project Overrides')}
+              </SettingRowTitle>
+              <Switch
+                checked={safeStudioSettings.overridePolicy.allowProjectOverride}
+                onChange={(checked) => dispatch(setArtifactStudioOverridePolicy({ allowProjectOverride: checked }))}
+                disabled={!safeSettings.enabled}
+              />
+            </SettingRow>
+          </StudioFields>
+        </StudioSection>
+
+        <StudioSection>
+          <StudioSectionTitle>
+            {t('settings.artifacts.studio.model_and_generation', 'Model & Generation')}
+          </StudioSectionTitle>
+          <StudioSectionDescription>
+            {t(
+              'settings.artifacts.studio.model_and_generation_desc',
+              'These defaults are used when the Artifact Studio agent or project context does not specify overrides.'
+            )}
+          </StudioSectionDescription>
+          <StudioFields>
+            <StudioField>
+              <StudioFieldLabel>{t('settings.artifacts.studio.default_model', 'Default Model')}</StudioFieldLabel>
+              <Select
+                allowClear
+                showSearch
+                value={selectedModelValue}
+                options={modelOptions}
+                optionFilterProp="label"
+                placeholder={t(
+                  'settings.artifacts.studio.default_model_placeholder',
+                  'Select a model for Artifact Studio'
+                )}
+                onChange={(value) => {
+                  if (!value) {
+                    dispatch(setArtifactStudioDefaultLlm({ modelId: undefined, providerId: undefined }))
+                    return
+                  }
+                  const [providerId, modelId] = String(value).split('::')
+                  dispatch(setArtifactStudioDefaultLlm({ modelId, providerId: providerId || undefined }))
+                }}
+                disabled={!safeSettings.enabled}
+                style={{ width: '100%' }}
+              />
+              {!selectedModelValue && appDefaultModelLabel && (
+                <SettingHelpText>
+                  {t('settings.artifacts.studio.default_model_seeded_hint', 'Detected app default model')}:{' '}
+                  {appDefaultModelLabel}
+                </SettingHelpText>
+              )}
+            </StudioField>
+
+            <StudioFieldGrid>
+              <StudioField>
+                <StudioFieldLabel>
+                  {t('settings.artifacts.studio.default_temperature', 'Default Temperature')}
+                </StudioFieldLabel>
+                <InputNumber
+                  min={0}
+                  max={2}
+                  step={0.1}
+                  value={safeStudioSettings.defaults.llm.temperature}
+                  onChange={(value) => dispatch(setArtifactStudioDefaultLlm({ temperature: value ?? undefined }))}
+                  disabled={!safeSettings.enabled}
+                  style={{ width: '100%' }}
+                />
+              </StudioField>
+              <StudioField>
+                <StudioFieldLabel>{t('settings.artifacts.studio.default_top_p', 'Default Top P')}</StudioFieldLabel>
+                <InputNumber
+                  min={0}
+                  max={1}
+                  step={0.05}
+                  value={safeStudioSettings.defaults.llm.topP}
+                  onChange={(value) => dispatch(setArtifactStudioDefaultLlm({ topP: value ?? undefined }))}
+                  disabled={!safeSettings.enabled}
+                  style={{ width: '100%' }}
+                />
+              </StudioField>
+            </StudioFieldGrid>
+
+            <StudioFieldGrid>
+              <StudioField>
+                <StudioFieldLabel>
+                  {t('settings.artifacts.studio.default_max_tokens', 'Default Max Tokens')}
+                </StudioFieldLabel>
+                <InputNumber
+                  min={1}
+                  value={safeStudioSettings.defaults.llm.maxTokens}
+                  onChange={(value) => dispatch(setArtifactStudioDefaultLlm({ maxTokens: value ?? undefined }))}
+                  disabled={!safeSettings.enabled}
+                  style={{ width: '100%' }}
+                />
+              </StudioField>
+              <StudioToggleField>
+                <SettingRowTitle>
+                  {t('settings.artifacts.studio.default_stream_output', 'Default Stream Output')}
+                </SettingRowTitle>
+                <Switch
+                  checked={safeStudioSettings.defaults.llm.streamOutput ?? true}
+                  onChange={(checked) => dispatch(setArtifactStudioDefaultLlm({ streamOutput: checked }))}
+                  disabled={!safeSettings.enabled}
+                />
+              </StudioToggleField>
+            </StudioFieldGrid>
+          </StudioFields>
+        </StudioSection>
+
+        <StudioSection>
+          <StudioSectionTitle>{t('settings.artifacts.studio.skills_section', 'Skills')}</StudioSectionTitle>
+          <StudioFields>
+            <StudioFieldGrid>
+              <StudioField>
+                <StudioFieldLabel>
+                  {t('settings.artifacts.studio.default_skill_mode', 'Default Skill Mode')}
+                </StudioFieldLabel>
+                <Select
+                  value={safeStudioSettings.defaults.skills.mode}
+                  onChange={(mode) =>
+                    dispatch(
+                      setArtifactStudioDefaultSkills({
+                        ...safeStudioSettings.defaults.skills,
+                        mode
+                      })
+                    )
+                  }
+                  options={[
+                    { label: 'Inherit', value: 'inherit' },
+                    { label: 'All', value: 'all' },
+                    { label: 'Selected', value: 'selected' },
+                    { label: 'None', value: 'none' }
+                  ]}
+                  disabled={!safeSettings.enabled}
+                  style={{ width: '100%' }}
+                />
+              </StudioField>
+              <StudioField>
+                <StudioFieldLabel>
+                  {t('settings.artifacts.studio.default_skill_strategy', 'Default Skill Strategy')}
+                </StudioFieldLabel>
+                <Select
+                  allowClear
+                  value={safeStudioSettings.defaults.skills.strategy}
+                  onChange={(strategy) =>
+                    dispatch(
+                      setArtifactStudioDefaultSkills({
+                        ...safeStudioSettings.defaults.skills,
+                        strategy
+                      })
+                    )
+                  }
+                  options={[
+                    { label: 'Hybrid', value: 'hybrid' },
+                    { label: 'Keyword', value: 'keyword' },
+                    { label: 'Embedding', value: 'embedding' },
+                    { label: 'Local Embedding', value: 'local-embedding' },
+                    { label: 'LLM', value: 'llm' },
+                    { label: 'None', value: 'none' }
+                  ]}
+                  disabled={!safeSettings.enabled}
+                  style={{ width: '100%' }}
+                />
+              </StudioField>
+            </StudioFieldGrid>
+          </StudioFields>
+        </StudioSection>
+
+        <StudioSection>
+          <StudioSectionTitle>{t('settings.artifacts.studio.context_section', 'Context')}</StudioSectionTitle>
+          <StudioFields>
+            <StudioField>
+              <StudioFieldLabel>
+                {t('settings.artifacts.studio.default_context_strategy', 'Default Context Strategy')}
+              </StudioFieldLabel>
+              <Select
+                value={safeStudioSettings.defaults.contextManagement.type}
+                onChange={(type) =>
+                  dispatch(
+                    setArtifactStudioDefaultContextManagement({
+                      ...safeStudioSettings.defaults.contextManagement,
+                      type
+                    })
+                  )
+                }
+                options={[
+                  { label: 'Sliding Window', value: 'sliding_window' },
+                  { label: 'Summarize', value: 'summarize' },
+                  { label: 'Hierarchical', value: 'hierarchical' },
+                  { label: 'Truncate Middle', value: 'truncate_middle' },
+                  { label: 'None', value: 'none' }
+                ]}
+                disabled={!safeSettings.enabled}
+                style={{ width: '100%' }}
+              />
+            </StudioField>
+          </StudioFields>
+        </StudioSection>
+
+        <StudioSection>
+          <StudioSectionTitle>{t('settings.artifacts.studio.knowledge_section', 'Knowledge')}</StudioSectionTitle>
+          <StudioFields>
+            <StudioField>
+              <StudioFieldLabel>
+                {t('settings.artifacts.studio.default_knowledge_bases', 'Default Knowledge Bases')}
+              </StudioFieldLabel>
+              <Select
+                mode="multiple"
+                value={safeStudioSettings.defaults.knowledge.knowledgeBaseIds}
+                options={knowledgeBases.map((base) => ({ label: base.name, value: base.id }))}
+                onChange={(knowledgeBaseIds) => dispatch(setArtifactStudioDefaultKnowledge({ knowledgeBaseIds }))}
+                disabled={!safeSettings.enabled}
+                style={{ width: '100%' }}
+              />
+            </StudioField>
+            <SettingRow>
+              <SettingRowTitle>
+                {t(
+                  'settings.artifacts.studio.auto_create_knowledge_bridge',
+                  'Auto-create knowledge bridge from source chat'
+                )}
+              </SettingRowTitle>
+              <Switch
+                checked={safeStudioSettings.defaults.knowledge.autoCreateFromChatHistory}
+                onChange={(checked) =>
+                  dispatch(setArtifactStudioDefaultKnowledge({ autoCreateFromChatHistory: checked }))
+                }
+                disabled={!safeSettings.enabled}
+              />
+            </SettingRow>
+          </StudioFields>
+        </StudioSection>
       </SettingGroup>
 
       <SettingGroup theme={theme}>
@@ -443,6 +873,71 @@ const AddDependencyRow = styled.div`
   display: flex;
   gap: 8px;
   align-items: center;
+`
+
+const StudioHeaderActions = styled.div`
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 12px;
+`
+
+const StudioSection = styled.div`
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  padding: 14px;
+  margin-bottom: 12px;
+  background: var(--color-background);
+`
+
+const StudioSectionTitle = styled.div`
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--color-text-1);
+`
+
+const StudioSectionDescription = styled.div`
+  font-size: 12px;
+  color: var(--color-text-2);
+  margin-top: 6px;
+`
+
+const StudioFields = styled.div`
+  margin-top: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+`
+
+const StudioField = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+`
+
+const StudioFieldLabel = styled.div`
+  font-size: 13px;
+  color: var(--color-text-1);
+  font-weight: 500;
+`
+
+const StudioFieldGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+
+  @media (max-width: 960px) {
+    grid-template-columns: 1fr;
+  }
+`
+
+const StudioToggleField = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  padding: 9px 12px;
+  min-height: 42px;
 `
 
 export default ArtifactSettings

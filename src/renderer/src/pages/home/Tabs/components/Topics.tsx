@@ -1,3 +1,4 @@
+import { loggerService } from '@logger'
 import AssistantAvatar from '@renderer/components/Avatar/AssistantAvatar'
 import type { DraggableVirtualListRef } from '@renderer/components/DraggableList'
 import { DraggableVirtualList } from '@renderer/components/DraggableList'
@@ -20,7 +21,8 @@ import type { RootState } from '@renderer/store'
 import store from '@renderer/store'
 import { newMessagesActions } from '@renderer/store/newMessage'
 import { setGenerating } from '@renderer/store/runtime'
-import type { Assistant, Topic } from '@renderer/types'
+import type { Assistant, Skill, Topic } from '@renderer/types'
+import type { SkillScopeConfig } from '@renderer/types/skillScope'
 import { classNames, removeSpecialCharactersForFileName } from '@renderer/utils'
 import { copyTopicAsMarkdown, copyTopicAsPlainText } from '@renderer/utils/copy'
 import {
@@ -40,6 +42,7 @@ import { findIndex } from 'lodash'
 import {
   BrushCleaning,
   CheckSquare,
+  Cpu,
   FolderOpen,
   HelpCircle,
   Layers,
@@ -70,6 +73,8 @@ interface Props {
   position: 'left' | 'right'
 }
 
+const logger = loggerService.withContext('Topics')
+
 export const Topics: React.FC<Props> = ({ assistant: _assistant, activeTopic, setActiveTopic, position }) => {
   const { t } = useTranslation()
   const { notesPath } = useNotesSettings()
@@ -87,6 +92,7 @@ export const Topics: React.FC<Props> = ({ assistant: _assistant, activeTopic, se
   const [deletingTopicId, setDeletingTopicId] = useState<string | null>(null)
   const deleteTimerRef = useRef<NodeJS.Timeout>(null)
   const [editingTopicId, setEditingTopicId] = useState<string | null>(null)
+  const [availableSkills, setAvailableSkills] = useState<Skill[]>([])
   const listRef = useRef<DraggableVirtualListRef>(null)
 
   // 管理模式状态
@@ -111,6 +117,27 @@ export const Topics: React.FC<Props> = ({ assistant: _assistant, activeTopic, se
   const isPending = useCallback((topicId: string) => topicLoadingQuery[topicId], [topicLoadingQuery])
   const isFulfilled = useCallback((topicId: string) => topicFulfilledQuery[topicId], [topicFulfilledQuery])
   const dispatch = useDispatch()
+
+  useEffect(() => {
+    let cancelled = false
+
+    const loadSkills = async () => {
+      try {
+        const skills = await window.api.skill.getList()
+        if (!cancelled) {
+          setAvailableSkills(skills || [])
+        }
+      } catch (error) {
+        logger.error('Failed to load skills for topic scope menu', error as Error)
+      }
+    }
+
+    loadSkills()
+
+    return () => {
+      cancelled = true
+    }
+  }, [])
 
   useEffect(() => {
     dispatch(newMessagesActions.setTopicFulfilled({ topicId: activeTopic.id, fulfilled: false }))
@@ -251,6 +278,25 @@ export const Topics: React.FC<Props> = ({ assistant: _assistant, activeTopic, se
     const topic = targetTopic
     if (!topic) return []
 
+    const applyTopicUpdate = (nextTopic: Topic) => {
+      updateTopic(nextTopic)
+      topic.id === activeTopic.id && setActiveTopic(nextTopic)
+    }
+
+    const setTopicSkillScope = (scope: SkillScopeConfig | undefined) => {
+      applyTopicUpdate({ ...topic, skillScope: scope })
+    }
+
+    const upsertTopicSkillScope = (updater: (base: SkillScopeConfig) => SkillScopeConfig) => {
+      const baseScope: SkillScopeConfig = topic.skillScope ?? { mode: 'inherit' }
+      setTopicSkillScope(updater(baseScope))
+    }
+
+    const currentSkillScope = topic.skillScope
+    const currentSkillMode = currentSkillScope?.mode ?? 'inherit'
+    const currentSkillStrategy = currentSkillScope?.strategy
+    const selectedSkillIds = new Set(currentSkillScope?.selectedSkillIds ?? [])
+
     const menus: MenuProps['items'] = [
       {
         label: t('chat.topics.auto_rename'),
@@ -382,6 +428,210 @@ export const Topics: React.FC<Props> = ({ assistant: _assistant, activeTopic, se
               updateTopic(updatedTopic)
               topic.id === activeTopic.id && setActiveTopic(updatedTopic)
             }
+          }
+        ]
+      },
+      {
+        label: t('chat.topics.skill_scope.label', { defaultValue: 'Skill Scope' }),
+        key: 'skill-scope',
+        icon: <Cpu size={14} />,
+        children: [
+          {
+            label: t('chat.topics.skill_scope.use_assistant', { defaultValue: 'Use Assistant Default' }),
+            key: 'skill-inherit',
+            icon:
+              !currentSkillScope || currentSkillMode === 'inherit' ? (
+                <CheckSquare size={14} color="var(--color-primary)" />
+              ) : (
+                <Square size={14} color="var(--color-text-3)" />
+              ),
+            onClick: () => setTopicSkillScope(undefined)
+          },
+          {
+            label: t('chat.topics.skill_scope.all', { defaultValue: 'All Skills' }),
+            key: 'skill-all',
+            icon:
+              currentSkillMode === 'all' ? (
+                <CheckSquare size={14} color="var(--color-primary)" />
+              ) : (
+                <Square size={14} color="var(--color-text-3)" />
+              ),
+            onClick: () =>
+              upsertTopicSkillScope((base) => ({
+                ...base,
+                mode: 'all',
+                selectedSkillIds: undefined
+              }))
+          },
+          {
+            label: t('chat.topics.skill_scope.none', { defaultValue: 'No Skills' }),
+            key: 'skill-none',
+            icon:
+              currentSkillMode === 'none' ? (
+                <CheckSquare size={14} color="var(--color-primary)" />
+              ) : (
+                <Square size={14} color="var(--color-text-3)" />
+              ),
+            onClick: () =>
+              upsertTopicSkillScope((base) => ({
+                ...base,
+                mode: 'none',
+                selectedSkillIds: undefined
+              }))
+          },
+          { type: 'divider' as const },
+          {
+            label: t('chat.topics.skill_scope.selected', {
+              defaultValue: 'Selected Skills ({{count}})',
+              count: selectedSkillIds.size
+            }),
+            key: 'skill-selected-list',
+            children:
+              availableSkills.length > 0
+                ? availableSkills.map((skill) => ({
+                    label: skill.name,
+                    key: `skill-selected-${skill.id}`,
+                    icon:
+                      currentSkillMode === 'selected' && selectedSkillIds.has(skill.id) ? (
+                        <CheckSquare size={14} color="var(--color-primary)" />
+                      ) : (
+                        <Square size={14} color="var(--color-text-3)" />
+                      ),
+                    onClick: () => {
+                      upsertTopicSkillScope((base) => {
+                        const nextSelected = new Set(base.selectedSkillIds ?? [])
+                        if (nextSelected.has(skill.id)) {
+                          nextSelected.delete(skill.id)
+                        } else {
+                          nextSelected.add(skill.id)
+                        }
+                        return {
+                          ...base,
+                          mode: 'selected',
+                          selectedSkillIds: Array.from(nextSelected)
+                        }
+                      })
+                    }
+                  }))
+                : [
+                    {
+                      label: t('chat.topics.skill_scope.no_skills', { defaultValue: 'No skills available' }),
+                      key: 'skill-selected-empty',
+                      disabled: true
+                    }
+                  ]
+          },
+          { type: 'divider' as const },
+          {
+            label: t('chat.topics.skill_scope.strategy', { defaultValue: 'Intent Strategy' }),
+            key: 'skill-strategy',
+            children: [
+              {
+                label: t('chat.topics.skill_scope.strategy_inherit', { defaultValue: 'Inherit Global' }),
+                key: 'skill-strategy-inherit',
+                icon:
+                  currentSkillStrategy === undefined ? (
+                    <CheckSquare size={14} color="var(--color-primary)" />
+                  ) : (
+                    <Square size={14} color="var(--color-text-3)" />
+                  ),
+                onClick: () =>
+                  upsertTopicSkillScope((base) => ({
+                    ...base,
+                    strategy: undefined
+                  }))
+              },
+              {
+                label: 'None (Inject All)',
+                key: 'skill-strategy-none',
+                icon:
+                  currentSkillStrategy === 'none' ? (
+                    <CheckSquare size={14} color="var(--color-primary)" />
+                  ) : (
+                    <Square size={14} color="var(--color-text-3)" />
+                  ),
+                onClick: () =>
+                  upsertTopicSkillScope((base) => ({
+                    ...base,
+                    strategy: 'none'
+                  }))
+              },
+              {
+                label: 'Keyword',
+                key: 'skill-strategy-keyword',
+                icon:
+                  currentSkillStrategy === 'keyword' ? (
+                    <CheckSquare size={14} color="var(--color-primary)" />
+                  ) : (
+                    <Square size={14} color="var(--color-text-3)" />
+                  ),
+                onClick: () =>
+                  upsertTopicSkillScope((base) => ({
+                    ...base,
+                    strategy: 'keyword'
+                  }))
+              },
+              {
+                label: 'Embedding (API)',
+                key: 'skill-strategy-embedding',
+                icon:
+                  currentSkillStrategy === 'embedding' ? (
+                    <CheckSquare size={14} color="var(--color-primary)" />
+                  ) : (
+                    <Square size={14} color="var(--color-text-3)" />
+                  ),
+                onClick: () =>
+                  upsertTopicSkillScope((base) => ({
+                    ...base,
+                    strategy: 'embedding'
+                  }))
+              },
+              {
+                label: 'Local Embedding',
+                key: 'skill-strategy-local-embedding',
+                icon:
+                  currentSkillStrategy === 'local-embedding' ? (
+                    <CheckSquare size={14} color="var(--color-primary)" />
+                  ) : (
+                    <Square size={14} color="var(--color-text-3)" />
+                  ),
+                onClick: () =>
+                  upsertTopicSkillScope((base) => ({
+                    ...base,
+                    strategy: 'local-embedding'
+                  }))
+              },
+              {
+                label: 'LLM Classification',
+                key: 'skill-strategy-llm',
+                icon:
+                  currentSkillStrategy === 'llm' ? (
+                    <CheckSquare size={14} color="var(--color-primary)" />
+                  ) : (
+                    <Square size={14} color="var(--color-text-3)" />
+                  ),
+                onClick: () =>
+                  upsertTopicSkillScope((base) => ({
+                    ...base,
+                    strategy: 'llm'
+                  }))
+              },
+              {
+                label: 'Hybrid',
+                key: 'skill-strategy-hybrid',
+                icon:
+                  currentSkillStrategy === 'hybrid' ? (
+                    <CheckSquare size={14} color="var(--color-primary)" />
+                  ) : (
+                    <Square size={14} color="var(--color-text-3)" />
+                  ),
+                onClick: () =>
+                  upsertTopicSkillScope((base) => ({
+                    ...base,
+                    strategy: 'hybrid'
+                  }))
+              }
+            ]
           }
         ]
       },
@@ -588,7 +838,8 @@ export const Topics: React.FC<Props> = ({ assistant: _assistant, activeTopic, se
     onClearMessages,
     setTopicPosition,
     onMoveTopic,
-    onDeleteTopic
+    onDeleteTopic,
+    availableSkills
   ])
 
   // Sort topics based on pinned status if pinTopicsToTop is enabled

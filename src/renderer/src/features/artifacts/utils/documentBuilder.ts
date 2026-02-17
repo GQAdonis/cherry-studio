@@ -571,6 +571,8 @@ function buildReactDocument(
   options: RenderOptions,
   _artifactId: string
 ): string {
+  void _metadata
+  void _artifactId
   const cssTheme = options.theme === 'auto' ? 'light' : options.theme
   return buildReactBrowserDocument(content, 'React Artifact', cssTheme)
 }
@@ -809,6 +811,7 @@ export function buildDocument(artifact: Artifact, options: RenderOptions): strin
 
   switch (type) {
     case 'html':
+    case 'xhtml':
       return buildHtmlDocument(content, metadata, options, id, false)
     case 'htmx':
       return buildHtmlDocument(content, metadata, options, id, true)

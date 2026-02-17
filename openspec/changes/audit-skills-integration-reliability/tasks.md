@@ -18,7 +18,7 @@
 
 ## 5. Quality Gates and Coverage
 - [x] 5.1 Add a skills incident regression test target and enforce 100% line/branch coverage for that target.
-- [ ] 5.2 Ensure `pnpm lint`, `pnpm test`, and `pnpm format` pass with no errors and no warnings for all touched skills-related files.
+- [x] 5.2 Ensure `pnpm lint`, `pnpm test`, and `pnpm format` pass with no errors and no warnings for all touched skills-related files.
 - [x] 5.3 Produce a verification artifact summarizing commands, pass/fail status, and coverage proof for each incident scenario.
 
 ## 6. Final Validation

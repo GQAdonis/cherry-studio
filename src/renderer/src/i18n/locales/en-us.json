@@ -152,6 +152,11 @@
         },
         "title": "Advanced Settings"
       },
+      "context": {
+        "description": "Control how this agent/session manages long context windows before model limits are reached.",
+        "title": "Context Management",
+        "useGlobal": "Use Global Default"
+      },
       "essential": "Essential Settings",
       "permissionMode": {
         "tab": "Permission Mode",
@@ -223,6 +228,15 @@
         "uninstalling": "Uninstalling..."
       },
       "prompt": "Prompt Settings",
+      "skills": {
+        "description": "Configure skill availability and intent strategy for this agent/session scope.",
+        "helper": "Set scoped skill availability and intent strategy for this agent.",
+        "mode": "Availability",
+        "selected": "Selected Skills",
+        "selectedPlaceholder": "Choose skills for this scope",
+        "strategy": "Intent Strategy",
+        "title": "Skills"
+      },
       "tooling": {
         "mcp": {
           "description": "Connect MCP servers to unlock additional tools you can approve above.",
@@ -526,6 +540,8 @@
     "zoomOut": "Zoom Out"
   },
   "artifacts": {
+    "archive": "Archive",
+    "artifact_chat": "Artifact Chat",
     "attach_image": "Attach image",
     "change_model": "Click to change model",
     "click_to_open": "Click to open artifact",
@@ -533,14 +549,22 @@
     "console": "Console",
     "description_help": "Used for searching artifacts in your library",
     "description_placeholder": "What does this artifact do?",
+    "download_package": "Download package",
     "generating": "Generating artifact...",
+    "hide_archived": "Active",
+    "knowledge_bridge": "Create knowledge bridge from chat history",
     "library": "Artifact Library",
     "model_locked": "Model selection is locked",
     "new_artifact": "New Artifact",
+    "new_project_setup": "New Artifact Studio Project",
     "no_artifacts": "No artifacts found",
     "open_artifact": "Open Artifact",
+    "open_studio": "Artifact Studio",
     "preview": "Preview",
     "preview_type": "Type",
+    "project_name_placeholder": "Marketing landing page",
+    "projects_title": "Artifact Studio Projects",
+    "rebind_source": "Rebind Source",
     "refinement": "Refinement Chat",
     "refinement_empty": "No messages yet",
     "refinement_hint": "Ask the AI to modify this artifact",
@@ -548,6 +572,8 @@
     "save_from_modal": "Open the artifact to save it",
     "save_to_library": "Save to Library",
     "saved": "Artifact saved to library",
+    "show_archived": "Archived",
+    "source": "Source",
     "split": "Split",
     "tags_placeholder": "Add tags...",
     "title": "Artifacts",
@@ -561,6 +587,7 @@
       "react": "React",
       "svg": "SVG"
     },
+    "updated_at": "Updated",
     "version": "Version",
     "view": {
       "code": "Code",
@@ -576,6 +603,12 @@
     },
     "copy": {
       "title": "Copy Assistant"
+    },
+    "create": {
+      "settings": {
+        "description": "Apply skill and context defaults before creating this assistant.",
+        "title": "Creation Settings"
+      }
     },
     "delete": {
       "content": "Deleting an assistant will delete all topics and files under the assistant. Are you sure you want to delete it?",
@@ -759,6 +792,17 @@
         "title": "Regular Phrase",
         "titleLabel": "Title",
         "titlePlaceholder": "Enter title"
+      },
+      "skills": {
+        "custom": "Use Custom Policy",
+        "custom_info": "Custom skill policy overrides global defaults for this assistant. Conversation settings can still override assistant scope.",
+        "description": "Control skill availability and intent classification strategy for this assistant. Conversation-level settings can still override this.",
+        "mode": "Availability",
+        "selected": "Selected Skills",
+        "selected_placeholder": "Choose skills available to this assistant",
+        "strategy": "Intent Strategy",
+        "title": "Skills",
+        "use_global": "Use Global Default"
       },
       "title": "Assistant Settings",
       "tool_use_mode": {
@@ -1281,6 +1325,16 @@
         "placeholder": "Search topics...",
         "title": "Search"
       },
+      "skill_scope": {
+        "all": "All Skills",
+        "label": "Skill Scope",
+        "no_skills": "No skills available",
+        "none": "No Skills",
+        "selected": "Selected Skills ({{count}})",
+        "strategy": "Intent Strategy",
+        "strategy_inherit": "Inherit Global",
+        "use_assistant": "Use Assistant Default"
+      },
       "title": "Topics",
       "unpin": "Unpin Topic"
     },
@@ -1373,6 +1427,7 @@
     "advanced_settings": "Advanced Settings",
     "agent_one": "Agent",
     "agent_other": "Agents",
+    "all": "All",
     "and": "and",
     "assistant": "Agent",
     "assistant_one": "Assistant",
@@ -1385,6 +1440,7 @@
     "clear": "Clear",
     "clear_all": "Clear All",
     "click_to_replace": "Click to replace",
+    "clone": "Clone",
     "close": "Close",
     "collapse": "Collapse",
     "completed": "Completed",
@@ -1392,6 +1448,7 @@
     "copied": "Copied",
     "copy": "Copy",
     "copy_failed": "Copy failed",
+    "create": "Create",
     "current": "Current",
     "cut": "Cut",
     "dark_mode": "Dark Mode",
@@ -3764,9 +3821,46 @@
         "use_sandpack_help": "Use CodeSandbox Sandpack for React artifacts. Enables NPM dependencies, hot reload, and better error handling. Disable for simple Babel-only transpilation."
       },
       "required": "Required",
+      "runtime": {
+        "advanced": "Advanced",
+        "allow_custom_bundler": "Allow Custom Bundler URL",
+        "allow_dynamic_deps": "Allow Dynamic Dependencies",
+        "allow_external_resources": "Allow External Resources",
+        "basic": "Basic",
+        "profile": "Capability Profile",
+        "profile_help": "Basic locks runtime controls, Standard enables managed controls, and Advanced enables full runtime configuration.",
+        "standard": "Standard",
+        "title": "Runtime Profile"
+      },
       "storage_limit": "Storage Limit",
       "storage_limit_help": "Maximum number of artifacts to store. Older artifacts will be automatically removed.",
       "storage_title": "Storage",
+      "studio": {
+        "allow_conversation_override": "Allow Conversation Overrides",
+        "allow_project_override": "Allow Project Overrides",
+        "auto_create_knowledge_bridge": "Auto-create knowledge bridge",
+        "context_section": "Context",
+        "default_context_strategy": "Default Context Strategy",
+        "default_knowledge_bases": "Default Knowledge Bases",
+        "default_max_tokens": "Default Max Tokens",
+        "default_model": "Default Model",
+        "default_model_placeholder": "Select a model for Artifact Studio",
+        "default_model_seeded_hint": "Detected app default model",
+        "default_skill_mode": "Default Skill Mode",
+        "default_skill_strategy": "Default Skill Strategy",
+        "default_stream_output": "Default Stream Output",
+        "default_temperature": "Default Temperature",
+        "default_top_p": "Default Top P",
+        "description": "Configure default behavior for Artifact Studio agent sessions. These settings apply globally unless overridden by project or conversation-level configuration.",
+        "knowledge_section": "Knowledge",
+        "model_and_generation": "Model & Generation",
+        "model_and_generation_desc": "These defaults are used when the Artifact Studio agent or project context does not specify overrides.",
+        "open_agent_settings": "Open Artifact Agent Settings",
+        "override_policy": "Override Policy",
+        "override_policy_desc": "Control whether conversation and project-level settings can override studio defaults.",
+        "skills_section": "Skills",
+        "title": "Artifact Studio Governance"
+      },
       "title": "Artifacts",
       "types_help": "Select which types of artifacts should be generated. HTMX is always enabled.",
       "types_title": "Artifact Types"
@@ -3831,6 +3925,9 @@
         "truncate_middle": "Keep First & Last"
       },
       "useInherited": "Use Default"
+    },
+    "context_strategy": {
+      "title": "Context strategy"
     },
     "data": {
       "app_data": {
@@ -4600,6 +4697,9 @@
       },
       "title": "Math Settings"
     },
+    "max_tokens": {
+      "label": "Max Tokens"
+    },
     "mcp": {
       "actions": "Actions",
       "active": "Active",
@@ -5018,6 +5118,7 @@
       },
       "default_assistant_model": "Default Assistant Model",
       "default_assistant_model_description": "Model used when creating a new assistant, if the assistant is not set, this model will be used",
+      "default_model": "Model",
       "empty": "No models found",
       "manage": {
         "add_listed": {
@@ -5451,6 +5552,21 @@
       "zoom_out": "Zoom Out",
       "zoom_reset": "Reset Zoom"
     },
+    "skill": {
+      "manage": {
+        "active_skills": "Selected skills"
+      },
+      "matching": {
+        "strategy": "Skill strategy",
+        "title": "Skill availability"
+      }
+    },
+    "stream_output": {
+      "label": "Stream Output"
+    },
+    "temperature": {
+      "label": "Temperature"
+    },
     "theme": {
       "color_primary": "Primary Color",
       "dark": "Dark",
@@ -5747,6 +5863,9 @@
         "url_required": "Please enter a URL"
       }
     },
+    "top_p": {
+      "label": "Top P"
+    },
     "topic": {
       "pin_to_top": "Pin Topics to Top",
       "position": {
@@ -5822,6 +5941,7 @@
   },
   "title": {
     "apps": "Apps",
+    "artifacts": "Artifact Studio",
     "code": "Code",
     "files": "Files",
     "home": "Home",

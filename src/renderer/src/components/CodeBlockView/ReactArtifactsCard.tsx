@@ -1,11 +1,14 @@
 import { CodeOutlined, CopyOutlined } from '@ant-design/icons'
 import { useTheme } from '@renderer/context/ThemeProvider'
+import type { ParsedArtifact } from '@renderer/features/artifacts/types'
+import { openArtifactStudioFromChat } from '@renderer/features/artifacts/utils/studioNavigation'
 import type { ThemeMode } from '@renderer/types'
 import { Button } from 'antd'
 import { Code, DownloadIcon, Sparkles } from 'lucide-react'
 import type { FC } from 'react'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useNavigate } from 'react-router-dom'
 import { ClipLoader } from 'react-spinners'
 import styled, { keyframes } from 'styled-components'
 
@@ -16,15 +19,40 @@ interface Props {
   language: 'tsx' | 'jsx'
   onSave?: (code: string) => void
   isStreaming?: boolean
+  conversationId: string
+  messageId: string
 }
 
-const ReactArtifactsCard: FC<Props> = ({ code, language, onSave, isStreaming = false }) => {
+const ReactArtifactsCard: FC<Props> = ({ code, language, onSave, isStreaming = false, conversationId, messageId }) => {
   const { t } = useTranslation()
   const [isPopupOpen, setIsPopupOpen] = useState(false)
   const { theme } = useTheme()
+  const navigate = useNavigate()
 
   const codeContent = code || ''
   const hasContent = codeContent.trim().length > 0
+  const artifactTitle = 'React Component'
+
+  const openStudio = async () => {
+    const parsedArtifact: ParsedArtifact = {
+      identifier: `react-${Date.now()}`,
+      type: 'react',
+      title: artifactTitle,
+      content: codeContent,
+      attributes: {
+        language
+      },
+      startIndex: 0,
+      endIndex: codeContent.length
+    }
+
+    await openArtifactStudioFromChat({
+      artifact: parsedArtifact,
+      conversationId,
+      messageId,
+      navigate
+    })
+  }
 
   const handleCopy = async () => {
     try {
@@ -89,6 +117,9 @@ const ReactArtifactsCard: FC<Props> = ({ code, language, onSave, isStreaming = f
               <Button icon={<CopyOutlined />} onClick={handleCopy} type="text" disabled={!hasContent}>
                 {t('common.copy')}
               </Button>
+              <Button icon={<Sparkles size={14} />} onClick={openStudio} type="text" disabled={!hasContent}>
+                {t('artifacts.open_studio', 'Artifact Studio')}
+              </Button>
               <Button icon={<DownloadIcon size={14} />} onClick={handleDownload} type="text" disabled={!hasContent}>
                 {t('code_block.download.label')}
               </Button>
@@ -99,9 +130,10 @@ const ReactArtifactsCard: FC<Props> = ({ code, language, onSave, isStreaming = f
 
       <ReactArtifactsPopup
         open={isPopupOpen}
-        title="React Component"
+        title={artifactTitle}
         code={codeContent}
         onSave={onSave}
+        onOpenStudio={openStudio}
         onClose={() => setIsPopupOpen(false)}
       />
     </>

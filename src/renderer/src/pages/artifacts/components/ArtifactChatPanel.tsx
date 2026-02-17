@@ -15,7 +15,13 @@ import { PaperClipOutlined, SendOutlined, UserOutlined } from '@ant-design/icons
 import Scrollbar from '@renderer/components/Scrollbar'
 import type { Artifact } from '@renderer/features/artifacts'
 import { useArtifactRefinement } from '@renderer/features/artifacts/hooks/useArtifactRefinement'
-import { Tooltip } from 'antd'
+import {
+  ARTIFACT_STUDIO_AGENT_ID,
+  ARTIFACT_STUDIO_RUNTIME_ERROR_CODES,
+  isArtifactStudioRuntimeError
+} from '@renderer/features/artifacts/services/ArtifactStudioRuntimeService'
+import { AgentSettingsPopup } from '@renderer/pages/settings/AgentSettings'
+import { message, Tooltip } from 'antd'
 import { Bot, Sparkles, X } from 'lucide-react'
 import type { FC, KeyboardEvent } from 'react'
 import { memo, useCallback, useEffect, useRef, useState } from 'react'
@@ -32,9 +38,10 @@ interface AttachedImage {
 
 interface ArtifactChatPanelProps {
   artifact: Artifact
+  onSendRefinementReady?: (sendRefinement: (prompt: string) => Promise<void>) => void
 }
 
-const ArtifactChatPanel: FC<ArtifactChatPanelProps> = ({ artifact }) => {
+const ArtifactChatPanel: FC<ArtifactChatPanelProps> = ({ artifact, onSendRefinementReady }) => {
   const { t } = useTranslation()
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -42,13 +49,51 @@ const ArtifactChatPanel: FC<ArtifactChatPanelProps> = ({ artifact }) => {
   const [inputValue, setInputValue] = useState('')
   const [attachedImages, setAttachedImages] = useState<AttachedImage[]>([])
 
+  const handleRefinementError = useCallback(
+    (error: Error) => {
+      if (
+        isArtifactStudioRuntimeError(error, ARTIFACT_STUDIO_RUNTIME_ERROR_CODES.AGENT_MODEL_REQUIRED) ||
+        error.message.includes(ARTIFACT_STUDIO_RUNTIME_ERROR_CODES.AGENT_MODEL_REQUIRED)
+      ) {
+        message.warning(
+          t(
+            'artifacts.agent_model_required',
+            'Artifact Studio agent needs a model. Configure one in Agent Settings before refining.'
+          )
+        )
+        void AgentSettingsPopup.show({
+          agentId: ARTIFACT_STUDIO_AGENT_ID,
+          tab: 'essential'
+        })
+        return
+      }
+
+      if (
+        isArtifactStudioRuntimeError(error, ARTIFACT_STUDIO_RUNTIME_ERROR_CODES.AGENT_NOT_FOUND) ||
+        error.message.includes(ARTIFACT_STUDIO_RUNTIME_ERROR_CODES.AGENT_NOT_FOUND)
+      ) {
+        message.error(
+          t('artifacts.agent_not_found', 'Artifact Studio agent is unavailable. Restart Cherry Studio and try again.')
+        )
+      }
+    },
+    [t]
+  )
+
   // Use the artifact refinement hook for AI-powered chat
   const { messages, isRefining, sendRefinement, clearMessages } = useArtifactRefinement({
     artifact,
     onComplete: () => {
       scrollToBottom()
-    }
+    },
+    onError: handleRefinementError
   })
+
+  useEffect(() => {
+    if (onSendRefinementReady) {
+      onSendRefinementReady(sendRefinement)
+    }
+  }, [onSendRefinementReady, sendRefinement])
 
   const scrollToBottom = useCallback(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
@@ -128,7 +173,7 @@ const ArtifactChatPanel: FC<ArtifactChatPanelProps> = ({ artifact }) => {
         <HeaderIcon>
           <Sparkles size={16} />
         </HeaderIcon>
-        <HeaderTitle>{t('artifacts.refinement')}</HeaderTitle>
+        <HeaderTitle>{t('artifacts.artifact_chat', 'Artifact Chat')}</HeaderTitle>
       </Header>
 
       <RefinementToolbar onClear={clearMessages} />
@@ -150,10 +195,26 @@ const ArtifactChatPanel: FC<ArtifactChatPanelProps> = ({ artifact }) => {
                   <MessageAvatar $isUser={msg.role === 'user'}>
                     {msg.role === 'user' ? <UserOutlined /> : <Bot size={14} />}
                   </MessageAvatar>
-                  <MessageContent $isUser={msg.role === 'user'} $isStreaming={msg.isStreaming}>
-                    {msg.content}
-                    {msg.isStreaming && <StreamingCursor />}
-                  </MessageContent>
+                  <MessageStack>
+                    <MessageContent $isUser={msg.role === 'user'} $isStreaming={msg.isStreaming}>
+                      {msg.content}
+                      {msg.isStreaming && <StreamingCursor />}
+                    </MessageContent>
+                    {msg.role === 'assistant' && (msg.skillActivations?.length || 0) > 0 && (
+                      <SkillActivationList>
+                        {msg.skillActivations?.map((activation, index) => (
+                          <SkillActivationItem key={`${msg.id}-skill-${index}`}>
+                            <SkillActivationTitle>{activation.skillName}</SkillActivationTitle>
+                            <SkillActivationText>
+                              {activation.action}
+                              {activation.toolName ? ` · ${activation.toolName}` : ''}
+                              {activation.error ? ` · ${activation.error}` : ''}
+                            </SkillActivationText>
+                          </SkillActivationItem>
+                        ))}
+                      </SkillActivationList>
+                    )}
+                  </MessageStack>
                 </MessageBubble>
               ))
             )}
@@ -281,6 +342,13 @@ const MessageBubble = styled.div<{ $isUser: boolean }>`
   flex-direction: ${(props) => (props.$isUser ? 'row-reverse' : 'row')};
 `
 
+const MessageStack = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-width: 80%;
+`
+
 const MessageAvatar = styled.div<{ $isUser: boolean }>`
   display: flex;
   align-items: center;
@@ -295,7 +363,6 @@ const MessageAvatar = styled.div<{ $isUser: boolean }>`
 `
 
 const MessageContent = styled.div<{ $isUser: boolean; $isStreaming?: boolean }>`
-  max-width: 80%;
   padding: 8px 12px;
   border-radius: 12px;
   font-size: 13px;
@@ -305,6 +372,31 @@ const MessageContent = styled.div<{ $isUser: boolean; $isStreaming?: boolean }>`
   border: ${(props) => (props.$isUser ? 'none' : '1px solid var(--color-border)')};
   white-space: pre-wrap;
   opacity: ${(props) => (props.$isStreaming ? 0.9 : 1)};
+`
+
+const SkillActivationList = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+`
+
+const SkillActivationItem = styled.div`
+  border: 1px solid var(--color-border);
+  background: var(--color-background-soft);
+  border-radius: 8px;
+  padding: 6px 8px;
+`
+
+const SkillActivationTitle = styled.div`
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--color-primary);
+`
+
+const SkillActivationText = styled.div`
+  font-size: 11px;
+  color: var(--color-text-2);
+  line-height: 1.4;
 `
 
 const StreamingCursor = styled.span`

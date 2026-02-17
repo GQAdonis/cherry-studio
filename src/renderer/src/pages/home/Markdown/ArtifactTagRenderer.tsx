@@ -147,6 +147,7 @@ function normalizeType(type?: string): ArtifactType {
 
   switch (normalized) {
     case 'html':
+    case 'xhtml':
     case 'htmx':
       return normalized as ArtifactType
     case 'react':

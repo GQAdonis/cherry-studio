@@ -34,8 +34,7 @@ export class AgentService extends BaseService {
   }
 
   // Agent Methods
-  async createAgent(req: CreateAgentRequest): Promise<CreateAgentResponse> {
-    const id = `agent_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`
+  async createAgentWithId(id: string, req: CreateAgentRequest): Promise<CreateAgentResponse> {
     const now = new Date().toISOString()
 
     if (!req.accessible_paths || req.accessible_paths.length === 0) {
@@ -71,7 +70,8 @@ export class AgentService extends BaseService {
     }
 
     const database = await this.getDatabase()
-    await database.insert(agentsTable).values(insertData)
+    await database.insert(agentsTable).values(insertData).onConflictDoNothing()
+
     const result = await database.select().from(agentsTable).where(eq(agentsTable.id, id)).limit(1)
     if (!result[0]) {
       throw new Error('Failed to create agent')
@@ -79,6 +79,19 @@ export class AgentService extends BaseService {
 
     const agent = this.convertBooleanTextFields(this.deserializeJsonFields(result[0])) as AgentEntity
     return agent
+  }
+
+  async upsertAgent(id: string, req: CreateAgentRequest): Promise<GetAgentResponse> {
+    const existing = await this.getAgent(id)
+    if (existing) {
+      return existing
+    }
+    return await this.createAgentWithId(id, req)
+  }
+
+  async createAgent(req: CreateAgentRequest): Promise<CreateAgentResponse> {
+    const id = `agent_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`
+    return await this.createAgentWithId(id, req)
   }
 
   async getAgent(id: string): Promise<GetAgentResponse | null> {

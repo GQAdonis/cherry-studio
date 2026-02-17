@@ -1,6 +1,8 @@
 import { CodeOutlined, CopyOutlined } from '@ant-design/icons'
 import { loggerService } from '@logger'
 import { useTheme } from '@renderer/context/ThemeProvider'
+import type { ParsedArtifact } from '@renderer/features/artifacts/types'
+import { detectHtmlArtifactType, openArtifactStudioFromChat } from '@renderer/features/artifacts/utils/studioNavigation'
 import type { ThemeMode } from '@renderer/types'
 import { extractHtmlTitle, getFileNameFromHtmlTitle } from '@renderer/utils/formats'
 import { Button } from 'antd'
@@ -8,6 +10,7 @@ import { Code, DownloadIcon, Globe, LinkIcon, Sparkles } from 'lucide-react'
 import type { FC } from 'react'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useNavigate } from 'react-router-dom'
 import { ClipLoader } from 'react-spinners'
 import styled, { keyframes } from 'styled-components'
 
@@ -19,6 +22,8 @@ interface Props {
   html: string
   onSave?: (html: string) => void
   isStreaming?: boolean
+  conversationId: string
+  messageId: string
 }
 
 const getTerminalStyles = (theme: ThemeMode) => ({
@@ -27,11 +32,12 @@ const getTerminalStyles = (theme: ThemeMode) => ({
   promptColor: theme === 'dark' ? '#00ff00' : '#007700'
 })
 
-const HtmlArtifactsCard: FC<Props> = ({ html, onSave, isStreaming = false }) => {
+const HtmlArtifactsCard: FC<Props> = ({ html, onSave, isStreaming = false, conversationId, messageId }) => {
   const { t } = useTranslation()
   const title = extractHtmlTitle(html) || 'HTML Artifacts'
   const [isPopupOpen, setIsPopupOpen] = useState(false)
   const { theme } = useTheme()
+  const navigate = useNavigate()
 
   const htmlContent = html || ''
   const hasContent = htmlContent.trim().length > 0
@@ -61,6 +67,25 @@ const HtmlArtifactsCard: FC<Props> = ({ html, onSave, isStreaming = false }) => 
     const fileName = `${getFileNameFromHtmlTitle(title) || 'html-artifact'}.html`
     await window.api.file.save(fileName, htmlContent)
     window.toast.success(t('message.download.success'))
+  }
+
+  const openStudio = async () => {
+    const parsedArtifact: ParsedArtifact = {
+      identifier: `artifact-${Date.now()}`,
+      type: detectHtmlArtifactType(htmlContent),
+      title,
+      content: htmlContent,
+      attributes: {},
+      startIndex: 0,
+      endIndex: htmlContent.length
+    }
+
+    await openArtifactStudioFromChat({
+      artifact: parsedArtifact,
+      conversationId,
+      messageId,
+      navigate
+    })
   }
 
   return (
@@ -114,6 +139,9 @@ const HtmlArtifactsCard: FC<Props> = ({ html, onSave, isStreaming = false }) => 
               <Button icon={<CopyOutlined />} onClick={handleCopy} type="text" disabled={!hasContent}>
                 {t('common.copy')}
               </Button>
+              <Button icon={<Sparkles size={14} />} onClick={openStudio} type="text" disabled={!hasContent}>
+                {t('artifacts.open_studio', 'Artifact Studio')}
+              </Button>
               <Button icon={<DownloadIcon size={14} />} onClick={handleDownload} type="text" disabled={!hasContent}>
                 {t('code_block.download.label')}
               </Button>
@@ -127,6 +155,7 @@ const HtmlArtifactsCard: FC<Props> = ({ html, onSave, isStreaming = false }) => 
         title={title}
         html={htmlContent}
         onSave={onSave}
+        onOpenStudio={openStudio}
         onClose={() => setIsPopupOpen(false)}
       />
     </>

@@ -1,6 +1,5 @@
 import { configureStore } from '@reduxjs/toolkit'
 import type { Artifact } from '@renderer/features/artifacts/types'
-import { fetchChatCompletion } from '@renderer/services/ApiService'
 import artifactsReducer from '@renderer/store/artifacts'
 import { ChunkType } from '@renderer/types/chunk'
 import { act, renderHook } from '@testing-library/react'
@@ -8,93 +7,66 @@ import type { PropsWithChildren } from 'react'
 import { Provider } from 'react-redux'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
+import {
+  ensureArtifactStudioSession,
+  streamArtifactStudioSessionMessage
+} from '../../services/ArtifactStudioRuntimeService'
 import { useArtifactRefinement } from '../useArtifactRefinement'
 
-vi.mock('@renderer/services/ApiService', () => ({
-  fetchChatCompletion: vi.fn()
+vi.mock('../../services/ArtifactStudioRuntimeService', () => ({
+  ARTIFACT_STUDIO_AGENT_ID: 'artifact-studio',
+  ensureArtifactStudioSession: vi.fn(),
+  streamArtifactStudioSessionMessage: vi.fn()
 }))
-
-vi.mock('@renderer/services/AssistantService', () => {
-  const defaultAssistant = {
-    id: 'default-assistant',
-    name: 'Default Assistant',
-    type: 'assistant',
-    prompt: '',
-    topics: [],
-    messages: [],
-    regularPhrases: [],
-    settings: {
-      streamOutput: true,
-      temperature: 0.7
-    }
-  }
-
-  const defaultModel = {
-    id: 'test-model',
-    name: 'Test Model',
-    provider: 'openai'
-  }
-
-  return {
-    DEFAULT_ASSISTANT_SETTINGS: defaultAssistant.settings,
-    getDefaultAssistant: vi.fn(() => defaultAssistant),
-    getSkillsCreatorAssistant: vi.fn(() => ({ ...defaultAssistant, id: 'skills-creator' })),
-    getDefaultModel: vi.fn(() => defaultModel),
-    getQuickModel: vi.fn(() => defaultModel),
-    getTranslateModel: vi.fn(() => defaultModel),
-    getDefaultTopic: vi.fn(() => ({
-      id: 'topic-1',
-      assistantId: defaultAssistant.id,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-      name: 'Default Topic',
-      messages: [],
-      isNameManuallyEdited: false
-    })),
-    getDefaultProvider: vi.fn(() => null),
-    getAssistantProvider: vi.fn(() => null),
-    getProviderByModel: vi.fn(() => null),
-    getProviderByModelId: vi.fn(() => null),
-    getDefaultAssistantSettings: vi.fn(() => defaultAssistant.settings),
-    getAssistantSettings: vi.fn(() => defaultAssistant.settings),
-    getAssistantById: vi.fn(() => defaultAssistant),
-    createAssistantFromAgent: vi.fn(),
-    createAssistantFromAgentWithOptions: vi.fn(),
-    getDefaultTranslateAssistant: vi.fn()
-  }
-})
 
 describe('useArtifactRefinement diagnostics', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    vi.mocked(ensureArtifactStudioSession).mockResolvedValue({
+      agentId: 'artifact-studio',
+      sessionId: 'session-1',
+      modelId: 'test-model'
+    })
   })
 
-  it('surfaces skill activation, context actions, and lifecycle events on assistant message', async () => {
-    const mockFetch = vi.mocked(fetchChatCompletion)
-    mockFetch.mockImplementation(async ({ onChunkReceived }: any) => {
-      onChunkReceived({
+  it('routes refinement through artifact-studio agent/session runtime and surfaces diagnostics', async () => {
+    vi.mocked(streamArtifactStudioSessionMessage).mockImplementation(async ({ onChunk }: any) => {
+      onChunk({
         type: ChunkType.SKILL_ACTIVATION,
         skillName: 'artifact-refiner',
         action: 'activated'
       })
-      onChunkReceived({
+      onChunk({
         type: ChunkType.CONTEXT_ACTION,
         action: 'summarized',
         summary: 'Summarized prior chat context',
         removedCount: 4
       })
-      onChunkReceived({
+      onChunk({
         type: ChunkType.TEXT_DELTA,
-        text: 'Refinement complete.'
+        text: 'Refinement complete.\n<cs-studio-code identifier="artifact-1" type="html" title="Artifact 1"><div>updated</div></cs-studio-code>'
       })
-      onChunkReceived({
+      onChunk({
         type: ChunkType.LLM_RESPONSE_COMPLETE
       })
     })
 
     const store = configureStore({
       reducer: {
-        artifacts: artifactsReducer
+        artifacts: artifactsReducer,
+        llm: (state = { providers: [] }) => state,
+        knowledge: (state = { bases: [] }) => state,
+        settings: (
+          state = {
+            contextStrategy: { type: 'sliding_window' },
+            apiServer: {
+              enabled: true,
+              host: 'localhost',
+              port: 23333,
+              apiKey: 'test-key'
+            }
+          }
+        ) => state
       }
     })
 
@@ -126,20 +98,40 @@ describe('useArtifactRefinement diagnostics', () => {
       await result.current.sendRefinement('improve this')
     })
 
+    expect(ensureArtifactStudioSession).toHaveBeenCalledWith(
+      expect.objectContaining({
+        sessionName: 'Artifact Studio - Artifact 1'
+      })
+    )
+    expect(streamArtifactStudioSessionMessage).toHaveBeenCalledWith(
+      expect.objectContaining({
+        agentId: 'artifact-studio',
+        sessionId: 'session-1'
+      })
+    )
+
     const state = store.getState().artifacts
     const assistantMessage = state.refinementMessages.find((message) => message.role === 'assistant')
 
     expect(assistantMessage).toBeDefined()
-    expect(assistantMessage?.skillActivations).toEqual([
-      expect.objectContaining({ skillName: 'artifact-refiner', action: 'activated' })
-    ])
-    expect(assistantMessage?.contextActions).toEqual([
-      expect.objectContaining({ action: 'summarized', removedCount: 4 })
-    ])
+    expect(assistantMessage?.skillActivations).toEqual(
+      expect.arrayContaining([expect.objectContaining({ skillName: 'artifact-refiner', action: 'activated' })])
+    )
+    expect(assistantMessage?.contextActions).toEqual(
+      expect.arrayContaining([expect.objectContaining({ action: 'summarized', removedCount: 4 })])
+    )
     expect(assistantMessage?.artifactLifecycle).toEqual(
       expect.arrayContaining([
         expect.objectContaining({ stage: 'started' }),
         expect.objectContaining({ stage: 'completed' })
+      ])
+    )
+    expect(assistantMessage?.pmpoPhases).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ phase: 'spec' }),
+        expect.objectContaining({ phase: 'plan' }),
+        expect.objectContaining({ phase: 'execute' }),
+        expect.objectContaining({ phase: 'reflect' })
       ])
     )
   })

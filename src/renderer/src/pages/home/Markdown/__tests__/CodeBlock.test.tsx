@@ -28,6 +28,14 @@ const mocks = vi.hoisted(() => ({
         Save HTML
       </button>
     </div>
+  )),
+  ReactArtifactsCard: vi.fn(({ onSave, code }) => (
+    <div>
+      <div>{code}</div>
+      <button type="button" onClick={() => onSave('new react content')}>
+        Save React
+      </button>
+    </div>
   ))
 }))
 
@@ -45,7 +53,8 @@ vi.mock('@renderer/utils/markdown', () => ({
 vi.mock('@renderer/store', () => ({
   default: {
     getState: vi.fn(() => ({})) // Mock store, state doesn't matter here
-  }
+  },
+  useAppSelector: vi.fn(() => 'topic-1')
 }))
 
 vi.mock('@renderer/store/messageBlock', () => ({
@@ -60,7 +69,8 @@ vi.mock('@renderer/hooks/useSettings', () => ({
 
 vi.mock('@renderer/components/CodeBlockView', () => ({
   CodeBlockView: mocks.CodeBlockView,
-  HtmlArtifactsCard: mocks.HtmlArtifactsCard
+  HtmlArtifactsCard: mocks.HtmlArtifactsCard,
+  ReactArtifactsCard: mocks.ReactArtifactsCard
 }))
 
 describe('CodeBlock', () => {
