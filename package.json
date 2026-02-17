@@ -27,6 +27,7 @@
     "build:linux": "dotenv npm run build && electron-builder --linux --x64 --arm64",
     "build:linux:arm64": "dotenv npm run build && electron-builder --linux --arm64",
     "build:linux:x64": "dotenv npm run build && electron-builder --linux --x64",
+    "build:linux:x64:no-rpm": "dotenv npm run build && electron-builder --linux AppImage deb --x64",
     "release": "node scripts/version.js",
     "publish": "pnpm build:check && pnpm release patch push",
     "publish:artifacts": "cd packages/artifacts && npm publish && cd -",
@@ -99,7 +100,8 @@
     "tesseract.js": "6.0.1",
     "tr46": "^6.0.0",
     "turndown": "7.2.0",
-    "unstructured-client": "^0.30.2"
+    "unstructured-client": "^0.30.2",
+    "ws": "^8.19.0"
   },
   "devDependencies": {
     "@agentic/exa": "^7.3.3",
@@ -253,6 +255,7 @@
     "@types/uuid": "^10.0.0",
     "@types/vary": "^1",
     "@types/word-extractor": "^1",
+    "@types/ws": "^8.18.1",
     "@typescript/native-preview": "7.0.0-dev.20260204.1",
     "@uiw/codemirror-extensions-langs": "4.25.1",
     "@uiw/codemirror-themes-all": "^4.25.1",
