@@ -106,6 +106,9 @@ extraResources:
   # Copy built-in skills to Resources folder for proper file system access
   - from: "./resources/skills/"
     to: "skills"
+  # Copy UAR binaries
+  - from: "resources/bin/"
+    to: "bin"
 
 win:
   executableName: The Boss

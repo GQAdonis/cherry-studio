@@ -31,6 +31,8 @@
     "release": "node scripts/version.js",
     "publish": "pnpm build:check && pnpm release patch push",
     "publish:artifacts": "cd packages/artifacts && npm publish && cd -",
+    "build:uar": "cd ../prometheus/universal-agent-runtime && cargo build --release",
+    "copy:uar": "mkdir -p resources/bin && cp ../prometheus/universal-agent-runtime/target/release/universal-agent-runtime resources/bin/universal-agent-runtime-$(uname -s | tr '[:upper:]' '[:lower:]' | sed 's/darwin/macos/')-$(uname -m | sed 's/x86_64/x64/')",
     "agents:generate": "NODE_ENV='development' drizzle-kit generate --config src/main/services/agents/drizzle.config.ts",
     "agents:push": "NODE_ENV='development' drizzle-kit push --config src/main/services/agents/drizzle.config.ts",
     "agents:studio": "NODE_ENV='development' drizzle-kit studio --config src/main/services/agents/drizzle.config.ts",
