@@ -759,6 +759,18 @@ export const SYSTEM_MODELS: Record<SystemProviderId | 'defaultModel', Model[]> =
   ],
   zhipu: [
     {
+      id: 'glm-5',
+      provider: 'zhipu',
+      name: 'GLM-5',
+      group: 'GLM-5'
+    },
+    {
+      id: 'glm-4.7',
+      provider: 'zhipu',
+      name: 'GLM-4.7',
+      group: 'GLM-4.7'
+    },
+    {
       id: 'glm-4.5-flash',
       provider: 'zhipu',
       name: 'GLM-4.5-Flash',
@@ -846,6 +858,46 @@ export const SYSTEM_MODELS: Record<SystemProviderId | 'defaultModel', Model[]> =
         output_per_million_tokens: 2.5,
         currencySymbol: 'USD'
       }
+    },
+    {
+      id: 'kimi-k2.5',
+      provider: 'moonshot',
+      name: 'Kimi K2.5',
+      group: 'Kimi K2.5',
+      owned_by: 'moonshot',
+      capabilities: [{ type: 'text' }, { type: 'vision' }, { type: 'function_calling' }]
+    },
+    {
+      id: 'kimi-k2-0905-Preview',
+      provider: 'moonshot',
+      name: 'Kimi K2 0905 Preview',
+      group: 'Kimi K2',
+      owned_by: 'moonshot',
+      capabilities: [{ type: 'text' }, { type: 'function_calling' }]
+    },
+    {
+      id: 'kimi-k2-turbo-preview',
+      provider: 'moonshot',
+      name: 'Kimi K2 Turbo Preview',
+      group: 'Kimi K2',
+      owned_by: 'moonshot',
+      capabilities: [{ type: 'text' }, { type: 'function_calling' }]
+    },
+    {
+      id: 'kimi-k2-thinking',
+      provider: 'moonshot',
+      name: 'Kimi K2 Thinking',
+      group: 'Kimi K2 Thinking',
+      owned_by: 'moonshot',
+      capabilities: [{ type: 'text' }, { type: 'function_calling' }]
+    },
+    {
+      id: 'kimi-k2-thinking-turbo',
+      provider: 'moonshot',
+      name: 'Kimi K2 Thinking Turbo',
+      group: 'Kimi K2 Thinking',
+      owned_by: 'moonshot',
+      capabilities: [{ type: 'text' }, { type: 'function_calling' }]
     }
   ],
   baichuan: [
@@ -943,6 +995,14 @@ export const SYSTEM_MODELS: Record<SystemProviderId | 'defaultModel', Model[]> =
     { id: 'qwen-plus', name: 'qwen-plus', provider: 'dashscope', group: 'qwen-plus', owned_by: 'system' },
     { id: 'qwen-max', name: 'qwen-max', provider: 'dashscope', group: 'qwen-max', owned_by: 'system' },
     { id: 'qwen3-max', name: 'qwen3-max', provider: 'dashscope', group: 'qwen-max', owned_by: 'system' },
+    { id: 'qwen3.5-plus', name: 'qwen3.5-plus', provider: 'dashscope', group: 'qwen-plus', owned_by: 'system' },
+    {
+      id: 'qwen3.5-397b-a17b',
+      name: 'qwen3.5-397b-a17b',
+      provider: 'dashscope',
+      group: 'qwen-plus',
+      owned_by: 'system'
+    },
     { id: 'text-embedding-v4', name: 'text-embedding-v4', provider: 'dashscope', group: 'qwen-text-embedding' },
     { id: 'text-embedding-v3', name: 'text-embedding-v3', provider: 'dashscope', group: 'qwen-text-embedding' },
     { id: 'text-embedding-v2', name: 'text-embedding-v2', provider: 'dashscope', group: 'qwen-text-embedding' },
