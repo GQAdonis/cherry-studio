@@ -17,6 +17,7 @@ import type { Model, Provider, ProviderType, VertexProvider } from '@types'
 import type { ChildProcess } from 'child_process'
 import semver from 'semver'
 
+import { configManager } from './ConfigManager'
 import VertexAIService from './VertexAIService'
 import { windowService } from './WindowService'
 
@@ -439,6 +440,12 @@ class OpenClawService {
       return { success: false, message: 'Gateway is already starting' }
     }
 
+    if (configManager.getUarUseCustomUrl()) {
+      this.gatewayStatus = 'running'
+      logger.info('Bypassing sidecar startup, using custom UAR URL explicitly configured.')
+      return { success: true, message: 'Using external UAR gateway' }
+    }
+
     // Refresh shell env first so findExecutableInEnv and crossPlatformSpawn both use the same fresh env
     const shellEnv = await refreshShellEnv()
     const openclawPath = await findExecutableInEnv('openclaw')
@@ -565,6 +572,13 @@ class OpenClawService {
    * Handles both our process and external gateway processes
    */
   public async stopGateway(): Promise<{ success: boolean; message: string }> {
+    if (configManager.getUarUseCustomUrl()) {
+      this.gatewayStatus = 'stopped'
+      this.gatewayProcess = null
+      logger.info('Gateway connection explicitly stopped (external UAR logic)')
+      return { success: true, message: 'Gateway stopped successfully' }
+    }
+
     try {
       const openclawPath = await findExecutableInEnv('openclaw')
       if (openclawPath) {
@@ -671,6 +685,29 @@ class OpenClawService {
    * Check Gateway health by verifying WebSocket connectivity
    */
   public async checkHealth(): Promise<HealthInfo> {
+    if (configManager.getUarUseCustomUrl()) {
+      try {
+        const customUrl = configManager.getUarCustomUrl() // e.g., 'http://127.0.0.1:18790'
+        const parsedUrl = new URL(customUrl)
+        const portToTest = parsedUrl.port ? parseInt(parsedUrl.port, 10) : parsedUrl.protocol === 'https:' ? 443 : 80
+
+        const isAlive = await this.checkPortOpen(portToTest, parsedUrl.hostname)
+        if (isAlive) {
+          return {
+            status: 'healthy',
+            gatewayPort: portToTest,
+            version: 'External UAR'
+          }
+        }
+      } catch (error) {
+        logger.debug('External UAR health check failed:', error as Error)
+      }
+      return {
+        status: 'unhealthy',
+        gatewayPort: this.gatewayPort
+      }
+    }
+
     // If we know the gateway is not running, return unhealthy immediately
     if (this.gatewayStatus !== 'running' || !this.gatewayProcess) {
       return {
@@ -701,7 +738,7 @@ class OpenClawService {
   /**
    * Check if a port is open and accepting connections
    */
-  private async checkPortOpen(port: number): Promise<boolean> {
+  private async checkPortOpen(port: number, host: string = 'localhost'): Promise<boolean> {
     return new Promise((resolve) => {
       const socket = new Socket()
       socket.setTimeout(2000)
@@ -721,7 +758,7 @@ class OpenClawService {
         resolve(false)
       })
 
-      socket.connect(port, 'localhost')
+      socket.connect(port, host)
     })
   }
 
@@ -729,6 +766,10 @@ class OpenClawService {
    * Get OpenClaw Dashboard URL (for opening in minapp)
    */
   public getDashboardUrl(): string {
+    if (configManager.getUarUseCustomUrl()) {
+      return configManager.getUarCustomUrl()
+    }
+
     let dashboardUrl = `http://localhost:${this.gatewayPort}`
     // Include auth token in URL for dashboard authentication
     if (this.gatewayAuthToken) {

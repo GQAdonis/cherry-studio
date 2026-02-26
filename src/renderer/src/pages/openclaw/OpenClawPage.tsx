@@ -15,7 +15,7 @@ import {
 } from '@renderer/store/openclaw'
 import type { NodeCheckResult } from '@shared/config/types'
 import { IpcChannel } from '@shared/IpcChannel'
-import { Alert, Avatar, Button, Result, Space, Spin } from 'antd'
+import { Alert, Avatar, Button, Input, Result, Space, Spin, Switch } from 'antd'
 import { Download, ExternalLink, Play, RefreshCw, Square } from 'lucide-react'
 import type { FC } from 'react'
 import { useCallback, useEffect, useMemo, useState } from 'react'
@@ -99,6 +99,18 @@ const OpenClawPage: FC = () => {
   const [gitMissing, setGitMissing] = useState(false)
   const [nodeDownloadUrl, setNodeDownloadUrl] = useState<string>('https://nodejs.org/')
   const [gitDownloadUrl, setGitDownloadUrl] = useState<string>('https://git-scm.com/downloads')
+
+  const [uarUseCustomUrl, setUarUseCustomUrl] = useState<boolean>(false)
+  const [uarCustomUrl, setUarCustomUrl] = useState<string>('http://127.0.0.1:18790')
+
+  useEffect(() => {
+    Promise.all([window.api.config.get('uarUseCustomUrl'), window.api.config.get('uarCustomUrl')])
+      .then(([useCustom, customUrl]) => {
+        setUarUseCustomUrl(!!useCustom)
+        if (customUrl) setUarCustomUrl(customUrl as string)
+      })
+      .catch((err) => logger.error('Failed to load UAR config', err))
+  }, [])
 
   // Fetch Node.js download URL and poll node availability when node issue is shown
   useEffect(() => {
@@ -619,6 +631,43 @@ const OpenClawPage: FC = () => {
             </span>
           </div>
         )}
+
+        <div className="mb-6 rounded-lg p-4" style={{ background: 'var(--color-background-soft)' }}>
+          <div className="flex items-center justify-between">
+            <div>
+              <div className="font-medium" style={{ color: 'var(--color-text-1)' }}>
+                Use remote UAR instance
+              </div>
+              <div className="mt-1 text-xs" style={{ color: 'var(--color-text-3)' }}>
+                Bypass local sidecar and connect to an existing Universal Agent Runtime via URL
+              </div>
+            </div>
+            <Switch
+              checked={uarUseCustomUrl}
+              disabled={gatewayStatus === 'running' || isStarting || isRestarting}
+              onChange={async (checked) => {
+                setUarUseCustomUrl(checked)
+                await window.api.config.set('uarUseCustomUrl', checked)
+              }}
+            />
+          </div>
+          {uarUseCustomUrl && (
+            <div className="mt-4">
+              <div className="mb-1 text-xs" style={{ color: 'var(--color-text-2)' }}>
+                UAR API Host URL
+              </div>
+              <Input
+                value={uarCustomUrl}
+                disabled={gatewayStatus === 'running' || isStarting || isRestarting}
+                onChange={(e) => setUarCustomUrl(e.target.value)}
+                onBlur={async () => {
+                  await window.api.config.set('uarCustomUrl', uarCustomUrl)
+                }}
+                placeholder="http://127.0.0.1:18790"
+              />
+            </div>
+          )}
+        </div>
 
         {/* Gateway Status Card - show when running or restarting */}
         {(gatewayStatus === 'running' || isRestarting) && (

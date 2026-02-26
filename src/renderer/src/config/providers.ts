@@ -42,6 +42,7 @@ import O3ProviderLogo from '@renderer/assets/images/providers/o3.png'
 import OcoolAiProviderLogo from '@renderer/assets/images/providers/ocoolai.png'
 import OllamaProviderLogo from '@renderer/assets/images/providers/ollama.png'
 import OpenAiProviderLogo from '@renderer/assets/images/providers/openai.png'
+import OpenClawLogo from '@renderer/assets/images/providers/openclaw.svg'
 import OpenRouterProviderLogo from '@renderer/assets/images/providers/openrouter.png'
 import PerplexityProviderLogo from '@renderer/assets/images/providers/perplexity.png'
 import Ph8ProviderLogo from '@renderer/assets/images/providers/ph8.png'
@@ -723,6 +724,16 @@ export const SYSTEM_PROVIDERS_CONFIG: Record<SystemProviderId, SystemProvider> =
     models: SYSTEM_MODELS.mimo,
     isSystem: true,
     enabled: false
+  },
+  uar: {
+    id: 'uar',
+    name: 'Universal Agent Runtime',
+    type: 'openai',
+    apiKey: '',
+    apiHost: 'http://127.0.0.1:18790/v1',
+    models: [],
+    isSystem: true,
+    enabled: true
   }
 } as const
 
@@ -794,7 +805,8 @@ export const PROVIDER_LOGO_MAP: AtLeast<SystemProviderId, string> = {
   sophnet: SophnetProviderLogo,
   gateway: AIGatewayProviderLogo,
   cerebras: CerebrasProviderLogo,
-  mimo: MiMoProviderLogo
+  mimo: MiMoProviderLogo,
+  uar: OpenClawLogo
 } as const
 
 export function getProviderLogo(providerId: string) {

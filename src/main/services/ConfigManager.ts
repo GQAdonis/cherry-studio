@@ -50,7 +50,9 @@ export enum ConfigKeys {
   EnableDeveloperMode = 'enableDeveloperMode',
   ClientId = 'clientId',
   GitBashPath = 'gitBashPath',
-  GitBashPathSource = 'gitBashPathSource' // 'manual' | 'auto' | null
+  GitBashPathSource = 'gitBashPathSource', // 'manual' | 'auto' | null
+  UarUseCustomUrl = 'uarUseCustomUrl',
+  UarCustomUrl = 'uarCustomUrl'
 }
 
 export class ConfigManager {
@@ -281,6 +283,22 @@ export class ConfigManager {
     }
 
     return clientId
+  }
+
+  getUarUseCustomUrl(): boolean {
+    return this.get<boolean>(ConfigKeys.UarUseCustomUrl, false)
+  }
+
+  setUarUseCustomUrl(value: boolean) {
+    this.setAndNotify(ConfigKeys.UarUseCustomUrl, value)
+  }
+
+  getUarCustomUrl(): string {
+    return this.get<string>(ConfigKeys.UarCustomUrl, 'http://127.0.0.1:18790')
+  }
+
+  setUarCustomUrl(value: string) {
+    this.setAndNotify(ConfigKeys.UarCustomUrl, value)
   }
 
   set(key: string, value: unknown, isNotify: boolean = false) {
