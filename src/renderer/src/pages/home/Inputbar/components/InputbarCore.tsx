@@ -606,8 +606,16 @@ export const InputbarCore: FC<InputbarCoreProps> = ({
 
   const rightSectionExtras = useMemo(() => {
     const extras: React.ReactNode[] = []
-    extras.push(<TranslateButton key="translate" text={text} onTranslated={onTranslated} isLoading={isTranslating} />)
-    extras.push(<SendMessageButton key="send" sendMessage={handleSendMessage} disabled={isSendDisabled} />)
+    extras.push(
+      <TranslateButton
+        key="translate"
+        text={text}
+        disabled={isSendDisabled}
+        onTranslated={onTranslated}
+        isLoading={isTranslating}
+      />
+    )
+    extras.push(<SendMessageButton sendMessage={handleSendMessage} disabled={isSendDisabled} />)
 
     if (isLoading) {
       extras.push(

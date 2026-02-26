@@ -1,6 +1,6 @@
 {
   "name": "CherryStudio",
-  "version": "1.7.19",
+  "version": "1.7.21",
   "private": true,
   "description": "The Boss - A powerful AI assistant",
   "desktopName": "TheBoss.desktop",
@@ -77,7 +77,7 @@
     "release:ai-sdk-provider": "pnpm --filter @cherrystudio/ai-sdk-provider version patch && pnpm --filter @cherrystudio/ai-sdk-provider build && pnpm --filter @cherrystudio/ai-sdk-provider publish --access public"
   },
   "dependencies": {
-    "@anthropic-ai/claude-agent-sdk": "0.1.76",
+    "@anthropic-ai/claude-agent-sdk": "0.2.59",
     "@codesandbox/sandpack-react": "^2.20.0",
     "@codesandbox/sandpack-themes": "^2.0.21",
     "@e2b/code-interpreter": "^2.3.3",
@@ -104,7 +104,7 @@
     "tesseract.js": "6.0.1",
     "tr46": "^6.0.0",
     "turndown": "7.2.0",
-    "unstructured-client": "^0.30.2",
+    "unstructured-client": "^0.31.0",
     "ws": "^8.19.0"
   },
   "devDependencies": {
@@ -179,7 +179,7 @@
     "@langchain/openai": "1.0.0",
     "@langchain/textsplitters": "0.1.0",
     "@mistralai/mistralai": "^1.7.5",
-    "@modelcontextprotocol/sdk": "1.23.0",
+    "@modelcontextprotocol/sdk": "1.27.1",
     "@mozilla/readability": "^0.6.0",
     "@notionhq/client": "^2.2.15",
     "@openrouter/ai-sdk-provider": "^1.5.4",
@@ -483,9 +483,8 @@
       "libsql@0.4.7": "patches/libsql-npm-0.4.7-444e260fb1.patch",
       "pdf-parse@1.1.1": "patches/pdf-parse-npm-1.1.1-04a6109b2a.patch",
       "@ai-sdk/openai-compatible@1.0.28": "patches/@ai-sdk__openai-compatible@1.0.28.patch",
-      "@anthropic-ai/claude-agent-sdk@0.1.76": "patches/@anthropic-ai__claude-agent-sdk@0.1.76.patch",
       "@openrouter/ai-sdk-provider": "patches/@openrouter__ai-sdk-provider.patch",
-      "@ai-sdk/google@2.0.49": "patches/@ai-sdk-google-npm-2.0.49-84720f41bd.patch"
+      "dmg-builder@26.3.4": "patches/dmg-builder@26.3.4.patch"
     },
     "onlyBuiltDependencies": [
       "@j178/prek",

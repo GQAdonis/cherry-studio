@@ -1,0 +1,13 @@
+diff --git a/out/dmgUtil.js b/out/dmgUtil.js
+index ebf48fcd74d946b1b8c7c9b2a94deedae98709bb..37dd8f3d3e84ebb36135ef687991e5d74a16f9aa 100644
+--- a/out/dmgUtil.js
++++ b/out/dmgUtil.js
+@@ -102,7 +102,7 @@
+         "icon-size": specification.iconSize,
+         "text-size": iconTextSize,
+         "compression-level": Number(process.env.ELECTRON_BUILDER_COMPRESSION_LEVEL || "9"),
+-        // filesystem: specification.filesystem || "HFS+",
++        filesystem: specification.filesystem || "APFS",
+         format: specification.format,
+         contents: ((_a = specification.contents) === null || _a === void 0 ? void 0 : _a.map(c => ({
+             path: c.path || appPath, // path is required, when ommitted, appPath is used (backward compatibility

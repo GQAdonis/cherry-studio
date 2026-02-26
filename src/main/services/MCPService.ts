@@ -37,6 +37,7 @@ import type { MCPServerLogEntry } from '@shared/config/types'
 import { IpcChannel } from '@shared/IpcChannel'
 import { buildFunctionCallToolName } from '@shared/mcp'
 import { defaultAppHeaders } from '@shared/utils'
+import { safeSerialize } from '@shared/utils/serialize'
 import {
   BuiltinMCPServerNames,
   type GetResourceResponse,
@@ -690,14 +691,16 @@ class McpService {
 
       // Set up logging message notification handler
       client.setNotificationHandler(LoggingMessageNotificationSchema, async (notification) => {
-        logger.debug(`Message from server ${server.name}:`, notification.params)
         const data = notification.params?.data
-        if (data !== undefined && data !== null) {
+        const message = safeSerialize(notification.params.data) ?? 'No data'
+        logger.debug(`Message from server ${server.name}: ${message}`)
+        if (data) {
           this.emitServerLog(server, {
             timestamp: Date.now(),
+            // FIXME: as MCPServerLogEntry['level'] not type safe
             level: (notification.params?.level as MCPServerLogEntry['level']) || 'info',
-            message: typeof data === 'string' ? data : JSON.stringify(data),
-            data: redactSensitive(data),
+            message,
+            data: redactSensitive(notification.params?.data),
             source: notification.params?.logger || 'server'
           })
         }

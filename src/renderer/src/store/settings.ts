@@ -26,6 +26,7 @@ import type {
   ContextStrategyConfig,
   LanguageVarious,
   MathEngine,
+  MinAppRegionFilter,
   OpenAIServiceTier,
   PaintingProvider,
   S3Config,
@@ -194,31 +195,8 @@ export interface SettingsState {
   maxKeepAliveMinapps: number
   showOpenedMinappsInSidebar: boolean
   minappsOpenLinkExternal: boolean
-  // Mini-App Automation
-  minappAutomation: {
-    /** Enable CDP-based automation for mini-apps */
-    enabled: boolean
-    /** Enable enhanced context menu with Send to Chat/KB options */
-    enableContextMenu: boolean
-    /** Auto-inject content script into webviews */
-    injectContentScript: boolean
-    /** Enable conversation extraction from AI chat apps */
-    enableConversationExtraction: boolean
-  }
-  // SDK Settings
-  sdk: {
-    /** Enable the SDK WebSocket server for external apps */
-    enableWebSocketServer: boolean
-    /** WebSocket server port */
-    webSocketPort: number
-    /** Auto-start WebSocket server on app launch */
-    autoStartServer: boolean
-    /** Require approval for new apps */
-    requireApproval: boolean
-    /** Trusted apps and their granted capabilities */
-    trustedApps: Record<string, string[]>
-  }
-
+  /** Mini app region filter: 'auto' (detect from IP), 'CN', or 'Global' */
+  minAppRegion: MinAppRegionFilter
   // 隐私设置
   enableDataCollection: boolean
   enableSpellCheck: boolean
@@ -292,6 +270,21 @@ export interface SettingsState {
   /** Maximum characters for truncation fallback */
   mcpMaxCharactersForTruncation: number
   // Artifact settings
+  // MinApp automation settings
+  minappAutomation: {
+    enabled: boolean
+    enableContextMenu: boolean
+    injectContentScript: boolean
+    enableConversationExtraction: boolean
+  }
+  // SDK / WebSocket server settings
+  sdk: {
+    enableWebSocketServer: boolean
+    webSocketPort: number
+    autoStartServer: boolean
+    requireApproval: boolean
+    trustedApps: Record<string, string[]>
+  }
   artifacts: {
     enabled: boolean
     autoOpen: boolean
@@ -470,22 +463,7 @@ export const initialState: SettingsState = {
   maxKeepAliveMinapps: 3,
   showOpenedMinappsInSidebar: true,
   minappsOpenLinkExternal: false,
-  // Mini-App Automation
-  minappAutomation: {
-    enabled: true,
-    enableContextMenu: true,
-    injectContentScript: true,
-    enableConversationExtraction: true
-  },
-  // SDK Settings
-  sdk: {
-    enableWebSocketServer: false,
-    webSocketPort: 23847,
-    autoStartServer: false,
-    requireApproval: true,
-    trustedApps: {}
-  },
-
+  minAppRegion: 'auto',
   enableDataCollection: false,
   enableSpellCheck: false,
   spellCheckLanguages: [],
@@ -565,6 +543,19 @@ export const initialState: SettingsState = {
   mcpSummarizationThreshold: 30_000,
   mcpTargetSummarizedTokens: 8_000,
   mcpMaxCharactersForTruncation: 100_000,
+  minappAutomation: {
+    enabled: true,
+    enableContextMenu: true,
+    injectContentScript: true,
+    enableConversationExtraction: true
+  },
+  sdk: {
+    enableWebSocketServer: false,
+    webSocketPort: 23847,
+    autoStartServer: false,
+    requireApproval: true,
+    trustedApps: {}
+  },
   artifacts: {
     enabled: true,
     autoOpen: false,
@@ -983,13 +974,9 @@ const settingsSlice = createSlice({
     setMinappsOpenLinkExternal: (state, action: PayloadAction<boolean>) => {
       state.minappsOpenLinkExternal = action.payload
     },
-    setMinappAutomation: (state, action: PayloadAction<Partial<SettingsState['minappAutomation']>>) => {
-      state.minappAutomation = { ...state.minappAutomation, ...action.payload }
+    setMinAppRegion: (state, action: PayloadAction<MinAppRegionFilter>) => {
+      state.minAppRegion = action.payload
     },
-    setSdkSettings: (state, action: PayloadAction<Partial<SettingsState['sdk']>>) => {
-      state.sdk = { ...state.sdk, ...action.payload }
-    },
-
     setEnableDataCollection: (state, action: PayloadAction<boolean>) => {
       state.enableDataCollection = action.payload
     },
@@ -1220,6 +1207,12 @@ const settingsSlice = createSlice({
         ...state.artifacts.studio.defaults.knowledge,
         ...action.payload
       }
+    },
+    setMinappAutomation: (state, action: PayloadAction<Partial<SettingsState['minappAutomation']>>) => {
+      state.minappAutomation = { ...state.minappAutomation, ...action.payload }
+    },
+    setSdkSettings: (state, action: PayloadAction<Partial<SettingsState['sdk']>>) => {
+      state.sdk = { ...state.sdk, ...action.payload }
     }
   }
 })
@@ -1325,9 +1318,7 @@ export const {
   setMaxKeepAliveMinapps,
   setShowOpenedMinappsInSidebar,
   setMinappsOpenLinkExternal,
-  setMinappAutomation,
-  setSdkSettings,
-
+  setMinAppRegion,
   setEnableDataCollection,
   setEnableSpellCheck,
   setSpellCheckLanguages,
@@ -1387,7 +1378,9 @@ export const {
   setArtifactStudioDefaultLlm,
   setArtifactStudioDefaultSkills,
   setArtifactStudioDefaultContextManagement,
-  setArtifactStudioDefaultKnowledge
+  setArtifactStudioDefaultKnowledge,
+  setMinappAutomation,
+  setSdkSettings
 } = settingsSlice.actions
 
 export default settingsSlice.reducer
