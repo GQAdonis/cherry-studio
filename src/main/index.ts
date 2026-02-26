@@ -26,6 +26,7 @@ import mcpService from './services/MCPService'
 import { nodeTraceService } from './services/NodeTraceService'
 import { openClawService } from './services/OpenClawService'
 import { isOvmsSupported } from './services/OvmsManager'
+import { uarSidecarService } from './services/UarSidecarService'
 import powerMonitorService from './services/PowerMonitorService'
 import {
   CHERRY_STUDIO_PROTOCOL,
@@ -254,6 +255,9 @@ if (!app.requestSingleInstanceLock()) {
     //start selection assistant service
     initSelectionService()
 
+    // Start Universal Agent Runtime Sidecar
+    uarSidecarService.start()
+
     runAsyncFunction(async () => {
       // Start API server if enabled or if agents exist
       try {
@@ -344,6 +348,7 @@ if (!app.requestSingleInstanceLock()) {
       await openClawService.stopGateway()
       await mcpService.cleanup()
       await apiServerService.stop()
+      uarSidecarService.stop()
     } catch (error) {
       logger.warn('Error cleaning up services:', error as Error)
     }

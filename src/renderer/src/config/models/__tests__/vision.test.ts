@@ -287,6 +287,35 @@ describe('isVisionModel', () => {
       ).toBe(true)
     })
 
+    it('should return true for gemini 3.1 models', () => {
+      // Preview versions
+      expect(
+        isVisionModel({
+          id: 'gemini-3.1-pro-preview',
+          name: '',
+          provider: '',
+          group: ''
+        })
+      ).toBe(true)
+      // Stable versions
+      expect(
+        isVisionModel({
+          id: 'gemini-3.1-pro',
+          name: '',
+          provider: '',
+          group: ''
+        })
+      ).toBe(true)
+      expect(
+        isVisionModel({
+          id: 'gemini-3.1-flash',
+          name: '',
+          provider: '',
+          group: ''
+        })
+      ).toBe(true)
+    })
+
     it('should return true for gemini exp models', () => {
       expect(
         isVisionModel({
@@ -317,6 +346,16 @@ describe('isVisionModel', () => {
     })
     it('should return false for kimi non-vision models', () => {
       expect(isVisionModel(createModel({ id: 'kimi-k2-thinking' }))).toBe(false)
+    })
+  })
+
+  describe('Qwen Models', () => {
+    it('should return true for Qwen vision models', () => {
+      expect(isVisionModel(createModel({ id: 'qwen-vl-max' }))).toBe(true)
+      expect(isVisionModel(createModel({ id: 'qwen3-vl' }))).toBe(true)
+      expect(isVisionModel(createModel({ id: 'qwen3.5-plus' }))).toBe(true)
+      expect(isVisionModel(createModel({ id: 'qwen3.5-plus-2026-02-15' }))).toBe(true)
+      expect(isVisionModel(createModel({ id: 'qwen3.5-397b-a17b' }))).toBe(true)
     })
   })
 })
