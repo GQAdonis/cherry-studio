@@ -1500,5 +1500,14 @@ export const PROVIDER_URLS: Record<SystemProviderId, ProviderUrls> = {
       docs: 'https://platform.xiaomimimo.com/#/docs/welcome',
       models: 'https://platform.xiaomimimo.com/'
     }
+  },
+  uar: {
+    api: {
+      url: 'http://127.0.0.1:18790/v1'
+    },
+    websites: {
+      official: 'https://github.com/Prometheus-AGS/universal-agent-runtime',
+      docs: 'https://github.com/Prometheus-AGS/universal-agent-runtime'
+    }
   }
 }

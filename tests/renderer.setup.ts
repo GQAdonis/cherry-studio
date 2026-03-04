@@ -151,6 +151,16 @@ vi.mock('axios', () => {
   }
 })
 
+// Mock ResizeObserver for jsdom environment
+vi.stubGlobal(
+  'ResizeObserver',
+  class ResizeObserver {
+    observe() {}
+    unobserve() {}
+    disconnect() {}
+  }
+)
+
 vi.stubGlobal('electron', {
   ipcRenderer: {
     on: vi.fn(),

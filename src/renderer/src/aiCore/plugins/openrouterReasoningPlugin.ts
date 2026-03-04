@@ -1,4 +1,5 @@
 import type { LanguageModelV3StreamPart } from '@ai-sdk/provider'
+import { definePlugin } from '@cherrystudio/ai-core'
 import type { LanguageModelMiddleware } from 'ai'
 
 /**
@@ -6,7 +7,7 @@ import type { LanguageModelMiddleware } from 'ai'
  *
  * @returns LanguageModelMiddleware - a middleware filter redacted block
  */
-export function openrouterReasoningMiddleware(): LanguageModelMiddleware {
+function createOpenrouterReasoningMiddleware(): LanguageModelMiddleware {
   const REDACTED_BLOCK = '[REDACTED]'
   return {
     specificationVersion: 'v3',
@@ -48,3 +49,14 @@ export function openrouterReasoningMiddleware(): LanguageModelMiddleware {
     }
   }
 }
+
+export const createOpenrouterReasoningPlugin = () =>
+  definePlugin({
+    name: 'openrouterReasoning',
+    enforce: 'pre',
+
+    configureContext: (context) => {
+      context.middlewares = context.middlewares || []
+      context.middlewares.push(createOpenrouterReasoningMiddleware())
+    }
+  })

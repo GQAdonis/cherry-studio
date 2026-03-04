@@ -18,7 +18,7 @@ on:
 jobs:
   changes:
     runs-on: ubuntu-latest
-    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch' || github.event.pull_request.draft == false
+    if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch' || github.event.pull_request.draft == false) && (github.event.action != 'edited' || github.event.changes.base != null)
     outputs:
       main: ${{ steps.filter.outputs.main }}
       renderer: ${{ steps.filter.outputs.renderer }}
@@ -53,7 +53,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       CI: true
-    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch' || github.event.pull_request.draft == false
+    if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch' || github.event.pull_request.draft == false) && (github.event.action != 'edited' || github.event.changes.base != null)
 
     steps:
       - name: Check out Git repository
@@ -62,7 +62,7 @@ jobs:
       - name: Install Node.js
         uses: actions/setup-node@v6
         with:
-          node-version: 22
+          node-version-file: '.node-version'
 
       - name: Install pnpm
         uses: pnpm/action-setup@v4
@@ -119,7 +119,7 @@ jobs:
       - name: Install Node.js
         uses: actions/setup-node@v6
         with:
-          node-version: 22
+          node-version-file: '.node-version'
 
       - name: Install pnpm
         uses: pnpm/action-setup@v4
@@ -170,7 +170,7 @@ jobs:
       - name: Install Node.js
         uses: actions/setup-node@v6
         with:
-          node-version: 22
+          node-version-file: '.node-version'
 
       - name: Install pnpm
         uses: pnpm/action-setup@v4
@@ -198,7 +198,7 @@ jobs:
     runs-on: windows-latest
     env:
       CI: true
-    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch' || github.event.pull_request.draft == false
+    if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch' || github.event.pull_request.draft == false) && (github.event.action != 'edited' || github.event.changes.base != null)
     steps:
       - name: Check out Git repository
         uses: actions/checkout@v6
@@ -206,7 +206,7 @@ jobs:
       - name: Install Node.js
         uses: actions/setup-node@v6
         with:
-          node-version: 22
+          node-version-file: '.node-version'
 
       - name: Install pnpm
         uses: pnpm/action-setup@v4
@@ -241,7 +241,7 @@ jobs:
       - name: Install Node.js
         uses: actions/setup-node@v6
         with:
-          node-version: 22
+          node-version-file: '.node-version'
 
       - name: Install pnpm
         uses: pnpm/action-setup@v4

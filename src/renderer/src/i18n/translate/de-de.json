@@ -1241,6 +1241,7 @@
       },
       "export": {
         "image": "Als Bild exportieren",
+        "image_saved": "Bild erfolgreich gespeichert",
         "joplin": "Nach Joplin exportieren",
         "md": {
           "label": "Als Markdown exportieren",
@@ -6107,6 +6108,7 @@
       "scroll_sync": "Scroll-Synchronisierungs-Einstellungen",
       "title": "Übersetzungseinstellungen"
     },
+    "stop": "Übersetzung stoppen",
     "success": {
       "custom": {
         "delete": "Erfolgreich gelöscht",

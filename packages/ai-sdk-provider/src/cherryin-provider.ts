@@ -1,12 +1,11 @@
-import type { OpenAIProviderSettings } from '@ai-sdk/openai'
-import { createOpenAI } from '@ai-sdk/openai'
-import type {
-  EmbeddingModelV3,
-  ImageModelV3,
-  LanguageModelV3,
-  ProviderV3,
-  SpeechModelV3,
-  TranscriptionModelV3
+import { createOpenAI, type OpenAIProviderSettings } from '@ai-sdk/openai'
+import {
+  type EmbeddingModelV3,
+  type ImageModelV3,
+  type LanguageModelV3,
+  type ProviderV3,
+  type SpeechModelV3,
+  type TranscriptionModelV3
 } from '@ai-sdk/provider'
 import type { FetchFunction } from '@ai-sdk/provider-utils'
 import { loadApiKey } from '@ai-sdk/provider-utils'
@@ -42,22 +41,24 @@ export interface CherryInProviderSettings {
 }
 
 export interface CherryInProvider extends ProviderV3 {
-  (modelId: string, settings?: OpenAIProviderSettings): LanguageModelV3
-  languageModel(modelId: string, settings?: OpenAIProviderSettings): LanguageModelV3
-  embeddingModel(modelId: string, settings?: OpenAIProviderSettings): EmbeddingModelV3
-  chat(modelId: string, settings?: OpenAIProviderSettings): LanguageModelV3
+  (modelId: string, settings?: any): LanguageModelV3
+  languageModel(modelId: string, settings?: any): LanguageModelV3
+  embeddingModel(modelId: string, settings?: any): EmbeddingModelV3
+  chat(modelId: string, settings?: any): LanguageModelV3
   responses(modelId: string): LanguageModelV3
-  completion(modelId: string, settings?: OpenAIProviderSettings): LanguageModelV3
-  embedding(modelId: string, settings?: OpenAIProviderSettings): EmbeddingModelV3
-  textEmbedding(modelId: string, settings?: OpenAIProviderSettings): EmbeddingModelV3
-  textEmbeddingModel(modelId: string, settings?: OpenAIProviderSettings): EmbeddingModelV3
-  image(modelId: string, settings?: OpenAIProviderSettings): ImageModelV3
-  imageModel(modelId: string, settings?: OpenAIProviderSettings): ImageModelV3
+  completion(modelId: string, settings?: any): LanguageModelV3
+  embedding(modelId: string, settings?: any): EmbeddingModelV3
+  textEmbedding(modelId: string, settings?: any): EmbeddingModelV3
+  textEmbeddingModel(modelId: string, settings?: any): EmbeddingModelV3
+  image(modelId: string, settings?: any): ImageModelV3
+  imageModel(modelId: string, settings?: any): ImageModelV3
   transcription(modelId: string): TranscriptionModelV3
   transcriptionModel(modelId: string): TranscriptionModelV3
   speech(modelId: string): SpeechModelV3
   speechModel(modelId: string): SpeechModelV3
 }
+
+export type AiSdkModel = LanguageModelV3 | ImageModelV3 | EmbeddingModelV3 | TranscriptionModelV3 | SpeechModelV3
 
 const resolveApiKey = (options: CherryInProviderSettings): string => {
   // In browser environments, we can't access environment variables
@@ -148,7 +149,7 @@ export const createCherryIn = (options: CherryInProviderSettings = {}): CherryIn
     openaiProvider.textEmbeddingModel(modelId) as any as EmbeddingModelV3
 
   const provider = Object.assign(
-    function (modelId: string, settings?: OpenAIProviderSettings) {
+    function (modelId: string, settings?: any) {
       if (new.target) {
         throw new Error('CherryIN provider function cannot be called with the new keyword.')
       }
@@ -173,7 +174,7 @@ export const createCherryIn = (options: CherryInProviderSettings = {}): CherryIn
     }
   ) as CherryInProvider
 
-  return provider
+  return provider as CherryInProvider
 }
 
 export const cherryIn = createCherryIn()

@@ -13,7 +13,7 @@
 
 import { loggerService } from '@logger'
 import AiProviderNew from '@renderer/aiCore/index_new'
-import type { AiSdkMiddlewareConfig } from '@renderer/aiCore/middleware/AiSdkMiddlewareBuilder'
+import type { ModernAiProviderConfig } from '@renderer/aiCore/index_new'
 import { getDefaultModel, getProviderByModel } from '@renderer/services/AssistantService'
 import type { Assistant, Model } from '@renderer/types'
 import type { Message } from '@renderer/types/newMessage'
@@ -257,15 +257,9 @@ export async function summarizeConversation(
       prompt: formattedConversation
     }
 
-    const middlewareConfig: AiSdkMiddlewareConfig = {
+    const middlewareConfig: Partial<ModernAiProviderConfig> = {
       streamOutput: false,
-      enableReasoning: false,
-      isPromptToolUse: false,
-      isSupportedToolUse: false,
-      isImageGenerationEndpoint: false,
       enableWebSearch: false,
-      enableGenerateImage: false,
-      enableUrlContext: false,
       mcpTools: []
     }
 

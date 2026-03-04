@@ -532,7 +532,7 @@ export function getOpenAIReasoningParams(
   return {}
 }
 
-export function getAnthropicThinkingBudget(
+export function getThinkingBudget(
   maxTokens: number | undefined,
   reasoningEffort: string | undefined,
   modelId: string
@@ -615,7 +615,7 @@ export function getAnthropicReasoningParams(
 
     // Other Claude models continue using enabled + budgetTokens
     const { maxTokens } = getAssistantSettings(assistant)
-    const budgetTokens = getAnthropicThinkingBudget(maxTokens, reasoningEffort, model.id)
+    const budgetTokens = getThinkingBudget(maxTokens, reasoningEffort, model.id)
 
     return {
       thinking: {
@@ -623,9 +623,12 @@ export function getAnthropicReasoningParams(
         budgetTokens: budgetTokens
       }
     }
+  } else {
+    // 其他使用claude端點的模型，比如Kimi,Minimax等等
+    const { maxTokens } = getAssistantSettings(assistant)
+    const budgetTokens = getThinkingBudget(maxTokens, reasoningEffort, model.id)
+    return budgetTokens ? { thinking: { type: 'enabled', budgetTokens } } : { thinking: { type: 'enabled' } }
   }
-
-  return {}
 }
 
 type GoogleThinkingLevel = NonNullable<GoogleGenerativeAIProviderOptions['thinkingConfig']>['thinkingLevel']
@@ -796,7 +799,7 @@ export function getBedrockReasoningParams(
 
   // Other Claude models use enabled + budgetTokens
   const { maxTokens } = getAssistantSettings(assistant)
-  const budgetTokens = getAnthropicThinkingBudget(maxTokens, reasoningEffort, model.id)
+  const budgetTokens = getThinkingBudget(maxTokens, reasoningEffort, model.id)
   return {
     reasoningConfig: {
       type: 'enabled',
@@ -836,4 +839,22 @@ export function getCustomParameters(assistant: Assistant): Record<string, any> {
       }
     }, {}) || {}
   )
+}
+
+/**
+ * Get reasoning tag name based on model ID
+ * Used for extractReasoningMiddleware configuration
+ */
+export function getReasoningTagName(modelId: string | undefined): string {
+  const tagName = {
+    reasoning: 'reasoning',
+    think: 'think',
+    thought: 'thought',
+    seedThink: 'seed:think'
+  }
+
+  if (modelId?.includes('gpt-oss')) return tagName.reasoning
+  if (modelId?.includes('gemini')) return tagName.thought
+  if (modelId?.includes('seed-oss-36b')) return tagName.seedThink
+  return tagName.think
 }

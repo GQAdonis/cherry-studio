@@ -16,7 +16,7 @@ export const knowledgeSearchTool = (
   topicId: string,
   userMessage?: string
 ) => {
-  return tool<{ additionalContext?: string }, any>({
+  return tool({
     description: `Knowledge base search tool for retrieving information from user's private knowledge base. This searches your local collection of documents, web content, notes, and other materials you have stored.
 
 This tool has been configured with search parameters based on the conversation context:
@@ -100,38 +100,9 @@ You can use this tool as-is, or provide additionalContext to refine the search f
       // const searchCacheKey = `${topicId}-${JSON.stringify(finalQueries)}`
 
       // 返回结果
-      return knowledgeReferencesData as any
+      return knowledgeReferencesData
     },
-    toModelOutput: (results: any) => {
-      // Defensive check: handle undefined or malformed results
-      if (!results || !Array.isArray(results)) {
-        const fallbackResults = []
-        const summary = 'No search needed based on the query analysis.'
-        const referenceContent = `\`\`\`json\n${JSON.stringify(fallbackResults, null, 2)}\n\`\`\``
-        const fullInstructions = REFERENCE_PROMPT.replace(
-          '{question}',
-          "Based on the knowledge references, please answer the user's question with proper citations."
-        ).replace('{references}', referenceContent)
-
-        return {
-          type: 'content',
-          value: [
-            {
-              type: 'text',
-              text: 'This tool searches for relevant information and formats results for easy citation. The returned sources should be cited using [1], [2], etc. format in your response.'
-            },
-            {
-              type: 'text',
-              text: summary
-            },
-            {
-              type: 'text',
-              text: fullInstructions
-            }
-          ]
-        }
-      }
-
+    toModelOutput: ({ output: results }) => {
       let summary = 'No search needed based on the query analysis.'
       if (results.length > 0) {
         summary = `Found ${results.length} relevant sources. Use [number] format to cite specific information.`

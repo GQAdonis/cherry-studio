@@ -1241,6 +1241,7 @@
       },
       "export": {
         "image": "Exportar como imagem",
+        "image_saved": "Imagem salva com sucesso",
         "joplin": "Exportar para Joplin",
         "md": {
           "label": "Exportar como Markdown",
@@ -6107,6 +6108,7 @@
       "scroll_sync": "Configuração de Sincronização de Rolagem",
       "title": "Configurações de Tradução"
     },
+    "stop": "Parar Tradução",
     "success": {
       "custom": {
         "delete": "Eliminação bem-sucedida",

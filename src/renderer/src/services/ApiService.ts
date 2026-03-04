@@ -2,7 +2,6 @@
  * 职责：提供原子化的、无状态的API调用函数
  */
 import { loggerService } from '@logger'
-import type { AiSdkMiddlewareConfig } from '@renderer/aiCore/middleware/AiSdkMiddlewareBuilder'
 import { buildStreamTextParams } from '@renderer/aiCore/prepareParams'
 import { buildProviderOptions } from '@renderer/aiCore/utils/options'
 import { isDedicatedImageGenerationModel, isEmbeddingModel, isFunctionCallingModel } from '@renderer/config/models'
@@ -254,7 +253,6 @@ export async function fetchChatCompletion({
     ]
   }
 
-  // 使用 transformParameters 模块构建参数
   const {
     params: aiSdkParams,
     modelId,
@@ -266,7 +264,6 @@ export async function fetchChatCompletion({
     requestOptions
   })
 
-  // Safely fallback to prompt tool use when function calling is not supported by model.
   const usePromptToolUse =
     isPromptToolUse(assistant) || (isToolUseModeFunction(assistant) && !isFunctionCallingModel(assistant.model))
 
@@ -275,56 +272,36 @@ export async function fetchChatCompletion({
   const activeTopic = findTopicById(topicId)
   const effectiveSkillScope = resolveEffectiveSkillScope(activeTopic, assistant)
 
-  // Fetch skills for this assistant/topic scope.
   const getEnabledSkills = async () => {
     try {
       const skills = await window.api.skill.getList()
       const scopedSkills = filterSkillsForScope(skills || [], effectiveSkillScope)
-      logger.debug('Resolved scoped skills for assistant request', {
-        assistantId: assistant.id,
-        topicId,
-        mode: effectiveSkillScope.mode,
-        selectedSkillIds: effectiveSkillScope.selectedSkillIds,
-        resolvedCount: scopedSkills.length
-      })
       return scopedSkills
     } catch (error) {
-      logger.error('Failed to fetch scoped skills for assistant', {
-        assistantId: assistant.id,
-        topicId,
-        error
-      })
       return []
     }
   }
 
-  const middlewareConfig: AiSdkMiddlewareConfig = {
+  const middlewareConfig: ModernAiProviderConfig = {
     streamOutput: assistant.settings?.streamOutput ?? true,
     onChunk: onChunkReceived,
-    model: assistant.model,
-    enableReasoning: capabilities.enableReasoning,
-    isPromptToolUse: usePromptToolUse,
-    isSupportedToolUse: isSupportedToolUse(assistant),
     isImageGenerationEndpoint: isDedicatedImageGenerationModel(assistant.model || getDefaultModel()),
-    webSearchPluginConfig: webSearchPluginConfig,
     enableWebSearch: capabilities.enableWebSearch,
-    enableGenerateImage: capabilities.enableGenerateImage,
-    enableUrlContext: capabilities.enableUrlContext,
-    mcpMode,
+    webSearchPluginConfig,
+    isSupportedToolUse: isSupportedToolUse(assistant),
+    isPromptToolUse: usePromptToolUse,
     mcpTools,
     uiMessages,
-    knowledgeRecognition: assistant.knowledgeRecognition,
-    getSkills: getEnabledSkills
+    assistant,
+    topicId: topicId || '',
+    callType: 'chat',
+    mcpMode,
+    getSkills: getEnabledSkills,
+    knowledgeRecognition: assistant.knowledgeRecognition
   }
 
   // --- Call AI Completions ---
-  await AI.completions(modelId, aiSdkParams, {
-    ...middlewareConfig,
-    assistant,
-    topicId,
-    callType: 'chat',
-    uiMessages
-  })
+  await AI.completions(modelId, aiSdkParams, middlewareConfig)
 }
 
 export async function fetchMessagesSummary({
@@ -416,29 +393,11 @@ export async function fetchMessagesSummary({
     ...standardParams
   }
 
-  const middlewareConfig: AiSdkMiddlewareConfig = {
-    streamOutput: false,
-    enableReasoning: false,
-    isPromptToolUse: false,
-    isSupportedToolUse: false,
-    isImageGenerationEndpoint: false,
-    enableWebSearch: false,
-    enableGenerateImage: false,
-    enableUrlContext: false,
-    mcpTools: []
-  }
   try {
-    // 从 messages 中找到有 traceId 的助手消息，用于绑定现有 trace
-    const messageWithTrace = messages.find((m) => m.role === 'assistant' && m.traceId)
-
-    if (messageWithTrace && messageWithTrace.traceId) {
-      // 导入并调用 appendTrace 来绑定现有 trace，传入summary使用的模型名
-      const { appendTrace } = await import('@renderer/services/SpanManagerService')
-      await appendTrace({ topicId, traceId: messageWithTrace.traceId, model })
-    }
-
     const { getText, usage } = await AI.completions(model.id, llmMessages, {
-      ...middlewareConfig,
+      streamOutput: false,
+      enableWebSearch: false,
+      mcpTools: [],
       assistant: summaryAssistant,
       topicId,
       callType: 'summary'
@@ -499,21 +458,11 @@ export async function fetchNoteSummary({ content, assistant }: { content: string
     prompt: purifiedContent
   }
 
-  const middlewareConfig: AiSdkMiddlewareConfig = {
-    streamOutput: false,
-    enableReasoning: false,
-    isPromptToolUse: false,
-    isSupportedToolUse: false,
-    isImageGenerationEndpoint: false,
-    enableWebSearch: false,
-    enableGenerateImage: false,
-    enableUrlContext: false,
-    mcpTools: []
-  }
-
   try {
     const { getText, usage } = await AI.completions(model.id, llmMessages, {
-      ...middlewareConfig,
+      streamOutput: false,
+      enableWebSearch: false,
+      mcpTools: [],
       assistant: summaryAssistant,
       callType: 'summary'
     })
@@ -589,17 +538,6 @@ export async function fetchGenerate({
   //   streamOutput: false
   // }
 
-  const middlewareConfig: AiSdkMiddlewareConfig = {
-    streamOutput: assistant.settings?.streamOutput ?? false,
-    enableReasoning: false,
-    isPromptToolUse: false,
-    isSupportedToolUse: false,
-    isImageGenerationEndpoint: false,
-    enableWebSearch: false,
-    enableGenerateImage: false,
-    enableUrlContext: false
-  }
-
   try {
     const result = await AI.completions(
       resolvedModel.id,
@@ -608,13 +546,14 @@ export async function fetchGenerate({
         prompt: content
       },
       {
-        ...middlewareConfig,
+        streamOutput: assistant.settings?.streamOutput ?? false,
+        enableWebSearch: false,
         assistant,
         callType: 'generate'
       }
     )
 
-    trackTokenUsage({ usage: result.usage, model })
+    trackTokenUsage({ usage: result.usage, model: resolvedModel })
 
     return result.getText() || ''
   } catch (error: any) {
@@ -759,14 +698,9 @@ export async function checkApi(provider: Provider, model: Model, timeout = 15000
     }
     const config: ModernAiProviderConfig = {
       streamOutput: true,
-      enableReasoning: false,
-      isSupportedToolUse: false,
-      isImageGenerationEndpoint: false,
       enableWebSearch: false,
-      enableGenerateImage: false,
-      isPromptToolUse: false,
-      enableUrlContext: false,
       assistant,
+      topicId: '',
       callType: 'check',
       onChunk: (chunk: Chunk) => {
         if (chunk.type === ChunkType.ERROR) {

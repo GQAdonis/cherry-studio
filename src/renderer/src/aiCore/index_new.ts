@@ -7,6 +7,7 @@
  * 2. 暂时保持接口兼容性
  */
 
+import type { AiSdkModel } from '@cherrystudio/ai-core'
 import { createExecutor } from '@cherrystudio/ai-core'
 import { loggerService } from '@logger'
 import { getEnableDeveloperMode } from '@renderer/hooks/useSettings'
@@ -14,16 +15,14 @@ import { normalizeGatewayModels, normalizeSdkModels } from '@renderer/services/m
 import { addSpan, endSpan } from '@renderer/services/SpanManagerService'
 import type { StartSpanParams } from '@renderer/trace/types/ModelSpanEntity'
 import { type Assistant, type GenerateImageParams, type Model, type Provider, SystemProviderIds } from '@renderer/types'
-import type { AiSdkModel, StreamTextParams } from '@renderer/types/aiCoreTypes'
+import type { StreamTextParams } from '@renderer/types/aiCoreTypes'
 import { SUPPORTED_IMAGE_ENDPOINT_LIST } from '@renderer/utils'
 import { buildClaudeCodeSystemModelMessage } from '@shared/anthropic'
-import { gateway, type LanguageModel, type Provider as AiSdkProvider, wrapLanguageModel } from 'ai'
+import { gateway, type LanguageModel, type Provider as AiSdkProvider } from 'ai'
 
 import AiSdkToChunkAdapter from './chunk/AiSdkToChunkAdapter'
 import LegacyAiProvider from './legacy/index'
 import type { CompletionsParams, CompletionsResult } from './legacy/middleware/schemas'
-import type { AiSdkMiddlewareConfig } from './middleware/AiSdkMiddlewareBuilder'
-import { buildAiSdkMiddlewares } from './middleware/AiSdkMiddlewareBuilder'
 import { buildPlugins } from './plugins/PluginBuilder'
 import { createAiSdkProvider } from './provider/factory'
 import {
@@ -37,11 +36,23 @@ import type { AiSdkConfig } from './types'
 
 const logger = loggerService.withContext('ModernAiProvider')
 
-export type ModernAiProviderConfig = AiSdkMiddlewareConfig & {
+export type ModernAiProviderConfig = {
   assistant: Assistant
   // topicId for tracing
   topicId?: string
   callType: string
+  onChunk?: (chunk: any) => void
+  mcpTools?: any[]
+  enableWebSearch?: boolean
+  streamOutput?: boolean
+  uiMessages?: any[]
+  isImageGenerationEndpoint?: boolean
+  webSearchPluginConfig?: any
+  isSupportedToolUse?: boolean
+  isPromptToolUse?: boolean
+  mcpMode?: string
+  getSkills?: () => Promise<any[]>
+  knowledgeRecognition?: string
 }
 
 export default class ModernAiProvider {
@@ -122,54 +133,6 @@ export default class ModernAiProvider {
       throw new Error('Model is required for completions. Please use constructor with model parameter.')
     }
 
-    // Normalize params: handle simplified { system, prompt } format
-    // Convert to proper StreamTextParams with messages array for Responses API compatibility
-    if ('prompt' in params && !params.messages) {
-      const promptValue = (params as any).prompt
-
-      if (typeof promptValue === 'string') {
-        // Case 1: prompt is a string, convert to messages array
-        // Create a new object without 'prompt' to satisfy the discriminated union type
-
-        const { prompt, ...restParams } = params as any
-        void prompt // Mark as intentionally unused
-        params = {
-          ...restParams,
-          messages: [
-            {
-              role: 'user',
-              content: promptValue
-            }
-          ]
-        } as StreamTextParams
-
-        logger.debug('Normalized params from { prompt: string } to { messages }', {
-          hasSystem: !!params.system,
-          messageCount: params.messages!.length
-        })
-      } else if (Array.isArray(promptValue)) {
-        // Case 2: prompt is Array<ModelMessage>, rename to messages
-        // Create a new object without 'prompt' to satisfy the discriminated union type
-
-        const { prompt, ...restParams } = params as any
-        void prompt // Mark as intentionally unused
-        params = {
-          ...restParams,
-          messages: promptValue
-        } as StreamTextParams
-
-        logger.debug('Normalized params from { prompt: Array<ModelMessage> } to { messages }', {
-          hasSystem: !!params.system,
-          messageCount: params.messages!.length
-        })
-      } else {
-        logger.warn('Unexpected prompt type, leaving params unchanged', {
-          promptType: typeof promptValue,
-          isArray: Array.isArray(promptValue)
-        })
-      }
-    }
-
     // Config is now set in constructor, ApiService handles key rotation before passing provider
     if (!this.config) {
       // If config wasn't set in constructor (when provider only), generate it now
@@ -192,16 +155,6 @@ export default class ModernAiProvider {
       this.localProvider = await createAiSdkProvider(this.config)
     }
 
-    // 提前构建中间件
-    const middlewares = buildAiSdkMiddlewares({
-      ...providerConfig,
-      provider: this.actualProvider,
-      assistant: providerConfig.assistant
-    })
-    logger.debug('Built middlewares in completions', {
-      middlewareCount: middlewares.length,
-      isImageGeneration: providerConfig.isImageGenerationEndpoint
-    })
     if (!this.localProvider) {
       throw new Error('Local provider not created')
     }
@@ -212,20 +165,22 @@ export default class ModernAiProvider {
       model = this.localProvider.imageModel(modelId)
     } else {
       model = this.localProvider.languageModel(modelId)
-      // 如果有中间件，应用到语言模型上
-      if (middlewares.length > 0 && typeof model === 'object') {
-        model = wrapLanguageModel({ model: model as any, middleware: middlewares }) as any
-      }
     }
 
     if (this.actualProvider.id === 'anthropic' && this.actualProvider.authType === 'oauth') {
-      const claudeCodeSystemMessage = buildClaudeCodeSystemModelMessage(params.system as any)
-      params.system = undefined // 清除原有system，避免重复
-      params.messages = [...(claudeCodeSystemMessage as any), ...(params.messages || [])]
-    }
+      // 类型守卫：确保 system 是 string、Array 或 undefined
+      const system = params.system
+      let systemParam: string | Array<any> | undefined
+      if (typeof system === 'string' || Array.isArray(system) || system === undefined) {
+        systemParam = system
+      } else {
+        // SystemModelMessage 类型，转换为 string
+        systemParam = undefined
+      }
 
-    if (!model) {
-      throw new Error('Failed to create model instance')
+      const claudeCodeSystemMessage = buildClaudeCodeSystemModelMessage(systemParam)
+      params.system = undefined // 清除原有system，避免重复
+      params.messages = [...claudeCodeSystemMessage, ...(params.messages || [])]
     }
 
     if (providerConfig.topicId && getEnableDeveloperMode()) {
@@ -363,18 +318,12 @@ export default class ModernAiProvider {
     params: StreamTextParams,
     config: ModernAiProviderConfig
   ): Promise<CompletionsResult> {
-    // const modelId = this.model!.id
-    // logger.info('Starting modernCompletions', {
-    //   modelId,
-    //   providerId: this.config!.providerId,
-    //   topicId: config.topicId,
-    //   hasOnChunk: !!config.onChunk,
-    //   hasTools: !!params.tools && Object.keys(params.tools).length > 0,
-    //   toolCount: params.tools ? Object.keys(params.tools).length : 0
-    // })
-
     // 根据条件构建插件数组
-    const plugins = buildPlugins(config)
+    const plugins = buildPlugins({
+      provider: this.actualProvider,
+      model: this.model!,
+      config
+    })
 
     // 用构建好的插件数组创建executor
     const executor = createExecutor(this.config!.providerId, this.config!.options, plugins)
@@ -388,7 +337,7 @@ export default class ModernAiProvider {
         ...params,
         model,
         experimental_context: { onChunk: config.onChunk }
-      })
+      } as any)
 
       const finalText = await adapter.processStream(streamResult)
 
@@ -399,7 +348,7 @@ export default class ModernAiProvider {
       const streamResult = await executor.streamText({
         ...params,
         model
-      })
+      } as any)
 
       // 强制消费流,不然await streamResult.text会阻塞
       await streamResult?.consumeStream()
@@ -540,9 +489,8 @@ export default class ModernAiProvider {
   // 代理其他方法到原有实现
   public async models() {
     if (this.actualProvider.id === SystemProviderIds.gateway) {
-      const availableModels = await gateway.getAvailableModels()
-      // Accept models as-is, the adapter will handle version differences
-      return normalizeGatewayModels(this.actualProvider, availableModels.models as any)
+      const gatewayModels = (await gateway.getAvailableModels()).models
+      return normalizeGatewayModels(this.actualProvider, gatewayModels)
     }
     const sdkModels = await this.legacyProvider.models()
     return normalizeSdkModels(this.actualProvider, sdkModels)
@@ -598,7 +546,7 @@ export default class ModernAiProvider {
 
     const executor = createExecutor(this.config!.providerId, this.config!.options, [])
     const result = await executor.generateImage({
-      model: this.localProvider?.imageModel(model) as any,
+      model: model, // 直接使用 model ID 字符串，由 executor 内部解析
       ...aiSdkParams
     })
 

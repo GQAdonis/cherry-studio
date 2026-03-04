@@ -3,6 +3,7 @@
  * @see https://ai-sdk.dev/providers/ai-sdk-providers/anthropic#cache-control
  */
 import type { LanguageModelV3Message } from '@ai-sdk/provider'
+import { definePlugin } from '@cherrystudio/ai-core/core/plugins'
 import { estimateTextTokens } from '@renderer/services/TokenService'
 import type { Provider } from '@renderer/types'
 import type { LanguageModelMiddleware } from 'ai'
@@ -24,7 +25,7 @@ function estimateContentTokens(content: LanguageModelV3Message['content']): numb
   return 0
 }
 
-export function anthropicCacheMiddleware(provider: Provider): LanguageModelMiddleware {
+function anthropicCacheMiddleware(provider: Provider): LanguageModelMiddleware {
   return {
     specificationVersion: 'v3',
     transformParams: async ({ params }) => {
@@ -83,3 +84,13 @@ export function anthropicCacheMiddleware(provider: Provider): LanguageModelMiddl
     }
   }
 }
+
+export const createAnthropicCachePlugin = () =>
+  definePlugin({
+    name: 'anthropicCache',
+    enforce: 'pre',
+    configureContext: (context) => {
+      context.middlewares = context.middlewares || []
+      context.middlewares.push(anthropicCacheMiddleware(context.provider))
+    }
+  })

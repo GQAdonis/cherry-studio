@@ -3,12 +3,11 @@ import { type AnthropicProviderOptions } from '@ai-sdk/anthropic'
 import type { GoogleGenerativeAIProviderOptions } from '@ai-sdk/google'
 import type { OpenAIResponsesProviderOptions } from '@ai-sdk/openai'
 import type { XaiProviderOptions } from '@ai-sdk/xai'
-import { baseProviderIdSchema, customProviderIdSchema, hasProviderConfig } from '@cherrystudio/ai-core/provider'
+import { baseProviderIdSchema, customProviderIdSchema } from '@cherrystudio/ai-core/provider'
 import { loggerService } from '@logger'
 import {
   getModelSupportedVerbosity,
   isAnthropicModel,
-  isClaude45ReasoningModel,
   isGeminiModel,
   isGrokModel,
   isOpenAIModel,
@@ -41,10 +40,10 @@ import { type AiSdkParam, isAiSdkParam, type OpenAIVerbosity } from '@renderer/t
 import { isSupportServiceTierProvider, isSupportVerbosityProvider } from '@renderer/utils/provider'
 import type { JSONValue } from 'ai'
 import { t } from 'i18next'
-import type { OllamaCompletionProviderOptions } from 'ollama-ai-provider-v2'
+import type { OllamaProviderOptions } from 'ollama-ai-provider-v2'
 
 import { addAnthropicHeaders } from '../prepareParams/header'
-import { getModelAwareAiSdkProviderId } from '../provider/factory'
+import { getAiSdkProviderId } from '../provider/factory'
 import { buildGeminiGenerateImageParams } from './image'
 import {
   getAnthropicReasoningParams,
@@ -163,7 +162,7 @@ export function buildProviderOptions(
   providerOptions: Record<string, Record<string, JSONValue>>
   standardParams: Partial<Record<AiSdkParam, any>>
 } {
-  const rawProviderId = getModelAwareAiSdkProviderId(actualProvider, model)
+  const rawProviderId = getAiSdkProviderId(actualProvider)
   logger.debug('buildProviderOptions', { assistant, model, actualProvider, capabilities, rawProviderId })
   // 构建 provider 特定的选项
   let providerSpecificOptions: Record<string, any> = {}
@@ -397,10 +396,12 @@ function buildOpenAIProviderOptions(
     }
   }
 
+  // TODO: 支持配置是否在服务端持久化
   providerOptions = {
     ...providerOptions,
     serviceTier,
-    textVerbosity
+    textVerbosity,
+    store: false
   }
 
   return {
@@ -572,19 +573,27 @@ function buildOllamaProviderOptions(
     enableWebSearch: boolean
     enableGenerateImage: boolean
   }
-): Record<string, OllamaCompletionProviderOptions> {
+): Record<string, OllamaProviderOptions> {
   const { enableReasoning } = capabilities
-  const providerOptions: OllamaCompletionProviderOptions = {}
+  const providerOptions: OllamaProviderOptions = {}
   const reasoningEffort = assistant.settings?.reasoning_effort
   if (enableReasoning) {
     if (isOpenAIOpenWeightModel(model)) {
-      // For gpt-oss models, Ollama accepts: 'low' | 'medium' | 'high'
+      // gpt-oss models accept 'low' | 'medium' | 'high' string values
       if (reasoningEffort === 'low' || reasoningEffort === 'medium' || reasoningEffort === 'high') {
+        providerOptions.think = reasoningEffort
+      } else if (reasoningEffort === 'none') {
+        providerOptions.think = false
+      } else {
         providerOptions.think = true
       }
     } else {
-      providerOptions.think = !['none', undefined].includes(reasoningEffort)
+      // Other models: boolean only. undefined defaults to true (user enabled reasoning)
+      providerOptions.think = reasoningEffort !== 'none'
     }
+  } else {
+    // Explicitly disable thinking when reasoning is turned off (fixes Issue #11612)
+    providerOptions.think = false
   }
   return {
     ollama: providerOptions
@@ -604,26 +613,13 @@ function buildGenericProviderOptions(
     enableGenerateImage: boolean
   }
 ): Record<string, any> {
-  const { enableReasoning, enableWebSearch } = capabilities
+  const { enableWebSearch } = capabilities
   let providerOptions: Record<string, any> = {}
 
   const reasoningParams = getReasoningEffort(assistant, model)
   providerOptions = {
     ...providerOptions,
     ...reasoningParams
-  }
-  if (enableReasoning) {
-    if (isClaude45ReasoningModel(model)) {
-      // sendReasoning is a patch specific to @ai-sdk/openai-compatible
-      // Only apply when provider will actually use openai-compatible SDK
-      // (i.e., no dedicated SDK registered OR explicitly openai-compatible)
-      if (!hasProviderConfig(providerId) || providerId === 'openai-compatible') {
-        providerOptions = {
-          ...providerOptions,
-          sendReasoning: true
-        }
-      }
-    }
   }
 
   if (enableWebSearch) {
@@ -649,10 +645,6 @@ function buildGenericProviderOptions(
     } else {
       throw new Error(t('translate.error.chat_qwen_mt'))
     }
-  }
-
-  if (isOpenAIModel(model)) {
-    providerOptions.strictJsonSchema = false
   }
 
   return {

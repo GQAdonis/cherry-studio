@@ -146,7 +146,7 @@ export class Runtime {
 
       worker.on('message', handleMessage)
       worker.on('error', (error) => {
-        logger.error('Worker execution error', error)
+        logger.error('Worker execution error', { error: error instanceof Error ? error.message : String(error) })
         handleError(error instanceof Error ? error.message : String(error))
       })
       worker.on('exit', (code) => {

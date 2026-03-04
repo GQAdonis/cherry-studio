@@ -19,7 +19,7 @@ export const webSearchToolWithPreExtractedKeywords = (
 ) => {
   const webSearchProvider = WebSearchService.getWebSearchProvider(webSearchProviderId)
 
-  return tool<{ additionalContext?: string }, any>({
+  return tool({
     description: `Web search tool for finding current information, news, and real-time data from the internet.
 
 This tool has been configured with search parameters based on the conversation context:
@@ -68,24 +68,15 @@ You can use this tool as-is to search with the prepared queries, or provide addi
       }
       searchResults = await WebSearchService.processWebsearch(webSearchProvider!, extractResults, requestId)
 
-      return searchResults as any
+      return searchResults
     },
-    toModelOutput: (results: any) => {
-      // Defensive check: handle undefined or malformed results
-      if (!results || typeof results !== 'object') {
-        return {
-          type: 'text',
-          value: 'Search tool returned invalid results.'
-        }
-      }
-
-      const resultsList = results.results || []
+    toModelOutput: ({ output: results }) => {
       let summary = 'No search needed based on the query analysis.'
-      if (results.query && resultsList.length > 0) {
-        summary = `Found ${resultsList.length} relevant sources. Use [number] format to cite specific information.`
+      if (results.query && results.results.length > 0) {
+        summary = `Found ${results.results.length} relevant sources. Use [number] format to cite specific information.`
       }
 
-      const citationData = resultsList.map((result: any, index: number) => ({
+      const citationData = results.results.map((result, index) => ({
         number: index + 1,
         title: result.title,
         content: result.content,

@@ -9,7 +9,7 @@ import { google } from '@ai-sdk/google'
 import { vertexAnthropic } from '@ai-sdk/google-vertex/anthropic/edge'
 import { vertex } from '@ai-sdk/google-vertex/edge'
 import { combineHeaders } from '@ai-sdk/provider-utils'
-import type { WebSearchPluginConfig } from '@cherrystudio/ai-core/built-in/plugins'
+import type { AnthropicSearchConfig, WebSearchPluginConfig } from '@cherrystudio/ai-core/built-in/plugins'
 import { isBaseProvider } from '@cherrystudio/ai-core/core/providers/schemas'
 import type { BaseProviderId } from '@cherrystudio/ai-core/provider'
 import { loggerService } from '@logger'
@@ -36,10 +36,10 @@ import type { StreamTextParams } from '@renderer/types/aiCoreTypes'
 import { mapRegexToPatterns } from '@renderer/utils/blacklistMatchPattern'
 import { replacePromptVariables } from '@renderer/utils/prompt'
 import { isAIGatewayProvider, isAwsBedrockProvider, isSupportUrlContextProvider } from '@renderer/utils/provider'
-import type { ModelMessage } from 'ai'
+import type { ModelMessage, Tool } from 'ai'
 import { stepCountIs } from 'ai'
 
-import { getModelAwareAiSdkProviderId } from '../provider/factory'
+import { getAiSdkProviderId } from '../provider/factory'
 import { setupToolsConfig } from '../utils/mcp'
 import { buildProviderOptions } from '../utils/options'
 import { buildProviderBuiltinWebSearchConfig } from '../utils/websearch'
@@ -47,6 +47,8 @@ import { addAnthropicHeaders } from './header'
 import { getMaxTokens, getTemperature, getTopP } from './modelParameters'
 
 const logger = loggerService.withContext('parameterBuilder')
+
+type ProviderDefinedTool = Extract<Tool<any, any>, { type: 'provider' }>
 
 function mapVertexAIGatewayModelToProviderId(model: Model): BaseProviderId | undefined {
   if (isAnthropicModel(model)) {
@@ -61,9 +63,7 @@ function mapVertexAIGatewayModelToProviderId(model: Model): BaseProviderId | und
   if (isOpenAIModel(model)) {
     return 'openai'
   }
-  logger.warn(
-    `[mapVertexAIGatewayModelToProviderId] Unknown model type for AI Gateway: ${model.id}. Web search will not be enabled.`
-  )
+  logger.warn(`Unknown model type for AI Gateway: ${model.id}. Web search will not be enabled.`)
   return undefined
 }
 
@@ -99,7 +99,7 @@ export async function buildStreamTextParams(
   const { mcpTools } = options
 
   const model = assistant.model || getDefaultModel()
-  const aiSdkProviderId = getModelAwareAiSdkProviderId(provider, model)
+  const aiSdkProviderId = getAiSdkProviderId(provider)
 
   // 这三个变量透传出来，交给下面启用插件/中间件
   // 也可以在外部构建好再传入buildStreamTextParams
@@ -157,24 +157,24 @@ export async function buildStreamTextParams(
       tools = {}
     }
     if (aiSdkProviderId === 'google-vertex') {
-      tools.google_search = vertex.tools.googleSearch({}) as any
+      tools.google_search = vertex.tools.googleSearch({}) as ProviderDefinedTool
     } else if (aiSdkProviderId === 'google-vertex-anthropic') {
       const blockedDomains = mapRegexToPatterns(webSearchConfig.excludeDomains)
       tools.web_search = vertexAnthropic.tools.webSearch_20250305({
         maxUses: webSearchConfig.maxResults,
         blockedDomains: blockedDomains.length > 0 ? blockedDomains : undefined
-      }) as any
+      }) as ProviderDefinedTool
     } else if (aiSdkProviderId === 'azure-responses') {
       tools.web_search_preview = azure.tools.webSearchPreview({
-        searchContextSize: (webSearchPluginConfig as any)?.openai?.searchContextSize || 'medium'
-      }) as any
+        searchContextSize: webSearchPluginConfig?.openai!.searchContextSize
+      }) as ProviderDefinedTool
     } else if (aiSdkProviderId === 'azure-anthropic') {
       const blockedDomains = mapRegexToPatterns(webSearchConfig.excludeDomains)
-      const anthropicSearchOptions = {
+      const anthropicSearchOptions: AnthropicSearchConfig = {
         maxUses: webSearchConfig.maxResults,
         blockedDomains: blockedDomains.length > 0 ? blockedDomains : undefined
       }
-      tools.web_search = anthropic.tools.webSearch_20250305(anthropicSearchOptions) as any
+      tools.web_search = anthropic.tools.webSearch_20250305(anthropicSearchOptions) as ProviderDefinedTool
     }
   }
 
@@ -186,25 +186,20 @@ export async function buildStreamTextParams(
 
     switch (aiSdkProviderId) {
       case 'google-vertex':
-        tools.url_context = vertex.tools.urlContext({}) as any
+        tools.url_context = vertex.tools.urlContext({}) as ProviderDefinedTool
         break
       case 'google':
-        tools.url_context = google.tools.urlContext({}) as any
+        tools.url_context = google.tools.urlContext({}) as ProviderDefinedTool
         break
       case 'anthropic':
       case 'azure-anthropic':
       case 'google-vertex-anthropic':
-        tools.web_fetch = (
-          ['anthropic', 'azure-anthropic'].includes(aiSdkProviderId)
-            ? anthropic.tools.webFetch_20250910({
-                maxUses: webSearchConfig.maxResults,
-                blockedDomains: blockedDomains.length > 0 ? blockedDomains : undefined
-              })
-            : anthropic.tools.webFetch_20250910({
-                maxUses: webSearchConfig.maxResults,
-                blockedDomains: blockedDomains.length > 0 ? blockedDomains : undefined
-              })
-        ) as any
+        if (['anthropic', 'azure-anthropic'].includes(aiSdkProviderId)) {
+          tools.web_fetch = anthropic.tools.webFetch_20250910({
+            maxUses: webSearchConfig.maxResults,
+            blockedDomains: blockedDomains.length > 0 ? blockedDomains : undefined
+          }) as ProviderDefinedTool
+        }
         break
     }
   }

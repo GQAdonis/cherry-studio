@@ -1241,6 +1241,7 @@
       },
       "export": {
         "image": "Exporter sous forme d'image",
+        "image_saved": "Image enregistrée avec succès",
         "joplin": "Exporter vers Joplin",
         "md": {
           "label": "Exporter sous forme de Markdown",
@@ -6107,6 +6108,7 @@
       "scroll_sync": "Paramètres de synchronisation du défilement",
       "title": "Paramètres de traduction"
     },
+    "stop": "Arrêter la traduction",
     "success": {
       "custom": {
         "delete": "Suppression réussie",

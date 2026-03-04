@@ -1,5 +1,5 @@
 import type { ImageModelV3 } from '@ai-sdk/provider'
-import { experimental_generateImage as aiGenerateImage, NoImageGeneratedError } from 'ai'
+import { generateImage as aiGenerateImage, NoImageGeneratedError } from 'ai'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { type AiPlugin } from '../../plugins'
@@ -10,6 +10,8 @@ import { RuntimeExecutor } from '../executor'
 // Mock dependencies
 vi.mock('ai', () => ({
   experimental_generateImage: vi.fn(),
+  generateImage: vi.fn(),
+  jsonSchema: vi.fn((schema) => schema),
   NoImageGeneratedError: class NoImageGeneratedError extends Error {
     static isInstance = vi.fn()
     constructor() {

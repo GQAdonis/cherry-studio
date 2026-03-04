@@ -21,13 +21,12 @@
  */
 
 import type { SDKMessage } from '@anthropic-ai/claude-agent-sdk'
-import type { BetaStopReason } from '@anthropic-ai/sdk/resources/beta/messages/messages.mjs'
 import { loggerService } from '@logger'
-import type { FinishReason, LanguageModelUsage, ProviderMetadata, TextStreamPart } from 'ai'
+import type { LanguageModelUsage, ProviderMetadata, TextStreamPart } from 'ai'
 import { v4 as uuidv4 } from 'uuid'
 
 import { ClaudeStreamState } from './claude-stream-state'
-import { mapClaudeCodeFinishReason } from './map-claude-code-finish-reason'
+import { convertClaudeCodeUsage, mapClaudeCodeFinishReason, mapClaudeCodeStopReason } from './utils'
 
 const logger = loggerService.withContext('ClaudeCodeTransform')
 
@@ -47,37 +46,19 @@ type ToolResultContent = {
   is_error?: boolean
 }
 
-const normalizeSkillName = (commandName: string): string => commandName.replace(/^\//, '').trim()
-
-const toChunkText = (value: unknown): string => {
-  if (typeof value === 'string') return value
-  if (value == null) return ''
-  try {
-    return JSON.stringify(value)
-  } catch {
-    return String(value)
-  }
-}
-
-/**
- * Maps Anthropic stop reasons to the AiSDK equivalents so higher level
- * consumers can treat completion states uniformly across providers.
- */
-const finishReasonMapping: Record<BetaStopReason, FinishReason> = {
-  end_turn: 'stop',
-  max_tokens: 'length',
-  stop_sequence: 'stop',
-  tool_use: 'tool-calls',
-  pause_turn: 'other',
-  refusal: 'content-filter'
-}
-
 const emptyUsage: LanguageModelUsage = {
   inputTokens: 0,
   outputTokens: 0,
   totalTokens: 0,
-  inputTokenDetails: { noCacheTokens: 0, cacheReadTokens: 0, cacheWriteTokens: 0 },
-  outputTokenDetails: { textTokens: 0, reasoningTokens: 0 }
+  inputTokenDetails: {
+    cacheReadTokens: 0,
+    cacheWriteTokens: 0,
+    noCacheTokens: 0
+  },
+  outputTokenDetails: {
+    textTokens: 0,
+    reasoningTokens: 0
+  }
 }
 
 /**
@@ -102,6 +83,24 @@ export const stripLocalCommandTags = (text: string): string => {
 const filterCommandTags = (text: string): string => {
   const withoutLocalCommandTags = stripLocalCommandTags(text)
   return withoutLocalCommandTags.replace(/<command-[^>]+>.*?<\/command-[^>]+>/gs, '')
+}
+
+/**
+ * Normalises tool names by stripping the 'builtin_' prefix if present.
+ */
+const normalizeSkillName = (commandName: string): string => commandName.replace(/^\//, '').trim()
+
+/**
+ * Converts tool results to a displayable text format.
+ */
+const toChunkText = (value: unknown): string => {
+  if (typeof value === 'string') return value
+  if (value == null) return ''
+  try {
+    return JSON.stringify(value)
+  } catch {
+    return String(value)
+  }
 }
 
 /**
@@ -309,8 +308,7 @@ function finalizeNonStreamingStep(
   state: ClaudeStreamState,
   chunks: AgentStreamPart[]
 ): AgentStreamPart[] {
-  const usage = calculateUsageFromMessage(message)
-  const finishReason = inferFinishReason(message.message.stop_reason)
+  const finishReason = mapClaudeCodeStopReason(message.message.stop_reason)
   chunks.push({
     type: 'finish-step',
     response: {
@@ -318,10 +316,11 @@ function finalizeNonStreamingStep(
       timestamp: new Date(),
       modelId: message.message.model ?? ''
     },
-    usage: usage ?? emptyUsage,
+    usage: convertClaudeCodeUsage(message.message.usage),
     finishReason,
+    rawFinishReason: message.message.stop_reason ?? undefined,
     providerMetadata: sdkMessageToProviderMetadata(message)
-  } as any)
+  })
   state.resetStep()
   return chunks
 }
@@ -556,10 +555,8 @@ function handleStreamEvent(
     }
 
     case 'message_delta': {
-      const finishReason = event.delta.stop_reason
-        ? mapStopReason(event.delta.stop_reason as BetaStopReason)
-        : undefined
-      const usage = convertUsage(event.usage)
+      const finishReason = mapClaudeCodeStopReason(event.delta.stop_reason)
+      const usage = convertClaudeCodeUsage(event.usage)
       state.setPendingUsage(usage, finishReason)
       break
     }
@@ -577,9 +574,10 @@ function handleStreamEvent(
           modelId: ''
         },
         usage: pending.usage ?? emptyUsage,
+        rawFinishReason: pending.finishReason ?? 'stop',
         finishReason: pending.finishReason ?? 'stop',
         providerMetadata
-      } as any)
+      })
       state.resetStep()
       break
     }
@@ -727,14 +725,6 @@ function handleSystemMessage(message: Extract<SDKMessage, { type: 'system' }>): 
   const chunks: AgentStreamPart[] = []
   if (message.subtype === 'init') {
     chunks.push({
-      type: 'data',
-      data: {
-        type: 'artifact.lifecycle',
-        stage: 'started',
-        summary: 'Agent artifact run started.'
-      }
-    } as unknown as AgentStreamPart)
-    chunks.push({
       type: 'start'
     })
     chunks.push({
@@ -748,14 +738,6 @@ function handleSystemMessage(message: Extract<SDKMessage, { type: 'system' }>): 
       }
     })
   } else if (message.subtype === 'compact_boundary') {
-    chunks.push({
-      type: 'data',
-      data: {
-        type: 'context.action',
-        action: 'summarized',
-        summary: 'Context compacted by agent runtime.'
-      }
-    } as unknown as AgentStreamPart)
     chunks.push({
       type: 'raw',
       rawValue: {
@@ -776,29 +758,10 @@ function handleSystemMessage(message: Extract<SDKMessage, { type: 'system' }>): 
 function handleResultMessage(message: Extract<SDKMessage, { type: 'result' }>): AgentStreamPart[] {
   const chunks: AgentStreamPart[] = []
 
-  let usage: LanguageModelUsage | undefined
-  if ('usage' in message) {
-    usage = {
-      inputTokens: message.usage.input_tokens ?? 0,
-      outputTokens: message.usage.output_tokens ?? 0,
-      totalTokens: (message.usage.input_tokens ?? 0) + (message.usage.output_tokens ?? 0),
-      inputTokenDetails: { noCacheTokens: 0, cacheReadTokens: 0, cacheWriteTokens: 0 },
-      outputTokenDetails: { textTokens: 0, reasoningTokens: 0 }
-    }
-  }
-
   if (message.subtype === 'success') {
     chunks.push({
-      type: 'data',
-      data: {
-        type: 'artifact.lifecycle',
-        stage: 'completed',
-        summary: 'Agent artifact run completed.'
-      }
-    } as unknown as AgentStreamPart)
-    chunks.push({
       type: 'finish',
-      totalUsage: usage ?? emptyUsage,
+      totalUsage: convertClaudeCodeUsage(message.usage),
       finishReason: mapClaudeCodeFinishReason(message.subtype),
       rawFinishReason: message.subtype,
       providerMetadata: {
@@ -808,83 +771,16 @@ function handleResultMessage(message: Extract<SDKMessage, { type: 'result' }>): 
         costUsd: message.total_cost_usd,
         raw: message
       }
-    } as any)
+    } as AgentStreamPart)
   } else {
-    chunks.push({
-      type: 'data',
-      data: {
-        type: 'artifact.lifecycle',
-        stage: 'failed',
-        summary: `Agent artifact run failed (${message.subtype}).`
-      }
-    } as unknown as AgentStreamPart)
     chunks.push({
       type: 'error',
       error: {
         message: `${message.subtype}: Process failed after ${message.num_turns} turns`
       }
-    } as any)
+    } as AgentStreamPart)
   }
   return chunks
-}
-
-/**
- * Normalises usage payloads so the caller always receives numeric values even
- * when the provider omits certain fields.
- */
-function convertUsage(
-  usage?: {
-    input_tokens?: number | null
-    output_tokens?: number | null
-  } | null
-): LanguageModelUsage | undefined {
-  if (!usage) {
-    return undefined
-  }
-  const inputTokens = usage.input_tokens ?? 0
-  const outputTokens = usage.output_tokens ?? 0
-  return {
-    inputTokens,
-    outputTokens,
-    totalTokens: inputTokens + outputTokens,
-    inputTokenDetails: { noCacheTokens: 0, cacheReadTokens: 0, cacheWriteTokens: 0 },
-    outputTokenDetails: { textTokens: 0, reasoningTokens: 0 }
-  }
-}
-
-/**
- * Anthropic-only wrapper around {@link finishReasonMapping} that defaults to
- * `unknown` to avoid surprising downstream consumers when new stop reasons are
- * introduced.
- */
-function mapStopReason(reason: BetaStopReason): FinishReason {
-  return finishReasonMapping[reason] ?? 'unknown'
-}
-
-/**
- * Extracts token accounting details from an assistant message, if available.
- */
-function calculateUsageFromMessage(
-  message: Extract<SDKMessage, { type: 'assistant' }>
-): LanguageModelUsage | undefined {
-  const usage = message.message.usage
-  if (!usage) return undefined
-  return {
-    inputTokens: usage.input_tokens ?? 0,
-    outputTokens: usage.output_tokens ?? 0,
-    totalTokens: (usage.input_tokens ?? 0) + (usage.output_tokens ?? 0),
-    inputTokenDetails: { noCacheTokens: 0, cacheReadTokens: 0, cacheWriteTokens: 0 },
-    outputTokenDetails: { textTokens: 0, reasoningTokens: 0 }
-  }
-}
-
-/**
- * Converts Anthropic stop reasons into AiSDK finish reasons, falling back to a
- * generic `stop` if the provider omits the detail entirely.
- */
-function inferFinishReason(stopReason: BetaStopReason | null | undefined): FinishReason {
-  if (!stopReason) return 'stop'
-  return mapStopReason(stopReason)
 }
 
 export { ClaudeStreamState }
