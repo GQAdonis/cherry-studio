@@ -371,12 +371,6 @@ const PopupContainer: React.FC<Props> = ({ agent, afterSubmit, resolve }) => {
         return
       }
 
-      if (form.accessible_paths.length === 0) {
-        window.toast.error(t('agent.session.accessible_paths.error.at_least_one'))
-        loadingRef.current = false
-        return
-      }
-
       if (isWin && !gitBashPathInfo.path) {
         window.toast.error(t('agent.gitBash.error.required', 'Git Bash path is required on Windows'))
         loadingRef.current = false
@@ -600,9 +594,7 @@ const PopupContainer: React.FC<Props> = ({ agent, afterSubmit, resolve }) => {
 
             <FormItem>
               <LabelWithButton>
-                <Label>
-                  {t('agent.session.accessible_paths.label')} <RequiredMark>*</RequiredMark>
-                </Label>
+                <Label>{t('agent.session.accessible_paths.label')}</Label>
                 <Button size="small" onClick={addAccessiblePath}>
                   {t('agent.session.accessible_paths.add')}
                 </Button>
@@ -619,7 +611,12 @@ const PopupContainer: React.FC<Props> = ({ agent, afterSubmit, resolve }) => {
                   ))}
                 </PathList>
               ) : (
-                <EmptyText>{t('agent.session.accessible_paths.empty')}</EmptyText>
+                <HelpText>
+                  {t(
+                    'agent.session.accessible_paths.default_hint',
+                    'A default workspace will be created automatically if not specified.'
+                  )}
+                </HelpText>
               )}
             </FormItem>
 
@@ -772,12 +769,6 @@ const PathText = styled.span`
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-`
-
-const EmptyText = styled.p`
-  font-size: 13px;
-  color: var(--color-text-3);
-  margin: 0;
 `
 
 const FormFooter = styled.div`

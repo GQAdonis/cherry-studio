@@ -95,9 +95,10 @@ export type ReasoningEffortOptionalParams = {
   thinking_budget?: number
   incremental_output?: boolean
   enable_reasoning?: boolean
-  // nvidia
+  // nvidia, etc.
   chat_template_kwargs?: {
-    thinking: boolean
+    thinking?: boolean
+    enable_thinking?: boolean
   }
   extra_body?: {
     google?: {

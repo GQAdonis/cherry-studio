@@ -12,8 +12,8 @@
  */
 
 import { loggerService } from '@logger'
-import AiProviderNew from '@renderer/aiCore/index_new'
 import type { ModernAiProviderConfig } from '@renderer/aiCore/index_new'
+import AiProviderNew from '@renderer/aiCore/index_new'
 import { getDefaultModel, getProviderByModel } from '@renderer/services/AssistantService'
 import type { Assistant, Model } from '@renderer/types'
 import type { Message } from '@renderer/types/newMessage'

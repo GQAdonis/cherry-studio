@@ -27,7 +27,6 @@ import { isBinaryFile } from 'isbinaryfile'
 import officeParser from 'officeparser'
 import * as path from 'path'
 import { PDFDocument } from 'pdf-lib'
-import { chdir } from 'process'
 import { v4 as uuidv4 } from 'uuid'
 import WordExtractor from 'word-extractor'
 
@@ -175,6 +174,9 @@ class FileStorage {
     if (!this._tempDir) {
       this._tempDir = getTempDir()
     }
+    if (!fs.existsSync(this._tempDir)) {
+      fs.mkdirSync(this._tempDir, { recursive: true })
+    }
     return this._tempDir
   }
 
@@ -190,9 +192,6 @@ class FileStorage {
       }
       if (!fs.existsSync(this.notesDir)) {
         fs.mkdirSync(this.notesDir, { recursive: true })
-      }
-      if (!fs.existsSync(this.tempDir)) {
-        fs.mkdirSync(this.tempDir, { recursive: true })
       }
     } catch (error) {
       logger.error('Failed to initialize storage directories:', error as Error)
@@ -526,22 +525,18 @@ class FileStorage {
     const fileExtension = path.extname(filePath)
 
     if (documentExts.includes(fileExtension)) {
-      const originalCwd = process.cwd()
       try {
-        chdir(this.tempDir)
-
         if (fileExtension === '.doc') {
           const extractor = new WordExtractor()
           const extracted = await extractor.extract(filePath)
-          chdir(originalCwd)
           return extracted.getBody()
         }
 
-        const data = await officeParser.parseOfficeAsync(filePath)
-        chdir(originalCwd)
+        const data = await officeParser.parseOfficeAsync(filePath, {
+          tempFilesLocation: this.tempDir
+        })
         return data
       } catch (error) {
-        chdir(originalCwd)
         logger.error('Failed to read document file:', error as Error)
         throw error
       }
@@ -633,10 +628,6 @@ class FileStorage {
   }
 
   public createTempFile = async (_: Electron.IpcMainInvokeEvent, fileName: string): Promise<string> => {
-    if (!fs.existsSync(this.tempDir)) {
-      fs.mkdirSync(this.tempDir, { recursive: true })
-    }
-
     return path.join(this.tempDir, `temp_file_${uuidv4()}_${fileName}`)
   }
 

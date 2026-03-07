@@ -15,9 +15,9 @@ import { ARTIFACT_STUDIO_AGENT_ID } from '@renderer/features/artifacts/services/
 import { AgentSettingsPopup } from '@renderer/pages/settings/AgentSettings'
 import { useAppDispatch, useAppSelector } from '@renderer/store'
 import {
+  initialState,
   removeArtifactReactDependency,
   selectArtifactSettings,
-  selectArtifactStudioSettings,
   setArtifactAutoOpen,
   setArtifactEnabled,
   setArtifactReactCustomBundlerUrl,
@@ -39,6 +39,7 @@ import {
 } from '@renderer/store/settings'
 import { Button, Checkbox, Input, InputNumber, Segmented, Select, Space, Switch, Table, Tag } from 'antd'
 import type { ColumnsType } from 'antd/es/table'
+import { merge } from 'lodash'
 import type { FC } from 'react'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -87,56 +88,14 @@ const ArtifactSettings: FC = () => {
   const { t } = useTranslation()
   const dispatch = useAppDispatch()
   const settings = useAppSelector(selectArtifactSettings)
-  const studioSettings = useAppSelector(selectArtifactStudioSettings)
   const providers = useAppSelector((state) => state.llm.providers)
   const appDefaultModel = useAppSelector((state) => state.llm.defaultModel)
   const knowledgeBases = useAppSelector((state) => state.knowledge.bases)
 
-  // Default values if settings is undefined
-  const safeSettings = settings || {
-    enabled: true,
-    autoOpen: false,
-    enabledTypes: ['htmx', 'html', 'xhtml', 'react', 'svg', 'mermaid', 'markdown', 'code'],
-    storageLimit: 100,
-    runtime: {
-      profile: 'standard',
-      allowCustomBundlerUrl: true,
-      allowDynamicDependencies: true,
-      allowExternalResources: true
-    },
-    react: {
-      useSandpack: true,
-      showEditor: false,
-      showConsole: false,
-      customBundlerUrl: '',
-      dependencies: {}
-    },
-    studio: {
-      overridePolicy: {
-        allowConversationOverride: true,
-        allowProjectOverride: true
-      },
-      defaults: {
-        llm: {
-          modelId: undefined,
-          temperature: 0.7,
-          topP: 1,
-          maxTokens: undefined,
-          streamOutput: true
-        },
-        skills: {
-          mode: 'inherit'
-        },
-        contextManagement: {
-          type: 'sliding_window'
-        },
-        knowledge: {
-          knowledgeBaseIds: [],
-          autoCreateFromChatHistory: false
-        }
-      }
-    }
-  }
+  // Merge defined settings with the complete initial state mapping to ensure all sub-group settings are populated.
+  const safeSettings = useMemo(() => {
+    return merge({}, initialState.artifacts, settings)
+  }, [settings])
 
   // State for adding new dependency
   const [newDepName, setNewDepName] = useState('')
@@ -204,7 +163,7 @@ const ArtifactSettings: FC = () => {
   const allowCustomBundlerUrl = safeSettings.runtime?.allowCustomBundlerUrl ?? true
   const allowDynamicDependencies = safeSettings.runtime?.allowDynamicDependencies ?? true
   const allowExternalResources = safeSettings.runtime?.allowExternalResources ?? true
-  const safeStudioSettings = studioSettings || safeSettings.studio
+  const safeStudioSettings = safeSettings.studio
   const modelOptions = useMemo(
     () =>
       providers

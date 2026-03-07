@@ -1,14 +1,13 @@
 import type { AiPlugin } from '@cherrystudio/ai-core'
 import { createPromptToolUsePlugin, webSearchPlugin } from '@cherrystudio/ai-core/built-in/plugins'
 import { loggerService } from '@logger'
-import { isGemini3Model, isSupportedThinkingTokenQwenModel } from '@renderer/config/models'
+import { isGemini3Model, isQwen35Model, isSupportedThinkingTokenQwenModel } from '@renderer/config/models'
 import { getEnableDeveloperMode } from '@renderer/hooks/useSettings'
 import type { Model, Provider } from '@renderer/types'
 import { SystemProviderIds } from '@renderer/types'
 import { isOllamaProvider, isSupportEnableThinkingProvider } from '@renderer/utils/provider'
 
 import type { ModernAiProviderConfig } from '../index_new'
-import { getAiSdkProviderId } from '../provider/factory'
 import { isOpenRouterGeminiGenerateImageModel } from '../utils/image'
 import { getReasoningTagName } from '../utils/reasoning'
 import { createAnthropicCachePlugin } from './anthropicCachePlugin'
@@ -72,8 +71,8 @@ export function buildPlugins({ provider, model, config }: BuildPluginsContext): 
     plugins.push(createSimulateStreamingPlugin())
   }
 
-  if (providerType === 'anthropic' && provider.anthropicCacheControl?.tokenThreshold) {
-    plugins.push(createAnthropicCachePlugin())
+  if (provider.anthropicCacheControl?.tokenThreshold) {
+    plugins.push(createAnthropicCachePlugin(provider))
   }
 
   // 0.3 OpenRouter reasoning redaction
@@ -90,6 +89,7 @@ export function buildPlugins({ provider, model, config }: BuildPluginsContext): 
   if (
     !isOllamaProvider(provider) &&
     isSupportedThinkingTokenQwenModel(model) &&
+    !isQwen35Model(model) &&
     !isSupportEnableThinkingProvider(provider)
   ) {
     const enableThinking = config.assistant?.settings?.reasoning_effort !== undefined
@@ -101,10 +101,9 @@ export function buildPlugins({ provider, model, config }: BuildPluginsContext): 
     plugins.push(createOpenrouterGenerateImagePlugin())
   }
 
-  // 0.7 Skip Gemini3 thought signature
+  // 0.7 Skip Gemini3 thought signature for OpenAI-compatible API
   if (isGemini3Model(model)) {
-    const aiSdkId = getAiSdkProviderId(provider)
-    plugins.push(createSkipGeminiThoughtSignaturePlugin(aiSdkId))
+    plugins.push(createSkipGeminiThoughtSignaturePlugin())
   }
 
   // 1. 模型内置搜索
