@@ -77,6 +77,7 @@ const toSessionForm = (params: {
   const configuration: NonNullable<CreateSessionForm['configuration']> = {
     permission_mode: agent.configuration?.permission_mode ?? 'default',
     max_turns: agent.configuration?.max_turns ?? 100,
+    env_vars: {},
     ...agent.configuration,
     ...(skillScope ? { skillScope } : {}),
     ...(contextStrategy ? { contextStrategy } : {})

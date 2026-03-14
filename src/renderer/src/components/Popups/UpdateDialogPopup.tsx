@@ -54,6 +54,7 @@ const PopupContainer: React.FC<Props> = ({ releaseInfo, resolve }) => {
   }
 
   const onCancel = () => {
+    dispatch(setUpdateState({ manualCheck: false }))
     setOpen(false)
   }
 
@@ -62,7 +63,7 @@ const PopupContainer: React.FC<Props> = ({ releaseInfo, resolve }) => {
   }
 
   const onIgnore = () => {
-    dispatch(setUpdateState({ ignore: true }))
+    dispatch(setUpdateState({ ignore: true, manualCheck: false }))
     setOpen(false)
   }
 

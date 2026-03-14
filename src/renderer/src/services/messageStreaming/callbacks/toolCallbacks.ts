@@ -138,7 +138,8 @@ export const createToolCallbacks = (deps: ToolCallbacksDependencies) => {
         const mergedToolResponse: MCPToolResponse | NormalToolResponse = {
           ...(existingResponse ?? toolResponse),
           ...toolResponse,
-          arguments: mergedArguments
+          arguments: mergedArguments,
+          partialArguments: undefined // Strip redundant streaming buffer to free memory
         }
 
         let content = toolResponse.response

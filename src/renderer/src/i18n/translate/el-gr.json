@@ -7,7 +7,9 @@
         "invalid_agent": "Μη έγκυρος Agent"
       },
       "model": {
-        "tooltip": "Προς το παρόν, μόνο μοντέλα που υποστηρίζουν τελικά σημεία Anthropic είναι διαθέσιμα για τη λειτουργία Agent."
+        "supported_providers": "Υποστηριζόμενοι Πάροχοι",
+        "tooltip": "Προς το παρόν, μόνο μοντέλα που υποστηρίζουν τελικά σημεία Anthropic είναι διαθέσιμα για τη λειτουργία Agent.",
+        "view_providers": "Δείτε τους υποστηριζόμενους παρόχους"
       },
       "title": "Προσθήκη Agent",
       "type": {
@@ -135,6 +137,11 @@
     },
     "settings": {
       "advance": {
+        "envVars": {
+          "description": "Ορίστε προσαρμοσμένες μεταβλητές περιβάλλοντος για τη χρόνο εκτέλεσης του πράκτορα.",
+          "helper": "Εισαγάγετε προσαρμοσμένες μεταβλητές περιβάλλοντος (μία ανά γραμμή, μορφή: ΚΛΕΙΔΙ=τιμή)",
+          "label": "Μεταβλητές Περιβάλλοντος"
+        },
         "maxTurns": {
           "description": "Ορίστε τον αριθμό γύρων αιτήματος/απάντησης που θα εκτελούνται αυτόματα από τον διαμεσολαβητή.",
           "helper": "Όσο υψηλότερη είναι η τιμή, τόσο περισσότερο μπορεί να λειτουργεί αυτόνομα· όσο χαμηλότερη είναι, τόσο πιο εύκολα ελέγχεται.",
@@ -298,7 +305,7 @@
         },
         "tab": "Εργαλεία",
         "tools": {
-          "title": "Εργαλεία"
+          "title": "Προεγκεκριμένα εργαλεία"
         }
       }
     },
@@ -739,6 +746,10 @@
           "on": "Αναγνώριση πρόθεσης",
           "tip": "Ο πράκτορας θα καλέσει τη δυνατότητα αναγνώρισης πρόθεσης του μεγάλου μοντέλου για να αποφασίσει αν χρειάζεται να κληθεί η βάση γνώσης για να απαντηθεί, και αυτή η λειτουργία θα εξαρτηθεί από τις δυνατότητες του μοντέλου"
         }
+      },
+      "max_tool_calls": {
+        "label": "Μέγιστος Αριθμός Κλήσεων Εργαλείων",
+        "tip": "Μέγιστος αριθμός κλήσεων εργαλείων που επιτρέπονται σε μία συνομιλία. Υψηλότερες τιμές επιτρέπουν πιο σύνθετες πολυσταδιακές λειτουργίες, αλλά ενδέχεται να αυξήσουν τη χρήση token και τον χρόνο απόκρισης."
       },
       "mcp": {
         "description": "Διακομιστής MCP που είναι ενεργοποιημένος εξ ορισμού",
@@ -1656,7 +1667,6 @@
     "originalError": "Αρχικό σφάλμα",
     "originalMessage": "Αρχικό μήνυμα",
     "parameter": "παράμετροι",
-    "pause_placeholder": "Διακόπηκε",
     "prompt": "συμβουλές",
     "provider": "πάροχος",
     "providerId": "Αναγνωριστικό παρόχου",
@@ -1670,6 +1680,7 @@
     "requestBody": "Περιεχόμενο αιτήματος",
     "requestBodyValues": "Σώμα αιτήματος",
     "requestUrl": "Μονοπάτι αιτήματος",
+    "request_timeout": "Έληξε το χρονικό όριο του αιτήματος",
     "response": "απάντηση",
     "responseBody": "απάντηση περιεχομένου",
     "responseHeaders": "Επικεφαλίδες απόκρισης",
@@ -1679,6 +1690,7 @@
     "status": "Κωδικός κατάστασης",
     "statusCode": "Κωδικός κατάστασης",
     "statusText": "Κείμενο κατάστασης",
+    "stream_paused": "Διακόπηκε",
     "text": "κείμενο",
     "toolInput": "εισαγωγή εργαλείου",
     "toolName": "Όνομα εργαλείου",
@@ -2320,6 +2332,7 @@
     "tools": {
       "abort_failed": "Αποτυχία διακοπής κλήσης εργαλείου",
       "aborted": "Η κλήση του εργαλείου διακόπηκε",
+      "approvalRequired": "Το εργαλείο \"{{tool}}\" απαιτεί έγκριση",
       "autoApproveEnabled": "Αυτό το εργαλείο έχει ενεργοποιημένη την αυτόματη έγκριση",
       "cancelled": "Ακυρώθηκε",
       "completed": "Ολοκληρώθηκε",
@@ -2524,8 +2537,11 @@
     "chatglm": "ChatGLM",
     "dangbei": "Dangbei",
     "doubao": "Doubao",
-    "hailuo": "MINIMAX",
+    "hailuo": "Hailuo",
+    "ima": "ima",
     "metaso": "Metaso",
+    "minimax-agent": "MiniMax Agent CN",
+    "minimax-global": "MiniMax Agent",
     "nami-ai": "Nami AI",
     "nami-ai-search": "Nami AI Search",
     "qwen": "Qwen",
@@ -2782,9 +2798,9 @@
   "notification": {
     "assistant": "Απάντηση Βοηθού",
     "knowledge": {
-      "batch_error": "[to be translated]:{{failed}} items failed to process",
-      "batch_mixed": "[to be translated]:{{succeeded}} items succeeded, {{failed}} items failed",
-      "batch_success": "[to be translated]:{{succeeded}} items processed successfully",
+      "batch_error": "{{failed}} στοιχεία απέτυχαν να επεξεργαστούν",
+      "batch_mixed": "{{succeeded}} στοιχεία πέτυχαν, {{failed}} στοιχεία απέτυχαν",
+      "batch_success": "{{succeeded}} στοιχεία επεξεργάστηκαν με επιτυχία",
       "error": "{{error}}",
       "success": "Επιτυχής προσθήκη {{type}} στη βάση γνώσης"
     },
@@ -2844,6 +2860,11 @@
     },
     "install_progress": "Πρόοδος Εγκατάστασης",
     "installed_at": "Το OpenClaw εγκαταστάθηκε στο",
+    "migration": {
+      "description": "Έχει εντοπιστεί παλιά έκδοση του OpenClaw που εγκαταστάθηκε μέσω npm. Παρακαλούμε επανεγκαταστήστε για να αποκτήσετε την τελευταία επίσημη έκδοση.",
+      "install_button": "Επανεγκαταστήστε το OpenClaw",
+      "title": "Το OpenClaw χρειάζεται ενημέρωση"
+    },
     "model_config": {
       "auth_token": "Διακριτικό Πιστοποίησης",
       "auth_token_hint": "Διακριτικό για έλεγχο ταυτότητας πύλης. Αφήστε το κενό για να απενεργοποιήσετε τον έλεγχο ταυτότητας.",
@@ -2879,6 +2900,7 @@
       "windows_title": "Windows"
     },
     "quick_actions": {
+      "check_update": "Έλεγχος για ενημερώσεις",
       "open_dashboard": "Άνοιγμα Πίνακα Ελέγχου",
       "title": "Γρήγορες Ενέργειες",
       "uninstall": "Απεγκατάσταση",
@@ -2905,6 +2927,16 @@
     "uninstalling": {
       "description": "Παρακαλώ περιμένετε ενώ γίνεται η απεγκατάσταση του OpenClaw...",
       "title": "Απεγκατάσταση του OpenClaw"
+    },
+    "update": {
+      "available": "Νέα έκδοση διαθέσιμη: v{{latest}} (τρέχουσα: v{{current}})",
+      "checking": "Έλεγχος για ενημερώσεις...",
+      "confirm_button": "Ενημέρωση Τώρα",
+      "failed": "Αποτυχία ελέγχου για ενημερώσεις",
+      "modal_title": "Ενημέρωση OpenClaw",
+      "success": "Η ενημέρωση ολοκληρώθηκε με επιτυχία!",
+      "up_to_date": "Ήδη ενημερωμένο (v{{current}})",
+      "updating": "Ενημέρωση..."
     }
   },
   "ovms": {
@@ -3306,7 +3338,8 @@
     "lmstudio": "LM Studio",
     "longcat": "Τσίρο",
     "mimo": "Xiaomi MiMo",
-    "minimax": "MiniMax",
+    "minimax": "MiniMax CN",
+    "minimax-global": "Minimax",
     "mistral": "Mistral",
     "modelscope": "ModelScope Magpie",
     "moonshot": "Σκοτεινή Κορωνίδα της Σελήνης",
@@ -3334,6 +3367,7 @@
     "voyageai": "Voyage AI",
     "xirang": "China Telecom Xiran",
     "yi": "Zero One Wanyiwu",
+    "zai": "Ζ.ai",
     "zhinao": "360 Intelligent Brain",
     "zhipu": "BigModel"
   },
@@ -5264,6 +5298,7 @@
         "logout_failed": "Η αποσύνδεση απέτυχε, δοκιμάστε ξανά.",
         "logout_success": "Επιτυχής αποσύνδεση από το Anthropic",
         "oauth": "ιστοσελίδα OAuth",
+        "oauth_disabled_warning": "Η Anthropic ανέστειλε προσωρινά τη χρήση του Claude μέσω OAuth. Αυτή η μέθοδος ελέγχου ταυτότητας είναι προς το παρόν μη διαθέσιμη. Παρακαλούμε χρησιμοποιήστε ένα κλειδί API προς το παρόν.",
         "start_auth": "Έναρξη εξουσιοδότησης",
         "submit_code": "Ολοκληρώστε την σύνδεση"
       },
@@ -5435,6 +5470,11 @@
       },
       "docs_check": "Άνοιγμα",
       "docs_more_details": "Λάβετε περισσότερες λεπτομέρειες",
+      "filter": {
+        "agent": "Υποστηριζόμενος από πράκτορα",
+        "all": "Όλοι οι Πάροχοι"
+      },
+      "filter_agent": "Υποστηριζόμενοι Πάροχοι του Φίλτρου Πράκτορα",
       "get_api_key": "Κάντε κλικ εδώ για να πάρετε κλειδί",
       "misc": "Άλλο",
       "no_models_for_check": "Δεν υπάρχουν μοντέλα για έλεγχο (π.χ. μοντέλα συνομιλίας)",

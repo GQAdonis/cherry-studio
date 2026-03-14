@@ -7,7 +7,9 @@
         "invalid_agent": "无效的 Agent"
       },
       "model": {
-        "tooltip": "目前，只有支持 Anthropic 端点的模型可用于 Agent 功能。"
+        "supported_providers": "支持的服务商",
+        "tooltip": "目前，只有支持 Anthropic 端点的模型可用于 Agent 功能。",
+        "view_providers": "查看支持的服务商"
       },
       "title": "添加 Agent",
       "type": {
@@ -135,6 +137,11 @@
     },
     "settings": {
       "advance": {
+        "envVars": {
+          "description": "为智能体运行时设置自定义环境变量。",
+          "helper": "输入自定义环境变量（每行一个，格式：KEY=value）",
+          "label": "环境变量"
+        },
         "maxTurns": {
           "description": "设定代理自动执行的请求/回复轮次数。",
           "helper": "数值越高可自主运行越久；数值越低更易控制。",
@@ -298,7 +305,7 @@
         },
         "tab": "工具",
         "tools": {
-          "title": "工具"
+          "title": "预授权工具"
         }
       }
     },
@@ -335,7 +342,7 @@
       "executing": "正在执行...",
       "expired": "已过期",
       "inputPreview": "工具输入预览",
-      "pending": "等待中 ({{seconds}}秒)",
+      "pending": "等待审批",
       "permissionExpired": "权限请求已过期。等待新指令...",
       "requiresElevatedPermissions": "此工具需要更高权限。",
       "suggestion": {
@@ -739,6 +746,10 @@
           "on": "意图识别",
           "tip": "助手将调用大模型的意图识别能力，判断是否需要调用知识库进行回答，该功能将依赖模型的能力"
         }
+      },
+      "max_tool_calls": {
+        "label": "最大工具调用次数",
+        "tip": "单次对话中允许的最大工具调用次数。较高的值支持更复杂的多步操作，但可能增加 Token 消耗和响应时间。"
       },
       "mcp": {
         "description": "默认启用的 MCP 服务器",
@@ -1656,7 +1667,6 @@
     "originalError": "原错误",
     "originalMessage": "原消息",
     "parameter": "参数",
-    "pause_placeholder": "已中断",
     "prompt": "提示词",
     "provider": "提供商",
     "providerId": "提供商 ID",
@@ -1670,6 +1680,7 @@
     "requestBody": "请求内容",
     "requestBodyValues": "请求体",
     "requestUrl": "请求路径",
+    "request_timeout": "请求超时",
     "response": "响应",
     "responseBody": "响应内容",
     "responseHeaders": "响应首部",
@@ -1679,6 +1690,7 @@
     "status": "状态码",
     "statusCode": "状态码",
     "statusText": "状态文本",
+    "stream_paused": "已中断",
     "text": "文本",
     "toolInput": "工具输入",
     "toolName": "工具名",
@@ -2320,6 +2332,7 @@
     "tools": {
       "abort_failed": "工具调用中断失败",
       "aborted": "工具调用已中断",
+      "approvalRequired": "工具 \"{{tool}}\" 需要审批",
       "autoApproveEnabled": "此工具已启用自动批准",
       "cancelled": "已取消",
       "completed": "已完成",
@@ -2525,7 +2538,10 @@
     "dangbei": "当贝AI",
     "doubao": "豆包",
     "hailuo": "海螺",
+    "ima": "ima",
     "metaso": "秘塔AI搜索",
+    "minimax-agent": "MiniMax Agent",
+    "minimax-global": "MiniMax Agent 海外版",
     "nami-ai": "纳米AI",
     "nami-ai-search": "纳米AI搜索",
     "qwen": "通义千问",
@@ -2844,6 +2860,11 @@
     },
     "install_progress": "安装进度",
     "installed_at": "OpenClaw 安装路径",
+    "migration": {
+      "description": "检测到通过 npm 安装的旧版本 OpenClaw，请重新安装以获取最新官方版本。",
+      "install_button": "重新安装 OpenClaw",
+      "title": "OpenClaw 需要更新"
+    },
     "model_config": {
       "auth_token": "认证令牌",
       "auth_token_hint": "网关认证令牌（必填）。留空时将自动生成。",
@@ -2879,6 +2900,7 @@
       "windows_title": "Windows"
     },
     "quick_actions": {
+      "check_update": "检查更新",
       "open_dashboard": "打开控制面板",
       "title": "快捷操作",
       "uninstall": "卸载",
@@ -2905,6 +2927,16 @@
     "uninstalling": {
       "description": "正在卸载 OpenClaw，请稍候...",
       "title": "正在卸载 OpenClaw"
+    },
+    "update": {
+      "available": "发现新版本：v{{latest}}（当前版本：v{{current}}）",
+      "checking": "正在检查更新...",
+      "confirm_button": "立即更新",
+      "failed": "检查更新失败",
+      "modal_title": "OpenClaw 更新",
+      "success": "更新成功！",
+      "up_to_date": "已是最新版本（v{{current}}）",
+      "updating": "更新中..."
     }
   },
   "ovms": {
@@ -3307,6 +3339,7 @@
     "longcat": "龙猫",
     "mimo": "Xiaomi MiMo",
     "minimax": "MiniMax",
+    "minimax-global": "MiniMax 海外版",
     "mistral": "Mistral",
     "modelscope": "ModelScope 魔搭",
     "moonshot": "月之暗面",
@@ -3334,6 +3367,7 @@
     "voyageai": "Voyage AI",
     "xirang": "天翼云息壤",
     "yi": "零一万物",
+    "zai": "Z.ai",
     "zhinao": "360 智脑",
     "zhipu": "智谱开放平台"
   },
@@ -5264,6 +5298,7 @@
         "logout_failed": "退出登录失败，请重试",
         "logout_success": "成功退出 Anthropic 登录",
         "oauth": "网页 OAuth",
+        "oauth_disabled_warning": "Anthropic 目前已暂停通过 OAuth 使用 Claude，此认证方式暂时不可用，请先使用 API 密钥。",
         "start_auth": "开始授权",
         "submit_code": "完成登录"
       },
@@ -5435,6 +5470,11 @@
       },
       "docs_check": "查看",
       "docs_more_details": "获取更多详情",
+      "filter": {
+        "agent": "支持 Agent",
+        "all": "全部服务商"
+      },
+      "filter_agent": "筛选支持 Agent 的服务商",
       "get_api_key": "点击这里获取密钥",
       "misc": "其他",
       "no_models_for_check": "没有可以被检测的模型（例如对话模型）",

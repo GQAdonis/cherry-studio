@@ -7,7 +7,9 @@
         "invalid_agent": "Agent inválido"
       },
       "model": {
-        "tooltip": "Atualmente, apenas modelos que suportam endpoints da Anthropic estão disponíveis para o recurso Agente."
+        "supported_providers": "Provedores Suportados",
+        "tooltip": "Atualmente, apenas modelos que suportam endpoints da Anthropic estão disponíveis para o recurso Agente.",
+        "view_providers": "Ver provedores suportados"
       },
       "title": "Adicionar Agente",
       "type": {
@@ -135,6 +137,11 @@
     },
     "settings": {
       "advance": {
+        "envVars": {
+          "description": "Definir variáveis de ambiente personalizadas para o tempo de execução do agente.",
+          "helper": "Insira variáveis de ambiente personalizadas (uma por linha, formato: CHAVE=valor)",
+          "label": "Variáveis de Ambiente"
+        },
         "maxTurns": {
           "description": "Defina o número de ciclos de solicitação/resposta executados automaticamente pelo agente.",
           "helper": "Quanto maior o valor, mais tempo pode funcionar de forma autônoma; quanto menor o valor, mais fácil de controlar.",
@@ -298,7 +305,7 @@
         },
         "tab": "Ferramentas",
         "tools": {
-          "title": "Ferramentas"
+          "title": "Ferramentas pré-aprovadas"
         }
       }
     },
@@ -739,6 +746,10 @@
           "on": "Reconhecimento de intenção",
           "tip": "O agente usará a capacidade de reconhecimento de intenção do grande modelo para decidir se deve chamar a base de conhecimento para responder. Esta função depende da capacidade do modelo"
         }
+      },
+      "max_tool_calls": {
+        "label": "Máximo de Chamadas de Ferramentas",
+        "tip": "Número máximo de chamadas de ferramentas permitidas em uma única conversa. Valores mais altos permitem operações mais complexas de múltiplas etapas, mas podem aumentar o uso de tokens e o tempo de resposta."
       },
       "mcp": {
         "description": "Servidor MCP ativado por padrão",
@@ -1656,7 +1667,6 @@
     "originalError": "Erro original",
     "originalMessage": "Mensagem original",
     "parameter": "parâmetro",
-    "pause_placeholder": "Interrompido",
     "prompt": "prompt",
     "provider": "fornecedor",
     "providerId": "ID do fornecedor",
@@ -1670,6 +1680,7 @@
     "requestBody": "Conteúdo da solicitação",
     "requestBodyValues": "Corpo da solicitação",
     "requestUrl": "Caminho da solicitação",
+    "request_timeout": "Tempo limite esgotado",
     "response": "resposta",
     "responseBody": "Conteúdo da resposta",
     "responseHeaders": "Cabeçalho de resposta",
@@ -1679,6 +1690,7 @@
     "status": "Código de status",
     "statusCode": "Código de status",
     "statusText": "Texto de estado",
+    "stream_paused": "Interrompido",
     "text": "texto",
     "toolInput": "ferramenta de entrada",
     "toolName": "Nome da ferramenta",
@@ -2320,6 +2332,7 @@
     "tools": {
       "abort_failed": "Falha ao interromper a chamada da ferramenta",
       "aborted": "Chamada da ferramenta foi interrompida",
+      "approvalRequired": "Ferramenta \"{{tool}}\" requer aprovação",
       "autoApproveEnabled": "Esta ferramenta tem aprovação automática ativada",
       "cancelled": "Cancelado",
       "completed": "Completo",
@@ -2524,8 +2537,11 @@
     "chatglm": "ChatGLM",
     "dangbei": "Dangbei",
     "doubao": "Doubao",
-    "hailuo": "MINIMAX",
+    "hailuo": "Hailuo",
+    "ima": "ima",
     "metaso": "Metaso",
+    "minimax-agent": "MiniMax Agent CN",
+    "minimax-global": "MiniMax Agent",
     "nami-ai": "Nami AI",
     "nami-ai-search": "Nami AI Search",
     "qwen": "Qwen",
@@ -2782,9 +2798,9 @@
   "notification": {
     "assistant": "Resposta do assistente",
     "knowledge": {
-      "batch_error": "[to be translated]:{{failed}} items failed to process",
-      "batch_mixed": "[to be translated]:{{succeeded}} items succeeded, {{failed}} items failed",
-      "batch_success": "[to be translated]:{{succeeded}} items processed successfully",
+      "batch_error": "{{failed}} itens falharam ao ser processados",
+      "batch_mixed": "{{succeeded}} itens foram bem-sucedidos, {{failed}} itens falharam",
+      "batch_success": "{{succeeded}} itens processados com sucesso",
       "error": "{{error}}",
       "success": "Adicionado com sucesso {{type}} à base de conhecimento"
     },
@@ -2844,6 +2860,11 @@
     },
     "install_progress": "Progresso da Instalação",
     "installed_at": "OpenClaw instalado em",
+    "migration": {
+      "description": "Foi detectada uma versão desatualizada do OpenClaw instalada via npm. Por favor, reinstale para obter a versão oficial mais recente.",
+      "install_button": "Reinstale o OpenClaw",
+      "title": "OpenClaw Precisa de Atualização"
+    },
     "model_config": {
       "auth_token": "Token de Autenticação",
       "auth_token_hint": "Token para autenticação do gateway. Deixe vazio para desativar a autenticação.",
@@ -2879,6 +2900,7 @@
       "windows_title": "Windows"
     },
     "quick_actions": {
+      "check_update": "Verificar Atualizações",
       "open_dashboard": "Abrir Painel",
       "title": "Ações Rápidas",
       "uninstall": "Desinstalar",
@@ -2905,6 +2927,16 @@
     "uninstalling": {
       "description": "Aguarde enquanto o OpenClaw está sendo desinstalado...",
       "title": "Desinstalando OpenClaw"
+    },
+    "update": {
+      "available": "Nova versão disponível: v{{latest}} (atual: v{{current}})",
+      "checking": "Verificando atualizações...",
+      "confirm_button": "Atualizar agora",
+      "failed": "Falha ao verificar atualizações",
+      "modal_title": "Atualização do OpenClaw",
+      "success": "Atualização concluída com sucesso!",
+      "up_to_date": "Já está atualizado (v{{current}})",
+      "updating": "Atualizando..."
     }
   },
   "ovms": {
@@ -3306,7 +3338,8 @@
     "lmstudio": "Estúdio LM",
     "longcat": "Totoro",
     "mimo": "Xiaomi MiMo",
-    "minimax": "Minimax",
+    "minimax": "Minimax CN",
+    "minimax-global": "MiniMax",
     "mistral": "Mistral",
     "modelscope": "ModelScope MôDá",
     "moonshot": "Disparo Lunar",
@@ -3334,6 +3367,7 @@
     "voyageai": "Voyage AI",
     "xirang": "XiRang do Nuvem Telecom",
     "yi": "ZeroUmTudo",
+    "zai": "Z.ai",
     "zhinao": "360 Inteligência Artificial",
     "zhipu": "BigModel"
   },
@@ -5264,6 +5298,7 @@
         "logout_failed": "Falha ao sair da conta, tente novamente",
         "logout_success": "Logout bem-sucedido do login Anthropic",
         "oauth": "OAuth da Página Web",
+        "oauth_disabled_warning": "A Anthropic suspendeu temporariamente o uso do Claude via OAuth. Este método de autenticação está atualmente indisponível. Por favor, use uma chave de API por enquanto.",
         "start_auth": "Iniciar autorização",
         "submit_code": "Concluir login"
       },
@@ -5435,6 +5470,11 @@
       },
       "docs_check": "Verificar",
       "docs_more_details": "Obter mais detalhes",
+      "filter": {
+        "agent": "Suportado por Agente",
+        "all": "Todos os Provedores"
+      },
+      "filter_agent": "Agente de Filtro - Provedores Suportados",
       "get_api_key": "Clique aqui para obter a chave",
       "misc": "outro",
       "no_models_for_check": "Não há modelos disponíveis para verificação (por exemplo, modelos de conversa)",

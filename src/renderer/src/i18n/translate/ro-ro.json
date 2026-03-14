@@ -7,7 +7,9 @@
         "invalid_agent": "Agent invalid"
       },
       "model": {
-        "tooltip": "Momentan, doar modelele care acceptă endpoint-uri Anthropic sunt disponibile pentru funcția Agent."
+        "supported_providers": "Furnizori Acceptați",
+        "tooltip": "Momentan, doar modelele care acceptă endpoint-uri Anthropic sunt disponibile pentru funcția Agent.",
+        "view_providers": "Vezi furnizorii acceptați"
       },
       "title": "Adaugă agent",
       "type": {
@@ -135,6 +137,11 @@
     },
     "settings": {
       "advance": {
+        "envVars": {
+          "description": "Setați variabile de mediu personalizate pentru runtime-ul agentului.",
+          "helper": "Introduceți variabile de mediu personalizate (una pe linie, format: CHEIE=valoare)",
+          "label": "Variabile de mediu"
+        },
         "maxTurns": {
           "description": "Definește câte cicluri cerere/răspuns poate finaliza automat agentul.",
           "helper": "Valorile mai mari permit rulări autonome mai lungi; valorile mai mici mențin sesiunile scurte.",
@@ -298,7 +305,7 @@
         },
         "tab": "Unelte",
         "tools": {
-          "title": "Unelte"
+          "title": "Instrumente pre-aprobate"
         }
       }
     },
@@ -739,6 +746,10 @@
           "on": "Recunoaștere intenție",
           "tip": "Asistentul va folosi capacitatea de recunoaștere a intenției modelului mare pentru a determina dacă să folosească baza de cunoștințe pentru a răspunde. Această funcție depinde de capacitățile modelului"
         }
+      },
+      "max_tool_calls": {
+        "label": "Apeluri Maxime de Instrumente",
+        "tip": "Numărul maxim de apeluri de instrumente permise într-o singură conversație. Valori mai mari permit operații mai complexe, în mai multe etape, dar pot crește consumul de tokeni și timpul de răspuns."
       },
       "mcp": {
         "description": "Servere MCP activate implicit",
@@ -1656,7 +1667,6 @@
     "originalError": "Eroare originală",
     "originalMessage": "Mesaj original",
     "parameter": "Parametru",
-    "pause_placeholder": "În pauză",
     "prompt": "Prompt",
     "provider": "Furnizor",
     "providerId": "ID furnizor",
@@ -1670,6 +1680,7 @@
     "requestBody": "Corp cerere",
     "requestBodyValues": "Valori corp cerere",
     "requestUrl": "URL cerere",
+    "request_timeout": "Cerere expirată",
     "response": "Răspuns",
     "responseBody": "Corp răspuns",
     "responseHeaders": "Header răspuns",
@@ -1679,6 +1690,7 @@
     "status": "Cod stare",
     "statusCode": "Cod stare",
     "statusText": "Text stare",
+    "stream_paused": "În pauză",
     "text": "Text",
     "toolInput": "Intrare instrument",
     "toolName": "Nume instrument",
@@ -2320,6 +2332,7 @@
     "tools": {
       "abort_failed": "Anularea apelului instrumentului a eșuat",
       "aborted": "Apelul instrumentului a fost anulat",
+      "approvalRequired": "Instrumentul „{{tool}}” necesită aprobare",
       "autoApproveEnabled": "Aprobare automată activată pentru acest instrument",
       "cancelled": "Anulat",
       "completed": "Finalizat",
@@ -2524,8 +2537,11 @@
     "chatglm": "ChatGLM",
     "dangbei": "Dangbei",
     "doubao": "Doubao",
-    "hailuo": "MINIMAX",
+    "hailuo": "Hailuo",
+    "ima": "ima",
     "metaso": "Metaso",
+    "minimax-agent": "MiniMax Agent CN",
+    "minimax-global": "MiniMax Agent",
     "nami-ai": "Nami AI",
     "nami-ai-search": "Nami AI Search",
     "qwen": "Qwen",
@@ -2782,9 +2798,9 @@
   "notification": {
     "assistant": "Răspuns asistent",
     "knowledge": {
-      "batch_error": "[to be translated]:{{failed}} items failed to process",
-      "batch_mixed": "[to be translated]:{{succeeded}} items succeeded, {{failed}} items failed",
-      "batch_success": "[to be translated]:{{succeeded}} items processed successfully",
+      "batch_error": "{{failed}} elemente nu au putut fi procesate",
+      "batch_mixed": "{{succeeded}} elemente au reușit, {{failed}} elemente au eșuat",
+      "batch_success": "{{succeeded}} elemente procesate cu succes",
       "error": "{{error}}",
       "success": "S-a adăugat cu succes {{type}} în baza de cunoștințe"
     },
@@ -2844,6 +2860,11 @@
     },
     "install_progress": "Progresul instalării",
     "installed_at": "OpenClaw instalat la",
+    "migration": {
+      "description": "A fost detectată o versiune învechită a OpenClaw instalată prin npm. Te rugăm să reinstalezi pentru a obține cea mai recentă versiune oficială.",
+      "install_button": "Reinstalați OpenClaw",
+      "title": "OpenClaw Necesită Actualizare"
+    },
     "model_config": {
       "auth_token": "Token de autentificare",
       "auth_token_hint": "Token pentru autentificarea gateway-ului. Lăsați gol pentru a dezactiva autentificarea.",
@@ -2879,6 +2900,7 @@
       "windows_title": "Windows"
     },
     "quick_actions": {
+      "check_update": "Verifică actualizările",
       "open_dashboard": "Deschide Tabloul de Bord",
       "title": "Acțiuni rapide",
       "uninstall": "Dezinstalare",
@@ -2905,6 +2927,16 @@
     "uninstalling": {
       "description": "Vă rugăm să așteptați în timp ce OpenClaw este dezinstalat...",
       "title": "Dezinstalarea OpenClaw"
+    },
+    "update": {
+      "available": "Versiune nouă disponibilă: v{{latest}} (versiunea curentă: v{{current}})",
+      "checking": "Se verifică actualizările...",
+      "confirm_button": "Actualizează acum",
+      "failed": "Nu s-a reușit verificarea actualizărilor",
+      "modal_title": "Actualizare OpenClaw",
+      "success": "Actualizare finalizată cu succes!",
+      "up_to_date": "Deja actualizat (v{{current}})",
+      "updating": "Se actualizează..."
     }
   },
   "ovms": {
@@ -3306,7 +3338,8 @@
     "lmstudio": "LM Studio",
     "longcat": "LongCat AI",
     "mimo": "Xiaomi MiMo",
-    "minimax": "MiniMax",
+    "minimax": "MiniMax CN",
+    "minimax-global": "MiniMax",
     "mistral": "Mistral",
     "modelscope": "ModelScope",
     "moonshot": "Moonshot",
@@ -3334,6 +3367,7 @@
     "voyageai": "Voyage AI",
     "xirang": "State Cloud Xirang",
     "yi": "Yi",
+    "zai": "Z.ai",
     "zhinao": "360AI",
     "zhipu": "BigModel"
   },
@@ -5264,6 +5298,7 @@
         "logout_failed": "Deconectarea a eșuat, te rugăm să încerci din nou",
         "logout_success": "Te-ai deconectat cu succes de la Anthropic",
         "oauth": "Web OAuth",
+        "oauth_disabled_warning": "Anthropic a suspendat temporar utilizarea Claude prin OAuth. Această metodă de autentificare este momentan indisponibilă. Vă rugăm să utilizați o cheie API deocamdată.",
         "start_auth": "Începe autorizarea",
         "submit_code": "Finalizează conectarea"
       },
@@ -5435,6 +5470,11 @@
       },
       "docs_check": "Verifică",
       "docs_more_details": "pentru mai multe detalii",
+      "filter": {
+        "agent": "Asistat de agent",
+        "all": "Toți furnizorii"
+      },
+      "filter_agent": "Furnizori acceptați de Agentul de filtrare",
       "get_api_key": "Obține cheie API",
       "misc": "Altele",
       "no_models_for_check": "Nu există modele disponibile pentru verificare (de ex. modele chat)",

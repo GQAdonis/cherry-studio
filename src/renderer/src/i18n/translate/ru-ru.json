@@ -7,7 +7,9 @@
         "invalid_agent": "Недействительный агент"
       },
       "model": {
-        "tooltip": "В настоящее время для функции агента доступны только модели, поддерживающие конечные точки Anthropic."
+        "supported_providers": "Поддерживаемые поставщики",
+        "tooltip": "В настоящее время для функции агента доступны только модели, поддерживающие конечные точки Anthropic.",
+        "view_providers": "Просмотреть поддерживаемых поставщиков"
       },
       "title": "Добавить агента",
       "type": {
@@ -135,6 +137,11 @@
     },
     "settings": {
       "advance": {
+        "envVars": {
+          "description": "Задайте пользовательские переменные окружения для среды выполнения агента.",
+          "helper": "Введите пользовательские переменные окружения (по одной в строке, формат: КЛЮЧ=значение)",
+          "label": "Переменные окружения"
+        },
         "maxTurns": {
           "description": "Установить количество циклов запрос/ответ, выполняемых автоматически через прокси.",
           "helper": "Чем выше значение, тем дольше может работать автономно; чем ниже значение, тем легче контролировать.",
@@ -298,7 +305,7 @@
         },
         "tab": "Инструменты",
         "tools": {
-          "title": "Инструменты"
+          "title": "Предварительно одобренные инструменты"
         }
       }
     },
@@ -739,6 +746,10 @@
           "on": "Распознавание намерений",
           "tip": "Ассистент будет использовать возможности большой модели для распознавания намерений, чтобы определить, нужно ли обращаться к базе знаний для ответа. Эта функция будет зависеть от возможностей модели"
         }
+      },
+      "max_tool_calls": {
+        "label": "Максимальное количество вызовов инструментов",
+        "tip": "Максимальное количество вызовов инструментов, разрешённых в одном диалоге. Более высокие значения позволяют выполнять более сложные многошаговые операции, но могут увеличить использование токенов и время ответа."
       },
       "mcp": {
         "description": "Серверы MCP, включенные по умолчанию",
@@ -1656,7 +1667,6 @@
     "originalError": "Исходная ошибка",
     "originalMessage": "исходное сообщение",
     "parameter": "параметр",
-    "pause_placeholder": "Получение ответа приостановлено",
     "prompt": "подсказка",
     "provider": "поставщик",
     "providerId": "ID поставщика",
@@ -1670,6 +1680,7 @@
     "requestBody": "Запрашиваемый контент",
     "requestBodyValues": "Тело запроса",
     "requestUrl": "Путь запроса",
+    "request_timeout": "Время ожидания запроса истекло",
     "response": "ответ",
     "responseBody": "Содержание ответа",
     "responseHeaders": "Заголовки ответа",
@@ -1679,6 +1690,7 @@
     "status": "Код статуса",
     "statusCode": "Код состояния",
     "statusText": "Текст состояния",
+    "stream_paused": "Получение ответа приостановлено",
     "text": "текст",
     "toolInput": "ввод инструмента",
     "toolName": "имя инструмента",
@@ -2320,6 +2332,7 @@
     "tools": {
       "abort_failed": "Вызов инструмента прерван",
       "aborted": "Вызов инструмента прерван",
+      "approvalRequired": "Инструмент \"{{tool}}\" требует одобрения",
       "autoApproveEnabled": "Для этого инструмента включен автоматический одобрен",
       "cancelled": "Отменено",
       "completed": "Завершено",
@@ -2524,8 +2537,11 @@
     "chatglm": "ChatGLM",
     "dangbei": "Dangbei",
     "doubao": "Doubao",
-    "hailuo": "MINIMAX",
+    "hailuo": "Hailuo",
+    "ima": "ima",
     "metaso": "Metaso",
+    "minimax-agent": "MiniMax Agent CN",
+    "minimax-global": "MiniMax Agent",
     "nami-ai": "Nami AI",
     "nami-ai-search": "Nami AI Search",
     "qwen": "Qwen",
@@ -2782,9 +2798,9 @@
   "notification": {
     "assistant": "Ответ ассистента",
     "knowledge": {
-      "batch_error": "[to be translated]:{{failed}} items failed to process",
-      "batch_mixed": "[to be translated]:{{succeeded}} items succeeded, {{failed}} items failed",
-      "batch_success": "[to be translated]:{{succeeded}} items processed successfully",
+      "batch_error": "{{failed}} элементов не удалось обработать",
+      "batch_mixed": "{{succeeded}} элементов выполнено успешно, {{failed}} элементов завершилось с ошибкой",
+      "batch_success": "{{succeeded}} элементов обработано успешно",
       "error": "{{error}}",
       "success": "Успешно добавлено {{type}} в базу знаний"
     },
@@ -2844,6 +2860,11 @@
     },
     "install_progress": "Прогресс установки",
     "installed_at": "OpenClaw установлен в",
+    "migration": {
+      "description": "Обнаружена устаревшая версия OpenClaw, установленная через npm. Пожалуйста, переустановите её, чтобы получить последнюю официальную версию.",
+      "install_button": "Переустановите OpenClaw",
+      "title": "OpenClaw требует обновления"
+    },
     "model_config": {
       "auth_token": "Токен аутентификации",
       "auth_token_hint": "Токен для аутентификации шлюза. Оставьте пустым, чтобы отключить аутентификацию.",
@@ -2879,6 +2900,7 @@
       "windows_title": "Windows"
     },
     "quick_actions": {
+      "check_update": "Проверить обновления",
       "open_dashboard": "Открыть панель управления",
       "title": "Быстрые действия",
       "uninstall": "Удалить",
@@ -2905,6 +2927,16 @@
     "uninstalling": {
       "description": "Пожалуйста, подождите, пока OpenClaw удаляется...",
       "title": "Удаление OpenClaw"
+    },
+    "update": {
+      "available": "Новая версия доступна: v{{latest}} (текущая: v{{current}})",
+      "checking": "Проверка обновлений...",
+      "confirm_button": "Обновить сейчас",
+      "failed": "Не удалось проверить наличие обновлений",
+      "modal_title": "Обновление OpenClaw",
+      "success": "Обновление завершено успешно!",
+      "up_to_date": "Уже актуально (v{{current}})",
+      "updating": "Обновление..."
     }
   },
   "ovms": {
@@ -3306,7 +3338,8 @@
     "lmstudio": "LM Studio",
     "longcat": "Тоторо",
     "mimo": "Xiaomi MiMo",
-    "minimax": "MiniMax",
+    "minimax": "MiniMax CN",
+    "minimax-global": "MiniMax",
     "mistral": "Mistral",
     "modelscope": "ModelScope",
     "moonshot": "Moonshot",
@@ -3334,6 +3367,7 @@
     "voyageai": "Voyage AI",
     "xirang": "State Cloud Xirang",
     "yi": "Yi",
+    "zai": "Z.ai",
     "zhinao": "360AI",
     "zhipu": "BigModel"
   },
@@ -5264,6 +5298,7 @@
         "logout_failed": "Ошибка выхода, попробуйте еще раз",
         "logout_success": "Успешно вышли из Anthropic",
         "oauth": "веб OAuth",
+        "oauth_disabled_warning": "Anthropic временно приостановила использование Claude через OAuth. Этот метод аутентификации в настоящее время недоступен. Пожалуйста, используйте ключ API на данный момент.",
         "start_auth": "Начать авторизацию",
         "submit_code": "Завершить вход"
       },
@@ -5435,6 +5470,11 @@
       },
       "docs_check": "Проверить",
       "docs_more_details": "для получения дополнительной информации",
+      "filter": {
+        "agent": "Поддержка агента",
+        "all": "Все поставщики"
+      },
+      "filter_agent": "Поддерживаемые поставщики агента фильтрации",
       "get_api_key": "Получить ключ API",
       "misc": "другие",
       "no_models_for_check": "Нет моделей для проверки (например, диалоговые модели)",

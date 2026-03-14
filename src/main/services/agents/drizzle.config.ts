@@ -25,15 +25,7 @@ import { defineConfig } from 'drizzle-kit'
 import { app } from 'electron'
 
 function getDbPath() {
-  if (process.env.NODE_ENV === 'development') {
-    return path.join(os.homedir(), '.cherrystudio', 'data', 'agents.db')
-  }
-  try {
-    return path.join(app.getPath('userData'), 'Data', 'agents.db')
-  } catch {
-    // Fallback if app is not ready yet (e.g., during drizzle-kit CLI usage)
-    return path.join(os.homedir(), '.cherrystudio', 'data', 'agents.db')
-  }
+  return path.join(app.getPath('userData'), 'Data', 'agents.db')
 }
 
 export function getOldDbPath() {

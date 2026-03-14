@@ -65,7 +65,8 @@ export const AgentConfigurationSchema = z
     // Use `any` here so downstream merged configuration objects remain assignable while
     // specific UI surfaces enforce stronger types.
     skillScope: z.any().optional(),
-    contextStrategy: z.any().optional()
+    contextStrategy: z.any().optional(),
+    env_vars: z.record(z.string(), z.string()).optional().default({}) // Custom environment variables for the agent runtime
   })
   .loose()
 

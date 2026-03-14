@@ -10,7 +10,7 @@
 
 import { ClearOutlined, SettingOutlined } from '@ant-design/icons'
 import ModelAvatar from '@renderer/components/Avatar/ModelAvatar'
-import { SelectApiModelPopup } from '@renderer/components/Popups/SelectModelPopup'
+import { SelectAgentModelPopup } from '@renderer/components/Popups/SelectModelPopup'
 import { ARTIFACT_STUDIO_AGENT_ID } from '@renderer/features/artifacts/services/ArtifactStudioRuntimeService'
 import { useAgent } from '@renderer/hooks/agents/useAgent'
 import { useApiModel } from '@renderer/hooks/agents/useModel'
@@ -62,7 +62,7 @@ const RefinementToolbar: FC<RefinementToolbarProps> = ({ onClear, onSettings, mo
   const handleModelClick = useCallback(async () => {
     if (!canChangeModel) return
 
-    const selectedModel = await SelectApiModelPopup.show({ model: activeModel })
+    const selectedModel = await SelectAgentModelPopup.show({ model: activeModel })
 
     if (selectedModel && selectedModel.id !== activeModelId) {
       dispatch(setParentModelId(selectedModel.id))
