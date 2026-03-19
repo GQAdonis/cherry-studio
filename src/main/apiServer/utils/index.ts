@@ -29,7 +29,14 @@ export async function getAvailableProviders(): Promise<Provider[]> {
     }
 
     // Support OpenAI-compatible and Anthropic-compatible providers for API server
-    const supportedTypes: ProviderType[] = ['openai', 'anthropic', 'ollama', 'new-api']
+    const supportedTypes: ProviderType[] = [
+      'openai',
+      'anthropic',
+      'ollama',
+      'new-api',
+      'openai-compatible',
+      'mistral-rs'
+    ]
     const supportedProviders = providers.filter((p: Provider) => p.enabled && supportedTypes.includes(p.type))
 
     // Cache the filtered results
@@ -245,13 +252,18 @@ export function validateProvider(provider: Provider): boolean {
     }
 
     // Check required fields
-    if (!provider.id || !provider.type || !provider.apiKey || !provider.apiHost) {
+    if (!provider.id || !provider.type || !provider.apiHost) {
       logger.warn('Provider missing required fields', {
         id: !!provider.id,
         type: !!provider.type,
-        apiKey: !!provider.apiKey,
         apiHost: !!provider.apiHost
       })
+      return false
+    }
+
+    const apiKeyOptional = provider.type === 'openai-compatible' || provider.type === 'mistral-rs'
+    if (!apiKeyOptional && !provider.apiKey) {
+      logger.warn('Provider missing API key', { providerId: provider.id })
       return false
     }
 
@@ -261,8 +273,15 @@ export function validateProvider(provider: Provider): boolean {
       return false
     }
 
-    // Support OpenAI and Anthropic type providers
-    if (provider.type !== 'openai' && provider.type !== 'anthropic') {
+    const supportedTypes: ProviderType[] = [
+      'openai',
+      'anthropic',
+      'ollama',
+      'new-api',
+      'openai-compatible',
+      'mistral-rs'
+    ]
+    if (!supportedTypes.includes(provider.type)) {
       logger.debug('Provider type not supported', {
         providerId: provider.id,
         providerType: provider.type

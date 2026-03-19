@@ -562,6 +562,9 @@ export async function fetchGenerate({
 export function hasApiKey(provider: Provider) {
   if (!provider) return false
   if (provider.id === 'cherryai') return true
+  if (provider.type === 'openai-compatible' || provider.type === 'mistral-rs') {
+    return true
+  }
   if (
     (isSystemProvider(provider) && NOT_SUPPORT_API_KEY_PROVIDERS.includes(provider.id)) ||
     NOT_SUPPORT_API_KEY_PROVIDER_TYPES.includes(provider.type)
@@ -647,7 +650,9 @@ export function checkApiProvider(provider: Provider): void {
     (isSystemProvider(provider) && NOT_SUPPORT_API_KEY_PROVIDERS.includes(provider.id)) ||
     NOT_SUPPORT_API_KEY_PROVIDER_TYPES.includes(provider.type)
 
-  if (!isExcludedProvider) {
+  const apiKeyOptional = provider.type === 'openai-compatible' || provider.type === 'mistral-rs'
+
+  if (!isExcludedProvider && !apiKeyOptional) {
     if (!provider.apiKey) {
       window.toast.error(i18n.t('message.error.enter.api.label'))
       throw new Error(i18n.t('message.error.enter.api.label'))

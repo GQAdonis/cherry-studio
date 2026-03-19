@@ -10,7 +10,7 @@ import { ProviderAvatar } from '@renderer/components/ProviderAvatar'
 import { useAllProviders, useProviders } from '@renderer/hooks/useProvider'
 import { useTimer } from '@renderer/hooks/useTimer'
 import ImageStorage from '@renderer/services/ImageStorage'
-import type { Provider, ProviderType } from '@renderer/types'
+import type { Model, Provider, ProviderType } from '@renderer/types'
 import { isSystemProvider } from '@renderer/types'
 import { getFancyProviderName, matchKeywordsInModel, matchKeywordsInProvider, uuid } from '@renderer/utils'
 import { isAnthropicSupportedProvider } from '@renderer/utils/provider'
@@ -170,30 +170,52 @@ const ProviderList: FC = () => {
   }, [searchParams])
 
   const onAddProvider = async () => {
-    const { name: providerName, type, logo } = await AddProviderPopup.show()
+    const result = await AddProviderPopup.show()
 
-    if (!providerName.trim()) {
+    if (!result.name.trim()) {
       return
     }
 
+    const providerId = uuid()
+    let models: Model[] = []
+    let apiKey = ''
+    let apiHost = ''
+
+    if (result.type === 'mistral-rs') {
+      apiHost = result.mistralRsApiHost?.trim() ?? ''
+      apiKey = result.mistralRsApiKey?.trim() ?? ''
+      const modelId = result.mistralRsModelId?.trim() ?? ''
+      if (modelId) {
+        models = [
+          {
+            id: modelId,
+            name: modelId,
+            provider: providerId,
+            group: t('settings.provider.add.mistral_rs.model_group'),
+            endpoint_type: 'openai'
+          }
+        ]
+      }
+    }
+
     const provider = {
-      id: uuid(),
-      name: providerName.trim(),
-      type,
-      apiKey: '',
-      apiHost: '',
-      models: [],
+      id: providerId,
+      name: result.name.trim(),
+      type: result.type,
+      apiKey,
+      apiHost,
+      models,
       enabled: true,
       isSystem: false
     } as Provider
 
     let updatedLogos = { ...providerLogos }
-    if (logo) {
+    if (result.logo) {
       try {
-        await ImageStorage.set(`provider-${provider.id}`, logo)
+        await ImageStorage.set(`provider-${provider.id}`, result.logo)
         updatedLogos = {
           ...updatedLogos,
-          [provider.id]: logo
+          [provider.id]: result.logo!
         }
         setProviderLogos(updatedLogos)
       } catch (error) {
@@ -219,23 +241,48 @@ const ProviderList: FC = () => {
       key: 'edit',
       icon: <EditIcon size={14} />,
       async onClick() {
-        const { name, type, logoFile, logo } = await AddProviderPopup.show(provider)
+        const popupResult = await AddProviderPopup.show(provider)
 
-        if (name) {
-          updateProvider({ ...provider, name, type })
+        if (popupResult.name) {
+          if (popupResult.type === 'mistral-rs') {
+            const modelId = popupResult.mistralRsModelId?.trim() ?? ''
+            const nextModels: Model[] =
+              modelId.length > 0
+                ? [
+                    {
+                      ...(provider.models[0] ?? {}),
+                      id: modelId,
+                      name: modelId,
+                      provider: provider.id,
+                      group: t('settings.provider.add.mistral_rs.model_group'),
+                      endpoint_type: 'openai'
+                    }
+                  ]
+                : provider.models
+            updateProvider({
+              id: provider.id,
+              name: popupResult.name,
+              type: popupResult.type,
+              apiHost: popupResult.mistralRsApiHost?.trim() ?? '',
+              apiKey: popupResult.mistralRsApiKey?.trim() ?? '',
+              models: nextModels
+            })
+          } else {
+            updateProvider({ ...provider, name: popupResult.name, type: popupResult.type })
+          }
           if (provider.id) {
-            if (logo) {
+            if (popupResult.logo) {
               try {
-                await ImageStorage.set(`provider-${provider.id}`, logo)
+                await ImageStorage.set(`provider-${provider.id}`, popupResult.logo)
                 setProviderLogos((prev) => ({
                   ...prev,
-                  [provider.id]: logo
+                  [provider.id]: popupResult.logo!
                 }))
               } catch (error) {
                 logger.error('Failed to save logo', error as Error)
                 window.toast.error(t('message.error.update_provider_logo'))
               }
-            } else if (logo === undefined && logoFile === undefined) {
+            } else if (popupResult.logo === undefined && popupResult.logoFile === undefined) {
               try {
                 await ImageStorage.set(`provider-${provider.id}`, '')
                 setProviderLogos((prev) => {

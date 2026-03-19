@@ -5273,6 +5273,20 @@
     },
     "provider": {
       "add": {
+        "mistral_rs": {
+          "api_host": "API base URL",
+          "api_host_placeholder": "http://127.0.0.1:1234/v1",
+          "api_key": "API key",
+          "api_key_placeholder": "Optional — use any value if the server ignores it",
+          "api_key_tip": "Many local mistral.rs servers do not validate keys; OpenAI-compatible clients still send Authorization.",
+          "default_name": "mistral.rs",
+          "docs_link": "mistral.rs documentation (GitHub)",
+          "model_group": "mistral.rs",
+          "model_id": "Model id",
+          "model_id_placeholder": "e.g. google/gemma-3-4b-it",
+          "model_id_tip": "Use the same id you passed to mistralrs serve -m (or the id shown under GET /v1/models).",
+          "type_label": "mistral.rs (local OpenAI API)"
+        },
         "name": {
           "label": "Provider Name",
           "placeholder": "Example: OpenAI"

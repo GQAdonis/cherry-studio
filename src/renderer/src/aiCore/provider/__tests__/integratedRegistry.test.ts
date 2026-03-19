@@ -127,6 +127,12 @@ describe('Integrated Provider Registry', () => {
       expect(result).toBe('google')
     })
 
+    it('should map mistral-rs provider type to openai-compatible SDK id', () => {
+      const provider = createTestProvider('local-mistral', 'mistral-rs')
+      const result = getAiSdkProviderId(provider)
+      expect(result).toBe('openai-compatible')
+    })
+
     it('should fallback to provider.id for unknown providers', () => {
       const unknownProvider = createTestProvider('unknown-provider', 'unknown-type')
       const result = getAiSdkProviderId(unknownProvider)

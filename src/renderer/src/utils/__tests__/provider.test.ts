@@ -193,6 +193,8 @@ describe('provider utils', () => {
     expect(isOpenAICompatibleProvider(createProvider({ type: 'openai' }))).toBe(true)
     expect(isOpenAICompatibleProvider(createProvider({ type: 'new-api' }))).toBe(true)
     expect(isOpenAICompatibleProvider(createProvider({ type: 'mistral' }))).toBe(true)
+    expect(isOpenAICompatibleProvider(createProvider({ type: 'openai-compatible' }))).toBe(true)
+    expect(isOpenAICompatibleProvider(createProvider({ type: 'mistral-rs' }))).toBe(true)
     expect(isOpenAICompatibleProvider(createProvider({ type: 'anthropic' }))).toBe(false)
   })
 

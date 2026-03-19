@@ -153,7 +153,7 @@ export function isPerplexityProvider(provider: Provider): boolean {
  * @returns {boolean} 是否为 OpenAI 兼容提供商
  */
 export function isOpenAICompatibleProvider(provider: Provider): boolean {
-  return ['openai', 'new-api', 'mistral'].includes(provider.type)
+  return ['openai', 'new-api', 'mistral', 'openai-compatible', 'mistral-rs'].includes(provider.type)
 }
 
 export function isAzureOpenAIProvider(provider: Provider): provider is AzureOpenAIProvider {

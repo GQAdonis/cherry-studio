@@ -6,8 +6,8 @@ import { TopView } from '@renderer/components/TopView'
 import { PROVIDER_LOGO_MAP } from '@renderer/config/providers'
 import ImageStorage from '@renderer/services/ImageStorage'
 import type { Provider, ProviderType } from '@renderer/types'
-import { compressImage, generateColorFromChar, getForegroundColor } from '@renderer/utils'
-import { Divider, Dropdown, Form, Input, Modal, Popover, Select, Upload } from 'antd'
+import { compressImage, generateColorFromChar, getForegroundColor, validateApiHost } from '@renderer/utils'
+import { Divider, Dropdown, Form, Input, Modal, Popover, Select, Typography, Upload } from 'antd'
 import type { ItemType } from 'antd/es/menu/interface'
 import React, { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -15,9 +15,23 @@ import styled from 'styled-components'
 
 const logger = loggerService.withContext('AddProviderPopup')
 
+/** Default OpenAI-compatible base URL for a local mistral.rs server (`mistralrs serve`). */
+export const MISTRAL_RS_DEFAULT_OPENAI_BASE_URL = 'http://127.0.0.1:1234/v1'
+
+export type AddProviderPopupResult = {
+  name: string
+  type: ProviderType
+  logo?: string
+  logoFile?: File
+  /** Populated when `type === 'mistral-rs'` */
+  mistralRsApiHost?: string
+  mistralRsApiKey?: string
+  mistralRsModelId?: string
+}
+
 interface Props {
   provider?: Provider
-  resolve: (result: { name: string; type: ProviderType; logo?: string; logoFile?: File }) => void
+  resolve: (result: AddProviderPopupResult) => void
 }
 
 const PopupContainer: React.FC<Props> = ({ provider, resolve }) => {
@@ -28,6 +42,13 @@ const PopupContainer: React.FC<Props> = ({ provider, resolve }) => {
   const [logo, setLogo] = useState<string | null>(null)
   const [logoPickerOpen, setLogoPickerOpen] = useState(false)
   const [dropdownOpen, setDropdownOpen] = useState(false)
+  const [mistralRsApiHost, setMistralRsApiHost] = useState(
+    provider?.type === 'mistral-rs' ? (provider.apiHost ?? '') : ''
+  )
+  const [mistralRsApiKey, setMistralRsApiKey] = useState(provider?.type === 'mistral-rs' ? (provider.apiKey ?? '') : '')
+  const [mistralRsModelId, setMistralRsModelId] = useState(
+    provider?.type === 'mistral-rs' ? (provider.models?.[0]?.id ?? '') : ''
+  )
   const { t } = useTranslation()
   const uploadRef = useRef<HTMLDivElement>(null)
 
@@ -47,16 +68,33 @@ const PopupContainer: React.FC<Props> = ({ provider, resolve }) => {
     }
   }, [provider])
 
-  const onOk = async () => {
-    setOpen(false)
+  useEffect(() => {
+    if (provider?.type === 'mistral-rs') {
+      setMistralRsApiHost(provider.apiHost ?? '')
+      setMistralRsApiKey(provider.apiKey ?? '')
+      setMistralRsModelId(provider.models?.[0]?.id ?? '')
+    }
+  }, [provider])
 
-    // 返回结果，但不包含文件对象，因为文件已经直接保存到 ImageStorage
-    const result = {
+  const isMistralRs = type === 'mistral-rs'
+
+  const buildResult = (): AddProviderPopupResult => {
+    const base: AddProviderPopupResult = {
       name: name.trim(),
       type,
       logo: logo || undefined
     }
-    resolve(result)
+    if (isMistralRs) {
+      base.mistralRsApiHost = mistralRsApiHost.trim()
+      base.mistralRsApiKey = mistralRsApiKey.trim()
+      base.mistralRsModelId = mistralRsModelId.trim()
+    }
+    return base
+  }
+
+  const onOk = async () => {
+    setOpen(false)
+    resolve(buildResult())
   }
 
   const onCancel = () => {
@@ -65,12 +103,14 @@ const PopupContainer: React.FC<Props> = ({ provider, resolve }) => {
   }
 
   const onClose = () => {
-    resolve({ name: name.trim(), type, logo: logo || undefined })
+    resolve(buildResult())
   }
 
-  const buttonDisabled = name.trim().length === 0
+  const mistralRsHostOk = mistralRsApiHost.trim().length > 0 && validateApiHost(mistralRsApiHost.trim())
+  const mistralRsModelOk = mistralRsModelId.trim().length > 0
 
-  // 处理内置头像的点击事件
+  const buttonDisabled = name.trim().length === 0 || (isMistralRs && (!mistralRsHostOk || !mistralRsModelOk))
+
   const handleProviderLogoClick = async (providerId: string) => {
     try {
       const logoUrl = PROVIDER_LOGO_MAP[providerId]
@@ -137,10 +177,9 @@ const PopupContainer: React.FC<Props> = ({ provider, resolve }) => {
                 const savedLogo = await ImageStorage.get(`provider-${provider.id}`)
                 setLogo(savedLogo)
               } else {
-                // 临时保存在内存中，等创建 provider 后会在调用方保存
-                const tempUrl = await new Promise<string>((resolve) => {
+                const tempUrl = await new Promise<string>((resolveUrl) => {
                   const reader = new FileReader()
-                  reader.onload = () => resolve(reader.result as string)
+                  reader.onload = () => resolveUrl(reader.result as string)
                   reader.readAsDataURL(logoData)
                 })
                 setLogo(tempUrl)
@@ -173,7 +212,6 @@ const PopupContainer: React.FC<Props> = ({ provider, resolve }) => {
     }
   ] satisfies ItemType[]
 
-  // for logo
   const backgroundColor = generateColorFromChar(name)
   const color = name ? getForegroundColor(backgroundColor) : 'white'
 
@@ -183,7 +221,7 @@ const PopupContainer: React.FC<Props> = ({ provider, resolve }) => {
       onOk={onOk}
       onCancel={onCancel}
       afterClose={onClose}
-      width={360}
+      width={isMistralRs ? 420 : 360}
       closable={false}
       transitionName="animation-move-down"
       centered
@@ -238,19 +276,25 @@ const PopupContainer: React.FC<Props> = ({ provider, resolve }) => {
             placeholder={t('settings.provider.add.name.placeholder')}
             onKeyDown={(e) => {
               if (e.key === 'Enter' && !e.nativeEvent.isComposing) {
-                onOk()
+                if (!buttonDisabled) {
+                  onOk()
+                }
               }
             }}
             maxLength={32}
           />
         </Form.Item>
-        <Form.Item label={t('settings.provider.add.type')} style={{ marginBottom: 0 }}>
+        <Form.Item label={t('settings.provider.add.type')} style={{ marginBottom: isMistralRs ? 12 : 0 }}>
           <Select
             value={displayType}
             onChange={(value: string) => {
               setDisplayType(value)
-              // special case for cherryin-type, map to new-api internally
-              setType(value === 'cherryin-type' ? 'new-api' : (value as ProviderType))
+              const nextType = value === 'cherryin-type' ? 'new-api' : (value as ProviderType)
+              setType(nextType)
+              if (value === 'mistral-rs') {
+                setMistralRsApiHost((h) => (h.trim() ? h : MISTRAL_RS_DEFAULT_OPENAI_BASE_URL))
+                setName((n) => (n.trim() ? n : t('settings.provider.add.mistral_rs.default_name')))
+              }
             }}
             options={[
               { label: 'OpenAI', value: 'openai' },
@@ -262,10 +306,52 @@ const PopupContainer: React.FC<Props> = ({ provider, resolve }) => {
 
               { label: 'New API', value: 'new-api' },
               { label: 'CherryIN', value: 'cherryin-type' },
+              { label: t('settings.provider.add.mistral_rs.type_label'), value: 'mistral-rs' },
               { label: 'Ollama', value: 'ollama' }
             ]}
           />
         </Form.Item>
+        {isMistralRs && (
+          <>
+            <Form.Item
+              label={t('settings.provider.add.mistral_rs.api_host')}
+              extra={
+                <Typography.Link href="https://github.com/EricLBuehler/mistral.rs" target="_blank" rel="noreferrer">
+                  {t('settings.provider.add.mistral_rs.docs_link')}
+                </Typography.Link>
+              }
+              style={{ marginBottom: 8 }}>
+              <Input
+                value={mistralRsApiHost}
+                onChange={(e) => setMistralRsApiHost(e.target.value)}
+                placeholder={t('settings.provider.add.mistral_rs.api_host_placeholder')}
+                spellCheck={false}
+              />
+            </Form.Item>
+            <Form.Item
+              label={t('settings.provider.add.mistral_rs.api_key')}
+              extra={t('settings.provider.add.mistral_rs.api_key_tip')}
+              style={{ marginBottom: 8 }}>
+              <Input.Password
+                value={mistralRsApiKey}
+                onChange={(e) => setMistralRsApiKey(e.target.value)}
+                placeholder={t('settings.provider.add.mistral_rs.api_key_placeholder')}
+                spellCheck={false}
+              />
+            </Form.Item>
+            <Form.Item
+              label={t('settings.provider.add.mistral_rs.model_id')}
+              extra={t('settings.provider.add.mistral_rs.model_id_tip')}
+              style={{ marginBottom: 0 }}>
+              <Input
+                value={mistralRsModelId}
+                onChange={(e) => setMistralRsModelId(e.target.value)}
+                placeholder={t('settings.provider.add.mistral_rs.model_id_placeholder')}
+                spellCheck={false}
+              />
+            </Form.Item>
+          </>
+        )}
       </Form>
     </Modal>
   )
@@ -316,12 +402,7 @@ export default class AddProviderPopup {
     TopView.hide('AddProviderPopup')
   }
   static show(provider?: Provider) {
-    return new Promise<{
-      name: string
-      type: ProviderType
-      logo?: string
-      logoFile?: File
-    }>((resolve) => {
+    return new Promise<AddProviderPopupResult>((resolve) => {
       TopView.show(
         <PopupContainer
           provider={provider}

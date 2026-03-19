@@ -112,7 +112,9 @@ const ApiOptionsSettings = ({ providerId }: Props) => {
       provider.type === 'openai' ||
       provider.type === 'openai-response' ||
       provider.type === 'azure-openai' ||
-      provider.type === 'azure-foundry'
+      provider.type === 'azure-foundry' ||
+      provider.type === 'openai-compatible' ||
+      provider.type === 'mistral-rs'
     ) {
       items.push(...openAIOptions)
     }

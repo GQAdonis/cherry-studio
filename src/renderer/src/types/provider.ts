@@ -15,6 +15,8 @@ export const ProviderTypeSchema = z.enum([
 
   'vertexai',
   'mistral',
+  /** Local mistral.rs HTTP server (OpenAI-compatible API); see https://github.com/EricLBuehler/mistral.rs */
+  'mistral-rs',
   'aws-bedrock',
   'vertex-anthropic',
   'new-api',

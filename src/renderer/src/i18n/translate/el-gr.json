@@ -5273,6 +5273,20 @@
     },
     "provider": {
       "add": {
+        "mistral_rs": {
+          "api_host": "[to be translated]:API base URL",
+          "api_host_placeholder": "[to be translated]:http://127.0.0.1:1234/v1",
+          "api_key": "[to be translated]:API key",
+          "api_key_placeholder": "[to be translated]:Optional — use any value if the server ignores it",
+          "api_key_tip": "[to be translated]:Many local mistral.rs servers do not validate keys; OpenAI-compatible clients still send Authorization.",
+          "default_name": "[to be translated]:mistral.rs",
+          "docs_link": "[to be translated]:mistral.rs documentation (GitHub)",
+          "model_group": "[to be translated]:mistral.rs",
+          "model_id": "[to be translated]:Model id",
+          "model_id_placeholder": "[to be translated]:e.g. google/gemma-3-4b-it",
+          "model_id_tip": "[to be translated]:Use the same id you passed to mistralrs serve -m (or the id shown under GET /v1/models).",
+          "type_label": "[to be translated]:mistral.rs (local OpenAI API)"
+        },
         "name": {
           "label": "Όνομα παρόχου",
           "placeholder": "π.χ. OpenAI"

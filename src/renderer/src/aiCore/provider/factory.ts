@@ -29,6 +29,8 @@ const logger = loggerService.withContext('ProviderFactory')
  */
 const STATIC_PROVIDER_MAPPING: Record<string, ProviderId> = {
   gemini: 'google', // Google Gemini -> google
+  /** Local mistral.rs serve — OpenAI-compatible HTTP API (@ai-sdk/openai-compatible). */
+  'mistral-rs': 'openai-compatible',
   'azure-openai': 'azure', // Azure OpenAI -> azure
   'azure-foundry': 'azure', // Azure AI Foundry -> azure (base mapping)
   'azure-foundry-openai': 'azure', // Azure Foundry OpenAI models -> azure
