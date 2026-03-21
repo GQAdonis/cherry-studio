@@ -33,6 +33,7 @@ Thumbs.db
 
 # Project
 node_modules
+.pnpm-store
 dist
 out
 mcp_server
@@ -58,12 +59,14 @@ local
 .claude-code-router/*
 .codebuddy/*
 .zed/*
+!.zed/settings.json.example
 CLAUDE.local.md
 
 # vitest
 coverage
 .vitest-cache
 vitest.config.*.timestamp-*
+.context/vitest-temp/
 
 # TypeScript incremental build
 .tsbuildinfo

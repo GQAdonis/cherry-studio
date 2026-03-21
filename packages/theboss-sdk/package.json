@@ -17,9 +17,7 @@
       "types": "./dist/webview.d.ts"
     }
   },
-  "files": [
-    "dist"
-  ],
+  "files": ["dist"],
   "scripts": {
     "build": "tsup",
     "dev": "tsup --watch",
@@ -27,13 +25,7 @@
     "lint": "biome lint src",
     "clean": "rimraf dist"
   },
-  "keywords": [
-    "cherry-studio",
-    "sdk",
-    "ai",
-    "mcp",
-    "integration"
-  ],
+  "keywords": ["cherry-studio", "sdk", "ai", "mcp", "integration"],
   "author": "Cherry Studio Team",
   "license": "MIT",
   "repository": {

@@ -22,6 +22,7 @@ import { memo, useCallback, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import styled from 'styled-components'
 
+import { useArtifactHtmxServer } from '../hooks/useArtifactHtmxServer'
 import ArtifactChatPanel from './ArtifactChatPanel'
 import ArtifactWorkspace from './ArtifactWorkspace'
 
@@ -36,6 +37,7 @@ const ArtifactModal: FC = () => {
   const activeArtifact = useAppSelector(selectActiveArtifact)
   const viewMode = useAppSelector(selectViewMode)
   const htmxServerPort = useAppSelector(selectHtmxServerPort)
+  useArtifactHtmxServer(activeArtifact?.type === 'htmx')
 
   // Handle close
   const handleClose = useCallback(() => {

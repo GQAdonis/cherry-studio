@@ -1,3 +1,4 @@
+import { getProviderByModel } from '@renderer/services/ProviderService'
 import type { Model } from '@renderer/types'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
@@ -8,6 +9,10 @@ import { isPureGenerateImageModel, isTextToImageModel } from '../vision'
 
 vi.mock('@renderer/hooks/useStore', () => ({
   getStoreProviders: vi.fn(() => [])
+}))
+
+vi.mock('@renderer/services/ProviderService', () => ({
+  getProviderByModel: vi.fn(() => undefined)
 }))
 
 vi.mock('@renderer/store', () => ({
@@ -71,6 +76,7 @@ const rerankMock = vi.mocked(isRerankModel)
 const pureImageMock = vi.mocked(isPureGenerateImageModel)
 const textToImageMock = vi.mocked(isTextToImageModel)
 const deepSeekHybridMock = vi.mocked(isDeepSeekHybridInferenceModel)
+const getProviderByModelMock = vi.mocked(getProviderByModel)
 
 describe('isFunctionCallingModel', () => {
   beforeEach(() => {
@@ -80,6 +86,7 @@ describe('isFunctionCallingModel', () => {
     pureImageMock.mockReturnValue(false)
     textToImageMock.mockReturnValue(false)
     deepSeekHybridMock.mockReturnValue(false)
+    getProviderByModelMock.mockReturnValue(undefined)
   })
 
   it('returns false when the model is undefined', () => {
@@ -113,6 +120,32 @@ describe('isFunctionCallingModel', () => {
 
   it('returns true for regex matches on standard providers', () => {
     expect(isFunctionCallingModel(createModel({ id: 'gpt-5' }))).toBe(true)
+  })
+
+  it('treats new-api chat endpoints as function calling by default', () => {
+    getProviderByModelMock.mockReturnValue({
+      id: 'new-api',
+      type: 'new-api'
+    } as any)
+
+    expect(isFunctionCallingModel(createModel({ id: 'custom-chat-model', endpoint_type: 'openai' as any }))).toBe(true)
+    expect(isFunctionCallingModel(createModel({ id: 'custom-chat-model', endpoint_type: 'anthropic' as any }))).toBe(
+      true
+    )
+  })
+
+  it('keeps non-chat new-api endpoints out of function calling', () => {
+    getProviderByModelMock.mockReturnValue({
+      id: 'new-api',
+      type: 'new-api'
+    } as any)
+
+    expect(
+      isFunctionCallingModel(createModel({ id: 'custom-image-model', endpoint_type: 'image-generation' as any }))
+    ).toBe(false)
+    expect(
+      isFunctionCallingModel(createModel({ id: 'custom-rerank-model', endpoint_type: 'jina-rerank' as any }))
+    ).toBe(false)
   })
 
   it('excludes explicitly blocked ids', () => {
@@ -152,6 +185,29 @@ describe('isFunctionCallingModel', () => {
     expect(isFunctionCallingModel(createModel({ id: 'qwen3.5-plus', provider: 'dashscope' }))).toBe(true)
     expect(isFunctionCallingModel(createModel({ id: 'qwen3.5-plus-2026-02-15', provider: 'dashscope' }))).toBe(true)
     expect(isFunctionCallingModel(createModel({ id: 'qwen3.5-397b-a17b', provider: 'dashscope' }))).toBe(true)
+  })
+
+  describe('MiniMax M2.x Models', () => {
+    it('supports minimax-m2 base model', () => {
+      expect(isFunctionCallingModel(createModel({ id: 'minimax-m2', provider: 'minimax' }))).toBe(true)
+    })
+
+    it('supports minimax-m2.1 model', () => {
+      expect(isFunctionCallingModel(createModel({ id: 'minimax-m2.1', provider: 'minimax' }))).toBe(true)
+    })
+
+    it('supports minimax-m2.7 model', () => {
+      expect(isFunctionCallingModel(createModel({ id: 'minimax-m2.7', provider: 'minimax' }))).toBe(true)
+    })
+
+    it('supports minimax-m2.7-highspeed model with suffix', () => {
+      expect(isFunctionCallingModel(createModel({ id: 'minimax-m2.7-highspeed', provider: 'minimax' }))).toBe(true)
+    })
+
+    it('supports MiniMax-M2.7 with capital letters', () => {
+      expect(isFunctionCallingModel(createModel({ id: 'MiniMax-M2.7', provider: 'minimax' }))).toBe(true)
+      expect(isFunctionCallingModel(createModel({ id: 'MiniMax-M2.7-highspeed', provider: 'minimax' }))).toBe(true)
+    })
   })
 
   describe('Doubao Seed 2.0 Models', () => {

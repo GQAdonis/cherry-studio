@@ -74,6 +74,35 @@ const EMPTY_ARTIFACT_BY_TYPE: Record<ArtifactType, ParsedArtifact> = {
     startIndex: 0,
     endIndex: 0
   },
+  a2ui: {
+    identifier: 'artifact-a2ui',
+    type: 'a2ui',
+    title: 'Untitled A2UI Artifact',
+    content: JSON.stringify(
+      {
+        version: 1,
+        type: 'page',
+        title: 'Untitled A2UI Artifact',
+        children: [
+          {
+            id: 'hero',
+            type: 'stack',
+            props: { gap: 4 },
+            children: [
+              { id: 'heading', type: 'heading', props: { level: 1, text: 'Untitled A2UI Artifact' } },
+              { id: 'copy', type: 'text', props: { text: 'Start ideating in structured UI form...' } },
+              { id: 'cta', type: 'button', props: { label: 'Primary action', variant: 'primary' } }
+            ]
+          }
+        ]
+      },
+      null,
+      2
+    ),
+    attributes: {},
+    startIndex: 0,
+    endIndex: 0
+  },
   svg: {
     identifier: 'artifact-svg',
     type: 'svg',
@@ -447,7 +476,7 @@ const ArtifactLibraryPage: FC = () => {
     }
   }
 
-  const typeOptions = ['html', 'xhtml', 'htmx', 'react', 'svg', 'mermaid', 'markdown', 'code']
+  const typeOptions = ['html', 'xhtml', 'htmx', 'react', 'a2ui', 'svg', 'mermaid', 'markdown', 'code']
 
   return (
     <Container>

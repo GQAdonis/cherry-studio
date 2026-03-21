@@ -14,6 +14,7 @@ import { useTheme } from '@renderer/context/ThemeProvider'
 import { ARTIFACT_STUDIO_AGENT_ID } from '@renderer/features/artifacts/services/ArtifactStudioRuntimeService'
 import { AgentSettingsPopup } from '@renderer/pages/settings/AgentSettings'
 import { useAppDispatch, useAppSelector } from '@renderer/store'
+import { sanitizeArtifactDependencies } from '@renderer/store/artifactDependencySanitizer'
 import {
   initialState,
   removeArtifactReactDependency,
@@ -205,7 +206,10 @@ const ArtifactSettings: FC = () => {
 
   // Convert dependencies to table data
   const dependencyData: DependencyRow[] = useMemo(() => {
-    const deps = safeSettings.react?.dependencies || {}
+    const deps = sanitizeArtifactDependencies(
+      safeSettings.react?.dependencies,
+      initialState.artifacts.react.dependencies
+    )
     return Object.entries(deps).map(([name, version]) => {
       // Find category for this dependency
       let category: string | undefined

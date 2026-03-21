@@ -20,7 +20,7 @@ import type { JSONSchema7 } from 'json-schema'
 /**
  * Supported artifact types for rendering (simple artifacts)
  */
-export type ArtifactType = 'html' | 'xhtml' | 'htmx' | 'react' | 'svg' | 'mermaid' | 'markdown' | 'code'
+export type ArtifactType = 'html' | 'xhtml' | 'htmx' | 'react' | 'a2ui' | 'svg' | 'mermaid' | 'markdown' | 'code'
 
 /**
  * PAS 4.1 Artifact kinds for rich application artifacts
@@ -144,6 +144,14 @@ export interface ArtifactMetadata {
   validation?: ArtifactValidationState
   /** Revision ancestry/provenance metadata */
   provenance?: ArtifactProvenance
+  /** A2UI schema version for structured UI artifacts */
+  a2uiSchemaVersion?: number
+  /** Preferred component catalog identifier for A2UI rendering */
+  a2uiComponentCatalog?: string
+  /** Supported export targets for this artifact */
+  exportTargets?: ArtifactExportTarget[]
+  /** Whether preview should stay live while streaming */
+  livePreview?: boolean
 }
 
 export interface ArtifactValidationState {
@@ -154,9 +162,42 @@ export interface ArtifactValidationState {
 
 export interface ArtifactProvenance {
   sourceArtifactId?: string
+  sourceProjectId?: string
   revisionParentId?: string
+  sourceRevisionId?: string
   revisionNumber?: number
+  forkedFromArtifactId?: string
+  forkedFromVersionId?: string
+  forkedAt?: string
   timestamp: string
+}
+
+export type ArtifactRefinementIntent = 'ideate' | 'fix' | 'extend'
+
+export interface ArtifactSelection {
+  selectedText?: string
+  startLine?: number
+  endLine?: number
+  nodeId?: string
+  summary?: string
+}
+
+export interface ArtifactDiagnosticSnapshot {
+  source: 'compiler' | 'runtime' | 'validation' | 'user'
+  severity: 'info' | 'warning' | 'error'
+  message: string
+  line?: number
+  column?: number
+  codeContext?: string
+  timestamp: string
+}
+
+export interface ArtifactExportTarget {
+  id: string
+  label: string
+  format: 'react' | 'htmx' | 'a2ui' | 'html' | 'package'
+  description?: string
+  recommended?: boolean
 }
 
 /**
@@ -289,6 +330,16 @@ export interface ArtifactVersion {
   chatMessageId?: string
   /** Chat messages snapshot at this version for navigation restore */
   chatSnapshot?: RefinementMessage[]
+  /** Parent version for linear or branched revision history */
+  parentVersionId?: string
+  /** Optional branch label for experimental work */
+  branchId?: string
+  /** Human-readable summary of the change */
+  summary?: string
+  /** Refinement intent that produced this version */
+  intent?: ArtifactRefinementIntent
+  /** Diagnostics that informed this revision */
+  diagnostics?: ArtifactDiagnosticSnapshot[]
 }
 
 /**
@@ -356,6 +407,12 @@ export interface RefinementMessage {
 
   /** Skill strategy used for this refinement */
   skillStrategy?: string
+  /** Refinement intent for this turn */
+  intent?: ArtifactRefinementIntent
+  /** Optional scoped selection for targeted edits */
+  selection?: ArtifactSelection
+  /** Diagnostics that were part of the request/response loop */
+  diagnostics?: ArtifactDiagnosticSnapshot[]
 }
 
 export interface RefinementSkillActivation {
@@ -460,6 +517,12 @@ export interface ArtifactProject {
   contextEnvelope?: ArtifactProjectContextEnvelope
   overridePolicy?: ArtifactProjectContextOverridePolicy
   lastRunSummary?: string
+  rootArtifactId?: string
+  headArtifactId?: string
+  forkedFromProjectId?: string
+  forkedFromArtifactId?: string
+  forkedFromVersionId?: string
+  preferredOutputType?: 'react' | 'htmx' | 'a2ui'
 }
 
 /**
@@ -475,6 +538,9 @@ export interface ArtifactStudioSession {
   refinementMessages?: RefinementMessage[]
   versionHistory?: ArtifactVersion[]
   currentVersionIndex?: number
+  activeIntent?: ArtifactRefinementIntent
+  selection?: ArtifactSelection
+  diagnostics?: ArtifactDiagnosticSnapshot[]
   updatedAt: string
 }
 
@@ -488,6 +554,9 @@ export interface ArtifactPackageManifest {
   runtimeProfile: ArtifactRuntimeProfile
   dependencies: Record<string, string>
   artifactVersion: number
+  artifactVersionId?: string
+  selectedExportTarget?: string
+  exportTargets?: ArtifactExportTarget[]
   createdAt: string
   updatedAt: string
   provenance?: ArtifactProvenance
@@ -658,6 +727,8 @@ export interface ArtifactsState {
   autoFixAttempts: number
   /** Version history for active artifact */
   versionHistory: ArtifactVersion[]
+  /** Snapshot of the latest editable head revision */
+  headArtifactSnapshot: ArtifactVersion | null
   /** Current version index (for undo/redo) */
   currentVersionIndex: number
   /** Whether artifact content is being loaded */
@@ -678,6 +749,12 @@ export interface ArtifactsState {
   activeProjectContextEnvelope: ArtifactProjectContextEnvelope | null
   /** Effective context after precedence resolution */
   activeProjectResolvedContext: ArtifactProjectRuntimeResolvedContext | null
+  /** Active refinement intent for the current turn */
+  activeRefinementIntent: ArtifactRefinementIntent | null
+  /** Scoped selection used for targeted fixes */
+  activeSelection: ArtifactSelection | null
+  /** Latest diagnostics available to the refinement loop */
+  latestDiagnostics: ArtifactDiagnosticSnapshot[]
 }
 
 /** Context message for artifact refinement */
@@ -710,14 +787,18 @@ export const DEFAULT_ARTIFACT_METADATA: ArtifactMetadata = {
   htmxAllowedAttributes: ['hx-get', 'hx-post', 'hx-put', 'hx-delete', 'hx-patch', 'hx-trigger', 'hx-target', 'hx-swap'],
   customStyles: undefined,
   width: undefined,
-  height: undefined
+  height: undefined,
+  a2uiSchemaVersion: 1,
+  a2uiComponentCatalog: 'cherry-default',
+  exportTargets: [],
+  livePreview: true
 }
 
 /**
  * Type guard to check if a string is a valid ArtifactType
  */
 export function isValidArtifactType(type: string): type is ArtifactType {
-  return ['html', 'xhtml', 'htmx', 'react', 'svg', 'mermaid', 'markdown', 'code'].includes(type)
+  return ['html', 'xhtml', 'htmx', 'react', 'a2ui', 'svg', 'mermaid', 'markdown', 'code'].includes(type)
 }
 
 /**
@@ -731,6 +812,8 @@ export function getArtifactExtension(type: ArtifactType, language?: string): str
       return type === 'xhtml' ? 'xhtml' : 'html'
     case 'react':
       return 'tsx'
+    case 'a2ui':
+      return 'json'
     case 'svg':
       return 'svg'
     case 'mermaid':
@@ -756,6 +839,8 @@ export function getArtifactMimeType(type: ArtifactType): string {
       return 'application/xhtml+xml'
     case 'react':
       return 'text/javascript'
+    case 'a2ui':
+      return 'application/json'
     case 'svg':
       return 'image/svg+xml'
     case 'mermaid':

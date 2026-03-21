@@ -16,7 +16,6 @@ import { isSystemProvider, type Model, type Provider, SystemProviderIds } from '
 import type { OpenAICompletionsStreamOptions } from '@renderer/types/aiCoreTypes'
 import {
   formatApiHost,
-  formatAzureFoundryApiHost,
   formatAzureOpenAIApiHost,
   formatOllamaApiHost,
   formatVertexApiHost,
@@ -45,6 +44,17 @@ import { azureAnthropicProviderCreator } from './config/azure-anthropic'
 import { azureFoundryProviderCreator } from './config/azure-foundry'
 import { COPILOT_DEFAULT_HEADERS } from './constants'
 import { getAiSdkProviderId, getModelAwareAiSdkProviderId } from './factory'
+
+function formatAzureFoundryApiHost(host: string): string {
+  return formatApiHost(
+    host
+      .replace(/\/v1$/, '')
+      .replace(/\/openai$/, '')
+      .replace(/\/anthropic\/v1$/, '')
+      .replace(/\/models$/, ''),
+    false
+  )
+}
 
 /**
  * 处理特殊provider的转换逻辑
@@ -83,8 +93,13 @@ function handleSpecialProviders(model: Model, provider: Provider): Provider {
  * @param provider - The provider whose API host is to be formatted.
  * @returns A new provider instance with the formatted API host.
  */
+// WARNING: if any changes are made here, please sync it to src/main/aiCore/provider/providerConfig.ts:formatProviderApiHost
 export function formatProviderApiHost(provider: Provider): Provider {
-  const formatted = { ...provider }
+  const formatted = { ...provider } as Provider & {
+    apiHost: string
+    anthropicApiHost?: string
+    openaiApiHost?: string
+  }
   const appendApiVersion = !isWithTrailingSharp(provider.apiHost)
   if (formatted.anthropicApiHost) {
     formatted.anthropicApiHost = formatApiHost(formatted.anthropicApiHost, appendApiVersion)

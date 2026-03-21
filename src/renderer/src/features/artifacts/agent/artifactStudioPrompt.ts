@@ -12,7 +12,13 @@
  * - Includes error-fix protocol for compilation failures
  */
 
-import type { Artifact, ArtifactType } from '../types'
+import type {
+  Artifact,
+  ArtifactDiagnosticSnapshot,
+  ArtifactRefinementIntent,
+  ArtifactSelection,
+  ArtifactType
+} from '../types'
 
 // ── Prompt builder ──────────────────────────────────────────────────────────
 
@@ -138,6 +144,8 @@ COMPILATION ERROR:
 5. **Accessibility**: Semantic HTML, ARIA labels, keyboard navigation
 6. **Self-Contained**: No external images or scripts — everything must be inline
 7. **Preserve Existing Functionality**: When refining, don't break working features
+8. **Follow Request Intent**: Each request will specify whether it is ideation, a fix, or an extension. Match your response scope to that intent.
+9. **Respect Selection Scope**: If a request includes a selected region or node, focus your update there unless the diagnostics prove a broader fix is required.
 </quality_guidelines>`
 }
 
@@ -185,6 +193,23 @@ export default function App({ initial = 0 }: CounterProps): React.JSX.Element {
   );
 }
 \`\`\`
+</type_instructions>`
+
+    case 'a2ui':
+      return `<type_instructions>
+### A2UI / Structured UI Schema
+
+- Output valid JSON only inside the \`<cs-studio-code>\` block
+- The root shape must be:
+  \`{ "version": 1, "type": "page", "title": string, "children": [] }\`
+- Use only Cherry-supported node types:
+  \`page\`, \`stack\`, \`grid\`, \`card\`, \`heading\`, \`text\`, \`button\`, \`input\`, \`badge\`, \`divider\`, \`list\`
+- Each node may contain:
+  - \`id\`: string
+  - \`props\`: object
+  - \`children\`: array of nodes
+- Prefer semantic props like \`variant\`, \`label\`, \`value\`, \`placeholder\`, \`columns\`, \`gap\`
+- This mode is for ideation-grade UI structure, not arbitrary JavaScript execution
 </type_instructions>`
 
     case 'html':
@@ -275,6 +300,8 @@ export function getLanguageForType(type: ArtifactType): string {
       return 'html'
     case 'react':
       return 'tsx'
+    case 'a2ui':
+      return 'json'
     case 'svg':
       return 'xml'
     case 'mermaid':
@@ -303,6 +330,52 @@ export function buildArtifactStudioContext(artifact: Artifact): string {
 \`\`\`${lang}
 ${artifact.content}
 \`\`\``
+}
+
+export function buildArtifactRefinementRequestMessage(params: {
+  artifact: Artifact
+  request: string
+  intent: ArtifactRefinementIntent
+  selection?: ArtifactSelection | null
+  diagnostics?: ArtifactDiagnosticSnapshot[]
+  contextMessages?: Array<{ role: 'user' | 'assistant' | 'system'; content: string }>
+}): string {
+  const { artifact, request, intent, selection, diagnostics = [], contextMessages = [] } = params
+  const diagnosticsBlock =
+    diagnostics.length > 0
+      ? `\n## Diagnostics\n${diagnostics
+          .map((entry) => {
+            const position =
+              entry.line !== undefined
+                ? ` (line ${entry.line}${entry.column !== undefined ? `, column ${entry.column}` : ''})`
+                : ''
+            const codeContext = entry.codeContext ? `\nCode context:\n${entry.codeContext}` : ''
+            return `- [${entry.source}/${entry.severity}] ${entry.message}${position}${codeContext}`
+          })
+          .join('\n')}`
+      : ''
+
+  const selectionBlock = selection
+    ? `\n## Selection Scope\n- Summary: ${selection.summary || 'Target the selected region first'}\n- Selected text: ${
+        selection.selectedText || 'N/A'
+      }\n- Start line: ${selection.startLine ?? 'N/A'}\n- End line: ${selection.endLine ?? 'N/A'}\n- Node ID: ${
+        selection.nodeId || 'N/A'
+      }`
+    : ''
+
+  const contextBlock =
+    contextMessages.length > 0
+      ? `\n## Conversation Context\n${contextMessages.map((msg) => `${msg.role.toUpperCase()}: ${msg.content}`).join('\n\n')}`
+      : ''
+
+  return `${buildArtifactStudioContext(artifact)}
+## Request Intent
+${intent.toUpperCase()}
+
+## User Request
+${request}${selectionBlock}${diagnosticsBlock}${contextBlock}
+
+Please return the complete updated artifact using the required <cs-studio-code> protocol.`
 }
 
 /**

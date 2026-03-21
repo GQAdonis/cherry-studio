@@ -179,64 +179,30 @@ artifactBuildCompleted: scripts/artifact-build-completed.js
 releaseInfo:
   releaseNotes: |
     <!--LANG:en-->
-    Cherry Studio 1.7.25 - Security & Stability
-
-    ✨ New Features
-    - [Web Search] Add Querit search provider (1,000 free requests for new users)
-    - [Provider] Add MiniMax Global and Z.ai providers
-    - [Mini Apps] Add MiniMax Agent and IMA mini apps
-    - [Provider] Add agent support filter in provider settings
-    - [Agent] Add custom environment variables support
-    - [Models] Add GPT-5.4 support
+    Cherry Studio 1.8.2 - Bug Fixes and Model Updates
 
     🐛 Bug Fixes
-    - [Security] Built-in filesystem MCP now requires manual approval for write/edit/delete operations
-    - [Security] Fix MCP hub mode bypassing tool permission checks
-    - [Security] Remove auto-execution countdown - tools now wait for user confirmation
-    - [Agent] Fix tool status not stopping when aborting on Windows
-    - [Chat] Fix auto backup interrupting streaming responses
-    - [Chat] Fix topic renaming errors with image-capable models
-    - [UI] Fix "Move To" submenu overflow with long assistant lists
-    - [Editor] Render SVG code blocks as previews
-    - [Models] Fix Gemini 3 and Qwen 3.5 reasoning parameter issues
-    - [xAI] Upgrade to new Responses API with X/Twitter search support
-    - [API Server] Fix tool calling message validation
-    - [Plugins] Fix install/uninstall button state issues
-    - [Update] Fix update dialog not showing on manual check
-    - [Update] Prevent unexpected auto-updates on app quit
+    - [Knowledge Base] Fix knowledge base content not being delivered to the model when selected in conversation
+    - [Search] Fix crash when clicking topic title in message search results
+    - [Backup] Fix backup restoration path issue
+
+    ✨ New Features
+    - [Models] Add support for Xiaomi MiMo-V2-Pro and MiMo-V2-Omni models with reasoning control and tool use capabilities
 
     💄 Improvements
-    - [Provider] Improve agent model selector ordering and highlighting
-    - [MCP] Add system notifications when tool approval is required
+    - [Models] Upgrade MiniMax default model to M2.7 with enhanced reasoning and coding capabilities
 
     <!--LANG:zh-CN-->
-    Cherry Studio 1.7.25 - 安全与稳定性
-
-    ✨ 新功能
-    - [网络搜索] 新增 Querit 搜索引擎（新用户 1,000 次免费请求）
-    - [服务商] 新增 MiniMax Global 和 Z.ai 服务商
-    - [小程序] 新增 MiniMax Agent 和 IMA 小程序
-    - [服务商] 添加智能体支持筛选器
-    - [智能体] 支持自定义环境变量配置
-    - [模型] 新增 GPT-5.4 支持
+    Cherry Studio 1.8.2 - 错误修复和模型更新
 
     🐛 问题修复
-    - [安全] 内置文件系统 MCP 的写入/编辑/删除操作现需手动批准
-    - [安全] 修复 MCP Hub 模式绕过工具权限检查的问题
-    - [安全] 移除自动执行倒计时 - 工具现在等待用户确认
-    - [智能体] 修复 Windows 上中止时工具状态未停止的问题
-    - [对话] 修复自动备份中断流式响应的问题
-    - [对话] 修复使用图像模型时话题重命名出错的问题
-    - [UI] 修复助手列表过长时"移动到"子菜单溢出
-    - [编辑器] SVG 代码块现在显示为预览图
-    - [模型] 修复 Gemini 3 和 Qwen 3.5 推理参数问题
-    - [xAI] 升级到新版 Responses API，支持 X/Twitter 搜索
-    - [API 服务] 修复工具调用消息验证问题
-    - [插件] 修复安装/卸载按钮状态问题
-    - [更新] 修复手动检查更新时对话框不显示的问题
-    - [更新] 防止退出应用时意外自动更新
+    - [知识库] 修复选中知识库时内容未传递给模型的问题
+    - [搜索] 修复点击消息搜索结果中的主题标题时崩溃的问题
+    - [备份] 修复备份恢复路径问题
+
+    ✨ 新功能
+    - [模型] 新增小米 MiMo-V2-Pro 和 MiMo-V2-Omni 模型支持，支持推理控制和工具调用功能
 
     💄 改进
-    - [服务商] 优化智能体模型选择器排序和高亮
-    - [MCP] 工具需要批准时发送系统通知
+    - [模型] 升级 MiniMax 默认模型至 M2.7，增强推理和代码能力
     <!--LANG:END-->

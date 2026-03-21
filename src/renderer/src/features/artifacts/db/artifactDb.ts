@@ -10,6 +10,7 @@ import { Dexie, type EntityTable } from 'dexie'
 
 import {
   type Artifact,
+  type ArtifactDiagnosticSnapshot,
   type ArtifactKind,
   type ArtifactLibraryItem,
   type ArtifactMetadata,
@@ -19,8 +20,10 @@ import {
   type ArtifactProjectCreatedFrom,
   type ArtifactProjectStatus,
   type ArtifactReference,
+  type ArtifactRefinementIntent,
   type ArtifactRuntimeProfile,
   type ArtifactSchema,
+  type ArtifactSelection,
   ArtifactStatus,
   type ArtifactStudioSession,
   type ArtifactType,
@@ -78,6 +81,11 @@ export interface ArtifactVersionRecord {
   refinementPrompt?: string
   metadata?: Partial<ArtifactMetadata>
   chatSnapshot?: RefinementMessage[]
+  parentVersionId?: string
+  branchId?: string
+  summary?: string
+  intent?: ArtifactRefinementIntent
+  diagnostics?: ArtifactDiagnosticSnapshot[]
 }
 
 export interface ArtifactProjectRecord {
@@ -98,6 +106,12 @@ export interface ArtifactProjectRecord {
   contextEnvelope?: ArtifactProjectContextEnvelope
   overridePolicy?: ArtifactProjectContextOverridePolicy
   lastRunSummary?: string
+  rootArtifactId?: string
+  headArtifactId?: string
+  forkedFromProjectId?: string
+  forkedFromArtifactId?: string
+  forkedFromVersionId?: string
+  preferredOutputType?: 'react' | 'htmx' | 'a2ui'
 }
 
 export interface ArtifactStudioSessionRecord {
@@ -110,6 +124,9 @@ export interface ArtifactStudioSessionRecord {
   refinementMessages?: RefinementMessage[]
   versionHistory?: ArtifactVersion[]
   currentVersionIndex?: number
+  activeIntent?: ArtifactRefinementIntent
+  selection?: ArtifactSelection
+  diagnostics?: ArtifactDiagnosticSnapshot[]
   updatedAt: string
 }
 
@@ -222,6 +239,58 @@ class ArtifactDatabase extends Dexie {
               session.currentVersionIndex = -1
             }
           })
+      })
+
+    // Version 6: revision lineage, fork metadata, and scoped refinement diagnostics
+    this.version(6)
+      .stores({
+        artifacts:
+          'id, identifier, conversationId, messageId, type, kind, saved, starred, updatedAt, usageCount, *tags, [conversationId+messageId]',
+        artifactVersions: 'id, artifactId, version, branchId, intent, [artifactId+version]',
+        artifactProjects:
+          'id, updatedAt, source, artifactType, artifactId, headArtifactId, status, createdFrom, preferredOutputType',
+        artifactStudioSessions: 'id, projectId, artifactId, activeIntent, updatedAt'
+      })
+      .upgrade((tx) => {
+        return Promise.all([
+          tx
+            .table('artifactProjects')
+            .toCollection()
+            .modify((project: ArtifactProjectRecord) => {
+              if (!project.rootArtifactId) {
+                project.rootArtifactId = project.artifactId
+              }
+              if (!project.headArtifactId) {
+                project.headArtifactId = project.artifactId
+              }
+              if (!project.preferredOutputType) {
+                project.preferredOutputType =
+                  project.artifactType === 'htmx' ? 'htmx' : project.artifactType === 'a2ui' ? 'a2ui' : 'react'
+              }
+            }),
+          tx
+            .table('artifactStudioSessions')
+            .toCollection()
+            .modify((session: ArtifactStudioSessionRecord) => {
+              if (!session.activeIntent) {
+                session.activeIntent = 'extend'
+              }
+              if (!Array.isArray(session.diagnostics)) {
+                session.diagnostics = []
+              }
+            }),
+          tx
+            .table('artifactVersions')
+            .toCollection()
+            .modify((version: ArtifactVersionRecord) => {
+              if (!version.intent) {
+                version.intent = 'extend'
+              }
+              if (!Array.isArray(version.diagnostics)) {
+                version.diagnostics = []
+              }
+            })
+        ])
       })
   }
 }
@@ -550,7 +619,12 @@ export async function saveArtifactVersion(version: ArtifactVersion): Promise<voi
     createdAt: version.createdAt,
     refinementPrompt: version.refinementPrompt,
     metadata: version.metadata,
-    chatSnapshot: version.chatSnapshot
+    chatSnapshot: version.chatSnapshot,
+    parentVersionId: version.parentVersionId,
+    branchId: version.branchId,
+    summary: version.summary,
+    intent: version.intent,
+    diagnostics: version.diagnostics
   }
 
   await db.artifactVersions.put(record)
@@ -625,6 +699,11 @@ export function createArtifactVersion(params: {
   refinementPrompt?: string
   metadata?: Partial<ArtifactMetadata>
   chatSnapshot?: RefinementMessage[]
+  parentVersionId?: string
+  branchId?: string
+  summary?: string
+  intent?: ArtifactRefinementIntent
+  diagnostics?: ArtifactDiagnosticSnapshot[]
 }): ArtifactVersion {
   return {
     id: nanoid(),
@@ -634,7 +713,12 @@ export function createArtifactVersion(params: {
     createdAt: new Date().toISOString(),
     refinementPrompt: params.refinementPrompt,
     metadata: params.metadata,
-    chatSnapshot: params.chatSnapshot
+    chatSnapshot: params.chatSnapshot,
+    parentVersionId: params.parentVersionId,
+    branchId: params.branchId,
+    summary: params.summary,
+    intent: params.intent,
+    diagnostics: params.diagnostics
   }
 }
 
@@ -688,6 +772,14 @@ export async function saveArtifactProject(project: ArtifactProject): Promise<voi
     contextEnvelope: serializeContextEnvelope(project.contextEnvelope),
     overridePolicy: project.overridePolicy,
     lastRunSummary: project.lastRunSummary,
+    rootArtifactId: project.rootArtifactId || project.artifactId,
+    headArtifactId: project.headArtifactId || project.artifactId,
+    forkedFromProjectId: project.forkedFromProjectId,
+    forkedFromArtifactId: project.forkedFromArtifactId,
+    forkedFromVersionId: project.forkedFromVersionId,
+    preferredOutputType:
+      project.preferredOutputType ||
+      (project.artifactType === 'htmx' ? 'htmx' : project.artifactType === 'a2ui' ? 'a2ui' : 'react'),
     updatedAt: new Date().toISOString()
   })
 }
@@ -727,6 +819,12 @@ export async function updateArtifactProject(
       ? serializeContextEnvelope(updates.contextEnvelope)
       : current.contextEnvelope,
     overridePolicy: updates.overridePolicy || current.overridePolicy,
+    rootArtifactId: updates.rootArtifactId || current.rootArtifactId,
+    headArtifactId: updates.headArtifactId || current.headArtifactId,
+    forkedFromProjectId: updates.forkedFromProjectId || current.forkedFromProjectId,
+    forkedFromArtifactId: updates.forkedFromArtifactId || current.forkedFromArtifactId,
+    forkedFromVersionId: updates.forkedFromVersionId || current.forkedFromVersionId,
+    preferredOutputType: updates.preferredOutputType || current.preferredOutputType,
     updatedAt: new Date().toISOString()
   }
 
@@ -749,19 +847,90 @@ export async function cloneArtifactProject(sourceProjectId: string, title?: stri
     return null
   }
 
+  const db = getArtifactDb()
   const now = new Date().toISOString()
   const id = `studio-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`
-  const cloned: ArtifactProject = {
-    ...source,
-    id,
-    title: title || `${source.title} Copy`,
-    status: 'active',
-    createdFrom: source.createdFrom || 'legacy',
-    createdAt: now,
-    updatedAt: now
-  }
-  await saveArtifactProject(cloned)
-  return cloned
+
+  return db.transaction(
+    'rw',
+    [db.artifacts, db.artifactVersions, db.artifactProjects, db.artifactStudioSessions],
+    async () => {
+      const sourceArtifact = source.artifactId ? await getArtifact(source.artifactId) : null
+      const sourceVersions = source.artifactId ? await getArtifactVersions(source.artifactId) : []
+      const sourceSession = await getArtifactStudioSession(sourceProjectId)
+
+      let clonedArtifactId = source.artifactId
+      if (sourceArtifact) {
+        clonedArtifactId = nanoid()
+        const clonedArtifact: Artifact = {
+          ...sourceArtifact,
+          id: clonedArtifactId,
+          title: title || `${sourceArtifact.title} Copy`,
+          updatedAt: now,
+          artifactProjectId: id,
+          metadata: {
+            ...sourceArtifact.metadata,
+            artifactProjectId: id,
+            provenance: {
+              ...sourceArtifact.metadata.provenance,
+              sourceArtifactId: sourceArtifact.id,
+              sourceProjectId: sourceProjectId,
+              forkedFromArtifactId: sourceArtifact.id,
+              forkedFromVersionId: sourceVersions.at(-1)?.id,
+              forkedAt: now,
+              timestamp: now
+            }
+          }
+        }
+        await saveArtifact(clonedArtifact)
+
+        for (const version of sourceVersions) {
+          await saveArtifactVersion({
+            ...version,
+            id: nanoid(),
+            artifactId: clonedArtifactId,
+            parentVersionId: version.parentVersionId,
+            diagnostics: version.diagnostics || [],
+            intent: version.intent || 'extend'
+          })
+        }
+      }
+
+      const cloned: ArtifactProject = {
+        ...source,
+        id,
+        title: title || `${source.title} Copy`,
+        artifactId: clonedArtifactId,
+        headArtifactId: clonedArtifactId,
+        rootArtifactId: source.rootArtifactId || source.artifactId || clonedArtifactId,
+        forkedFromProjectId: source.id,
+        forkedFromArtifactId: source.artifactId,
+        forkedFromVersionId: sourceVersions.at(-1)?.id,
+        status: 'active',
+        createdFrom: source.createdFrom || 'legacy',
+        createdAt: now,
+        updatedAt: now
+      }
+      await saveArtifactProject(cloned)
+
+      if (sourceSession && clonedArtifactId) {
+        await upsertArtifactStudioSession({
+          ...sourceSession,
+          id: `session-${id}`,
+          projectId: id,
+          artifactId: clonedArtifactId,
+          versionHistory: (sourceSession.versionHistory || []).map((version) => ({
+            ...version,
+            id: nanoid(),
+            artifactId: clonedArtifactId
+          })),
+          updatedAt: now
+        })
+      }
+
+      return cloned
+    }
+  )
 }
 
 export async function upsertArtifactStudioSession(session: ArtifactStudioSession): Promise<void> {
@@ -771,6 +940,9 @@ export async function upsertArtifactStudioSession(session: ArtifactStudioSession
     refinementMessages: session.refinementMessages || [],
     versionHistory: session.versionHistory || [],
     currentVersionIndex: session.currentVersionIndex ?? -1,
+    activeIntent: session.activeIntent || 'extend',
+    selection: session.selection,
+    diagnostics: session.diagnostics || [],
     updatedAt: new Date().toISOString()
   })
 }
@@ -818,7 +990,12 @@ function recordToVersion(record: ArtifactVersionRecord): ArtifactVersion {
     createdAt: record.createdAt,
     refinementPrompt: record.refinementPrompt,
     metadata: record.metadata,
-    chatSnapshot: record.chatSnapshot
+    chatSnapshot: record.chatSnapshot,
+    parentVersionId: record.parentVersionId,
+    branchId: record.branchId,
+    summary: record.summary,
+    intent: record.intent,
+    diagnostics: record.diagnostics
   }
 }
 
@@ -840,7 +1017,13 @@ function projectRecordToProject(record: ArtifactProjectRecord): ArtifactProject 
     createdFrom: record.createdFrom || 'legacy',
     contextEnvelope: deserializeContextEnvelope(record.contextEnvelope),
     overridePolicy: record.overridePolicy,
-    lastRunSummary: record.lastRunSummary
+    lastRunSummary: record.lastRunSummary,
+    rootArtifactId: record.rootArtifactId,
+    headArtifactId: record.headArtifactId,
+    forkedFromProjectId: record.forkedFromProjectId,
+    forkedFromArtifactId: record.forkedFromArtifactId,
+    forkedFromVersionId: record.forkedFromVersionId,
+    preferredOutputType: record.preferredOutputType
   }
 }
 
@@ -855,6 +1038,9 @@ function studioSessionRecordToSession(record: ArtifactStudioSessionRecord): Arti
     refinementMessages: record.refinementMessages || [],
     versionHistory: record.versionHistory || [],
     currentVersionIndex: record.currentVersionIndex ?? -1,
+    activeIntent: record.activeIntent || 'extend',
+    selection: record.selection,
+    diagnostics: record.diagnostics || [],
     updatedAt: record.updatedAt
   }
 }

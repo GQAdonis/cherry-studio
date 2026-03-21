@@ -8,7 +8,7 @@ import { getEmbeddingMaxContext } from '@renderer/config/embedings'
 import { REFERENCE_PROMPT } from '@renderer/config/prompts'
 import { addSpan, endSpan } from '@renderer/services/SpanManagerService'
 import store from '@renderer/store'
-import type { Assistant, Message } from '@renderer/types'
+import type { Assistant, Message, Provider } from '@renderer/types'
 import {
   type FileMetadata,
   type KnowledgeBase,
@@ -49,7 +49,7 @@ export const getKnowledgeBaseParams = (base: KnowledgeBase): KnowledgeBaseParams
       }
     : base.preprocessProvider
 
-  const actualProvider = aiProvider.getActualProvider()
+  const actualProvider = aiProvider.getActualProvider() as Provider
 
   let { baseURL } = routeToEndpoint(actualProvider.apiHost)
 

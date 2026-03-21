@@ -26,7 +26,21 @@ const MAX_AUTO_FIX_ATTEMPTS = 3
 
 interface UseCompilationErrorHandlerOptions {
   /** Callback to send a follow-up message to the agent */
-  onSendAutoFix?: (message: string) => void
+  onSendAutoFix?: (
+    message: string,
+    options?: {
+      intent: 'fix'
+      diagnostics: Array<{
+        source: 'compiler'
+        severity: 'error'
+        message: string
+        line?: number
+        column?: number
+        codeContext?: string
+        timestamp: string
+      }>
+    }
+  ) => void
   /** Whether auto-fix is enabled (default: true) */
   autoFixEnabled?: boolean
 }
@@ -89,7 +103,20 @@ export function useCompilationErrorHandler(
 
         // Small delay to let the error state render before sending the fix message
         setTimeout(() => {
-          onSendAutoFix(errorMessage)
+          onSendAutoFix(errorMessage, {
+            intent: 'fix',
+            diagnostics: [
+              {
+                source: 'compiler',
+                severity: 'error',
+                message: error.message,
+                line: error.line,
+                column: error.column,
+                codeContext: error.codeContext,
+                timestamp: new Date().toISOString()
+              }
+            ]
+          })
           isAutoFixingRef.current = false
         }, 500)
       }

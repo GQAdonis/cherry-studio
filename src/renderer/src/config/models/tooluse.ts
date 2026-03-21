@@ -1,6 +1,8 @@
+import { getProviderByModel } from '@renderer/services/ProviderService'
 import type { Model } from '@renderer/types'
 import { isSystemProviderId } from '@renderer/types'
 import { getLowerBaseModelName, isUserSelectedModelType } from '@renderer/utils'
+import { isNewApiProvider } from '@renderer/utils/provider'
 
 import { isEmbeddingModel, isRerankModel } from './embedding'
 import { isDeepSeekHybridInferenceModel } from './reasoning'
@@ -34,8 +36,10 @@ export const FUNCTION_CALLING_MODELS = [
   'kimi-k2(?:-[\\w-]+)?',
   'ling-\\w+(?:-[\\w-]+)?',
   'ring-\\w+(?:-[\\w-]+)?',
-  'minimax-m2',
-  'mimo-v2-flash'
+  'minimax-m2(?:\\.\\d+)?(?:-[\\w-]+)?',
+  'mimo-v2-flash',
+  'mimo-v2-pro',
+  'mimo-v2-omni'
 ] as const
 
 const FUNCTION_CALLING_EXCLUDED_MODELS = [
@@ -65,9 +69,14 @@ export function isFunctionCallingModel(model?: Model): boolean {
   }
 
   const modelId = getLowerBaseModelName(model.id)
+  const provider = getProviderByModel(model)
 
   if (isUserSelectedModelType(model, 'function_calling') !== undefined) {
     return isUserSelectedModelType(model, 'function_calling')!
+  }
+
+  if (provider && isNewApiProvider(provider)) {
+    return model.endpoint_type !== 'image-generation' && model.endpoint_type !== 'jina-rerank'
   }
 
   if (model.provider === 'doubao' || modelId.includes('doubao')) {

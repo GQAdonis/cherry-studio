@@ -5,6 +5,7 @@
  * Listens for IPC events and routes actions to appropriate handlers.
  */
 
+import { loggerService } from '@logger'
 import KnowledgeBaseSelectorPopup from '@renderer/components/MinApp/KnowledgeBaseSelector'
 import { getKnowledgeBaseParams } from '@renderer/services/KnowledgeService'
 import type { KnowledgeBase, KnowledgeItem } from '@renderer/types'
@@ -30,6 +31,8 @@ interface RootState {
     bases: KnowledgeBase[]
   }
 }
+
+const logger = loggerService.withContext('useMinAppContextActions')
 
 export function useMinAppContextActions() {
   const navigate = useNavigate()
@@ -57,7 +60,7 @@ export function useMinAppContextActions() {
       })
       return true
     } catch (error) {
-      console.error('Failed to add to knowledge base:', error)
+      logger.error('Failed to add to knowledge base', error as Error)
       return false
     }
   }, [])
@@ -153,7 +156,7 @@ export function useMinAppContextActions() {
       await navigator.clipboard.writeText(noteContent)
       message.success('Note copied to clipboard')
     } catch (error) {
-      console.error('Failed to save note:', error)
+      logger.error('Failed to save note', error as Error)
       message.error('Failed to save note')
     }
   }, [])
@@ -220,7 +223,7 @@ export function useMinAppContextActions() {
           message.success('Page content sent to chat')
         }
       } catch (error) {
-        console.error('Failed to extract page:', error)
+        logger.error('Failed to extract page', error as Error)
         message.destroy()
         message.error('Failed to extract page content')
       }
@@ -309,7 +312,7 @@ export function useMinAppContextActions() {
           }
         }
       } catch (error) {
-        console.error('Failed to extract conversations:', error)
+        logger.error('Failed to extract conversations', error as Error)
         message.destroy()
         message.error('Failed to extract conversations')
       }
@@ -342,7 +345,7 @@ export function useMinAppContextActions() {
           handleExtractConversations(payload)
           break
         default:
-          console.warn('Unknown context menu action:', payload.action)
+          logger.warn('Unknown context menu action', { action: payload.action })
       }
     },
     [handleSendToChat, handleSendToKB, handleAskAbout, handleSaveAsNote, handleExtractPage, handleExtractConversations]

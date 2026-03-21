@@ -20,6 +20,11 @@ import {
   ARTIFACT_STUDIO_RUNTIME_ERROR_CODES,
   isArtifactStudioRuntimeError
 } from '@renderer/features/artifacts/services/ArtifactStudioRuntimeService'
+import type {
+  ArtifactDiagnosticSnapshot,
+  ArtifactRefinementIntent,
+  ArtifactSelection
+} from '@renderer/features/artifacts/types'
 import { AgentSettingsPopup } from '@renderer/pages/settings/AgentSettings'
 import { message, Tooltip } from 'antd'
 import { Bot, Sparkles, X } from 'lucide-react'
@@ -38,7 +43,16 @@ interface AttachedImage {
 
 interface ArtifactChatPanelProps {
   artifact: Artifact
-  onSendRefinementReady?: (sendRefinement: (prompt: string) => Promise<void>) => void
+  onSendRefinementReady?: (
+    sendRefinement: (
+      prompt: string,
+      options?: {
+        intent?: ArtifactRefinementIntent
+        selection?: ArtifactSelection | null
+        diagnostics?: ArtifactDiagnosticSnapshot[]
+      }
+    ) => Promise<void>
+  ) => void
 }
 
 const ArtifactChatPanel: FC<ArtifactChatPanelProps> = ({ artifact, onSendRefinementReady }) => {

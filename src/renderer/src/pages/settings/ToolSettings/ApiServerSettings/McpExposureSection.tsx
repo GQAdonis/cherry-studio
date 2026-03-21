@@ -33,7 +33,7 @@ const McpExposureSection: FC = () => {
   const knowledgeBases = useSelector((state: RootState) => state.knowledge.bases ?? [])
 
   // Agent data from API
-  const { agents, isLoading: agentsLoading } = useAgents()
+  const { agents = [], isLoading: agentsLoading } = useAgents()
 
   // Computed counts
   const activeServers = useMemo(() => mcpServers.filter((s) => s.isActive), [mcpServers])

@@ -121,6 +121,25 @@ describe('documentBuilder', () => {
       expect(doc).toContain('type="module"')
     })
 
+    it('should build A2UI document with structured schema renderer', () => {
+      const artifact = createTestArtifact({
+        type: 'a2ui',
+        content: JSON.stringify({
+          version: 1,
+          type: 'page',
+          title: 'Structured UI',
+          children: [{ id: 'title', type: 'heading', props: { level: 1, text: 'Hello A2UI' } }]
+        })
+      })
+      const options: RenderOptions = { theme: 'light', interactive: true }
+
+      const doc = buildDocument(artifact, options)
+
+      expect(doc).toContain('A2UI Artifact Preview')
+      expect(doc).toContain('safeParseSchema')
+      expect(doc).toContain('Hello A2UI')
+    })
+
     it('should build SVG document', () => {
       const artifact = createTestArtifact({
         type: 'svg',
@@ -214,6 +233,9 @@ describe('documentBuilder', () => {
 
       const mermaidDoc = buildPreviewDocument('graph TD\n    A-->B', 'mermaid')
       expect(mermaidDoc).toContain('mermaid')
+
+      const a2uiDoc = buildPreviewDocument('{"version":1,"type":"page","title":"Preview","children":[]}', 'a2ui')
+      expect(a2uiDoc).toContain('A2UI Artifact Preview')
     })
   })
 

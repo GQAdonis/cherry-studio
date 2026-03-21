@@ -9,6 +9,7 @@ import { ErrorBoundary } from './components/ErrorBoundary'
 import TabsContainer from './components/Tab/TabContainer'
 import NavigationHandler from './handler/NavigationHandler'
 import { useNavbarPosition } from './hooks/useSettings'
+import AgentPage from './pages/agents/AgentPage'
 import ArtifactLibraryPage from './pages/artifacts/ArtifactLibraryPage'
 import ArtifactPage from './pages/artifacts/ArtifactPage'
 import CodeToolsPage from './pages/code/CodeToolsPage'
@@ -33,6 +34,7 @@ const Router: FC = () => {
       <ErrorBoundary>
         <Routes>
           <Route path="/" element={<HomePage />} />
+          <Route path="/agents" element={<AgentPage />} />
           <Route path="/store" element={<AssistantPresetsPage />} />
           <Route path="/paintings/*" element={<PaintingsRoutePage />} />
           <Route path="/translate" element={<TranslatePage />} />

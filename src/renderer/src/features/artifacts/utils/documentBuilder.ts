@@ -292,6 +292,168 @@ function getBaseStyles(): string {
   `
 }
 
+function buildA2uiDocument(
+  content: string,
+  metadata: ArtifactMetadata,
+  options: RenderOptions,
+  artifactId: string
+): string {
+  const cssTheme = options.theme === 'auto' ? 'light' : options.theme
+  const escapedSchema = JSON.stringify(content)
+
+  return `<!DOCTYPE html>
+<html lang="en" class="${cssTheme === 'dark' ? 'dark' : ''}">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>A2UI Artifact Preview</title>
+  ${metadata.tailwind ? `<script src="${CDN_URLS.tailwind}"></script>` : ''}
+  <style>
+    ${getThemeVariables(cssTheme)}
+    ${getBaseStyles()}
+    .a2ui-root { display: flex; flex-direction: column; gap: 16px; min-height: 100%; }
+    .a2ui-card { border: 1px solid var(--color-border); border-radius: 16px; padding: 16px; background: var(--color-background-soft); }
+    .a2ui-stack { display: flex; flex-direction: column; }
+    .a2ui-grid { display: grid; gap: 16px; }
+    .a2ui-heading { margin: 0; }
+    .a2ui-text { color: var(--color-text-soft); }
+    .a2ui-button { display: inline-flex; align-items: center; justify-content: center; padding: 10px 16px; border-radius: 10px; border: none; cursor: pointer; font-weight: 600; }
+    .a2ui-button-primary { background: var(--color-primary); color: white; }
+    .a2ui-button-secondary { background: var(--color-background-mute); color: var(--color-text); border: 1px solid var(--color-border); }
+    .a2ui-input { width: 100%; padding: 10px 12px; border-radius: 10px; border: 1px solid var(--color-border); background: var(--color-background); color: var(--color-text); }
+    .a2ui-badge { display: inline-flex; padding: 4px 10px; border-radius: 999px; background: var(--color-background-mute); color: var(--color-text-soft); font-size: 12px; font-weight: 600; }
+    .a2ui-divider { border-top: 1px solid var(--color-border); margin: 4px 0; }
+    .a2ui-list { display: flex; flex-direction: column; gap: 8px; padding-left: 20px; }
+    .a2ui-empty { color: var(--color-text-soft); font-style: italic; }
+  </style>
+  <script>${getBridgeScript(artifactId)}</script>
+</head>
+<body>
+  <div id="root" class="a2ui-root"></div>
+  <script>
+    const rawSchema = ${escapedSchema};
+
+    function safeParseSchema(value) {
+      try {
+        return JSON.parse(value);
+      } catch (error) {
+        return {
+          version: 1,
+          type: 'page',
+          title: 'Invalid A2UI artifact',
+          children: [
+            {
+              id: 'error',
+              type: 'text',
+              props: { text: 'The A2UI schema could not be parsed. Check the JSON structure.' }
+            }
+          ]
+        };
+      }
+    }
+
+    function appendChildren(node, element) {
+      const children = Array.isArray(node?.children) ? node.children : [];
+      children.forEach((child) => element.appendChild(renderNode(child)));
+      return element;
+    }
+
+    function renderNode(node) {
+      const type = node?.type || 'text';
+      const props = node?.props || {};
+      switch (type) {
+        case 'page':
+          return appendChildren(node, document.createElement('section'));
+        case 'stack': {
+          const el = document.createElement('div');
+          el.className = 'a2ui-stack';
+          el.style.gap = typeof props.gap === 'number' ? props.gap * 4 + 'px' : '16px';
+          return appendChildren(node, el);
+        }
+        case 'grid': {
+          const el = document.createElement('div');
+          el.className = 'a2ui-grid';
+          const columns = typeof props.columns === 'number' ? props.columns : 2;
+          el.style.gridTemplateColumns = 'repeat(' + columns + ', minmax(0, 1fr))';
+          return appendChildren(node, el);
+        }
+        case 'card':
+          return appendChildren(node, Object.assign(document.createElement('div'), { className: 'a2ui-card' }));
+        case 'heading': {
+          const level = Math.min(6, Math.max(1, Number(props.level || 2)));
+          const el = document.createElement('h' + level);
+          el.className = 'a2ui-heading';
+          el.textContent = props.text || node.title || 'Heading';
+          return el;
+        }
+        case 'text': {
+          const el = document.createElement('p');
+          el.className = 'a2ui-text';
+          el.textContent = props.text || '';
+          return el;
+        }
+        case 'button': {
+          const el = document.createElement('button');
+          el.className = 'a2ui-button ' + (props.variant === 'secondary' ? 'a2ui-button-secondary' : 'a2ui-button-primary');
+          el.textContent = props.label || 'Button';
+          return el;
+        }
+        case 'input': {
+          const el = document.createElement('input');
+          el.className = 'a2ui-input';
+          el.placeholder = props.placeholder || '';
+          el.value = props.value || '';
+          return el;
+        }
+        case 'badge': {
+          const el = document.createElement('span');
+          el.className = 'a2ui-badge';
+          el.textContent = props.label || 'Badge';
+          return el;
+        }
+        case 'divider':
+          return Object.assign(document.createElement('div'), { className: 'a2ui-divider' });
+        case 'list': {
+          const listType = props.ordered ? 'ol' : 'ul';
+          const el = document.createElement(listType);
+          el.className = 'a2ui-list';
+          const items = Array.isArray(props.items) ? props.items : [];
+          items.forEach((item) => {
+            const li = document.createElement('li');
+            li.textContent = typeof item === 'string' ? item : item?.label || JSON.stringify(item);
+            el.appendChild(li);
+          });
+          if (!items.length) {
+            const li = document.createElement('li');
+            li.textContent = 'List item';
+            el.appendChild(li);
+          }
+          return el;
+        }
+        default: {
+          const fallback = document.createElement('div');
+          fallback.className = 'a2ui-empty';
+          fallback.textContent = 'Unsupported A2UI node type: ' + type;
+          return fallback;
+        }
+      }
+    }
+
+    const schema = safeParseSchema(rawSchema);
+    const root = document.getElementById('root');
+    if (schema?.title) {
+      const title = document.createElement('h1');
+      title.className = 'a2ui-heading';
+      title.textContent = schema.title;
+      root.appendChild(title);
+    }
+    root.appendChild(renderNode(schema));
+    window.artifactBridge.send('ready');
+  </script>
+</body>
+</html>`
+}
+
 /**
  * Communication bridge script for iframe-parent messaging
  * Implements v2.0 API: emit, onMessage, setState, getState
@@ -817,6 +979,8 @@ export function buildDocument(artifact: Artifact, options: RenderOptions): strin
       return buildHtmlDocument(content, metadata, options, id, true)
     case 'react':
       return buildReactDocument(content, metadata, options, id)
+    case 'a2ui':
+      return buildA2uiDocument(content, metadata, options, id)
     case 'svg':
       return buildSvgDocument(content, metadata, options, id)
     case 'mermaid':

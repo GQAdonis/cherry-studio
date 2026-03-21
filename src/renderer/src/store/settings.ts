@@ -41,9 +41,14 @@ import type {
 } from '@renderer/types/aiCoreTypes'
 import { DEFAULT_CONTEXT_STRATEGY_CONFIG } from '@renderer/types/contextStrategy'
 import type { SkillScopeConfig } from '@renderer/types/skillScope'
-import { uuid } from '@renderer/utils'
 import { API_SERVER_DEFAULTS, UpgradeChannel } from '@shared/config/constant'
+import { v4 as uuid } from 'uuid'
 
+import {
+  sanitizeArtifactDependencies,
+  sanitizeArtifactDependencyName,
+  sanitizeArtifactDependencyVersion
+} from './artifactDependencySanitizer'
 import type { RemoteSyncState } from './backup'
 
 export type SendMessageShortcut = 'Enter' | 'Shift+Enter' | 'Ctrl+Enter' | 'Command+Enter' | 'Alt+Enter'
@@ -1161,10 +1166,20 @@ const settingsSlice = createSlice({
       state.artifacts.react.customBundlerUrl = action.payload
     },
     setArtifactReactDependencies: (state, action: PayloadAction<Record<string, string>>) => {
-      state.artifacts.react.dependencies = action.payload
+      state.artifacts.react.dependencies = sanitizeArtifactDependencies(
+        action.payload,
+        initialState.artifacts.react.dependencies
+      )
     },
     setArtifactReactDependency: (state, action: PayloadAction<{ name: string; version: string }>) => {
-      state.artifacts.react.dependencies[action.payload.name] = action.payload.version
+      const sanitizedName = sanitizeArtifactDependencyName(action.payload.name)
+      const sanitizedVersion = sanitizeArtifactDependencyVersion(action.payload.version)
+
+      if (!sanitizedName || !sanitizedVersion) {
+        return
+      }
+
+      state.artifacts.react.dependencies[sanitizedName] = sanitizedVersion
     },
     removeArtifactReactDependency: (state, action: PayloadAction<string>) => {
       delete state.artifacts.react.dependencies[action.payload]

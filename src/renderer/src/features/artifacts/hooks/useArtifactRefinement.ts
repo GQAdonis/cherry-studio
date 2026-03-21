@@ -28,6 +28,7 @@ import {
   setIsArtifactStreaming,
   setIsCodeStreaming,
   setIsRefining,
+  setRefinementContext,
   updateContent,
   updateRefinementMessage,
   updateStreamingArtifactContent
@@ -36,7 +37,7 @@ import type { Chunk } from '@renderer/types/chunk'
 import { ChunkType } from '@renderer/types/chunk'
 import { useCallback, useEffect, useRef } from 'react'
 
-import { buildArtifactStudioContext } from '../agent/artifactStudioPrompt'
+import { buildArtifactRefinementRequestMessage } from '../agent/artifactStudioPrompt'
 import { runPMPOWorkflow } from '../agent/pmpoEngine'
 import {
   ARTIFACT_STUDIO_AGENT_ID,
@@ -45,7 +46,10 @@ import {
 } from '../services/ArtifactStudioRuntimeService'
 import type {
   Artifact,
+  ArtifactDiagnosticSnapshot,
   ArtifactLifecycleEvent,
+  ArtifactRefinementIntent,
+  ArtifactSelection,
   ContextMessage,
   PMPOPhaseEvent,
   RefinementContextAction,
@@ -75,7 +79,14 @@ interface UseArtifactRefinementResult {
   /** Context messages from original conversation */
   contextMessages: ContextMessage[]
   /** Send a refinement request */
-  sendRefinement: (prompt: string) => Promise<void>
+  sendRefinement: (
+    prompt: string,
+    options?: {
+      intent?: ArtifactRefinementIntent
+      selection?: ArtifactSelection | null
+      diagnostics?: ArtifactDiagnosticSnapshot[]
+    }
+  ) => Promise<void>
   /** Clear refinement messages */
   clearMessages: () => void
 }
@@ -86,17 +97,17 @@ const logger = loggerService.withContext('useArtifactRefinement')
  * Build user prompt for artifact refinement
  * Includes current artifact content and optional conversation context
  */
-function buildUserPrompt(request: string, artifact: Artifact, contextMessages: ContextMessage[]): string {
-  const context = buildArtifactStudioContext(artifact)
-  const conversationContext =
-    contextMessages.length > 0
-      ? `\n\n## Conversation Context\n${contextMessages.map((msg) => `${msg.role.toUpperCase()}: ${msg.content}`).join('\n\n')}`
-      : ''
-
-  return `${context}
-${conversationContext}
-
-Please make the following changes: ${request}`
+function inferRefinementIntent(
+  request: string,
+  diagnostics: ArtifactDiagnosticSnapshot[] = []
+): ArtifactRefinementIntent {
+  if (diagnostics.length > 0 || /compilation error|runtime error|please fix/i.test(request)) {
+    return 'fix'
+  }
+  if (/brainstorm|ideate|concept|wireframe|explore/i.test(request)) {
+    return 'ideate'
+  }
+  return 'extend'
 }
 
 /**
@@ -145,17 +156,39 @@ export function useArtifactRefinement(options: UseArtifactRefinementOptions): Us
 
   // Send refinement request
   const sendRefinement = useCallback(
-    async (prompt: string) => {
+    async (
+      prompt: string,
+      options?: {
+        intent?: ArtifactRefinementIntent
+        selection?: ArtifactSelection | null
+        diagnostics?: ArtifactDiagnosticSnapshot[]
+      }
+    ) => {
       if (!prompt.trim() || isRefining) return
+
+      const diagnostics = options?.diagnostics || []
+      const intent = options?.intent || inferRefinementIntent(prompt, diagnostics)
+      const selection = options?.selection || null
 
       // Notify start
       onStart?.()
+
+      dispatch(
+        setRefinementContext({
+          intent,
+          selection,
+          diagnostics
+        })
+      )
 
       // Add user message
       dispatch(
         addRefinementMessage({
           role: 'user',
-          content: prompt
+          content: prompt,
+          intent,
+          selection: selection || undefined,
+          diagnostics
         })
       )
 
@@ -216,6 +249,9 @@ export function useArtifactRefinement(options: UseArtifactRefinementOptions): Us
           role: 'assistant',
           content: '',
           isStreaming: true,
+          intent,
+          selection: selection || undefined,
+          diagnostics,
           artifactLifecycle: artifactLifecycleRef.current,
           pmpoPhases: pmpoPhaseEventsRef.current
         })
@@ -243,8 +279,15 @@ export function useArtifactRefinement(options: UseArtifactRefinementOptions): Us
           dispatch(setActiveStudioSessionId(runtimeSession.sessionId))
         }
 
-        // Build the user prompt with artifact content
-        const userPrompt = buildUserPrompt(prompt, artifact, contextMessages)
+        // Build the user prompt with artifact content and structured diagnostics
+        const userPrompt = buildArtifactRefinementRequestMessage({
+          artifact,
+          request: prompt,
+          intent,
+          selection,
+          diagnostics,
+          contextMessages
+        })
 
         const handleChunk = (chunk: Chunk) => {
           const msgId = assistantMessageIdRef.current
@@ -502,7 +545,10 @@ export function useArtifactRefinement(options: UseArtifactRefinementOptions): Us
             artifactLifecycle: artifactLifecycleRef.current,
             pmpoPhases: pmpoPhaseEventsRef.current,
             contextStrategy: resolvedContextStrategy,
-            skillStrategy
+            skillStrategy,
+            intent,
+            selection: selection || undefined,
+            diagnostics
           })
         )
 
@@ -518,7 +564,10 @@ export function useArtifactRefinement(options: UseArtifactRefinementOptions): Us
             saveVersion({
               artifact,
               newContent: finalContent,
-              refinementPrompt: prompt
+              refinementPrompt: prompt,
+              intent,
+              diagnostics,
+              summary: textContent.trim() || `${intent} refinement`
             })
           )
 
@@ -574,7 +623,10 @@ export function useArtifactRefinement(options: UseArtifactRefinementOptions): Us
             artifactLifecycle: artifactLifecycleRef.current,
             pmpoPhases: pmpoPhaseEventsRef.current,
             contextStrategy: resolvedProjectContext?.contextManagement?.type || contextStrategyType,
-            skillStrategy: 'inherit'
+            skillStrategy: 'inherit',
+            intent,
+            selection: selection || undefined,
+            diagnostics
           })
         )
         onError?.(error as Error)

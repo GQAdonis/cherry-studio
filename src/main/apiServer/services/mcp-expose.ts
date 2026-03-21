@@ -19,7 +19,7 @@ import KnowledgeMcpServer from '../../mcpServers/knowledge-mcp-server'
 import SingleAgentMcpServer from '../../mcpServers/single-agent-mcp-server'
 import SingleKnowledgeMcpServer from '../../mcpServers/single-knowledge-mcp-server'
 import { reduxService } from '../../services/ReduxService'
-import { getMcpServerById, getMCPServersFromRedux } from '../utils/mcp'
+import { createMcpServerForTransport, getMCPServersFromRedux } from '../utils/mcp'
 
 const logger = loggerService.withContext('McpExposeService')
 
@@ -28,7 +28,7 @@ const logger = loggerService.withContext('McpExposeService')
  * This is critical for multi-client support: the MCP SDK Server class only supports
  * one transport at a time, so each concurrent client needs its own Server.
  */
-type ServerFactory = () => Server
+type ServerFactory = () => Server | Promise<Server>
 
 // Transport sessions keyed by `${prefix}:${sessionId}`
 // Each transport has its own dedicated Server instance for multi-client isolation
@@ -269,7 +269,7 @@ export async function handleProxyRequest(req: Request, res: Response, serverId: 
   }
 
   try {
-    const factory = () => getMcpServerById(serverId) as unknown as Server
+    const factory = () => createMcpServerForTransport(serverId)
     await handleMcpRequest(req, res, factory, `proxy/${serverId}`)
   } catch (error) {
     logger.error('Failed to handle proxy request', error as Error)
@@ -307,7 +307,7 @@ async function handleMcpRequest(
     transport = streamableTransports[transportKey]
   } else {
     // New session → fresh Server + Transport pair
-    const server = serverFactory()
+    const server = await serverFactory()
 
     transport = new StreamableHTTPServerTransport({
       sessionIdGenerator: () => randomUUID(),
@@ -380,7 +380,7 @@ async function handleSseRequest(
     logger.debug('MCP SSE session reused', { key: transportKey })
   } else {
     // New SSE session → fresh Server + Transport pair
-    const server = serverFactory()
+    const server = await serverFactory()
     const postEndpoint = `/v1/mcp-servers/${prefix}`
     transport = new SSEServerTransport(postEndpoint, res as unknown as ServerResponse)
     sseTransports[transportKey] = transport

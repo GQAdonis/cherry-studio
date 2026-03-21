@@ -41,10 +41,31 @@ interface ArtifactPreviewPaneProps {
   artifact: Artifact
   viewMode: 'preview' | 'code'
   onViewModeChange?: (mode: 'preview' | 'code') => void
-  onSendAutoFix?: (message: string) => void
+  onSendAutoFix?: (
+    message: string,
+    options?: {
+      intent: 'fix'
+      diagnostics: Array<{
+        source: 'compiler'
+        severity: 'error'
+        message: string
+        line?: number
+        column?: number
+        codeContext?: string
+        timestamp: string
+      }>
+    }
+  ) => void
+  htmxServerPort?: number | null
 }
 
-const ArtifactPreviewPane: FC<ArtifactPreviewPaneProps> = ({ artifact, viewMode, onViewModeChange, onSendAutoFix }) => {
+const ArtifactPreviewPane: FC<ArtifactPreviewPaneProps> = ({
+  artifact,
+  viewMode,
+  onViewModeChange,
+  onSendAutoFix,
+  htmxServerPort
+}) => {
   const { t } = useTranslation()
   const dispatch = useAppDispatch()
   const [refreshKey, setRefreshKey] = useState(0)
@@ -182,30 +203,25 @@ const ArtifactPreviewPane: FC<ArtifactPreviewPaneProps> = ({ artifact, viewMode,
   const renderArtifact = useMemo(
     () => ({
       ...artifact,
-      content: editedContent
+      content: displayContent
     }),
-    [artifact, editedContent]
+    [artifact, displayContent]
   )
 
-  // Render preview iframe with streaming indicator
+  // Keep preview live while streaming so non-React artifacts can be corrected in context.
   const renderPreview = () => {
-    // Show streaming indicator when artifact content is being generated
-    if (isArtifactStreaming) {
-      return (
-        <PreviewContainer>
-          <StreamingOverlay>
-            <Spin indicator={<LoadingOutlined style={{ fontSize: 32 }} spin />} />
-            <StreamingText>{t('artifacts.generating', 'Generating artifact...')}</StreamingText>
-          </StreamingOverlay>
-        </PreviewContainer>
-      )
-    }
-
     return (
       <PreviewContainer>
+        {isArtifactStreaming && (
+          <StreamingOverlay>
+            <Spin indicator={<LoadingOutlined style={{ fontSize: 24 }} spin />} />
+            <StreamingText>{t('artifacts.generating', 'Generating artifact...')}</StreamingText>
+          </StreamingOverlay>
+        )}
         <ArtifactRenderer
           key={refreshKey}
           artifact={renderArtifact}
+          htmxServerPort={htmxServerPort}
           width="100%"
           height="100%"
           onReady={handleCompilationSuccess}

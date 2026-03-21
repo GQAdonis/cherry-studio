@@ -134,5 +134,6 @@ describe('useArtifactRefinement diagnostics', () => {
         expect.objectContaining({ phase: 'reflect' })
       ])
     )
+    expect(assistantMessage?.intent).toBe('extend')
   })
 })

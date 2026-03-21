@@ -24,10 +24,13 @@ import {
 } from '@renderer/features/artifacts/db/artifactDb'
 import type {
   Artifact,
+  ArtifactDiagnosticSnapshot,
   ArtifactError,
   ArtifactMetadata,
   ArtifactProjectContextEnvelope,
   ArtifactProjectRuntimeResolvedContext,
+  ArtifactRefinementIntent,
+  ArtifactSelection,
   ArtifactsState,
   ArtifactStatus,
   CompilationStatus,
@@ -55,6 +58,7 @@ const initialState: ArtifactsState = {
   compilationError: null, // Compilation error message
   autoFixAttempts: 0, // Number of auto-fix attempts in current refinement turn
   versionHistory: [],
+  headArtifactSnapshot: null,
   currentVersionIndex: -1,
   isLoading: false,
   error: null,
@@ -64,7 +68,10 @@ const initialState: ArtifactsState = {
   activeProjectId: null,
   activeStudioSessionId: null,
   activeProjectContextEnvelope: null,
-  activeProjectResolvedContext: null
+  activeProjectResolvedContext: null,
+  activeRefinementIntent: null,
+  activeSelection: null,
+  latestDiagnostics: []
 }
 
 /**
@@ -133,11 +140,17 @@ export const saveVersion = createAsyncThunk(
     {
       artifact,
       newContent,
-      refinementPrompt
+      refinementPrompt,
+      intent,
+      diagnostics,
+      summary
     }: {
       artifact: Artifact
       newContent: string
       refinementPrompt?: string
+      intent?: ArtifactRefinementIntent
+      diagnostics?: ArtifactDiagnosticSnapshot[]
+      summary?: string
     },
     { rejectWithValue, getState }
   ) => {
@@ -151,7 +164,11 @@ export const saveVersion = createAsyncThunk(
         content: artifact.content,
         refinementPrompt,
         metadata: artifact.metadata,
-        chatSnapshot: state.artifacts.refinementMessages
+        chatSnapshot: state.artifacts.refinementMessages,
+        parentVersionId: state.artifacts.versionHistory.at(-1)?.id,
+        intent,
+        diagnostics,
+        summary
       })
       await saveArtifactVersion(version)
 
@@ -228,7 +245,17 @@ const artifactsSlice = createSlice({
       state.viewMode = 'preview'
       state.refinementMessages = []
       state.versionHistory = []
-      state.currentVersionIndex = -1
+      state.headArtifactSnapshot = {
+        id: `head-${artifact.id}`,
+        artifactId: artifact.id,
+        version: artifact.version,
+        content: artifact.content,
+        createdAt: artifact.updatedAt,
+        metadata: artifact.metadata,
+        summary: 'Current head',
+        intent: 'extend'
+      }
+      state.currentVersionIndex = 0
       state.error = null
       state.contextMessages = contextMessages
       state.parentModelId = null
@@ -244,6 +271,18 @@ const artifactsSlice = createSlice({
       state.activeArtifact = action.payload
       state.viewMode = 'preview'
       state.refinementMessages = []
+      state.versionHistory = []
+      state.currentVersionIndex = 0
+      state.headArtifactSnapshot = {
+        id: `head-${action.payload.id}`,
+        artifactId: action.payload.id,
+        version: action.payload.version,
+        content: action.payload.content,
+        createdAt: action.payload.updatedAt,
+        metadata: action.payload.metadata,
+        summary: 'Current head',
+        intent: 'extend'
+      }
       state.error = null
       state.parentModelId = null
       state.activeProjectId = action.payload.artifactProjectId || action.payload.metadata?.artifactProjectId || null
@@ -264,6 +303,7 @@ const artifactsSlice = createSlice({
       state.compilationError = null
       state.autoFixAttempts = 0
       state.versionHistory = []
+      state.headArtifactSnapshot = null
       state.currentVersionIndex = -1
       state.error = null
       state.parentModelId = null
@@ -271,6 +311,9 @@ const artifactsSlice = createSlice({
       state.activeStudioSessionId = null
       state.activeProjectContextEnvelope = null
       state.activeProjectResolvedContext = null
+      state.activeRefinementIntent = null
+      state.activeSelection = null
+      state.latestDiagnostics = []
     },
 
     /**
@@ -287,6 +330,17 @@ const artifactsSlice = createSlice({
       if (state.activeArtifact) {
         state.activeArtifact.content = action.payload
         state.activeArtifact.updatedAt = new Date().toISOString()
+        state.headArtifactSnapshot = {
+          id: `head-${state.activeArtifact.id}`,
+          artifactId: state.activeArtifact.id,
+          version: state.activeArtifact.version,
+          content: action.payload,
+          createdAt: state.activeArtifact.updatedAt,
+          metadata: state.activeArtifact.metadata,
+          summary: 'Current head',
+          intent: state.activeRefinementIntent || 'extend',
+          diagnostics: state.latestDiagnostics
+        }
       }
     },
 
@@ -300,6 +354,10 @@ const artifactsSlice = createSlice({
           ...action.payload
         }
         state.activeArtifact.updatedAt = new Date().toISOString()
+        if (state.headArtifactSnapshot) {
+          state.headArtifactSnapshot.metadata = state.activeArtifact.metadata
+          state.headArtifactSnapshot.createdAt = state.activeArtifact.updatedAt
+        }
       }
     },
 
@@ -376,6 +434,10 @@ const artifactsSlice = createSlice({
         // Strategy diagnostics
         contextStrategy?: RefinementMessage['contextStrategy']
         skillStrategy?: RefinementMessage['skillStrategy']
+        // Structured refinement state
+        intent?: RefinementMessage['intent']
+        selection?: RefinementMessage['selection']
+        diagnostics?: RefinementMessage['diagnostics']
       }>
     ) => {
       const message = state.refinementMessages.find((m) => m.id === action.payload.id)
@@ -455,7 +517,7 @@ const artifactsSlice = createSlice({
      * Redo to next version
      */
     redo: (state) => {
-      if (state.currentVersionIndex < state.versionHistory.length - 1 && state.activeArtifact) {
+      if (state.currentVersionIndex < state.versionHistory.length && state.activeArtifact) {
         state.currentVersionIndex += 1
         const version = state.versionHistory[state.currentVersionIndex]
         if (version) {
@@ -464,6 +526,14 @@ const artifactsSlice = createSlice({
             state.activeArtifact.metadata = {
               ...state.activeArtifact.metadata,
               ...version.metadata
+            }
+          }
+        } else if (state.currentVersionIndex === state.versionHistory.length && state.headArtifactSnapshot) {
+          state.activeArtifact.content = state.headArtifactSnapshot.content
+          if (state.headArtifactSnapshot.metadata) {
+            state.activeArtifact.metadata = {
+              ...state.activeArtifact.metadata,
+              ...state.headArtifactSnapshot.metadata
             }
           }
         }
@@ -482,6 +552,19 @@ const artifactsSlice = createSlice({
     ) => {
       state.versionHistory = action.payload.versionHistory
       state.currentVersionIndex = action.payload.currentVersionIndex
+      if (state.activeArtifact) {
+        state.headArtifactSnapshot = {
+          id: `head-${state.activeArtifact.id}`,
+          artifactId: state.activeArtifact.id,
+          version: state.activeArtifact.version,
+          content: state.activeArtifact.content,
+          createdAt: state.activeArtifact.updatedAt,
+          metadata: state.activeArtifact.metadata,
+          summary: 'Current head',
+          intent: state.activeRefinementIntent || 'extend',
+          diagnostics: state.latestDiagnostics
+        }
+      }
     },
 
     /**
@@ -542,6 +625,19 @@ const artifactsSlice = createSlice({
 
     setActiveProjectResolvedContext: (state, action: PayloadAction<ArtifactProjectRuntimeResolvedContext | null>) => {
       state.activeProjectResolvedContext = action.payload
+    },
+
+    setRefinementContext: (
+      state,
+      action: PayloadAction<{
+        intent?: ArtifactRefinementIntent | null
+        selection?: ArtifactSelection | null
+        diagnostics?: ArtifactDiagnosticSnapshot[]
+      }>
+    ) => {
+      state.activeRefinementIntent = action.payload.intent ?? null
+      state.activeSelection = action.payload.selection ?? null
+      state.latestDiagnostics = action.payload.diagnostics || []
     },
 
     /**
@@ -642,7 +738,17 @@ const artifactsSlice = createSlice({
       .addCase(loadArtifact.fulfilled, (state, action) => {
         state.activeArtifact = action.payload.artifact
         state.versionHistory = action.payload.versions
-        state.currentVersionIndex = action.payload.versions.length - 1
+        state.headArtifactSnapshot = {
+          id: `head-${action.payload.artifact.id}`,
+          artifactId: action.payload.artifact.id,
+          version: action.payload.artifact.version,
+          content: action.payload.artifact.content,
+          createdAt: action.payload.artifact.updatedAt,
+          metadata: action.payload.artifact.metadata,
+          summary: 'Current head',
+          intent: 'extend'
+        }
+        state.currentVersionIndex = action.payload.versions.length
         state.isLoading = false
         state.isModalOpen = true
       })
@@ -656,7 +762,18 @@ const artifactsSlice = createSlice({
       .addCase(saveVersion.fulfilled, (state, action) => {
         state.activeArtifact = action.payload.artifact
         state.versionHistory.push(action.payload.version)
-        state.currentVersionIndex = state.versionHistory.length - 1
+        state.headArtifactSnapshot = {
+          id: `head-${action.payload.artifact.id}`,
+          artifactId: action.payload.artifact.id,
+          version: action.payload.artifact.version,
+          content: action.payload.artifact.content,
+          createdAt: action.payload.artifact.updatedAt,
+          metadata: action.payload.artifact.metadata,
+          summary: 'Current head',
+          intent: state.activeRefinementIntent || 'extend',
+          diagnostics: state.latestDiagnostics
+        }
+        state.currentVersionIndex = state.versionHistory.length
       })
       .addCase(saveVersion.rejected, (state, action) => {
         state.error = action.payload as ArtifactError
@@ -696,7 +813,8 @@ export const {
   setActiveProjectId,
   setActiveStudioSessionId,
   setActiveProjectContextEnvelope,
-  setActiveProjectResolvedContext
+  setActiveProjectResolvedContext,
+  setRefinementContext
 } = artifactsSlice.actions
 
 export default artifactsSlice.reducer
@@ -712,10 +830,11 @@ export const selectIsArtifactStreaming = (state: { artifacts: ArtifactsState }) 
 export const selectStreamingArtifactContent = (state: { artifacts: ArtifactsState }) =>
   state.artifacts.streamingArtifactContent
 export const selectVersionHistory = (state: { artifacts: ArtifactsState }) => state.artifacts.versionHistory
+export const selectHeadArtifactSnapshot = (state: { artifacts: ArtifactsState }) => state.artifacts.headArtifactSnapshot
 export const selectCurrentVersionIndex = (state: { artifacts: ArtifactsState }) => state.artifacts.currentVersionIndex
 export const selectCanUndo = (state: { artifacts: ArtifactsState }) => state.artifacts.currentVersionIndex > 0
 export const selectCanRedo = (state: { artifacts: ArtifactsState }) =>
-  state.artifacts.currentVersionIndex < state.artifacts.versionHistory.length - 1
+  state.artifacts.currentVersionIndex < state.artifacts.versionHistory.length
 export const selectArtifactError = (state: { artifacts: ArtifactsState }) => state.artifacts.error
 export const selectHtmxServerPort = (state: { artifacts: ArtifactsState }) => state.artifacts.htmxServerPort
 export const selectIsLoading = (state: { artifacts: ArtifactsState }) => state.artifacts.isLoading
@@ -728,13 +847,17 @@ export const selectActiveProjectContextEnvelope = (state: { artifacts: Artifacts
   state.artifacts.activeProjectContextEnvelope
 export const selectActiveProjectResolvedContext = (state: { artifacts: ArtifactsState }) =>
   state.artifacts.activeProjectResolvedContext
+export const selectActiveRefinementIntent = (state: { artifacts: ArtifactsState }) =>
+  state.artifacts.activeRefinementIntent
+export const selectActiveSelection = (state: { artifacts: ArtifactsState }) => state.artifacts.activeSelection
+export const selectLatestDiagnostics = (state: { artifacts: ArtifactsState }) => state.artifacts.latestDiagnostics
 export const selectIsCodeStreaming = (state: { artifacts: ArtifactsState }) => state.artifacts.isCodeStreaming
 export const selectCompilationStatus = (state: { artifacts: ArtifactsState }) => state.artifacts.compilationStatus
 export const selectCompilationError = (state: { artifacts: ArtifactsState }) => state.artifacts.compilationError
 export const selectAutoFixAttempts = (state: { artifacts: ArtifactsState }) => state.artifacts.autoFixAttempts
 export const selectVersionNavigation = (state: { artifacts: ArtifactsState }) => ({
-  currentVersion: state.artifacts.currentVersionIndex + 1,
-  totalVersions: state.artifacts.versionHistory.length,
+  currentVersion: Math.max(1, state.artifacts.currentVersionIndex + 1),
+  totalVersions: state.artifacts.versionHistory.length + (state.artifacts.headArtifactSnapshot ? 1 : 0),
   canGoBack: state.artifacts.currentVersionIndex > 0,
-  canGoForward: state.artifacts.currentVersionIndex < state.artifacts.versionHistory.length - 1
+  canGoForward: state.artifacts.currentVersionIndex < state.artifacts.versionHistory.length
 })

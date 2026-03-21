@@ -45,6 +45,7 @@ describe('ArtifactPackageService', () => {
     expect(parsed.manifest.artifactId).toBe('artifact-1')
     expect(parsed.manifest.projectId).toBe('project-1')
     expect(parsed.manifest.runtimeProfile).toBe('advanced')
+    expect(parsed.manifest.exportTargets?.[0].id).toBe('html-package')
     expect(parsed.files['artifact.html']).toContain('Hello')
   })
 
@@ -58,5 +59,22 @@ describe('ArtifactPackageService', () => {
 
     expect(validation.isValid).toBe(false)
     expect(validation.issues.length).toBeGreaterThan(0)
+  })
+
+  it('validates structured A2UI delivery payloads', () => {
+    const validation = validateArtifactForDelivery(
+      createArtifact({
+        type: 'a2ui',
+        content: JSON.stringify({
+          version: 1,
+          type: 'page',
+          title: 'Structured UI',
+          children: []
+        })
+      })
+    )
+
+    expect(validation.isValid).toBe(true)
+    expect(validation.issues).toEqual([])
   })
 })

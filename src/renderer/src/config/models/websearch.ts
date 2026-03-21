@@ -1,5 +1,5 @@
 import { getProviderByModel } from '@renderer/services/AssistantService'
-import type { Model } from '@renderer/types'
+import type { Model, Provider } from '@renderer/types'
 import { SystemProviderIds } from '@renderer/types'
 import { getLowerBaseModelName, isUserSelectedModelType } from '@renderer/utils'
 import {
@@ -46,7 +46,7 @@ export function isWebSearchModel(model: Model): boolean {
     return isUserSelectedModelType(model, 'web_search')!
   }
 
-  const provider = getProviderByModel(model)
+  const provider = getProviderByModel(model) as Provider
 
   if (!provider) {
     return false
@@ -130,7 +130,7 @@ export function isMandatoryWebSearchModel(model: Model): boolean {
     return false
   }
 
-  const provider = getProviderByModel(model)
+  const provider = getProviderByModel(model) as Provider
 
   if (!provider) {
     return false
@@ -150,7 +150,7 @@ export function isOpenRouterBuiltInWebSearchModel(model: Model): boolean {
     return false
   }
 
-  const provider = getProviderByModel(model)
+  const provider = getProviderByModel(model) as Provider
 
   if (provider.id !== 'openrouter') {
     return false

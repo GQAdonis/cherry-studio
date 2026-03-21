@@ -304,7 +304,7 @@ const PopupContainer: React.FC<Props> = ({ provider, resolve }) => {
               { label: 'Azure OpenAI', value: 'azure-openai' },
               { label: 'Azure AI Foundry', value: 'azure-foundry' },
 
-              { label: 'New API', value: 'new-api' },
+              { label: 'OpenAI Compatible', value: 'new-api' },
               { label: 'CherryIN', value: 'cherryin-type' },
               { label: t('settings.provider.add.mistral_rs.type_label'), value: 'mistral-rs' },
               { label: 'Ollama', value: 'ollama' }

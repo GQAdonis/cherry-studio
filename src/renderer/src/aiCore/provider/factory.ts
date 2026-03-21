@@ -68,13 +68,14 @@ function tryResolveProviderId(identifier: string): ProviderId | null {
  * TODO: 整理函数逻辑
  */
 export function getAiSdkProviderId(provider: Provider): string {
+  const providerLike = provider as Provider & { id: string; type: string; apiHost: string }
   // 1. 尝试解析provider.id
-  const resolvedFromId = tryResolveProviderId(provider.id)
+  const resolvedFromId = tryResolveProviderId(providerLike.id)
 
   // Handle Azure Foundry providers
-  if (isAzureFoundryProvider(provider)) {
+  if (isAzureFoundryProvider(providerLike)) {
     // Check if it's an AzureOpenAIProvider first (type guard)
-    if ((provider as any).type === 'azure-foundry' && isAzureResponsesEndpoint(provider as any)) {
+    if (providerLike.type === 'azure-foundry' && isAzureResponsesEndpoint(provider as any)) {
       return 'azure-responses'
     }
     // Return the already-routed provider ID from azure-foundry.ts
@@ -82,8 +83,8 @@ export function getAiSdkProviderId(provider: Provider): string {
   }
 
   // Handle Azure OpenAI providers
-  if (isAzureOpenAIProvider(provider)) {
-    if (isAzureResponsesEndpoint(provider)) {
+  if (isAzureOpenAIProvider(providerLike)) {
+    if (isAzureResponsesEndpoint(providerLike)) {
       return 'azure-responses'
     } else {
       return 'azure'
@@ -95,17 +96,17 @@ export function getAiSdkProviderId(provider: Provider): string {
 
   // 2. 尝试解析provider.type
   // 会把所有类型为openai的自定义provider解析到aisdk的openaiProvider上
-  if (provider.type !== 'openai') {
-    const resolvedFromType = tryResolveProviderId(provider.type)
+  if (providerLike.type !== 'openai') {
+    const resolvedFromType = tryResolveProviderId(providerLike.type)
     if (resolvedFromType) {
       return resolvedFromType
     }
   }
-  if (provider.apiHost.includes('api.openai.com')) {
+  if (providerLike.apiHost.includes('api.openai.com')) {
     return 'openai-chat'
   }
   // 3. 最后的fallback（使用provider本身的id）
-  return provider.id
+  return providerLike.id
 }
 
 export function getModelAwareAiSdkProviderId(provider: Provider, model?: Model): string {

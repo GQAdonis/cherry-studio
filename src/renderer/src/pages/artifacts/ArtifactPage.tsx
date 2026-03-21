@@ -17,10 +17,14 @@ import {
   saveArtifactProject,
   upsertArtifactStudioSession
 } from '@renderer/features/artifacts/db/artifactDb'
+import { useArtifactHtmxServer } from '@renderer/features/artifacts/hooks/useArtifactHtmxServer'
 import type {
+  ArtifactDiagnosticSnapshot,
   ArtifactProject,
   ArtifactProjectContextEnvelope,
-  ArtifactProjectSeedPayload
+  ArtifactProjectSeedPayload,
+  ArtifactRefinementIntent,
+  ArtifactSelection
 } from '@renderer/features/artifacts/types'
 import { normalizeContextEnvelope, resolveArtifactProjectRuntimeContext } from '@renderer/features/artifacts/utils'
 import { getKnowledgeBaseParams } from '@renderer/services/KnowledgeService'
@@ -30,8 +34,12 @@ import {
   openExistingArtifact,
   selectActiveArtifact,
   selectActiveProjectContextEnvelope,
+  selectActiveRefinementIntent,
+  selectActiveSelection,
   selectActiveStudioSessionId,
   selectCurrentVersionIndex,
+  selectHtmxServerPort,
+  selectLatestDiagnostics,
   selectRefinementMessages,
   selectVersionHistory,
   selectViewMode,
@@ -39,6 +47,7 @@ import {
   setActiveProjectId,
   setActiveProjectResolvedContext,
   setActiveStudioSessionId,
+  setRefinementContext,
   setRefinementMessages,
   setVersionHistoryState,
   setViewMode
@@ -67,18 +76,33 @@ const ArtifactPage: React.FC = () => {
 
   const activeArtifact = useAppSelector(selectActiveArtifact)
   const activeProjectContextEnvelope = useAppSelector(selectActiveProjectContextEnvelope)
+  const activeRefinementIntent = useAppSelector(selectActiveRefinementIntent)
+  const activeSelection = useAppSelector(selectActiveSelection)
   const viewMode = useAppSelector(selectViewMode)
   const activeStudioSessionId = useAppSelector(selectActiveStudioSessionId)
+  const latestDiagnostics = useAppSelector(selectLatestDiagnostics)
   const refinementMessages = useAppSelector(selectRefinementMessages)
   const versionHistory = useAppSelector(selectVersionHistory)
   const currentVersionIndex = useAppSelector(selectCurrentVersionIndex)
+  const htmxServerPort = useAppSelector(selectHtmxServerPort)
   const artifactStudioSettings = useAppSelector(selectArtifactStudioSettings)
   const assistants = useAppSelector((state) => state.assistants.assistants)
   const quickModel = useAppSelector((state) => state.llm.quickModel)
   const knowledgeBases = useAppSelector((state) => state.knowledge.bases)
 
   const [isLoading, setIsLoading] = useState(true)
-  const sendRefinementRef = useRef<((prompt: string) => Promise<void>) | null>(null)
+  const sendRefinementRef = useRef<
+    | ((
+        prompt: string,
+        options?: {
+          intent?: ArtifactRefinementIntent
+          selection?: ArtifactSelection | null
+          diagnostics?: ArtifactDiagnosticSnapshot[]
+        }
+      ) => Promise<void>)
+    | null
+  >(null)
+  useArtifactHtmxServer(activeArtifact?.type === 'htmx')
 
   const resolvedProjectId = useMemo(() => {
     if (projectId) {
@@ -305,6 +329,13 @@ const ArtifactPage: React.FC = () => {
       dispatch(setViewMode(resolvedViewMode))
       if (session) {
         dispatch(setActiveStudioSessionId(session.id))
+        dispatch(
+          setRefinementContext({
+            intent: session.activeIntent,
+            selection: session.selection,
+            diagnostics: session.diagnostics
+          })
+        )
       }
       dispatch(setRefinementMessages(session?.refinementMessages || []))
       if (session?.versionHistory && typeof session.currentVersionIndex === 'number') {
@@ -319,7 +350,7 @@ const ArtifactPage: React.FC = () => {
         dispatch(
           setVersionHistoryState({
             versionHistory: persistedVersions,
-            currentVersionIndex: persistedVersions.length - 1
+            currentVersionIndex: persistedVersions.length
           })
         )
       }
@@ -500,6 +531,9 @@ const ArtifactPage: React.FC = () => {
         refinementMessages,
         versionHistory,
         currentVersionIndex,
+        activeIntent: activeRefinementIntent || 'extend',
+        selection: activeSelection || undefined,
+        diagnostics: latestDiagnostics,
         updatedAt: new Date().toISOString()
       })
 
@@ -531,11 +565,14 @@ const ArtifactPage: React.FC = () => {
   }, [
     activeArtifact,
     activeProjectContextEnvelope,
+    activeRefinementIntent,
+    activeSelection,
     activeStudioSessionId,
     currentVersionIndex,
     artifactStudioSettings?.overridePolicy,
     dispatch,
     isLoading,
+    latestDiagnostics,
     refinementMessages,
     resolvedProjectId,
     versionHistory,
@@ -550,16 +587,31 @@ const ArtifactPage: React.FC = () => {
     dispatch(setViewMode(mode))
   }
 
-  const handleSendRefinementReady = (sendRefinement: (prompt: string) => Promise<void>) => {
+  const handleSendRefinementReady = (
+    sendRefinement: (
+      prompt: string,
+      options?: {
+        intent?: ArtifactRefinementIntent
+        selection?: ArtifactSelection | null
+        diagnostics?: ArtifactDiagnosticSnapshot[]
+      }
+    ) => Promise<void>
+  ) => {
     sendRefinementRef.current = sendRefinement
   }
 
-  const handleAutoFixSend = (message: string) => {
+  const handleAutoFixSend = (
+    message: string,
+    options?: {
+      intent: 'fix'
+      diagnostics: ArtifactDiagnosticSnapshot[]
+    }
+  ) => {
     if (!sendRefinementRef.current) {
       logger.warn('Auto-fix requested before refinement sender was registered')
       return
     }
-    void sendRefinementRef.current(message)
+    void sendRefinementRef.current(message, options)
   }
 
   if (isLoading) {
@@ -608,6 +660,7 @@ const ArtifactPage: React.FC = () => {
               viewMode={safeViewMode}
               onViewModeChange={handleViewModeChange}
               onSendAutoFix={handleAutoFixSend}
+              htmxServerPort={htmxServerPort}
             />
           }
           storageKey={`artifact-studio-width:${resolvedProjectId || 'default'}`}

@@ -191,7 +191,7 @@ describe('StudioStreamParser', () => {
     })
 
     it('should accept all valid artifact types', () => {
-      const validTypes = ['html', 'xhtml', 'htmx', 'react', 'svg', 'mermaid', 'markdown', 'code']
+      const validTypes = ['html', 'xhtml', 'htmx', 'react', 'a2ui', 'svg', 'mermaid', 'markdown', 'code']
       for (const type of validTypes) {
         const p = new StudioStreamParser({
           callbacks: { onCodeStart: vi.fn() }

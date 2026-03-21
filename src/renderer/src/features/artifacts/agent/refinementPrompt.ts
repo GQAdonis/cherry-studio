@@ -55,6 +55,7 @@ ${typeSpecificInstructions}
 5. **Theme Support**: Ensure dark mode compatibility using Tailwind's \`dark:\` variants
 6. **Accessibility**: Use semantic HTML and ARIA labels where appropriate
 7. **Self-Contained**: The artifact must be self-contained (no external images, external JS files, etc.)
+8. **Intent Aware**: Treat compilation/runtime failures as fix requests, otherwise preserve the user's requested scope
 
 ### Current Artifact Content
 
@@ -190,6 +191,14 @@ export default function App(): React.JSX.Element {
 }
 \`\`\``
 
+    case 'a2ui':
+      return `### A2UI Specific Rules
+
+- Return valid JSON only
+- Use the root shape \`{ "version": 1, "type": "page", "title": string, "children": [] }\`
+- Allowed node types: \`page\`, \`stack\`, \`grid\`, \`card\`, \`heading\`, \`text\`, \`button\`, \`input\`, \`badge\`, \`divider\`, \`list\`
+- Keep the schema declarative and safe; do not emit executable JavaScript`
+
     case 'svg':
       return `### SVG Specific Rules
 
@@ -255,6 +264,8 @@ function getLanguageFromType(type: Artifact['type']): string {
       return 'html'
     case 'react':
       return 'tsx'
+    case 'a2ui':
+      return 'json'
     case 'svg':
       return 'xml'
     case 'mermaid':

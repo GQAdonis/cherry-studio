@@ -4,6 +4,7 @@ import './ThemeService'
 import { loggerService } from '@logger'
 import { isDev, isLinux, isMac, isWin } from '@main/constant'
 import { getFilesDir } from '@main/utils/file'
+import { getWindowsBackgroundMaterial } from '@main/utils/windowUtil'
 import { MIN_WINDOW_HEIGHT, MIN_WINDOW_WIDTH } from '@shared/config/constant'
 import { IpcChannel } from '@shared/IpcChannel'
 import { app, BrowserWindow, nativeImage, nativeTheme, screen, shell } from 'electron'
@@ -55,6 +56,12 @@ export class WindowService {
       fullScreen: false,
       maximize: false
     })
+    const windowsBackgroundMaterial = getWindowsBackgroundMaterial()
+    let mainWindowBackgroundColor: string | undefined
+
+    if (!isMac && !windowsBackgroundMaterial) {
+      mainWindowBackgroundColor = nativeTheme.shouldUseDarkColors ? '#181818' : '#FFFFFF'
+    }
 
     this.mainWindow = new BrowserWindow({
       x: mainWindowState.x,
@@ -80,7 +87,8 @@ export class WindowService {
             // On Linux, allow using system title bar if setting is enabled
             frame: isLinux && configManager.getUseSystemTitleBar() ? true : false
           }),
-      backgroundColor: isMac ? undefined : nativeTheme.shouldUseDarkColors ? '#181818' : '#FFFFFF',
+      ...(windowsBackgroundMaterial ? { backgroundMaterial: windowsBackgroundMaterial } : {}),
+      ...(mainWindowBackgroundColor ? { backgroundColor: mainWindowBackgroundColor } : {}),
       darkTheme: nativeTheme.shouldUseDarkColors,
       ...(isLinux ? { icon: linuxIcon } : {}),
       webPreferences: {

@@ -264,7 +264,8 @@ export async function fetchChatCompletion({
     params: aiSdkParams,
     modelId,
     capabilities,
-    webSearchPluginConfig
+    webSearchPluginConfig,
+    idleTimeout
   } = await buildStreamTextParams(messages, assistant, provider, {
     mcpTools: mcpTools,
     allowedTools,
@@ -309,7 +310,14 @@ export async function fetchChatCompletion({
   }
 
   // --- Call AI Completions ---
-  await AI.completions(modelId, aiSdkParams, middlewareConfig)
+  await AI.completions(modelId, aiSdkParams, {
+    ...middlewareConfig,
+    assistant,
+    topicId,
+    callType: 'chat',
+    uiMessages,
+    idleTimeout
+  })
 }
 
 export async function fetchMessagesSummary({
@@ -406,7 +414,7 @@ export async function fetchMessagesSummary({
     const text = getText()
     const result = removeSpecialCharactersForTopicName(text)
     return result ? { text: result } : { text: null, error: i18n.t('error.no_response') }
-  } catch (error: any) {
+  } catch (error: unknown) {
     return { text: null, error: getErrorMessage(error) }
   }
 }

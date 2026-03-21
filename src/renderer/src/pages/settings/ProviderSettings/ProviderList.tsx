@@ -250,7 +250,7 @@ const ProviderList: FC = () => {
               modelId.length > 0
                 ? [
                     {
-                      ...(provider.models[0] ?? {}),
+                      ...provider.models[0],
                       id: modelId,
                       name: modelId,
                       provider: provider.id,
