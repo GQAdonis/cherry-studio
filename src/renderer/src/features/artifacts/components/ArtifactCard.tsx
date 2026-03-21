@@ -16,12 +16,12 @@ import {
 } from '@ant-design/icons'
 import { loggerService } from '@logger'
 import { openArtifactStudioFromChat } from '@renderer/features/artifacts/utils/studioNavigation'
+import { useAppNavigate } from '@renderer/hooks/useAppNavigate'
 import { message, Tooltip } from 'antd'
 import { Sparkles } from 'lucide-react'
 import type { FC } from 'react'
 import { memo, useCallback, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useNavigate } from 'react-router-dom'
 import styled from 'styled-components'
 
 import type { ArtifactType, ParsedArtifact } from '../types'
@@ -118,7 +118,7 @@ function getArtifactTypeLabel(type: ArtifactType): string {
  */
 const ArtifactCard: FC<ArtifactCardProps> = ({ artifact, conversationId, messageId, className }) => {
   const { t } = useTranslation()
-  const navigate = useNavigate()
+  const navigate = useAppNavigate()
 
   const typeColor = useMemo(() => getArtifactColor(artifact.type), [artifact.type])
   const typeLabel = useMemo(() => getArtifactTypeLabel(artifact.type), [artifact.type])

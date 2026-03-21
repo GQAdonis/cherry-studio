@@ -1,9 +1,9 @@
+import type { AppNavigateFunction } from '@renderer/hooks/useAppNavigate'
 import { TopicManager } from '@renderer/hooks/useTopic'
 import store from '@renderer/store'
 import type { Assistant, Topic } from '@renderer/types'
 import type { Message } from '@renderer/types/newMessage'
 import { getMainTextContent } from '@renderer/utils/messageUtils/find'
-import type { NavigateFunction } from 'react-router-dom'
 
 import type { ArtifactProjectContextEnvelope, ArtifactProjectSeedPayload, ParsedArtifact } from '../types'
 import { normalizeContextEnvelope } from './projectContext'
@@ -12,7 +12,7 @@ interface OpenArtifactStudioParams {
   artifact: ParsedArtifact
   conversationId: string
   messageId: string
-  navigate: NavigateFunction
+  navigate: AppNavigateFunction
 }
 
 const DEFAULT_CONTEXT_WINDOW = 5

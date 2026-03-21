@@ -27,6 +27,7 @@ import type {
   ArtifactSelection
 } from '@renderer/features/artifacts/types'
 import { normalizeContextEnvelope, resolveArtifactProjectRuntimeContext } from '@renderer/features/artifacts/utils'
+import { useAppNavigate, useAppParams } from '@renderer/hooks/useAppNavigate'
 import { getKnowledgeBaseParams } from '@renderer/services/KnowledgeService'
 import { useAppDispatch, useAppSelector } from '@renderer/store'
 import {
@@ -58,7 +59,6 @@ import { addNoteThunk } from '@renderer/store/thunk/knowledgeThunk'
 import type { KnowledgeBase } from '@renderer/types'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useNavigate, useParams } from 'react-router-dom'
 import styled from 'styled-components'
 
 import ArtifactChatPanel from './components/ArtifactChatPanel'
@@ -69,9 +69,9 @@ import ResizablePanes from './components/ResizablePanes'
 const logger = loggerService.withContext('ArtifactPage')
 
 const ArtifactPage: React.FC = () => {
-  const { artifactId, projectId } = useParams<{ artifactId?: string; projectId?: string }>()
+  const { artifactId, projectId } = useAppParams<{ artifactId?: string; projectId?: string }>()
   const { t } = useTranslation()
-  const navigate = useNavigate()
+  const navigate = useAppNavigate()
   const dispatch = useAppDispatch()
 
   const activeArtifact = useAppSelector(selectActiveArtifact)

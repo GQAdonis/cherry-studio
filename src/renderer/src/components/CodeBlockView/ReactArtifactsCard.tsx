@@ -2,13 +2,13 @@ import { CodeOutlined, CopyOutlined } from '@ant-design/icons'
 import { useTheme } from '@renderer/context/ThemeProvider'
 import type { ParsedArtifact } from '@renderer/features/artifacts/types'
 import { openArtifactStudioFromChat } from '@renderer/features/artifacts/utils/studioNavigation'
+import { useAppNavigate } from '@renderer/hooks/useAppNavigate'
 import type { ThemeMode } from '@renderer/types'
 import { Button } from 'antd'
 import { Code, DownloadIcon, Sparkles } from 'lucide-react'
 import type { FC } from 'react'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useNavigate } from 'react-router-dom'
 import { ClipLoader } from 'react-spinners'
 import styled, { keyframes } from 'styled-components'
 
@@ -27,7 +27,7 @@ const ReactArtifactsCard: FC<Props> = ({ code, language, onSave, isStreaming = f
   const { t } = useTranslation()
   const [isPopupOpen, setIsPopupOpen] = useState(false)
   const { theme } = useTheme()
-  const navigate = useNavigate()
+  const navigate = useAppNavigate()
 
   const codeContent = code || ''
   const hasContent = codeContent.trim().length > 0

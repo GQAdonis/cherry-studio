@@ -3,6 +3,7 @@ import { loggerService } from '@logger'
 import { useTheme } from '@renderer/context/ThemeProvider'
 import type { ParsedArtifact } from '@renderer/features/artifacts/types'
 import { detectHtmlArtifactType, openArtifactStudioFromChat } from '@renderer/features/artifacts/utils/studioNavigation'
+import { useAppNavigate } from '@renderer/hooks/useAppNavigate'
 import type { ThemeMode } from '@renderer/types'
 import { extractHtmlTitle, getFileNameFromHtmlTitle } from '@renderer/utils/formats'
 import { Button } from 'antd'
@@ -10,7 +11,6 @@ import { Code, DownloadIcon, Globe, LinkIcon, Sparkles } from 'lucide-react'
 import type { FC } from 'react'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useNavigate } from 'react-router-dom'
 import { ClipLoader } from 'react-spinners'
 import styled, { keyframes } from 'styled-components'
 
@@ -37,7 +37,7 @@ const HtmlArtifactsCard: FC<Props> = ({ html, onSave, isStreaming = false, conve
   const title = extractHtmlTitle(html) || 'HTML Artifacts'
   const [isPopupOpen, setIsPopupOpen] = useState(false)
   const { theme } = useTheme()
-  const navigate = useNavigate()
+  const navigate = useAppNavigate()
 
   const htmlContent = html || ''
   const hasContent = htmlContent.trim().length > 0

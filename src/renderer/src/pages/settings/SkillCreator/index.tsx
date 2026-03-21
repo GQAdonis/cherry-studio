@@ -1,9 +1,9 @@
 import { ArrowLeftOutlined, SaveOutlined } from '@ant-design/icons'
+import { useAppNavigate } from '@renderer/hooks/useAppNavigate'
 import type { SkillAssetEntry, SkillReference, SkillScript, SkillStorageProviderConfig } from '@types'
 import { Button, message, Modal, Select, Tag, Typography } from 'antd'
 import { type FC, useCallback, useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useNavigate } from 'react-router-dom'
 import styled from 'styled-components'
 
 import FrontmatterForm from './FrontmatterForm'
@@ -52,7 +52,7 @@ interface ValidationResult {
 
 const SkillCreator: FC = () => {
   const { t } = useTranslation()
-  const navigate = useNavigate()
+  const navigate = useAppNavigate()
 
   const [formData, setFormData] = useState<SkillFormData>(INITIAL_FORM)
   const [validation, setValidation] = useState<ValidationResult>({ valid: true, errors: [], warnings: [] })

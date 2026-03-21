@@ -1,4 +1,5 @@
 import { CopyOutlined, DatabaseOutlined, FolderOutlined, GlobalOutlined, PlusOutlined } from '@ant-design/icons'
+import { useAppNavigate } from '@renderer/hooks/useAppNavigate'
 import type {
   Skill,
   SkillMatchingConfig,
@@ -25,7 +26,6 @@ import {
 } from 'antd'
 import { useCallback, useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useNavigate } from 'react-router-dom'
 
 import {
   SettingContainer,
@@ -84,7 +84,7 @@ const STORAGE_TYPE_OPTIONS: { value: SkillStorageType; label: string; icon: Reac
 
 export default function SkillSettings() {
   const { t } = useTranslation()
-  const navigate = useNavigate()
+  const navigate = useAppNavigate()
 
   const [skills, setSkills] = useState<Skill[]>([])
   const [loading, setLoading] = useState(false)

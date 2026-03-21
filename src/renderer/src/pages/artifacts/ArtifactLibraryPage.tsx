@@ -20,6 +20,7 @@ import type {
   ParsedArtifact
 } from '@renderer/features/artifacts/types'
 import { normalizeContextEnvelope } from '@renderer/features/artifacts/utils'
+import { useAppNavigate } from '@renderer/hooks/useAppNavigate'
 import { useAppDispatch, useAppSelector } from '@renderer/store'
 import { loadSavedArtifacts, selectSavedArtifacts } from '@renderer/store/artifacts'
 import { selectArtifactStudioSettings } from '@renderer/store/settings'
@@ -28,7 +29,6 @@ import { Code, CopyPlus, FileText, Layers, RefreshCcw, Search, Sparkles } from '
 import type { FC } from 'react'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useNavigate } from 'react-router-dom'
 import styled from 'styled-components'
 
 const createProjectId = (prefix: string = 'studio') =>
@@ -160,7 +160,7 @@ interface NewProjectDraft {
 
 const ArtifactLibraryPage: FC = () => {
   const { t } = useTranslation()
-  const navigate = useNavigate()
+  const navigate = useAppNavigate()
   const dispatch = useAppDispatch()
 
   const savedArtifacts = useAppSelector(selectSavedArtifacts)

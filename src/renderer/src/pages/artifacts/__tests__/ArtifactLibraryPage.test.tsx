@@ -88,7 +88,8 @@ vi.mock('@renderer/store', () => ({
 }))
 
 vi.mock('react-router-dom', () => ({
-  useNavigate: () => mocks.navigate
+  useNavigate: () => mocks.navigate,
+  useParams: () => ({})
 }))
 
 vi.mock('react-i18next', async (importOriginal) => {

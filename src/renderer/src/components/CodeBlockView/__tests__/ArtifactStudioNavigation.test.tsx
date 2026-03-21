@@ -10,7 +10,8 @@ const mocks = vi.hoisted(() => ({
 }))
 
 vi.mock('react-router-dom', () => ({
-  useNavigate: () => mocks.navigate
+  useNavigate: () => mocks.navigate,
+  useParams: () => ({})
 }))
 
 vi.mock('@renderer/context/ThemeProvider', () => ({
