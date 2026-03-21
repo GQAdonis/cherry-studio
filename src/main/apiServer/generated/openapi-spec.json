@@ -837,6 +837,50 @@
           }
         }
       },
+      "post": {
+        "summary": "Upsert agent by ID",
+        "description": "Creates the agent with the given ID if it does not exist, or returns the existing agent. Idempotent.",
+        "tags": ["Agents"],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "agentId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Desired agent ID"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateAgentRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Agent returned (existing or newly created)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AgentEntity"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation error"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      },
       "put": {
         "summary": "Update agent",
         "description": "Updates an existing agent with the provided data",

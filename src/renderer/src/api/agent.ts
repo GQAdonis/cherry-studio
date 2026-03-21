@@ -145,6 +145,18 @@ export class AgentApiClient {
     }
   }
 
+  public async upsertAgent(id: string, form: AddAgentForm): Promise<GetAgentResponse> {
+    const url = this.agentPaths.withId(id)
+    try {
+      const payload = form satisfies CreateAgentRequest
+      const response = await this.axios.post(url, payload)
+      const data = GetAgentResponseSchema.parse(response.data)
+      return data
+    } catch (error) {
+      throw processError(error, 'Failed to upsert agent.')
+    }
+  }
+
   public async getAgent(id: string): Promise<GetAgentResponse> {
     const url = this.agentPaths.withId(id)
     try {

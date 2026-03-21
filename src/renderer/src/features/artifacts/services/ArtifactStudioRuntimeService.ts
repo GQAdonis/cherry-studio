@@ -177,37 +177,36 @@ export async function ensureArtifactStudioSession(params: EnsureSessionParams): 
 
   let agent: GetAgentResponse
   try {
-    agent = await client.getAgent(ARTIFACT_STUDIO_AGENT_ID)
+    agent = await client.upsertAgent(ARTIFACT_STUDIO_AGENT_ID, {
+      type: 'claude-code',
+      name: 'Artifact Studio',
+      description: 'Agent for artifact creation and refinement with PMPO support',
+      instructions: 'You are a helpful assistant that creates and refines artifacts using the PMPO methodology.',
+      model: preferredModelId || fallbackModelId || '',
+      accessible_paths: ['/tmp'],
+      allowed_tools: [],
+      mcps: []
+    })
+    logger.info('Artifact Studio agent ready', { agentId: agent.id })
   } catch (error) {
-    // Agent doesn't exist - create it automatically
-    logger.info('Artifact Studio agent not found, creating default agent')
-    try {
-      agent = await client.createAgent({
-        type: 'claude-code',
-        name: 'Artifact Studio',
-        description: 'Agent for artifact creation and refinement with PMPO support',
-        instructions: 'You are a helpful assistant that creates and refines artifacts using the PMPO methodology.',
-        model: fallbackModelId || '', // Will be set/validated by ensureAgentModel
-        accessible_paths: ['/tmp'],
-        allowed_tools: [],
-        mcps: []
-      })
-      logger.info('Created Artifact Studio agent', { agentId: agent.id })
-
-      // If the auto-generated ID doesn't match our expected ID, we have a problem
-      if (agent.id !== ARTIFACT_STUDIO_AGENT_ID) {
-        logger.warn('Created agent ID does not match expected ARTIFACT_STUDIO_AGENT_ID', {
-          expected: ARTIFACT_STUDIO_AGENT_ID,
-          actual: agent.id
-        })
-      }
-    } catch (createError) {
+    const msg = error instanceof Error ? error.message : String(error)
+    const isModelError =
+      msg.includes('model') ||
+      msg.includes('provider') ||
+      msg.includes('invalid_model') ||
+      msg.includes('model_required')
+    if (isModelError) {
       throw new ArtifactStudioRuntimeError(
-        ARTIFACT_STUDIO_RUNTIME_ERROR_CODES.AGENT_NOT_FOUND,
-        'Failed to create Artifact Studio agent. Check API server connectivity and configuration.',
-        { cause: createError }
+        ARTIFACT_STUDIO_RUNTIME_ERROR_CODES.AGENT_MODEL_REQUIRED,
+        'No AI model configured for Artifact Studio. Please go to Settings → Artifact Studio and select a model, or configure a default model in Settings → Providers.',
+        { cause: error }
       )
     }
+    throw new ArtifactStudioRuntimeError(
+      ARTIFACT_STUDIO_RUNTIME_ERROR_CODES.AGENT_NOT_FOUND,
+      'Failed to initialize Artifact Studio agent. Check API server connectivity and configuration.',
+      { cause: error }
+    )
   }
 
   const hydratedAgent = await ensureAgentModel({

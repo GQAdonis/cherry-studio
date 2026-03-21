@@ -459,6 +459,7 @@ agentsRouter.get('/', validatePagination, handleValidationErrors, agentHandlers.
  *               $ref: '#/components/schemas/ErrorResponse'
  */
 agentsRouter.get('/:agentId', validateAgentId, handleValidationErrors, agentHandlers.getAgent)
+agentsRouter.post('/:agentId', validateAgentId, validateAgent, handleValidationErrors, agentHandlers.upsertAgent)
 /**
  * @swagger
  * /agents/{agentId}:
@@ -1012,4 +1013,4 @@ agentsRouter.use(
 )
 
 // Export main router and convenience router
-export const agentsRoutes = agentsRouter
+export const agentsRoutes: express.Router = agentsRouter

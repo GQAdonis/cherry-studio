@@ -285,6 +285,67 @@ export const getAgent = async (req: Request, res: Response): Promise<Response> =
 /**
  * @swagger
  * /v1/agents/{agentId}:
+ *   post:
+ *     summary: Upsert agent by ID
+ *     description: Creates the agent with the given ID if it does not exist, or returns the existing agent. Idempotent.
+ *     tags: [Agents]
+ *     parameters:
+ *       - in: path
+ *         name: agentId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Desired agent ID
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/CreateAgentRequest'
+ *     responses:
+ *       200:
+ *         description: Agent returned (existing or newly created)
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/AgentEntity'
+ *       400:
+ *         description: Validation error
+ *       500:
+ *         description: Internal server error
+ */
+export const upsertAgent = async (req: Request, res: Response): Promise<Response> => {
+  const { agentId } = req.params as { agentId: string }
+  try {
+    logger.debug('Upserting agent', { agentId })
+    const agent = await agentService.upsertAgent(agentId, req.body)
+    return res.status(200).json(agent)
+  } catch (error: any) {
+    if (error instanceof AgentModelValidationError) {
+      logger.warn('Agent model validation error during upsert', {
+        agentId,
+        agentType: error.context.agentType,
+        field: error.context.field,
+        model: error.context.model,
+        detail: error.detail
+      })
+      return res.status(400).json(modelValidationErrorBody(error))
+    }
+
+    logger.error('Error upserting agent', { error, agentId })
+    return res.status(500).json({
+      error: {
+        message: `Failed to upsert agent: ${error.message}`,
+        type: 'internal_error',
+        code: 'agent_upsert_failed'
+      }
+    })
+  }
+}
+
+/**
+ * @swagger
+ * /v1/agents/{agentId}:
  *   put:
  *     summary: Update agent
  *     description: Updates an existing agent with the provided data
