@@ -2,10 +2,10 @@ import { describe, expect, it } from 'vitest'
 
 import migrate from '../migrate'
 
-describe('settings migration 201 (artifact studio governance)', () => {
+describe('settings migration 206 (artifact studio governance)', () => {
   it('initializes missing artifact studio settings', async () => {
     const inboundState: any = {
-      _persist: { version: 200, rehydrated: true },
+      _persist: { version: 205, rehydrated: true },
       settings: {
         artifacts: {
           enabled: true,
@@ -29,7 +29,7 @@ describe('settings migration 201 (artifact studio governance)', () => {
       }
     }
 
-    const migrated: any = await migrate(inboundState, 201)
+    const migrated: any = await migrate(inboundState, 206)
 
     expect(migrated.settings.artifacts.studio).toBeDefined()
     expect(migrated.settings.artifacts.studio.overridePolicy).toEqual({
@@ -45,7 +45,7 @@ describe('settings migration 201 (artifact studio governance)', () => {
 
   it('merges partial studio settings without dropping existing values', async () => {
     const inboundState: any = {
-      _persist: { version: 200, rehydrated: true },
+      _persist: { version: 205, rehydrated: true },
       settings: {
         artifacts: {
           studio: {
@@ -66,7 +66,7 @@ describe('settings migration 201 (artifact studio governance)', () => {
       }
     }
 
-    const migrated: any = await migrate(inboundState, 201)
+    const migrated: any = await migrate(inboundState, 206)
 
     expect(migrated.settings.artifacts.studio.overridePolicy.allowConversationOverride).toBe(false)
     expect(migrated.settings.artifacts.studio.overridePolicy.allowProjectOverride).toBe(true)

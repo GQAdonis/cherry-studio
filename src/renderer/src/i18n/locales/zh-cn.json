@@ -3407,6 +3407,10 @@
     "zhinao": "360 智脑",
     "zhipu": "智谱开放平台"
   },
+  "react_artifacts": {
+    "generating": "正在生成 React 组件...",
+    "receiving": "接收中..."
+  },
   "restore": {
     "confirm": {
       "button": "选择备份文件",

@@ -3294,11 +3294,33 @@ const migrateConfig = {
   },
   '200': (state: RootState) => {
     try {
-      state.llm.providers.forEach((provider) => {
+      state.llm?.providers?.forEach((provider) => {
         if (provider.type === 'ollama') {
           provider.anthropicApiHost = provider.apiHost || 'http://localhost:11434'
         }
       })
+
+      // Initialize artifacts runtime settings and add htmx/xhtml types
+      if (state.settings?.artifacts) {
+        const requiredTypes = ['htmx', 'xhtml']
+        for (const type of requiredTypes) {
+          if (!state.settings.artifacts.enabledTypes?.includes(type)) {
+            state.settings.artifacts.enabledTypes = [...(state.settings.artifacts.enabledTypes || []), type]
+          }
+        }
+        if (!state.settings.artifacts.runtime) {
+          state.settings.artifacts.runtime = {
+            profile: 'standard',
+            allowCustomBundlerUrl: true,
+            allowDynamicDependencies: true,
+            allowExternalResources: true
+          }
+        } else if (state.settings.artifacts.runtime.profile === 'basic') {
+          state.settings.artifacts.runtime.allowCustomBundlerUrl = false
+          state.settings.artifacts.runtime.allowDynamicDependencies = false
+          state.settings.artifacts.runtime.allowExternalResources = false
+        }
+      }
 
       // Migrate minimax app id to hailuo
       if (state.minapps) {
@@ -3317,7 +3339,7 @@ const migrateConfig = {
       addProvider(state, 'minimax-global')
       addProvider(state, 'zai')
       // Update grok provider type to openai-response
-      state.llm.providers.forEach((provider) => {
+      state.llm?.providers?.forEach((provider) => {
         if (provider.id === SystemProviderIds.grok) {
           provider.type = 'openai-response'
         }
@@ -3422,6 +3444,43 @@ const migrateConfig = {
       return state
     } catch (error) {
       logger.error('migrate 205 error', error as Error)
+      return state
+    }
+  },
+  '206': (state: RootState) => {
+    try {
+      if (state.settings?.artifacts) {
+        if (!state.settings.artifacts.studio) {
+          state.settings.artifacts.studio = settingsInitialState.artifacts.studio
+        } else {
+          // Deep-merge overridePolicy with defaults so partial existing values are preserved
+          state.settings.artifacts.studio.overridePolicy = {
+            ...settingsInitialState.artifacts.studio.overridePolicy,
+            ...state.settings.artifacts.studio.overridePolicy
+          }
+          if (!state.settings.artifacts.studio.defaults) {
+            state.settings.artifacts.studio.defaults = settingsInitialState.artifacts.studio.defaults
+          } else {
+            state.settings.artifacts.studio.defaults.llm = {
+              ...settingsInitialState.artifacts.studio.defaults.llm,
+              ...state.settings.artifacts.studio.defaults.llm
+            }
+            state.settings.artifacts.studio.defaults.skills =
+              state.settings.artifacts.studio.defaults.skills || settingsInitialState.artifacts.studio.defaults.skills
+            state.settings.artifacts.studio.defaults.contextManagement =
+              state.settings.artifacts.studio.defaults.contextManagement ||
+              settingsInitialState.artifacts.studio.defaults.contextManagement
+            state.settings.artifacts.studio.defaults.knowledge = {
+              ...settingsInitialState.artifacts.studio.defaults.knowledge,
+              ...state.settings.artifacts.studio.defaults.knowledge
+            }
+          }
+        }
+      }
+      logger.info('migrate 206 success')
+      return state
+    } catch (error) {
+      logger.error('migrate 206 error', error as Error)
       return state
     }
   }

@@ -512,6 +512,7 @@ describe('options utils', () => {
             custom_param: 'custom_value',
             another_param: 123,
             serviceTier: undefined,
+            store: false,
             textVerbosity: undefined
           }
         })

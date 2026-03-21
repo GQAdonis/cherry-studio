@@ -3407,6 +3407,10 @@
     "zhinao": "360AI",
     "zhipu": "BigModel"
   },
+  "react_artifacts": {
+    "generating": "Generating React component...",
+    "receiving": "Receiving..."
+  },
   "restore": {
     "confirm": {
       "button": "Select Backup File",

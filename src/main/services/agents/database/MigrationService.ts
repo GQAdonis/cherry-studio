@@ -40,7 +40,15 @@ export class MigrationService {
       const hasMigrationsTable = await this.migrationsTableExists()
 
       if (!hasMigrationsTable) {
-        logger.info('Migrations table not found; assuming fresh database state')
+        logger.info('Migrations table not found; checking if schema was pushed without migrations...')
+        const schemaAlreadyExists = await this.schemaTablesExist()
+        if (schemaAlreadyExists) {
+          logger.info('Schema tables detected (pushed via drizzle-kit push). Bootstrapping migration tracking...')
+          await this.bootstrapMigrationTracking()
+          logger.info('Migration tracking bootstrapped. Database is up to date.')
+          return
+        }
+        logger.info('Fresh database state; will run all migrations from scratch')
       }
 
       // Read migration journal
@@ -94,6 +102,38 @@ export class MigrationService {
       logger.error('Failed to check migrations table status:', { error })
       throw error
     }
+  }
+
+  private async schemaTablesExist(): Promise<boolean> {
+    try {
+      const result = await this.client.execute(`SELECT name FROM sqlite_master WHERE type='table' AND name='agents'`)
+      return result.rows.length > 0
+    } catch (error) {
+      logger.error('Failed to check schema tables existence:', { error })
+      return false
+    }
+  }
+
+  private async bootstrapMigrationTracking(): Promise<void> {
+    const journal = await this.readMigrationJournal()
+
+    await this.client.executeMultiple(
+      `CREATE TABLE IF NOT EXISTS migrations (
+        version INTEGER PRIMARY KEY,
+        tag TEXT NOT NULL,
+        executed_at INTEGER NOT NULL
+      )`
+    )
+
+    const now = Date.now()
+    for (const entry of journal.entries) {
+      await this.db
+        .insert(migrations)
+        .values({ version: entry.idx, tag: entry.tag, executedAt: now })
+        .onConflictDoNothing()
+    }
+
+    logger.info(`Bootstrapped ${journal.entries.length} migration entries as applied`)
   }
 
   private async readMigrationJournal(): Promise<MigrationJournal> {

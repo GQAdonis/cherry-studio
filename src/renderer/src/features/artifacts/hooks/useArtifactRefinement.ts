@@ -134,6 +134,7 @@ export function useArtifactRefinement(options: UseArtifactRefinementOptions): Us
   const resolvedProjectContext = useAppSelector(selectActiveProjectResolvedContext)
   const defaultModel = useAppSelector((state) => state.llm.defaultModel)
   const apiServer = useAppSelector((state) => state.settings.apiServer)
+  const studioLlm = useAppSelector((state) => state.settings?.artifacts?.studio?.defaults?.llm)
   const activeStudioSessionId = useAppSelector(selectActiveStudioSessionId)
   const contextStrategyType = useAppSelector((state) => state.settings?.contextStrategy?.type || 'sliding_window')
 
@@ -260,7 +261,10 @@ export function useArtifactRefinement(options: UseArtifactRefinementOptions): Us
       try {
         const skillStrategy = resolvedProjectContext?.skills?.strategy || 'inherit'
         const resolvedContextStrategy = resolvedProjectContext?.contextManagement?.type || contextStrategyType
+        const studioModelId =
+          studioLlm?.providerId && studioLlm?.modelId ? `${studioLlm.providerId}:${studioLlm.modelId}` : undefined
         const fallbackModelId =
+          studioModelId ||
           parentModelId ||
           (defaultModel?.provider && defaultModel?.id ? `${defaultModel.provider}:${defaultModel.id}` : undefined)
 
@@ -268,7 +272,7 @@ export function useArtifactRefinement(options: UseArtifactRefinementOptions): Us
           apiServer,
           preferredSessionId: runtimeSessionIdRef.current,
           sessionName: `Artifact Studio - ${artifact.title}`,
-          preferredModelId: parentModelId || undefined,
+          preferredModelId: studioModelId || parentModelId || undefined,
           fallbackModelId,
           skillScope: resolvedProjectContext?.skills,
           contextStrategy: resolvedProjectContext?.contextManagement
@@ -644,6 +648,7 @@ export function useArtifactRefinement(options: UseArtifactRefinementOptions): Us
       resolvedProjectContext,
       defaultModel,
       apiServer,
+      studioLlm,
       activeStudioSessionId,
       contextStrategyType,
       dispatch,

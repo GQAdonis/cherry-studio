@@ -3407,6 +3407,10 @@
     "zhinao": "360 ZhiNao",
     "zhipu": "BigModel"
   },
+  "react_artifacts": {
+    "generating": "[to be translated]:Generating React component...",
+    "receiving": "[to be translated]:Receiving..."
+  },
   "restore": {
     "confirm": {
       "button": "Sélectionnez le fichier de sauvegarde",

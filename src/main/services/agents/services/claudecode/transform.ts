@@ -728,6 +728,10 @@ function handleSystemMessage(message: Extract<SDKMessage, { type: 'system' }>): 
       type: 'start'
     })
     chunks.push({
+      type: 'data',
+      data: { type: 'artifact.lifecycle', stage: 'started' }
+    } as unknown as AgentStreamPart)
+    chunks.push({
       type: 'raw',
       rawValue: {
         type: 'init',
@@ -738,6 +742,10 @@ function handleSystemMessage(message: Extract<SDKMessage, { type: 'system' }>): 
       }
     })
   } else if (message.subtype === 'compact_boundary') {
+    chunks.push({
+      type: 'data',
+      data: { type: 'context.action', action: 'summarized' }
+    } as unknown as AgentStreamPart)
     chunks.push({
       type: 'raw',
       rawValue: {
@@ -759,6 +767,10 @@ function handleResultMessage(message: Extract<SDKMessage, { type: 'result' }>): 
   const chunks: AgentStreamPart[] = []
 
   if (message.subtype === 'success') {
+    chunks.push({
+      type: 'data',
+      data: { type: 'artifact.lifecycle', stage: 'completed' }
+    } as unknown as AgentStreamPart)
     chunks.push({
       type: 'finish',
       totalUsage: convertClaudeCodeUsage(message.usage),

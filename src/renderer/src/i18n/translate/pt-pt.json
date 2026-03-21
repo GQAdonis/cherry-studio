@@ -3407,6 +3407,10 @@
     "zhinao": "360 Inteligência Artificial",
     "zhipu": "BigModel"
   },
+  "react_artifacts": {
+    "generating": "[to be translated]:Generating React component...",
+    "receiving": "[to be translated]:Receiving..."
+  },
   "restore": {
     "confirm": {
       "button": "Selecione o arquivo de backup",

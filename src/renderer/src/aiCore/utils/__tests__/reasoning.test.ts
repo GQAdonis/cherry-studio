@@ -51,12 +51,15 @@ vi.mock('@renderer/store/llm', () => ({
   default: (state = { llm: {} }) => state
 }))
 
-vi.mock('@renderer/config/constant', () => ({
-  DEFAULT_MAX_TOKENS: 4096,
-  isMac: false,
-  isWin: false,
-  TOKENFLUX_HOST: 'mock-host'
-}))
+vi.mock('@renderer/config/constant', async (importOriginal) => {
+  const actual: any = await importOriginal()
+  return {
+    ...actual,
+    DEFAULT_MAX_TOKENS: 4096,
+    isMac: false,
+    isWin: false
+  }
+})
 
 vi.mock('@renderer/utils/provider', () => ({
   isSupportEnableThinkingProvider: vi.fn((provider) => {

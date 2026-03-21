@@ -1188,6 +1188,7 @@ const settingsSlice = createSlice({
       state,
       action: PayloadAction<Partial<SettingsState['artifacts']['studio']['overridePolicy']>>
     ) => {
+      if (!state.artifacts.studio) state.artifacts.studio = initialState.artifacts.studio
       state.artifacts.studio.overridePolicy = {
         ...state.artifacts.studio.overridePolicy,
         ...action.payload
@@ -1197,6 +1198,8 @@ const settingsSlice = createSlice({
       state,
       action: PayloadAction<Partial<SettingsState['artifacts']['studio']['defaults']['llm']>>
     ) => {
+      if (!state.artifacts.studio) state.artifacts.studio = initialState.artifacts.studio
+      if (!state.artifacts.studio.defaults) state.artifacts.studio.defaults = initialState.artifacts.studio.defaults
       state.artifacts.studio.defaults.llm = {
         ...state.artifacts.studio.defaults.llm,
         ...action.payload
@@ -1206,18 +1209,24 @@ const settingsSlice = createSlice({
       state,
       action: PayloadAction<SettingsState['artifacts']['studio']['defaults']['skills']>
     ) => {
+      if (!state.artifacts.studio) state.artifacts.studio = initialState.artifacts.studio
+      if (!state.artifacts.studio.defaults) state.artifacts.studio.defaults = initialState.artifacts.studio.defaults
       state.artifacts.studio.defaults.skills = action.payload
     },
     setArtifactStudioDefaultContextManagement: (
       state,
       action: PayloadAction<SettingsState['artifacts']['studio']['defaults']['contextManagement']>
     ) => {
+      if (!state.artifacts.studio) state.artifacts.studio = initialState.artifacts.studio
+      if (!state.artifacts.studio.defaults) state.artifacts.studio.defaults = initialState.artifacts.studio.defaults
       state.artifacts.studio.defaults.contextManagement = action.payload
     },
     setArtifactStudioDefaultKnowledge: (
       state,
       action: PayloadAction<Partial<SettingsState['artifacts']['studio']['defaults']['knowledge']>>
     ) => {
+      if (!state.artifacts.studio) state.artifacts.studio = initialState.artifacts.studio
+      if (!state.artifacts.studio.defaults) state.artifacts.studio.defaults = initialState.artifacts.studio.defaults
       state.artifacts.studio.defaults.knowledge = {
         ...state.artifacts.studio.defaults.knowledge,
         ...action.payload

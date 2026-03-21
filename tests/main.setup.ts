@@ -68,7 +68,11 @@ vi.mock('electron', () => {
       getPrimaryDisplay: vi.fn(),
       getAllDisplays: vi.fn()
     },
-    Notification: vi.fn()
+    Notification: vi.fn(),
+    nativeImage: {
+      createFromPath: vi.fn(() => ({})),
+      createEmpty: vi.fn(() => ({}))
+    }
   }
 
   return { __esModule: true, ...mock, default: mock }
