@@ -48,6 +48,7 @@ function modelSupportValidator(
 }
 
 /**
+<<<<<<< HEAD
  * 检查模型是否支持原生PDF输入
  */
 export function supportsPdfInput(model: Model): boolean {
@@ -69,6 +70,8 @@ export function supportsPdfInput(model: Model): boolean {
 }
 
 /**
+=======
+>>>>>>> upstream/main
  * 检查模型是否支持原生图片输入
  */
 export function supportsImageInput(model: Model): boolean {
