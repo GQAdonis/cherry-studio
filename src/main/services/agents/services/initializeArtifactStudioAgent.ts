@@ -59,10 +59,20 @@ interface LlmModelShape {
 
 interface LlmProviderShape {
   id?: string
+  type?: string
   enabled?: boolean
   apiKey?: string
   models?: Array<{ id?: string }>
 }
+
+const AGENT_SUPPORTED_PROVIDER_TYPES = new Set([
+  'openai',
+  'anthropic',
+  'ollama',
+  'new-api',
+  'openai-compatible',
+  'mistral-rs'
+])
 
 const hasValue = (value: unknown): value is string => typeof value === 'string' && value.trim().length > 0
 
@@ -82,6 +92,14 @@ async function resolveArtifactStudioDefaultModelId(): Promise<string | undefined
       logger.warn('Skipping Artifact Studio default model assignment because provider is missing or disabled', {
         providerId: defaultModel.provider
       })
+      return undefined
+    }
+
+    if (provider.type && !AGENT_SUPPORTED_PROVIDER_TYPES.has(provider.type)) {
+      logger.warn(
+        'Skipping Artifact Studio default model assignment because provider type is not supported by the agent API server',
+        { providerId: defaultModel.provider, providerType: provider.type }
+      )
       return undefined
     }
 
