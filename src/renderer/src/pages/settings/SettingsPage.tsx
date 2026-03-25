@@ -2,7 +2,7 @@ import { GlobalOutlined } from '@ant-design/icons'
 import { Navbar, NavbarCenter } from '@renderer/components/app/Navbar'
 import { McpLogo } from '@renderer/components/Icons'
 import Scrollbar from '@renderer/components/Scrollbar'
-import ModelSettings from '@renderer/pages/settings/ModelSettings/ModelSettings'
+import { Link, Outlet, useLocation } from '@tanstack/react-router'
 import { Divider as AntDivider } from 'antd'
 import {
   AppWindow,
@@ -27,33 +27,11 @@ import {
 } from 'lucide-react'
 import type { FC } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Link, Route, Routes, useLocation } from 'react-router-dom'
 import styled from 'styled-components'
 
-import AboutSettings from './AboutSettings'
-import ArtifactSettings from './ArtifactSettings'
-import ContextManagementSettings from './ContextManagementSettings'
-import DataSettings from './DataSettings/DataSettings'
-import DisplaySettings from './DisplaySettings/DisplaySettings'
-import DocProcessSettings from './DocProcessSettings'
-import E2BSettings from './E2BSettings'
-import GeneralSettings from './GeneralSettings'
-import MCPSettings from './MCPSettings'
-import MemorySettings from './MemorySettings'
-import MinAppSettings from './MinAppSettings'
-import NotesSettings from './NotesSettings'
-import { ProviderList } from './ProviderSettings'
-import QuickAssistantSettings from './QuickAssistantSettings'
-import QuickPhraseSettings from './QuickPhraseSettings'
-import SelectionAssistantSettings from './SelectionAssistantSettings/SelectionAssistantSettings'
-import ShortcutSettings from './ShortcutSettings'
-import SkillCreator from './SkillCreator'
-import SkillSettings from './SkillSettings'
-import { ApiServerSettings } from './ToolSettings/ApiServerSettings'
-import WebSearchSettings from './WebSearchSettings'
-
 const SettingsPage: FC = () => {
-  const { pathname } = useLocation()
+  const location = useLocation()
+  const { pathname } = location
   const { t } = useTranslation()
 
   const isRoute = (path: string): string => (pathname.startsWith(path) ? 'active' : '')
@@ -199,32 +177,7 @@ const SettingsPage: FC = () => {
           </MenuItemLink>
         </SettingMenus>
         <SettingContent>
-          <Routes>
-            <Route path="provider" element={<ProviderList />} />
-            <Route path="model" element={<ModelSettings />} />
-            <Route path="websearch/*" element={<WebSearchSettings />} />
-            <Route path="api-server" element={<ApiServerSettings />} />
-            <Route path="docprocess" element={<DocProcessSettings />} />
-            <Route path="e2b" element={<E2BSettings />} />
-            <Route path="quickphrase" element={<QuickPhraseSettings />} />
-            <Route path="mcp/*" element={<MCPSettings />} />
-            <Route path="skills" element={<SkillSettings />} />
-            <Route path="skills/create" element={<SkillCreator />} />
-            <Route path="minapp" element={<MinAppSettings />} />
-            <Route path="memory" element={<MemorySettings />} />
-            <Route path="context" element={<ContextManagementSettings />} />
-
-            <Route path="general/*" element={<GeneralSettings />} />
-            <Route path="display" element={<DisplaySettings />} />
-            <Route path="shortcut" element={<ShortcutSettings />} />
-            <Route path="quickAssistant" element={<QuickAssistantSettings />} />
-            <Route path="selectionAssistant" element={<SelectionAssistantSettings />} />
-            <Route path="data" element={<DataSettings />} />
-            <Route path="notes" element={<NotesSettings />} />
-            <Route path="artifacts" element={<ArtifactSettings />} />
-
-            <Route path="about" element={<AboutSettings />} />
-          </Routes>
+          <Outlet />
         </SettingContent>
       </ContentContainer>
     </Container>

@@ -1,39 +1,29 @@
+import { preferenceService } from '@data/PreferenceService'
+import { ThemeMode } from '@shared/data/preference/preferenceTypes'
 import { IpcChannel } from '@shared/IpcChannel'
-import { ThemeMode } from '@types'
 import { BrowserWindow, nativeTheme } from 'electron'
 
 import { titleBarOverlayDark, titleBarOverlayLight } from '../config'
-import { configManager } from './ConfigManager'
 
 class ThemeService {
   private theme: ThemeMode = ThemeMode.system
-  private isInitialized = false
 
   constructor() {
-    // Defer nativeTheme access until initialize() is called
-  }
-
-  /**
-   * Initialize theme service after app is ready
-   * MUST be called after app.whenReady() to access nativeTheme
-   */
-  public initialize(): void {
-    if (this.isInitialized) {
-      return
-    }
-
-    this.theme = configManager.getTheme()
+    this.theme = preferenceService.get('ui.theme_mode')
 
     if (this.theme === ThemeMode.dark || this.theme === ThemeMode.light || this.theme === ThemeMode.system) {
       nativeTheme.themeSource = this.theme
     } else {
       // 兼容旧版本
-      configManager.setTheme(ThemeMode.system)
+      preferenceService.set('ui.theme_mode', ThemeMode.system)
       nativeTheme.themeSource = ThemeMode.system
     }
     nativeTheme.on('updated', this.themeUpdatadHandler.bind(this))
 
-    this.isInitialized = true
+    preferenceService.subscribeChange('ui.theme_mode', (newTheme) => {
+      this.theme = newTheme
+      nativeTheme.themeSource = newTheme
+    })
   }
 
   themeUpdatadHandler() {
@@ -46,18 +36,11 @@ class ThemeService {
           // Because it may be called with some windows have some title bar
         }
       }
-      win.webContents.send(IpcChannel.ThemeUpdated, nativeTheme.shouldUseDarkColors ? ThemeMode.dark : ThemeMode.light)
+      win.webContents.send(
+        IpcChannel.NativeThemeUpdated,
+        nativeTheme.shouldUseDarkColors ? ThemeMode.dark : ThemeMode.light
+      )
     })
-  }
-
-  setTheme(theme: ThemeMode) {
-    if (theme === this.theme) {
-      return
-    }
-
-    this.theme = theme
-    nativeTheme.themeSource = theme
-    configManager.setTheme(theme)
   }
 }
 

@@ -1,19 +1,21 @@
 /**
  * Navigation abstraction for router-agnostic navigation.
  *
- * Currently backed by react-router-dom. When the app migrates to
- * @tanstack/react-router (upstream v2 / PR #10162), only this file
- * needs to change — all call sites remain untouched.
- *
- * @tanstack migration notes:
- *   useAppNavigate → useNavigate from @tanstack/react-router
- *     navigate('/path') → navigate({ to: '/path' })
- *   useAppParams    → useParams from @tanstack/react-router (fully typed via route)
- *   AppNavigateFunction → NavigateFn from @tanstack/react-router
+ * Backed by @tanstack/react-router but provides a simplified API
+ * compatible with react-router-dom's navigate(path) pattern.
+ * All call sites use navigate('/path') — this wrapper converts
+ * to tanstack's navigate({ to: '/path' }) format.
  */
-import { type NavigateFunction, useNavigate, useParams } from 'react-router-dom'
+import { useNavigate, useParams } from '@tanstack/react-router'
+import { useCallback } from 'react'
 
-export type AppNavigateFunction = NavigateFunction
+export type AppNavigateFunction = (to: string) => void
 
-export const useAppNavigate = useNavigate
-export const useAppParams = useParams
+export const useAppNavigate = (): AppNavigateFunction => {
+  const navigate = useNavigate()
+  return useCallback((to: string) => navigate({ to }), [navigate])
+}
+
+export function useAppParams<T extends Record<string, string | undefined> = Record<string, string | undefined>>(): T {
+  return useParams({ strict: false }) as T
+}

@@ -17,7 +17,8 @@ import {
 // Mock configManager
 vi.mock('@main/services/ConfigManager', () => ({
   ConfigKeys: {
-    GitBashPath: 'gitBashPath'
+    GitBashPath: 'gitBashPath',
+    GitBashPathSource: 'gitBashPathSource'
   },
   configManager: {
     get: vi.fn(),
@@ -969,11 +970,10 @@ describe.skipIf(process.platform !== 'win32')('process utilities', () => {
 
         autoDiscoverGitBash()
 
-        // On Windows, configManager.set is called twice (for path and source)
-        // On other platforms, it's called once
-        const expectedCalls = process.platform === 'win32' ? 2 : 1
-        expect(configManager.set).toHaveBeenCalledTimes(expectedCalls)
-        expect(configManager.set).toHaveBeenCalledWith('gitBashPath', bashPath)
+        // Verify the exact call to configManager.set
+        expect(configManager.set).toHaveBeenCalledTimes(2)
+        expect(configManager.set).toHaveBeenNthCalledWith(1, 'gitBashPath', bashPath)
+        expect(configManager.set).toHaveBeenNthCalledWith(2, 'gitBashPathSource', 'auto')
       })
 
       it('should persist on each discovery when config remains undefined', () => {
@@ -987,10 +987,12 @@ describe.skipIf(process.platform !== 'win32')('process utilities', () => {
         autoDiscoverGitBash()
         autoDiscoverGitBash()
 
-        // On Windows, configManager.set is called twice per discovery (for path and source)
-        // On other platforms, it's called once per discovery
-        const expectedCallsPerCall = process.platform === 'win32' ? 2 : 1
-        expect(configManager.set).toHaveBeenCalledTimes(expectedCallsPerCall * 2)
+        // Each call discovers and persists since config remains undefined (mocked)
+        expect(configManager.set).toHaveBeenCalledTimes(4)
+        expect(configManager.set).toHaveBeenNthCalledWith(1, 'gitBashPath', bashPath)
+        expect(configManager.set).toHaveBeenNthCalledWith(2, 'gitBashPathSource', 'auto')
+        expect(configManager.set).toHaveBeenNthCalledWith(3, 'gitBashPath', bashPath)
+        expect(configManager.set).toHaveBeenNthCalledWith(4, 'gitBashPathSource', 'auto')
       })
     })
 

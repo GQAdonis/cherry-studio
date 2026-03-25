@@ -10,8 +10,6 @@ import { IpcChannel } from '@shared/IpcChannel'
 import type { MenuItemConstructorOptions } from 'electron'
 import { Menu, webContents } from 'electron'
 
-import { locales } from '../utils/locales'
-import { configManager } from './ConfigManager'
 import { webViewRegistryService } from './WebViewRegistryService'
 import { windowService } from './WindowService'
 
@@ -48,8 +46,13 @@ class MinAppContextMenuService {
    * Show the context menu
    */
   private showContextMenu(webContentsId: number, properties: Electron.ContextMenuParams): void {
-    const locale = locales[configManager.getLanguage()]
-    const { common } = locale.translation
+    const common: Record<string, string> = {
+      copy: 'Copy',
+      paste: 'Paste',
+      cut: 'Cut',
+      selectAll: 'Select All',
+      inspect: 'Inspect'
+    }
     const webviewInfo = webViewRegistryService.getByWebContentsId(webContentsId)
 
     const hasText = properties.selectionText.trim().length > 0

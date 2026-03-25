@@ -1,3 +1,4 @@
+import { Switch } from '@cherrystudio/ui'
 import { HStack } from '@renderer/components/Layout'
 import { InfoTooltip } from '@renderer/components/TooltipIcons'
 import { useTheme } from '@renderer/context/ThemeProvider'
@@ -10,7 +11,7 @@ import {
   setMcpSummarizationThreshold,
   setMcpTargetSummarizedTokens
 } from '@renderer/store/settings'
-import { InputNumber, Slider, Switch } from 'antd'
+import { InputNumber, Slider } from 'antd'
 import { FileText, Scissors } from 'lucide-react'
 import type { FC } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -86,7 +87,10 @@ const McpContentSettings: FC = () => {
             })}
           />
         </SettingRowTitle>
-        <Switch checked={mcpAutoSummarization} onChange={(checked) => dispatch(setMcpAutoSummarization(checked))} />
+        <Switch
+          checked={mcpAutoSummarization}
+          onCheckedChange={(checked) => dispatch(setMcpAutoSummarization(checked))}
+        />
       </SettingRow>
 
       <SettingDivider />

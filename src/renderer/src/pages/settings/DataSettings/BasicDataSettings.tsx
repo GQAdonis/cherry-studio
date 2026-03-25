@@ -1,4 +1,5 @@
 import { LoadingOutlined, WifiOutlined } from '@ant-design/icons'
+import { Switch } from '@cherrystudio/ui'
 import { HStack } from '@renderer/components/Layout'
 import BackupPopup from '@renderer/components/Popups/BackupPopup'
 import LanTransferPopup from '@renderer/components/Popups/LanTransferPopup'
@@ -12,7 +13,7 @@ import { setSkipBackupFile as _setSkipBackupFile } from '@renderer/store/setting
 import type { AppInfo } from '@renderer/types'
 import { formatFileSize } from '@renderer/utils'
 import { occupiedDirs } from '@shared/config/constant'
-import { Button, Progress, Switch, Tooltip, Typography } from 'antd'
+import { Button, Progress, Tooltip, Typography } from 'antd'
 import { FolderInput, FolderOpen, FolderOutput, SaveIcon } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -139,7 +140,7 @@ const BasicDataSettings: React.FC = () => {
         <MigrationPathRow style={{ marginTop: '20px', flexDirection: 'row', alignItems: 'center' }}>
           <Switch
             defaultChecked={shouldCopyData}
-            onChange={(checked) => (shouldCopyData = checked)}
+            onCheckedChange={(checked) => (shouldCopyData = checked)}
             style={{ marginRight: '8px' }}
             title={t('settings.data.app_data.copy_data_option')}
           />
@@ -472,7 +473,7 @@ const BasicDataSettings: React.FC = () => {
         <SettingDivider />
         <SettingRow>
           <SettingRowTitle>{t('settings.data.backup.skip_file_data_title')}</SettingRowTitle>
-          <Switch checked={skipBackupFile} onChange={onSkipBackupFilesChange} />
+          <Switch checked={skipBackupFile} onCheckedChange={onSkipBackupFilesChange} />
         </SettingRow>
         <SettingRow>
           <SettingHelpText>{t('settings.data.backup.skip_file_data_help')}</SettingHelpText>

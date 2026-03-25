@@ -5,6 +5,7 @@
  */
 
 import { PlusOutlined, StarFilled, StarOutlined } from '@ant-design/icons'
+import { Switch } from '@cherrystudio/ui'
 import { Navbar, NavbarCenter } from '@renderer/components/app/Navbar'
 import Scrollbar from '@renderer/components/Scrollbar'
 import {
@@ -24,7 +25,7 @@ import { useAppNavigate } from '@renderer/hooks/useAppNavigate'
 import { useAppDispatch, useAppSelector } from '@renderer/store'
 import { loadSavedArtifacts, selectSavedArtifacts } from '@renderer/store/artifacts'
 import { selectArtifactStudioSettings } from '@renderer/store/settings'
-import { Button, Empty, Input, InputNumber, message, Modal, Select, Spin, Switch, Tag } from 'antd'
+import { Button, Empty, Input, InputNumber, message, Modal, Select, Spin, Tag } from 'antd'
 import { Code, CopyPlus, FileText, Layers, RefreshCcw, Search, Sparkles } from 'lucide-react'
 import type { FC } from 'react'
 import { useCallback, useEffect, useMemo, useState } from 'react'
@@ -523,12 +524,7 @@ const ArtifactLibraryPage: FC = () => {
           <SectionWrap>
             <SectionHeader>
               <h3>{t('artifacts.projects_title', 'Artifact Studio Projects')}</h3>
-              <Switch
-                checked={showArchivedProjects}
-                onChange={setShowArchivedProjects}
-                checkedChildren={t('artifacts.show_archived', 'Archived')}
-                unCheckedChildren={t('artifacts.hide_archived', 'Active')}
-              />
+              <Switch checked={showArchivedProjects} onCheckedChange={setShowArchivedProjects} />
             </SectionHeader>
             {projectsLoading ? (
               <LoadingContainer>
@@ -768,14 +764,16 @@ const ArtifactLibraryPage: FC = () => {
             <FieldLabel>{t('settings.stream_output.label', 'Stream Output')}</FieldLabel>
             <Switch
               checked={newProjectDraft.streamOutput}
-              onChange={(checked) => setNewProjectDraft((prev) => ({ ...prev, streamOutput: checked }))}
+              onCheckedChange={(checked) => setNewProjectDraft((prev) => ({ ...prev, streamOutput: checked }))}
             />
           </FieldBlock>
           <FieldBlock>
             <FieldLabel>{t('artifacts.knowledge_bridge', 'Create knowledge bridge from chat history')}</FieldLabel>
             <Switch
               checked={newProjectDraft.autoCreateFromChatHistory}
-              onChange={(checked) => setNewProjectDraft((prev) => ({ ...prev, autoCreateFromChatHistory: checked }))}
+              onCheckedChange={(checked) =>
+                setNewProjectDraft((prev) => ({ ...prev, autoCreateFromChatHistory: checked }))
+              }
             />
           </FieldBlock>
         </ModalGrid>

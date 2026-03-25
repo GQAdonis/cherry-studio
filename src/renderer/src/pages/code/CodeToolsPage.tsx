@@ -1,22 +1,23 @@
+import { Button, Tooltip } from '@cherrystudio/ui'
 import AiProvider from '@renderer/aiCore'
 import AnthropicProviderListPopover from '@renderer/components/AnthropicProviderListPopover'
 import { Navbar, NavbarCenter } from '@renderer/components/app/Navbar'
 import ModelSelector from '@renderer/components/ModelSelector'
 import { isMac, isWin } from '@renderer/config/constant'
 import { isEmbeddingModel, isRerankModel, isTextToImageModel } from '@renderer/config/models'
+import { usePersistCache } from '@renderer/data/hooks/useCache'
 import { useCodeTools } from '@renderer/hooks/useCodeTools'
 import { useProviders } from '@renderer/hooks/useProvider'
 import { useTimer } from '@renderer/hooks/useTimer'
 import { getAssistantSettings, getProviderByModel } from '@renderer/services/AssistantService'
 import { loggerService } from '@renderer/services/LoggerService'
 import { getModelUniqId } from '@renderer/services/ModelService'
-import { useAppDispatch, useAppSelector } from '@renderer/store'
-import { setIsBunInstalled } from '@renderer/store/mcp'
+import { useAppSelector } from '@renderer/store'
 import type { EndpointType, Model } from '@renderer/types'
 import type { TerminalConfig } from '@shared/config/constant'
 import { codeTools, terminalApps } from '@shared/config/constant'
 import { CLAUDE_OFFICIAL_SUPPORTED_PROVIDERS, isSiliconAnthropicCompatibleModel } from '@shared/config/providers'
-import { Alert, Button, Checkbox, Input, Select, Space, Tooltip } from 'antd'
+import { Alert, Checkbox, Input, Select, Space } from 'antd'
 import { Download, FolderOpen, Terminal, X } from 'lucide-react'
 import type { FC } from 'react'
 import { useCallback, useEffect, useMemo, useState } from 'react'
@@ -36,8 +37,7 @@ const logger = loggerService.withContext('CodeToolsPage')
 const CodeToolsPage: FC = () => {
   const { t } = useTranslation()
   const { providers } = useProviders()
-  const dispatch = useAppDispatch()
-  const isBunInstalled = useAppSelector((state) => state.mcp.isBunInstalled)
+  const [isBunInstalled, setIsBunInstalled] = usePersistCache('feature.mcp.is_bun_installed')
   const {
     selectedCliTool,
     selectedModel,
@@ -179,12 +179,12 @@ const CodeToolsPage: FC = () => {
   const checkBunInstallation = useCallback(async () => {
     try {
       const bunExists = await window.api.isBinaryExist('bun')
-      dispatch(setIsBunInstalled(bunExists))
+      setIsBunInstalled(bunExists)
     } catch (error) {
       logger.error('Failed to check bun installation status:', error as Error)
-      dispatch(setIsBunInstalled(false))
+      // IPC failure — leave previous value unchanged
     }
-  }, [dispatch])
+  }, [setIsBunInstalled])
 
   // 获取可用终端
   const loadAvailableTerminals = useCallback(async () => {
@@ -211,7 +211,7 @@ const CodeToolsPage: FC = () => {
     try {
       setIsInstallingBun(true)
       await window.api.installBunBinary()
-      dispatch(setIsBunInstalled(true))
+      setIsBunInstalled(true)
       window.toast.success(t('settings.mcp.installSuccess'))
     } catch (error: any) {
       logger.error('Failed to install bun:', error as Error)
@@ -371,13 +371,8 @@ const CodeToolsPage: FC = () => {
                       alignItems: 'center'
                     }}>
                     <span>{t('code.bun_required_message')}</span>
-                    <Button
-                      type="primary"
-                      size="small"
-                      icon={<Download size={14} />}
-                      onClick={handleInstallBun}
-                      loading={isInstallingBun}
-                      disabled={isInstallingBun}>
+                    <Button size="sm" onClick={handleInstallBun} disabled={isInstallingBun}>
+                      <Download size={14} />
                       {isInstallingBun ? t('code.installing_bun') : t('code.install_bun')}
                     </Button>
                   </div>
@@ -507,8 +502,10 @@ const CodeToolsPage: FC = () => {
                     selectedTerminal !== terminalApps.cmd &&
                     selectedTerminal !== terminalApps.powershell &&
                     selectedTerminal !== terminalApps.windowsTerminal && (
-                      <Tooltip title={terminalCustomPaths[selectedTerminal] || t('code.set_custom_path')}>
-                        <Button icon={<FolderOpen size={16} />} onClick={() => handleSetCustomPath(selectedTerminal)} />
+                      <Tooltip content={terminalCustomPaths[selectedTerminal] || t('code.set_custom_path')}>
+                        <Button size="icon" onClick={() => handleSetCustomPath(selectedTerminal)}>
+                          <FolderOpen size={16} />
+                        </Button>
                       </Tooltip>
                     )}
                 </Space.Compact>
@@ -540,13 +537,11 @@ const CodeToolsPage: FC = () => {
           </SettingsPanel>
 
           <Button
-            type="primary"
-            icon={<Terminal size={16} />}
-            size="large"
+            size="lg"
             onClick={handleLaunch}
-            loading={isLaunching}
-            disabled={!canLaunch || !isBunInstalled}
-            block>
+            disabled={!canLaunch || !isBunInstalled || isLaunching}
+            className="w-full">
+            <Terminal size={16} />
             {isLaunching ? t('code.launching') : t('code.launch.label')}
           </Button>
         </MainContent>

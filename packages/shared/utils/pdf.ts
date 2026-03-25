@@ -1,8 +1,8 @@
-import pdfParse from 'pdf-parse'
+import { PDFParse } from 'pdf-parse'
 
 /**
  * Extract text content from PDF data.
- * Works in Node.js environment via pdf-parse 2.x default function export.
+ * Works in Node.js environment via pdf-parse 2.x PDFParse class.
  *
  * @param data - PDF content as Uint8Array, ArrayBuffer, or base64-encoded string
  * @returns Extracted text content
@@ -21,6 +21,7 @@ export async function extractPdfText(data: Uint8Array | ArrayBuffer | string | U
     buffer = Buffer.from(data)
   }
 
-  const result = await pdfParse(buffer)
+  const parser = new PDFParse({ data: new Uint8Array(buffer) })
+  const result = await parser.getText()
   return result.text
 }

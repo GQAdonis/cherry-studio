@@ -1,6 +1,5 @@
-import { formatProviderApiHost } from '@main/aiCore/provider/providerConfig'
-import { CacheService } from '@main/services/CacheService'
-import { loggerService } from '@main/services/LoggerService'
+import { cacheService } from '@data/CacheService'
+import { loggerService } from '@logger'
 import { reduxService } from '@main/services/ReduxService'
 import { isSiliconAnthropicCompatibleModel } from '@shared/config/providers'
 import type { ApiModel, Model, Provider, ProviderType } from '@types'
@@ -14,7 +13,7 @@ const PROVIDERS_CACHE_TTL = 10 * 1000 // 10 seconds
 export async function getAvailableProviders(): Promise<Provider[]> {
   try {
     // Try to get from cache first (faster)
-    const cachedSupportedProviders = CacheService.get<Provider[]>(PROVIDERS_CACHE_KEY)
+    const cachedSupportedProviders = cacheService.get<Provider[]>(PROVIDERS_CACHE_KEY)
     if (cachedSupportedProviders && cachedSupportedProviders.length > 0) {
       logger.debug('Providers resolved from cache', {
         count: cachedSupportedProviders.length
@@ -40,30 +39,15 @@ export async function getAvailableProviders(): Promise<Provider[]> {
     ]
     const supportedProviders = providers.filter((p: Provider) => p.enabled && supportedTypes.includes(p.type))
 
-    // Format provider apiHost according to their type
-    const results = await Promise.allSettled(supportedProviders.map((p: Provider) => formatProviderApiHost(p)))
-    const formattedProviders: Provider[] = []
-    for (let i = 0; i < results.length; i++) {
-      const result = results[i]
-      if (result.status === 'fulfilled') {
-        formattedProviders.push(result.value)
-      } else {
-        logger.warn('Failed to format provider API host', {
-          providerId: supportedProviders[i].id,
-          error: result.reason
-        })
-      }
-    }
-
-    // Cache the formatted results
-    CacheService.set(PROVIDERS_CACHE_KEY, formattedProviders, PROVIDERS_CACHE_TTL)
+    // Cache the filtered results
+    cacheService.set(PROVIDERS_CACHE_KEY, supportedProviders, PROVIDERS_CACHE_TTL)
 
     logger.info('Providers filtered and formatted', {
-      supported: formattedProviders.length,
+      supported: supportedProviders.length,
       total: providers.length
     })
 
-    return formattedProviders
+    return supportedProviders
   } catch (error: any) {
     logger.error('Failed to get providers from Redux store', { error })
     return []

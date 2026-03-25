@@ -115,10 +115,15 @@ vi.mock('node-stream-zip', () => ({
 
 // Import after mocks
 import * as fs from 'fs-extra'
+import * as path from 'path'
 
 import BackupManager from '../BackupManager'
 
-describe('BackupManager.deleteLanTransferBackup - Security Tests', () => {
+// Helper to construct platform-independent paths for assertions
+// The implementation uses path.normalize() which converts to platform separators
+const normalizePath = (p: string): string => path.normalize(p)
+
+describe('BackupManager.deleteTempBackup - Security Tests', () => {
   let backupManager: BackupManager
 
   beforeEach(() => {
@@ -135,7 +140,7 @@ describe('BackupManager.deleteLanTransferBackup - Security Tests', () => {
       const result = await backupManager.deleteLanTransferBackup({} as Electron.IpcMainInvokeEvent, validPath)
 
       expect(result).toBe(true)
-      expect(fs.remove).toHaveBeenCalledWith(validPath)
+      expect(fs.remove).toHaveBeenCalledWith(normalizePath(validPath))
       expect(mockLogger.info).toHaveBeenCalledWith(expect.stringContaining('Deleted temp backup'))
     })
 
@@ -147,7 +152,7 @@ describe('BackupManager.deleteLanTransferBackup - Security Tests', () => {
       const result = await backupManager.deleteLanTransferBackup({} as Electron.IpcMainInvokeEvent, nestedPath)
 
       expect(result).toBe(true)
-      expect(fs.remove).toHaveBeenCalledWith(nestedPath)
+      expect(fs.remove).toHaveBeenCalledWith(normalizePath(nestedPath))
     })
 
     it('should return false when file does not exist', async () => {
@@ -272,7 +277,7 @@ describe('BackupManager.deleteLanTransferBackup - Security Tests', () => {
       const result = await backupManager.deleteLanTransferBackup({} as Electron.IpcMainInvokeEvent, tempDir)
 
       expect(result).toBe(true)
-      expect(fs.remove).toHaveBeenCalledWith(tempDir)
+      expect(fs.remove).toHaveBeenCalledWith(normalizePath(tempDir))
     })
 
     it('should handle path with trailing slash', async () => {

@@ -1,3 +1,4 @@
+import { RowFlex } from '@cherrystudio/ui'
 import { loggerService } from '@logger'
 import ContextStrategySelector from '@renderer/components/ContextStrategySelector'
 import { TopView } from '@renderer/components/TopView'
@@ -22,7 +23,6 @@ import { useTranslation } from 'react-i18next'
 import styled from 'styled-components'
 
 import EmojiIcon from '../EmojiIcon'
-import { HStack } from '../Layout'
 import Scrollbar from '../Scrollbar'
 
 interface Props {
@@ -296,7 +296,7 @@ const PopupContainer: React.FC<Props> = ({ resolve }) => {
       }}
       closeIcon={null}
       footer={null}>
-      <HStack style={{ padding: '0 12px', marginTop: 5 }}>
+      <RowFlex className="mt-[5px] px-3">
         <Input
           prefix={
             <SearchIcon>
@@ -313,7 +313,7 @@ const PopupContainer: React.FC<Props> = ({ resolve }) => {
           variant="borderless"
           size="middle"
         />
-      </HStack>
+      </RowFlex>
       <Divider style={{ margin: 0, marginTop: 4, borderBlockStartWidth: 0.5 }} />
       <Container ref={containerRef}>
         {take(presets, 100).map((preset, index) => (
@@ -322,10 +322,10 @@ const PopupContainer: React.FC<Props> = ({ resolve }) => {
             onClick={() => onCreateAssistant(preset)}
             className={`agent-item ${preset.id === 'default' ? 'default' : ''} ${index === selectedIndex ? 'keyboard-selected' : ''}`}
             onMouseEnter={() => setSelectedIndex(index)}>
-            <HStack alignItems="center" gap={5} style={{ overflow: 'hidden', maxWidth: '100%' }}>
+            <RowFlex className="max-w-full items-center gap-[5px] overflow-hidden">
               <EmojiIcon emoji={preset.emoji || ''} />
               <span className="text-nowrap">{preset.name}</span>
-            </HStack>
+            </RowFlex>
             {preset.id === 'default' && <Tag color="green">{t('assistants.presets.tag.system')}</Tag>}
             {preset.type === 'agent' && <Tag color="orange">{t('assistants.presets.tag.agent')}</Tag>}
             {preset.id === 'new' && <Tag color="green">{t('assistants.presets.tag.new')}</Tag>}

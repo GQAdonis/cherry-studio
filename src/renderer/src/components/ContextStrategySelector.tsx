@@ -1,3 +1,4 @@
+import { Switch } from '@cherrystudio/ui'
 import { HStack } from '@renderer/components/Layout'
 import Selector from '@renderer/components/Selector'
 import { InfoTooltip } from '@renderer/components/TooltipIcons'
@@ -9,7 +10,7 @@ import {
   CONTEXT_STRATEGY_LABELS,
   DEFAULT_CONTEXT_STRATEGY_CONFIG
 } from '@renderer/types/contextStrategy'
-import { InputNumber, Slider, Switch } from 'antd'
+import { InputNumber, Slider } from 'antd'
 import type { FC } from 'react'
 import { useTranslation } from 'react-i18next'
 import styled from 'styled-components'
@@ -78,7 +79,7 @@ const ContextStrategySelector: FC<ContextStrategySelectorProps> = ({
             <RowTitle>
               {inheritLabel || t('settings.contextStrategy.useInherited', { defaultValue: 'Use Default' })}
             </RowTitle>
-            <Switch size="small" checked={useInherited} onChange={onInheritedChange} />
+            <Switch size="sm" checked={useInherited} onCheckedChange={onInheritedChange} />
           </SettingRow>
           {useInherited && inheritedStrategyType && (
             <InheritedInfo>

@@ -1,6 +1,7 @@
+import { Switch } from '@cherrystudio/ui'
 import { loggerService } from '@logger'
 import type { Skill } from '@types'
-import { Button, Empty, List, Popover, Switch, Tooltip } from 'antd'
+import { Button, Empty, List, Popover, Tooltip } from 'antd'
 import { GraduationCap } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -56,7 +57,12 @@ export const SkillSelector = () => {
           <List.Item
             key={item.id}
             actions={[
-              <Switch key={item.id} size="small" checked={item.enabled} onChange={(v) => handleToggle(item.id, v)} />
+              <Switch
+                key={item.id}
+                size="sm"
+                checked={item.enabled}
+                onCheckedChange={(v) => handleToggle(item.id, v)}
+              />
             ]}>
             <List.Item.Meta
               title={<span style={{ fontSize: 13 }}>{item.name}</span>}

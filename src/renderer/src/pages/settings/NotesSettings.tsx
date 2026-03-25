@@ -1,9 +1,10 @@
+import { Switch } from '@cherrystudio/ui'
 import { loggerService } from '@logger'
 import Selector from '@renderer/components/Selector'
 import { useTheme } from '@renderer/context/ThemeProvider'
 import { useNotesSettings } from '@renderer/hooks/useNotesSettings'
 import type { EditorView } from '@renderer/types'
-import { Button, Input, message, Slider, Switch } from 'antd'
+import { Button, Input, message, Slider } from 'antd'
 import { FolderOpen } from 'lucide-react'
 import type { FC } from 'react'
 import { useEffect, useState } from 'react'
@@ -165,7 +166,10 @@ const NotesSettings: FC = () => {
         <SettingDivider />
         <SettingRow>
           <SettingRowTitle>{t('notes.settings.display.compress_content')}</SettingRowTitle>
-          <Switch checked={!settings.isFullWidth} onChange={(checked) => updateSettings({ isFullWidth: !checked })} />
+          <Switch
+            checked={!settings.isFullWidth}
+            onCheckedChange={(checked) => updateSettings({ isFullWidth: !checked })}
+          />
         </SettingRow>
         <SettingHelpText>{t('notes.settings.display.compress_content_description')}</SettingHelpText>
         <SettingDivider />
@@ -188,7 +192,7 @@ const NotesSettings: FC = () => {
           <SettingRowTitle>{t('notes.settings.display.show_table_of_contents')}</SettingRowTitle>
           <Switch
             checked={settings.showTableOfContents}
-            onChange={(checked) => updateSettings({ showTableOfContents: checked })}
+            onCheckedChange={(checked) => updateSettings({ showTableOfContents: checked })}
           />
         </SettingRow>
         <SettingHelpText>{t('notes.settings.display.show_table_of_contents_description')}</SettingHelpText>

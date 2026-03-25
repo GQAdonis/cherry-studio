@@ -6067,6 +6067,9 @@
       "title": "Масштаб страницы"
     }
   },
+  "tab": {
+    "new": "[to be translated]:New Tab"
+  },
   "title": {
     "apps": "Приложения",
     "artifacts": "[to be translated]:Artifact Studio",

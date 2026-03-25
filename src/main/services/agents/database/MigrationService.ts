@@ -193,12 +193,13 @@ export class MigrationService {
 
       const executionTime = Date.now() - startTime
       logger.info(`Migration ${migration.tag} completed in ${executionTime}ms`)
-    } catch (error) {
-      const msg = error instanceof Error ? error.message : String(error)
+    } catch (error: any) {
+      const msg = error?.message || error?.toString?.() || String(error)
       const isAlreadyApplied =
         msg.includes('duplicate column name') ||
         msg.includes('already exists') ||
-        msg.includes('SQLITE_ERROR: duplicate column')
+        msg.includes('SQLITE_ERROR: duplicate column') ||
+        (error?.code === 'SQLITE_ERROR' && msg.includes('duplicate'))
 
       if (isAlreadyApplied) {
         logger.warn(`Migration ${migration.tag} schema already present (column/table exists) — recording as applied`, {

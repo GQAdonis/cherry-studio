@@ -1,14 +1,13 @@
 import { AppstoreOutlined } from '@ant-design/icons'
+import { Button, CodeEditor, type CodeEditorHandles, Tooltip } from '@cherrystudio/ui'
 import { loggerService } from '@logger'
-import type { CodeEditorHandles } from '@renderer/components/CodeEditor'
-import CodeEditor from '@renderer/components/CodeEditor'
 import { CopyIcon, FilePngIcon } from '@renderer/components/Icons'
 import { isMac } from '@renderer/config/constant'
 import { useTemporaryValue } from '@renderer/hooks/useTemporaryValue'
 import { classNames } from '@renderer/utils'
 import { extractHtmlTitle, getFileNameFromHtmlTitle } from '@renderer/utils/formats'
 import { captureScrollableIframeAsBlob, captureScrollableIframeAsDataURL } from '@renderer/utils/image'
-import { Button, Dropdown, Modal, Splitter, Tooltip, Typography } from 'antd'
+import { Dropdown, Modal, Splitter, Typography } from 'antd'
 import { Camera, Check, Code, Eye, Globe, Maximize2, Minimize2, SaveIcon, SquareSplitHorizontal, X } from 'lucide-react'
 import { memo, useCallback, useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -45,19 +44,14 @@ const CodePanel = memo<CodePanelProps>(({ codeEditorRef, html, onSave, saved, on
         }}
       />
       <ToolbarWrapper>
-        <Tooltip title={saveLabel} mouseLeaveDelay={0}>
-          <ToolbarButton
-            shape="circle"
-            size="large"
-            icon={
-              saved ? (
-                <Check size={16} color="var(--color-status-success)" />
-              ) : (
-                <SaveIcon size={16} className="custom-lucide" />
-              )
-            }
-            onClick={onClickSave}
-          />
+        <Tooltip content={saveLabel} closeDelay={0}>
+          <ToolbarButton size="icon" onClick={onClickSave}>
+            {saved ? (
+              <Check size={16} color="var(--color-status-success)" />
+            ) : (
+              <SaveIcon size={16} className="custom-lucide" />
+            )}
+          </ToolbarButton>
         </Tooltip>
       </ToolbarWrapper>
     </CodeSection>
@@ -199,35 +193,38 @@ const HtmlArtifactsPopup: React.FC<HtmlArtifactsPopupProps> = ({
       <HeaderCenter>
         <ViewControls onDoubleClick={(e) => e.stopPropagation()} className="nodrag">
           <ViewButton
-            size="small"
-            type={viewMode === 'split' ? 'primary' : 'default'}
-            icon={<SquareSplitHorizontal size={14} />}
+            size="sm"
+            variant={viewMode === 'split' ? 'default' : 'secondary'}
             onClick={() => setViewMode('split')}>
+            <SquareSplitHorizontal size={14} />
             {t('html_artifacts.split')}
           </ViewButton>
           <ViewButton
-            size="small"
-            type={viewMode === 'code' ? 'primary' : 'default'}
-            icon={<Code size={14} />}
+            size="sm"
+            variant={viewMode === 'code' ? 'default' : 'secondary'}
             onClick={() => setViewMode('code')}>
+            <Code size={14} />
             {t('html_artifacts.code')}
           </ViewButton>
           <ViewButton
-            size="small"
-            type={viewMode === 'preview' ? 'primary' : 'default'}
-            icon={<Eye size={14} />}
+            size="sm"
+            variant={viewMode === 'preview' ? 'default' : 'secondary'}
             onClick={() => setViewMode('preview')}>
+            <Eye size={14} />
             {t('html_artifacts.preview')}
           </ViewButton>
         </ViewControls>
       </HeaderCenter>
 
       <HeaderRight onDoubleClick={(e) => e.stopPropagation()}>
-        <Tooltip title={t('chat.artifacts.button.openExternal')} mouseLeaveDelay={0}>
-          <Button type="text" icon={<Globe size={16} />} onClick={handleOpenExternal} className="nodrag" />
+        <Tooltip content={t('chat.artifacts.button.openExternal')}>
+          <Button variant="ghost" size="icon" onClick={handleOpenExternal} className="nodrag">
+            <Globe size={16} />
+          </Button>
         </Tooltip>
         {onOpenStudio && (
-          <Button type="text" icon={<AppstoreOutlined />} onClick={onOpenStudio} className="nodrag">
+          <Button variant="ghost" size="sm" onClick={onOpenStudio} className="nodrag">
+            <AppstoreOutlined />
             {t('artifacts.open_studio', 'Artifact Studio')}
           </Button>
         )}
@@ -249,17 +246,18 @@ const HtmlArtifactsPopup: React.FC<HtmlArtifactsPopupProps> = ({
               }
             ]
           }}>
-          <Tooltip title={t('html_artifacts.capture.label')} mouseLeaveDelay={0}>
-            <Button type="text" icon={<Camera size={16} />} className="nodrag" />
+          <Tooltip content={t('html_artifacts.capture.label')} closeDelay={0}>
+            <Button variant="ghost" size="icon" className="nodrag">
+              <Camera size={16} />
+            </Button>
           </Tooltip>
         </Dropdown>
-        <Button
-          onClick={() => setIsFullscreen(!isFullscreen)}
-          type="text"
-          icon={isFullscreen ? <Minimize2 size={16} /> : <Maximize2 size={16} />}
-          className="nodrag"
-        />
-        <Button onClick={onClose} type="text" icon={<X size={16} />} className="nodrag" />
+        <Button onClick={() => setIsFullscreen(!isFullscreen)} variant="ghost" size="icon" className="nodrag">
+          {isFullscreen ? <Minimize2 size={16} /> : <Maximize2 size={16} />}
+        </Button>
+        <Button onClick={onClose} variant="ghost" size="icon" className="nodrag">
+          <X size={16} />
+        </Button>
       </HeaderRight>
     </ModalHeader>
   )

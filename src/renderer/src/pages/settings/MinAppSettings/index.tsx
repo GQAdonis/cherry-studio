@@ -1,8 +1,9 @@
+import { Switch } from '@cherrystudio/ui'
 import { useTheme } from '@renderer/context/ThemeProvider'
 import { useAppDispatch } from '@renderer/store'
 import type { SettingsState } from '@renderer/store/settings'
 import { setMinappAutomation, setSdkSettings } from '@renderer/store/settings'
-import { Input, Switch } from 'antd'
+import { Input } from 'antd'
 import type { FC } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
@@ -77,7 +78,7 @@ const MinAppSettings: FC = () => {
           </div>
           <Switch
             checked={minappAutomation.enabled}
-            onChange={(checked) => handleAutomationChange('enabled', checked)}
+            onCheckedChange={(checked) => handleAutomationChange('enabled', checked)}
           />
         </SettingRow>
 
@@ -92,7 +93,7 @@ const MinAppSettings: FC = () => {
           </div>
           <Switch
             checked={minappAutomation.enableContextMenu}
-            onChange={(checked) => handleAutomationChange('enableContextMenu', checked)}
+            onCheckedChange={(checked) => handleAutomationChange('enableContextMenu', checked)}
             disabled={!minappAutomation.enabled}
           />
         </SettingRow>
@@ -108,7 +109,7 @@ const MinAppSettings: FC = () => {
           </div>
           <Switch
             checked={minappAutomation.injectContentScript}
-            onChange={(checked) => handleAutomationChange('injectContentScript', checked)}
+            onCheckedChange={(checked) => handleAutomationChange('injectContentScript', checked)}
             disabled={!minappAutomation.enabled}
           />
         </SettingRow>
@@ -124,7 +125,7 @@ const MinAppSettings: FC = () => {
           </div>
           <Switch
             checked={minappAutomation.enableConversationExtraction}
-            onChange={(checked) => handleAutomationChange('enableConversationExtraction', checked)}
+            onCheckedChange={(checked) => handleAutomationChange('enableConversationExtraction', checked)}
             disabled={!minappAutomation.enabled}
           />
         </SettingRow>
@@ -143,7 +144,7 @@ const MinAppSettings: FC = () => {
           </div>
           <Switch
             checked={sdkSettings.enableWebSocketServer}
-            onChange={(checked) => handleSdkChange('enableWebSocketServer', checked)}
+            onCheckedChange={(checked) => handleSdkChange('enableWebSocketServer', checked)}
           />
         </SettingRow>
 
@@ -172,7 +173,7 @@ const MinAppSettings: FC = () => {
           </div>
           <Switch
             checked={sdkSettings.autoStartServer}
-            onChange={(checked) => handleSdkChange('autoStartServer', checked)}
+            onCheckedChange={(checked) => handleSdkChange('autoStartServer', checked)}
             disabled={!sdkSettings.enableWebSocketServer}
           />
         </SettingRow>
@@ -188,7 +189,7 @@ const MinAppSettings: FC = () => {
           </div>
           <Switch
             checked={sdkSettings.requireApproval}
-            onChange={(checked) => handleSdkChange('requireApproval', checked)}
+            onCheckedChange={(checked) => handleSdkChange('requireApproval', checked)}
             disabled={!sdkSettings.enableWebSocketServer}
           />
         </SettingRow>
@@ -213,7 +214,7 @@ const MinAppSettings: FC = () => {
                 </div>
                 <Switch
                   checked={true}
-                  onChange={() => {
+                  onCheckedChange={() => {
                     const newTrustedApps = { ...sdkSettings.trustedApps }
                     delete newTrustedApps[appId]
                     handleSdkChange('trustedApps', newTrustedApps)

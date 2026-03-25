@@ -10,6 +10,7 @@
  */
 
 import { DeleteOutlined, PlusOutlined, SettingOutlined } from '@ant-design/icons'
+import { Switch } from '@cherrystudio/ui'
 import { useTheme } from '@renderer/context/ThemeProvider'
 import { ARTIFACT_STUDIO_AGENT_ID } from '@renderer/features/artifacts/services/ArtifactStudioRuntimeService'
 import { AgentSettingsPopup } from '@renderer/pages/settings/AgentSettings'
@@ -38,7 +39,7 @@ import {
   setArtifactStudioOverridePolicy,
   setArtifactTypes
 } from '@renderer/store/settings'
-import { Button, Checkbox, Input, InputNumber, Segmented, Select, Space, Switch, Table, Tag } from 'antd'
+import { Button, Checkbox, Input, InputNumber, Segmented, Select, Space, Table, Tag } from 'antd'
 import type { ColumnsType } from 'antd/es/table'
 import { merge } from 'lodash'
 import type { FC } from 'react'
@@ -268,7 +269,7 @@ const ArtifactSettings: FC = () => {
 
         <SettingRow>
           <SettingRowTitle>{t('settings.artifacts.enable', 'Enable Artifact Support')}</SettingRowTitle>
-          <Switch checked={safeSettings.enabled} onChange={handleEnabledChange} />
+          <Switch checked={safeSettings.enabled} onCheckedChange={handleEnabledChange} />
         </SettingRow>
         <SettingHelpText>
           {t(
@@ -281,7 +282,11 @@ const ArtifactSettings: FC = () => {
 
         <SettingRow>
           <SettingRowTitle>{t('settings.artifacts.auto_open', 'Auto-open Artifacts')}</SettingRowTitle>
-          <Switch checked={safeSettings.autoOpen} onChange={handleAutoOpenChange} disabled={!safeSettings.enabled} />
+          <Switch
+            checked={safeSettings.autoOpen}
+            onCheckedChange={handleAutoOpenChange}
+            disabled={!safeSettings.enabled}
+          />
         </SettingRow>
         <SettingHelpText>
           {t(
@@ -354,7 +359,7 @@ const ArtifactSettings: FC = () => {
           </SettingRowTitle>
           <Switch
             checked={allowDynamicDependencies}
-            onChange={(checked) => dispatch(setArtifactRuntimeAllowDynamicDependencies(checked))}
+            onCheckedChange={(checked) => dispatch(setArtifactRuntimeAllowDynamicDependencies(checked))}
             disabled={!safeSettings.enabled || runtimeProfile === 'basic'}
           />
         </SettingRow>
@@ -364,7 +369,7 @@ const ArtifactSettings: FC = () => {
           </SettingRowTitle>
           <Switch
             checked={allowExternalResources}
-            onChange={(checked) => dispatch(setArtifactRuntimeAllowExternalResources(checked))}
+            onCheckedChange={(checked) => dispatch(setArtifactRuntimeAllowExternalResources(checked))}
             disabled={!safeSettings.enabled || runtimeProfile === 'basic'}
           />
         </SettingRow>
@@ -374,7 +379,7 @@ const ArtifactSettings: FC = () => {
           </SettingRowTitle>
           <Switch
             checked={allowCustomBundlerUrl}
-            onChange={(checked) => dispatch(setArtifactRuntimeAllowCustomBundlerUrl(checked))}
+            onCheckedChange={(checked) => dispatch(setArtifactRuntimeAllowCustomBundlerUrl(checked))}
             disabled={!safeSettings.enabled || runtimeProfile !== 'advanced'}
           />
         </SettingRow>
@@ -389,7 +394,7 @@ const ArtifactSettings: FC = () => {
           <SettingRowTitle>{t('settings.artifacts.react.use_sandpack', 'Use Sandpack Runtime')}</SettingRowTitle>
           <Switch
             checked={safeSettings.react?.useSandpack ?? true}
-            onChange={handleUseSandpackChange}
+            onCheckedChange={handleUseSandpackChange}
             disabled={!isReactEnabled}
           />
         </SettingRow>
@@ -406,7 +411,7 @@ const ArtifactSettings: FC = () => {
           <SettingRowTitle>{t('settings.artifacts.react.show_editor', 'Show Code Editor')}</SettingRowTitle>
           <Switch
             checked={safeSettings.react?.showEditor ?? false}
-            onChange={handleShowEditorChange}
+            onCheckedChange={handleShowEditorChange}
             disabled={!isSandpackEnabled}
           />
         </SettingRow>
@@ -423,7 +428,7 @@ const ArtifactSettings: FC = () => {
           <SettingRowTitle>{t('settings.artifacts.react.show_console', 'Show Console')}</SettingRowTitle>
           <Switch
             checked={safeSettings.react?.showConsole ?? false}
-            onChange={handleShowConsoleChange}
+            onCheckedChange={handleShowConsoleChange}
             disabled={!isSandpackEnabled}
           />
         </SettingRow>
@@ -535,7 +540,7 @@ const ArtifactSettings: FC = () => {
               </SettingRowTitle>
               <Switch
                 checked={safeStudioSettings.overridePolicy.allowConversationOverride}
-                onChange={(checked) =>
+                onCheckedChange={(checked) =>
                   dispatch(setArtifactStudioOverridePolicy({ allowConversationOverride: checked }))
                 }
                 disabled={!safeSettings.enabled}
@@ -547,7 +552,9 @@ const ArtifactSettings: FC = () => {
               </SettingRowTitle>
               <Switch
                 checked={safeStudioSettings.overridePolicy.allowProjectOverride}
-                onChange={(checked) => dispatch(setArtifactStudioOverridePolicy({ allowProjectOverride: checked }))}
+                onCheckedChange={(checked) =>
+                  dispatch(setArtifactStudioOverridePolicy({ allowProjectOverride: checked }))
+                }
                 disabled={!safeSettings.enabled}
               />
             </SettingRow>
@@ -644,7 +651,7 @@ const ArtifactSettings: FC = () => {
                 </SettingRowTitle>
                 <Switch
                   checked={safeStudioSettings.defaults.llm.streamOutput ?? true}
-                  onChange={(checked) => dispatch(setArtifactStudioDefaultLlm({ streamOutput: checked }))}
+                  onCheckedChange={(checked) => dispatch(setArtifactStudioDefaultLlm({ streamOutput: checked }))}
                   disabled={!safeSettings.enabled}
                 />
               </StudioToggleField>
@@ -767,7 +774,7 @@ const ArtifactSettings: FC = () => {
               </SettingRowTitle>
               <Switch
                 checked={safeStudioSettings.defaults.knowledge.autoCreateFromChatHistory}
-                onChange={(checked) =>
+                onCheckedChange={(checked) =>
                   dispatch(setArtifactStudioDefaultKnowledge({ autoCreateFromChatHistory: checked }))
                 }
                 disabled={!safeSettings.enabled}

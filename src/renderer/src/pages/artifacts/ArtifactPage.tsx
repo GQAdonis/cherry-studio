@@ -69,7 +69,7 @@ import ResizablePanes from './components/ResizablePanes'
 const logger = loggerService.withContext('ArtifactPage')
 
 const ArtifactPage: React.FC = () => {
-  const { artifactId, projectId } = useAppParams<{ artifactId?: string; projectId?: string }>()
+  const { artifactId, projectId } = useAppParams()
   const { t } = useTranslation()
   const navigate = useAppNavigate()
   const dispatch = useAppDispatch()

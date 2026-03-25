@@ -6067,6 +6067,9 @@
       "title": "Κλίμακα"
     }
   },
+  "tab": {
+    "new": "[to be translated]:New Tab"
+  },
   "title": {
     "apps": "Εφαρμογές",
     "artifacts": "[to be translated]:Artifact Studio",

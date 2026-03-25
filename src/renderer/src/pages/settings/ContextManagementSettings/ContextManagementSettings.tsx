@@ -10,7 +10,7 @@ import { setContextStrategy, setContextSummarizationModelId } from '@renderer/st
 import type { Model } from '@renderer/types'
 import type { ContextStrategyConfig } from '@renderer/types/contextStrategy'
 import { DEFAULT_CONTEXT_STRATEGY_CONFIG } from '@renderer/types/contextStrategy'
-import { Badge, Switch } from 'antd'
+import { Badge } from 'antd'
 import { find } from 'lodash'
 import { Layers, Sparkles } from 'lucide-react'
 import type { FC } from 'react'
@@ -105,7 +105,7 @@ const ContextManagementSettings: FC = () => {
               }}
             />
           </HStack>
-          <Switch checked={isEnabled} onChange={handleEnableToggle} />
+          <Switch checked={isEnabled} onCheckedChange={handleEnableToggle} />
         </HStack>
         <SettingDescription>
           {t('settings.contextStrategy.globalDescription', {
@@ -226,6 +226,7 @@ const ContextManagementSettings: FC = () => {
   )
 }
 
+import { Switch } from '@cherrystudio/ui'
 import styled from 'styled-components'
 
 const InfoBox = styled.div`

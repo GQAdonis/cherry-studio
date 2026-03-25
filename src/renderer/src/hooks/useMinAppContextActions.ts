@@ -12,10 +12,10 @@ import type { KnowledgeBase, KnowledgeItem } from '@renderer/types'
 import { uuid } from '@renderer/utils'
 import { minappControllerServer } from '@renderer/utils/mcpServerUtils'
 import { IpcChannel } from '@shared/IpcChannel'
+import { useNavigate } from '@tanstack/react-router'
 import { message } from 'antd'
 import { useCallback, useEffect } from 'react'
 import { useSelector } from 'react-redux'
-import { useNavigate } from 'react-router-dom'
 
 export interface ContextMenuActionPayload {
   action: 'send-to-chat' | 'send-to-kb' | 'ask-about' | 'save-as-note' | 'extract-page' | 'extract-conversations'
@@ -84,7 +84,7 @@ export function useMinAppContextActions() {
       }
 
       // Navigate to chat if needed
-      navigate('/')
+      navigate({ to: '/' })
     },
     [navigate]
   )
@@ -136,7 +136,7 @@ export function useMinAppContextActions() {
         window.api.quoteToMainWindow(prompt)
       }
 
-      navigate('/')
+      navigate({ to: '/' })
     },
     [navigate]
   )
@@ -219,7 +219,7 @@ export function useMinAppContextActions() {
           if (window.api?.quoteToMainWindow) {
             window.api.quoteToMainWindow(extractedContent)
           }
-          navigate('/')
+          navigate({ to: '/' })
           message.success('Page content sent to chat')
         }
       } catch (error) {
@@ -278,7 +278,7 @@ export function useMinAppContextActions() {
           if (window.api?.quoteToMainWindow) {
             window.api.quoteToMainWindow(conversationsJson)
           }
-          navigate('/')
+          navigate({ to: '/' })
           return
         }
 

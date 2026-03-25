@@ -1,5 +1,4 @@
 import { render, screen } from '@testing-library/react'
-import type * as Antd from 'antd'
 import type { ReactNode } from 'react'
 import { beforeAll, describe, expect, it, vi } from 'vitest'
 
@@ -72,7 +71,7 @@ vi.mock('react-i18next', () => ({
 }))
 
 vi.mock('antd', async () => {
-  const actual = await vi.importActual<typeof Antd>('antd')
+  const actual = await vi.importActual<Record<string, unknown>>('antd')
 
   return {
     ...actual,

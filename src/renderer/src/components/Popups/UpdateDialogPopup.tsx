@@ -1,8 +1,7 @@
 import { loggerService } from '@logger'
 import { TopView } from '@renderer/components/TopView'
-import { useRuntime } from '@renderer/hooks/useRuntime'
-import { handleSaveData, useAppDispatch } from '@renderer/store'
-import { setUpdateState } from '@renderer/store/runtime'
+import { useAppUpdateState } from '@renderer/hooks/useAppUpdate'
+import { handleSaveData } from '@renderer/store'
 import { Button, Modal } from 'antd'
 import type { ReleaseNoteInfo, UpdateInfo } from 'builder-util-runtime'
 import { useEffect, useState } from 'react'
@@ -22,11 +21,9 @@ interface Props extends ShowParams {
 
 const PopupContainer: React.FC<Props> = ({ releaseInfo, resolve }) => {
   const { t } = useTranslation()
-  const { update } = useRuntime()
   const [open, setOpen] = useState(true)
   const [isInstalling, setIsInstalling] = useState(false)
-  const dispatch = useAppDispatch()
-
+  const { appUpdateState, updateAppUpdateState } = useAppUpdateState()
   useEffect(() => {
     if (releaseInfo) {
       logger.info('Update dialog opened', { version: releaseInfo.version })
@@ -34,7 +31,7 @@ const PopupContainer: React.FC<Props> = ({ releaseInfo, resolve }) => {
   }, [releaseInfo])
 
   const handleInstall = async () => {
-    if (update.downloaded) {
+    if (appUpdateState.downloaded) {
       setIsInstalling(true)
       try {
         await handleSaveData()
@@ -54,7 +51,7 @@ const PopupContainer: React.FC<Props> = ({ releaseInfo, resolve }) => {
   }
 
   const onCancel = () => {
-    dispatch(setUpdateState({ manualCheck: false }))
+    updateAppUpdateState({ manualCheck: false })
     setOpen(false)
   }
 
@@ -63,7 +60,7 @@ const PopupContainer: React.FC<Props> = ({ releaseInfo, resolve }) => {
   }
 
   const onIgnore = () => {
-    dispatch(setUpdateState({ ignore: true, manualCheck: false }))
+    updateAppUpdateState({ ignore: true, manualCheck: false })
     setOpen(false)
   }
 
@@ -90,7 +87,7 @@ const PopupContainer: React.FC<Props> = ({ releaseInfo, resolve }) => {
           {t('update.later')}
         </Button>,
         <Button key="install" type="primary" onClick={handleInstall} loading={isInstalling}>
-          {update.downloaded ? t('update.install') : t('update.download')}
+          {appUpdateState.downloaded ? t('update.install') : t('update.download')}
         </Button>
       ]}>
       <ModalBodyWrapper>

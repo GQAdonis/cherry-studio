@@ -1,4 +1,5 @@
 import { CopyOutlined, DatabaseOutlined, FolderOutlined, GlobalOutlined, PlusOutlined } from '@ant-design/icons'
+import { Switch } from '@cherrystudio/ui'
 import { useAppNavigate } from '@renderer/hooks/useAppNavigate'
 import type {
   Skill,
@@ -19,7 +20,6 @@ import {
   Modal,
   Select,
   Slider,
-  Switch,
   Tag,
   Tooltip,
   Typography
@@ -541,12 +541,7 @@ export default function SkillSettings() {
                         onClick={() => handleCopyInstructions(skill)}
                       />
                     </Tooltip>
-                    <Switch
-                      checked={skill.enabled}
-                      onChange={(checked) => handleToggle(skill.id, checked)}
-                      checkedChildren="On"
-                      unCheckedChildren="Off"
-                    />
+                    <Switch checked={skill.enabled} onCheckedChange={(checked) => handleToggle(skill.id, checked)} />
                   </div>
                 }>
                 {skill.path && (

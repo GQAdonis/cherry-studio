@@ -1,4 +1,5 @@
 import { ExportOutlined } from '@ant-design/icons'
+import { Switch } from '@cherrystudio/ui'
 import E2BLogo from '@renderer/assets/images/providers/e2b.png'
 import { InfoTooltip } from '@renderer/components/TooltipIcons'
 import { useTheme } from '@renderer/context/ThemeProvider'
@@ -8,7 +9,7 @@ import { updateMCPServer } from '@renderer/store/mcp'
 import type { E2BOptions } from '@renderer/types'
 import { BuiltinMCPServerNames } from '@renderer/types'
 import { formatApiKeys } from '@renderer/utils'
-import { Avatar, Button, Divider, Flex, Input, InputNumber, Select, Slider, Switch } from 'antd'
+import { Avatar, Button, Divider, Flex, Input, InputNumber, Select, Slider } from 'antd'
 import Link from 'antd/es/typography/Link'
 import type { FC } from 'react'
 import { useCallback, useEffect, useState } from 'react'
@@ -201,7 +202,7 @@ const E2BSettings: FC = () => {
               <InfoTooltip title={t('settings.tool.preprocess.e2b.chat_tool.tooltip')} />
             </Flex>
           </SettingRowTitle>
-          <Switch checked={enableChatTool} onChange={handleEnableChatToolChange} disabled={!apiKey} />
+          <Switch checked={enableChatTool} onCheckedChange={handleEnableChatToolChange} disabled={!apiKey} />
         </SettingRow>
         {enableChatTool && (
           <>

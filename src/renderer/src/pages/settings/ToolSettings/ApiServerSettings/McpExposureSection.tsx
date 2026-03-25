@@ -4,12 +4,13 @@
  * Centralized settings for managing which resources (agents, knowledge bases,
  * MCP servers) are exposed as MCP endpoints for external AI tools.
  */
+import { Switch } from '@cherrystudio/ui'
 import { useAgentClient } from '@renderer/hooks/agents/useAgentClient'
 import { useAgents } from '@renderer/hooks/agents/useAgents'
 import { useAppDispatch } from '@renderer/store'
 import { setKnowledgeBaseExposed } from '@renderer/store/knowledge'
 import { setMcpExposureEnabled } from '@renderer/store/settings'
-import { Badge, Collapse, Switch, Typography } from 'antd'
+import { Badge, Collapse, Typography } from 'antd'
 import { BookOpen, Bot, Globe, Server } from 'lucide-react'
 import type { FC } from 'react'
 import { useCallback, useMemo } from 'react'
@@ -77,8 +78,8 @@ const McpExposureSection: FC = () => {
         </ToggleInfo>
         <Switch
           checked={mcpExposureEnabled}
-          onChange={(checked) => dispatch(setMcpExposureEnabled(checked))}
-          size="small"
+          onCheckedChange={(checked) => dispatch(setMcpExposureEnabled(checked))}
+          size="sm"
         />
       </MasterToggleRow>
 
@@ -135,8 +136,8 @@ const McpExposureSection: FC = () => {
                           </ItemInfo>
                           <Switch
                             checked={agent.exposed_via_mcp ?? false}
-                            onChange={(checked) => toggleAgentExposure(agent.id, checked)}
-                            size="small"
+                            onCheckedChange={(checked) => toggleAgentExposure(agent.id, checked)}
+                            size="sm"
                           />
                         </ItemRow>
                       ))
@@ -180,10 +181,10 @@ const McpExposureSection: FC = () => {
                           </ItemInfo>
                           <Switch
                             checked={kb.exposedViaMcp ?? false}
-                            onChange={(checked) =>
+                            onCheckedChange={(checked) =>
                               dispatch(setKnowledgeBaseExposed({ baseId: kb.id, exposed: checked }))
                             }
-                            size="small"
+                            size="sm"
                           />
                         </ItemRow>
                       ))
@@ -227,8 +228,10 @@ const McpExposureSection: FC = () => {
                           </ItemInfo>
                           <Switch
                             checked={server.exposedViaMcp ?? false}
-                            onChange={(checked) => dispatch(setMcpServerExposed({ id: server.id, exposed: checked }))}
-                            size="small"
+                            onCheckedChange={(checked) =>
+                              dispatch(setMcpServerExposed({ id: server.id, exposed: checked }))
+                            }
+                            size="sm"
                           />
                         </ItemRow>
                       ))

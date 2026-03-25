@@ -9,9 +9,9 @@ const mocks = vi.hoisted(() => ({
   getTopicMessages: vi.fn().mockResolvedValue([])
 }))
 
-vi.mock('react-router-dom', () => ({
-  useNavigate: () => mocks.navigate,
-  useParams: () => ({})
+vi.mock('@renderer/hooks/useAppNavigate', () => ({
+  useAppNavigate: () => mocks.navigate,
+  useAppParams: () => ({})
 }))
 
 vi.mock('@renderer/context/ThemeProvider', () => ({

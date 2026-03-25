@@ -6067,6 +6067,9 @@
       "title": "縮放"
     }
   },
+  "tab": {
+    "new": "新標籤頁"
+  },
   "title": {
     "apps": "小程式",
     "artifacts": "[to be translated]:Artifact Studio",

@@ -1,4 +1,5 @@
 import { ExportOutlined } from '@ant-design/icons'
+import { Switch } from '@cherrystudio/ui'
 import { InfoTooltip } from '@renderer/components/TooltipIcons'
 import { getPreprocessProviderLogo, PREPROCESS_PROVIDER_CONFIG } from '@renderer/config/preprocessProviders'
 import { usePreprocessProvider } from '@renderer/hooks/usePreprocess'
@@ -7,7 +8,7 @@ import { updateMCPServer } from '@renderer/store/mcp'
 import type { PreprocessProvider, UnstructuredOptions } from '@renderer/types'
 import { BuiltinMCPServerNames } from '@renderer/types'
 import { formatApiKeys } from '@renderer/utils'
-import { Avatar, Button, Divider, Flex, Input, InputNumber, Select, Slider, Switch } from 'antd'
+import { Avatar, Button, Divider, Flex, Input, InputNumber, Select, Slider } from 'antd'
 import Link from 'antd/es/typography/Link'
 import type { FC } from 'react'
 import { useCallback, useEffect, useMemo, useState } from 'react'
@@ -157,7 +158,7 @@ export const UnstructuredSettings: FC<Props> = ({ provider: _provider }) => {
     <>
       <SettingTitle>
         <Flex align="center" gap={8}>
-          <ProviderLogo shape="square" src={getPreprocessProviderLogo(provider.id)} size={16} />
+          <ProviderLogo shape="square" src={getPreprocessProviderLogo(provider.id) as any} size={16} />
           <ProviderName>{provider.name}</ProviderName>
           {officialWebsite && (
             <Link target="_blank" href={officialWebsite}>
@@ -220,7 +221,7 @@ export const UnstructuredSettings: FC<Props> = ({ provider: _provider }) => {
             <InfoTooltip title={t('settings.tool.preprocess.unstructured.chat_tool.tooltip')} />
           </Flex>
         </SettingRowTitle>
-        <Switch checked={enableChatTool} onChange={handleEnableChatToolChange} disabled={!apiKey} />
+        <Switch checked={enableChatTool} onCheckedChange={handleEnableChatToolChange} disabled={!apiKey} />
       </SettingRow>
       {enableChatTool && (
         <SettingHelpText style={{ marginTop: 5 }}>
@@ -290,7 +291,7 @@ export const UnstructuredSettings: FC<Props> = ({ provider: _provider }) => {
             <InfoTooltip title={t('settings.tool.preprocess.unstructured.options.split_pdf.tooltip')} />
           </Flex>
         </SettingRowTitle>
-        <Switch checked={splitPdfPage} onChange={handleSplitPdfPageChange} />
+        <Switch checked={splitPdfPage} onCheckedChange={handleSplitPdfPageChange} />
       </SettingRow>
 
       {/* Concurrency Level */}

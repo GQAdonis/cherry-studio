@@ -7,8 +7,9 @@ const mocks = vi.hoisted(() => ({
   navigate: vi.fn()
 }))
 
-vi.mock('react-router-dom', () => ({
-  useNavigate: () => mocks.navigate
+vi.mock('@tanstack/react-router', () => ({
+  useNavigate: () => mocks.navigate,
+  Link: ({ children, ...props }: any) => <a {...props}>{children}</a>
 }))
 
 vi.mock('@renderer/hooks/useSettings', () => ({
@@ -19,7 +20,8 @@ vi.mock('@renderer/hooks/useSettings', () => ({
 
 vi.mock('@renderer/hooks/useMinapps', () => ({
   useMinapps: () => ({
-    pinned: []
+    pinned: [],
+    openedKeepAliveMinapps: []
   })
 }))
 
@@ -47,6 +49,6 @@ describe('LaunchpadPage', () => {
 
     fireEvent.click(screen.getByText(/artifact studio|文物工作室/i))
 
-    expect(mocks.navigate).toHaveBeenCalledWith('/artifacts')
+    expect(mocks.navigate).toHaveBeenCalledWith({ to: '/artifacts' })
   })
 })

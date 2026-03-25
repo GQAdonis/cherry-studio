@@ -99,17 +99,9 @@ files:
   - "!node_modules/tesseract.js-core/{tesseract-core-lstm.js,tesseract-core-lstm.wasm,tesseract-core-lstm.wasm.js}" # we don't need source files
   - "!node_modules/tesseract.js-core/{tesseract-core-simd-lstm.js,tesseract-core-simd-lstm.wasm,tesseract-core-simd-lstm.wasm.js}" # we don't need source files
   - "!**/*.{h,iobj,ipdb,tlog,recipe,vcxproj,vcxproj.filters,Makefile,*.Makefile}" # filter .node build files
-# copy from node_modules/claude-code-plugins/plugins to resources/data/claude-code-plugins
 extraResources:
-  - from: "./node_modules/claude-code-plugins/plugins/"
-    to: "claude-code-plugins"
-  # Copy built-in skills to Resources folder for proper file system access
-  - from: "./resources/skills/"
-    to: "skills"
-  # Copy UAR binaries
-  - from: "resources/bin/"
-    to: "bin"
-
+  - from: "migrations/sqlite-drizzle"
+    to: "migrations/sqlite-drizzle"
 win:
   executableName: The Boss
   artifactName: ${productName}-${version}-${arch}-setup.${ext}
@@ -149,24 +141,31 @@ dmg:
   artifactName: The-Boss-${version}-${arch}.${ext}
 linux:
   artifactName: ${productName}-${version}-${arch}.${ext}
-  executableName: The Boss
+  executableName: theboss
+  icon: build/icon.png
   target:
-    - target: AppImage
     - target: deb
-    - target: rpm
   maintainer: electronjs.org
   category: Utility
   desktop:
     entry:
-      StartupWMClass: CherryStudio
+      StartupWMClass: TheBoss
       Name: The Boss
+      Icon: theboss
 
   mimeTypes:
     - x-scheme-handler/boss
-rpm:
-  # Workaround for electron build issue on rpm package:
-  # https://github.com/electron/forge/issues/3594
-  fpm: ["--rpm-rpmbuild-define=_build_id_links none"]
+deb:
+  depends:
+    - libgtk-3-0
+    - libnotify4
+    - libnss3
+    - libxss1
+    - libxtst6
+    - xdg-utils
+    - libatspi2.0-0
+    - libuuid1
+    - libsecret-1-0
 publish:
   provider: generic
   url: https://releases.cherry-ai.com
