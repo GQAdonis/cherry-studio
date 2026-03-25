@@ -39,6 +39,28 @@ function electronResolvePlugin() {
   if (process.env.ELECTRON_RUN_AS_NODE) {
     delete process.env.ELECTRON_RUN_AS_NODE;
   }
+
+  // Polyfill DOMMatrix/ImageData/Path2D for pdfjs-dist in Node.js main process.
+  // pdfjs-dist uses these at module load time; they exist in browsers but not Node.
+  if (!globalThis.DOMMatrix) {
+    globalThis.DOMMatrix = class DOMMatrix {
+      constructor() { this.a=1;this.b=0;this.c=0;this.d=1;this.e=0;this.f=0; }
+      isIdentity = true;
+      translate() { return new DOMMatrix(); }
+      scale() { return new DOMMatrix(); }
+      multiply() { return new DOMMatrix(); }
+      inverse() { return new DOMMatrix(); }
+      transformPoint() { return { x: 0, y: 0, z: 0, w: 1 }; }
+    };
+  }
+  if (!globalThis.ImageData) {
+    globalThis.ImageData = class ImageData {
+      constructor(w, h) { this.width = w || 0; this.height = h || 0; this.data = new Uint8ClampedArray(this.width * this.height * 4); }
+    };
+  }
+  if (!globalThis.Path2D) {
+    globalThis.Path2D = class Path2D { constructor() {} };
+  }
 })();
 `
 
