@@ -197,7 +197,12 @@ if (!app.requestSingleInstanceLock()) {
     }
 
     // Data Migration v2
-    // Check if data migration is needed BEFORE creating any windows
+    // Skip v2 data migration for now — the v1.8.x data layer (Redux/Dexie) is still
+    // the active data layer in The Boss fork. The v2 migration will be re-enabled
+    // when the fork completes Phase 3 (state management migration to DataApi).
+    // Without this skip, fresh installs and upgrades get stuck on the migration
+    // window because the migration flow requires renderer-side data export from
+    // systems that may not be initialized yet.
     try {
       logger.info('Checking if data migration v2 is needed')
 
@@ -210,7 +215,15 @@ if (!app.requestSingleInstanceLock()) {
       const needsMigration = await migrationEngine.needsMigration()
       logger.info('Migration status check result', { needsMigration })
 
+      // Skip migration and mark as completed — v1.8.x data layer is still active
       if (needsMigration) {
+        logger.info('Skipping v2 data migration — v1.8.x data layer still active in The Boss fork')
+        await migrationEngine.markCompleted()
+        unregisterMigrationIpcHandlers()
+      }
+
+      if (false && needsMigration) {
+        // Disabled: v2 migration window — re-enable in Phase 3
         logger.info('Data Migration v2 needed, starting migration process')
 
         try {

@@ -332,7 +332,7 @@ export class MigrationEngine {
   /**
    * Mark migration as completed in app_state
    */
-  private async markCompleted(): Promise<void> {
+  async markCompleted(): Promise<void> {
     const db = dbService.getDb()
     const statusValue: MigrationStatusValue = {
       status: 'completed',
