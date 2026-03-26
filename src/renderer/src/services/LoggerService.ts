@@ -181,7 +181,9 @@ class LoggerService {
 
       // In renderer process, use window.api.logToMain to send log to main process
       if (!IS_WORKER) {
-        window.electron.ipcRenderer.invoke(IpcChannel.App_LogToMain, source, level, message, data)
+        window.electron.ipcRenderer.invoke(IpcChannel.App_LogToMain, source, level, message, data).catch(() => {
+          // Silently ignore — handler may not be registered yet during early startup
+        })
       } else {
         //TODO support worker to send log to main process
       }

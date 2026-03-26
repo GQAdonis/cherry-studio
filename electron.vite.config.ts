@@ -202,10 +202,13 @@ export default defineConfig({
         'dockerfile-ast',
         '@e2b/code-interpreter',
         'e2b',
-        'unstructured-client',
-        // Exclude optional sandpack packages
+        'unstructured-client'
+      ],
+      include: [
+        // Force pre-bundle sandpack and its CJS deps (anser) for ESM compat
         '@codesandbox/sandpack-react',
-        '@codesandbox/sandpack-themes'
+        '@codesandbox/sandpack-themes',
+        'anser'
       ],
       esbuildOptions: {
         target: 'esnext' // for dev
