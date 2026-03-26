@@ -242,6 +242,8 @@ const SettingContent = styled.div`
   display: flex;
   height: 100%;
   flex: 1;
+  overflow-y: auto;
+  min-width: 0;
 `
 
 const Divider = styled(AntDivider)`

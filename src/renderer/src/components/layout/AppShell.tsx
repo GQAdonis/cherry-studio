@@ -34,8 +34,8 @@ export const AppShell = () => {
     addTab({
       id: uuid(),
       type: 'route',
-      url: '/',
-      title: getDefaultRouteTitle('/')
+      url: '/app/chat',
+      title: getDefaultRouteTitle('/app/chat')
     })
   }
 
@@ -47,8 +47,14 @@ export const AppShell = () => {
       <div className="flex h-full w-full flex-1 flex-col overflow-hidden">
         {/* Zone 2: Tab Bar */}
         <Tabs value={activeTabId} onValueChange={setActiveTab} variant="line" className="w-full">
-          <header className="flex h-10 w-full items-center border-b bg-muted/5">
-            <TabsList className="flex h-full min-w-0 flex-1 justify-start gap-0 overflow-hidden">
+          {}
+          <header
+            className="flex h-10 w-full items-center border-b bg-muted/5"
+            style={{ WebkitAppRegion: 'drag' } as any}>
+            {}
+            <TabsList
+              className="flex h-full min-w-0 flex-1 justify-start gap-0 overflow-hidden"
+              style={{ WebkitAppRegion: 'no-drag' } as any}>
               {tabs.map((tab) => (
                 <TabsTrigger
                   key={tab.id}
@@ -85,7 +91,7 @@ export const AppShell = () => {
         </Tabs>
 
         {/* Zone 3: Content Area - Multi MemoryRouter Architecture */}
-        <main className="relative flex-1 overflow-hidden bg-background">
+        <main className="relative flex-1 overflow-y-auto overflow-x-hidden bg-background">
           {/* Route Tabs: Only render non-dormant tabs */}
           {tabs
             .filter((t) => t.type === 'route' && !t.isDormant)

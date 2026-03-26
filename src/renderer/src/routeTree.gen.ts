@@ -29,6 +29,11 @@ import { Route as SettingsDocprocessRouteImport } from './routes/settings/docpro
 import { Route as SettingsDisplayRouteImport } from './routes/settings/display'
 import { Route as SettingsDataRouteImport } from './routes/settings/data'
 import { Route as SettingsApiServerRouteImport } from './routes/settings/api-server'
+import { Route as SettingsArtifactsRouteImport } from './routes/settings/artifacts'
+import { Route as SettingsContextRouteImport } from './routes/settings/context'
+import { Route as SettingsE2bRouteImport } from './routes/settings/e2b'
+import { Route as SettingsMinappRouteImport } from './routes/settings/minapp'
+import { Route as SettingsSkillsRouteImport } from './routes/settings/skills'
 import { Route as SettingsAboutRouteImport } from './routes/settings/about'
 import { Route as AppTranslateRouteImport } from './routes/app/translate'
 import { Route as AppNotesRouteImport } from './routes/app/notes'
@@ -158,6 +163,31 @@ const SettingsDataRoute = SettingsDataRouteImport.update({
 const SettingsApiServerRoute = SettingsApiServerRouteImport.update({
   id: '/api-server',
   path: '/api-server',
+  getParentRoute: () => SettingsRoute,
+} as any)
+const SettingsArtifactsRoute = SettingsArtifactsRouteImport.update({
+  id: '/artifacts',
+  path: '/artifacts',
+  getParentRoute: () => SettingsRoute,
+} as any)
+const SettingsContextRoute = SettingsContextRouteImport.update({
+  id: '/context',
+  path: '/context',
+  getParentRoute: () => SettingsRoute,
+} as any)
+const SettingsE2bRoute = SettingsE2bRouteImport.update({
+  id: '/e2b',
+  path: '/e2b',
+  getParentRoute: () => SettingsRoute,
+} as any)
+const SettingsMinappRoute = SettingsMinappRouteImport.update({
+  id: '/minapp',
+  path: '/minapp',
+  getParentRoute: () => SettingsRoute,
+} as any)
+const SettingsSkillsRoute = SettingsSkillsRouteImport.update({
+  id: '/skills',
+  path: '/skills',
   getParentRoute: () => SettingsRoute,
 } as any)
 const SettingsAboutRoute = SettingsAboutRouteImport.update({
@@ -1059,12 +1089,16 @@ const SettingsWebsearchRouteWithChildren =
 interface SettingsRouteChildren {
   SettingsAboutRoute: typeof SettingsAboutRoute
   SettingsApiServerRoute: typeof SettingsApiServerRoute
+  SettingsArtifactsRoute: typeof SettingsArtifactsRoute
+  SettingsContextRoute: typeof SettingsContextRoute
   SettingsDataRoute: typeof SettingsDataRoute
   SettingsDisplayRoute: typeof SettingsDisplayRoute
   SettingsDocprocessRoute: typeof SettingsDocprocessRoute
+  SettingsE2bRoute: typeof SettingsE2bRoute
   SettingsGeneralRoute: typeof SettingsGeneralRoute
   SettingsMcpRoute: typeof SettingsMcpRouteWithChildren
   SettingsMemoryRoute: typeof SettingsMemoryRoute
+  SettingsMinappRoute: typeof SettingsMinappRoute
   SettingsModelRoute: typeof SettingsModelRoute
   SettingsNotesRoute: typeof SettingsNotesRoute
   SettingsProviderRoute: typeof SettingsProviderRoute
@@ -1072,6 +1106,7 @@ interface SettingsRouteChildren {
   SettingsQuickphraseRoute: typeof SettingsQuickphraseRoute
   SettingsSelectionAssistantRoute: typeof SettingsSelectionAssistantRoute
   SettingsShortcutRoute: typeof SettingsShortcutRoute
+  SettingsSkillsRoute: typeof SettingsSkillsRoute
   SettingsWebsearchRoute: typeof SettingsWebsearchRouteWithChildren
   SettingsIndexRoute: typeof SettingsIndexRoute
 }
@@ -1079,12 +1114,16 @@ interface SettingsRouteChildren {
 const SettingsRouteChildren: SettingsRouteChildren = {
   SettingsAboutRoute: SettingsAboutRoute,
   SettingsApiServerRoute: SettingsApiServerRoute,
+  SettingsArtifactsRoute: SettingsArtifactsRoute,
+  SettingsContextRoute: SettingsContextRoute,
   SettingsDataRoute: SettingsDataRoute,
   SettingsDisplayRoute: SettingsDisplayRoute,
   SettingsDocprocessRoute: SettingsDocprocessRoute,
+  SettingsE2bRoute: SettingsE2bRoute,
   SettingsGeneralRoute: SettingsGeneralRoute,
   SettingsMcpRoute: SettingsMcpRouteWithChildren,
   SettingsMemoryRoute: SettingsMemoryRoute,
+  SettingsMinappRoute: SettingsMinappRoute,
   SettingsModelRoute: SettingsModelRoute,
   SettingsNotesRoute: SettingsNotesRoute,
   SettingsProviderRoute: SettingsProviderRoute,
@@ -1092,6 +1131,7 @@ const SettingsRouteChildren: SettingsRouteChildren = {
   SettingsQuickphraseRoute: SettingsQuickphraseRoute,
   SettingsSelectionAssistantRoute: SettingsSelectionAssistantRoute,
   SettingsShortcutRoute: SettingsShortcutRoute,
+  SettingsSkillsRoute: SettingsSkillsRoute,
   SettingsWebsearchRoute: SettingsWebsearchRouteWithChildren,
   SettingsIndexRoute: SettingsIndexRoute,
 }

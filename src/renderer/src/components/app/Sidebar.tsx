@@ -232,7 +232,8 @@ const MainMenusContainer = styled.div`
   display: flex;
   flex: 1;
   flex-direction: column;
-  overflow: hidden;
+  overflow-y: auto;
+  overflow-x: hidden;
 `
 
 const Menus = styled.div`
